@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>TTTN — UI Prototype</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: #f0f2f5; min-height: 100vh; }
+    header { background: #1677ff; color: #fff; padding: 24px 40px; }
+    header h1 { font-size: 22px; font-weight: 600; }
+    header p { font-size: 13px; opacity: 0.8; margin-top: 4px; }
+    main { max-width: 960px; margin: 32px auto; padding: 0 24px; }
+    .section { margin-bottom: 32px; }
+    .section-title {
+      font-size: 12px; font-weight: 600; text-transform: uppercase;
+      letter-spacing: 0.08em; color: #8c8c8c; margin-bottom: 12px;
+      padding-bottom: 8px; border-bottom: 1px solid #e8e8e8;
+    }
+    .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 12px; }
+    .card {
+      background: #fff; border-radius: 8px; padding: 16px 20px;
+      border: 1px solid #e8e8e8; text-decoration: none; color: inherit;
+      display: flex; align-items: center; gap: 14px;
+      transition: box-shadow 0.2s, border-color 0.2s;
+    }
+    .card:hover { box-shadow: 0 4px 16px rgba(22,119,255,0.12); border-color: #1677ff; }
+    .badge {
+      font-size: 10px; font-weight: 700; padding: 2px 8px; border-radius: 4px;
+      white-space: nowrap; flex-shrink: 0;
+    }
+    .badge-gv  { background: #e6f4ff; color: #0958d9; }
+    .badge-pdt { background: #f6ffed; color: #389e0d; }
+    .badge-sv  { background: #fff7e6; color: #d46b08; }
+    .card-name { font-size: 13px; font-weight: 500; color: #262626; }
+    .card-code { font-size: 11px; color: #8c8c8c; margin-top: 2px; }
+    footer { text-align: center; padding: 32px; color: #bfbfbf; font-size: 12px; }
+  </style>
+</head>
+<body>
+<header>
+  <h1>Hệ thống Quản lý Thực tập Tốt nghiệp</h1>
+  <p>UI Prototype — Đồ án Thực tập Tốt nghiệp</p>
+</header>
+<main>
+
+  <div class="section">
+    <div class="section-title">Giảng viên hướng dẫn (GV)</div>
+    <div class="grid">
+      <a class="card" href="Output/UI/MH-GV-01_InternshipTracking.html">
+        <span class="badge badge-gv">GV</span>
+        <div>
+          <div class="card-name">Theo dõi thực tập</div>
+          <div class="card-code">MH-GV-01</div>
+        </div>
+      </a>
+      <a class="card" href="Output/UI/MH-GV-02_ChangeRequestApproval.html">
+        <span class="badge badge-gv">GV</span>
+        <div>
+          <div class="card-name">Phê duyệt thay đổi</div>
+          <div class="card-code">MH-GV-02</div>
+        </div>
+      </a>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="section-title">Phòng Đào tạo (PDT)</div>
+    <div class="grid">
+      <a class="card" href="Output/UI/MH-PDT-00_Dashboard.html">
+        <span class="badge badge-pdt">PDT</span>
+        <div>
+          <div class="card-name">Dashboard</div>
+          <div class="card-code">MH-PDT-00</div>
+        </div>
+      </a>
+      <a class="card" href="Output/UI/MH-PDT-01_InternshipRound.html">
+        <span class="badge badge-pdt">PDT</span>
+        <div>
+          <div class="card-name">Quản lý đợt thực tập</div>
+          <div class="card-code">MH-PDT-01</div>
+        </div>
+      </a>
+      <a class="card" href="Output/UI/MH-PDT-04_InternshipRound_Create.html">
+        <span class="badge badge-pdt">PDT</span>
+        <div>
+          <div class="card-name">Tạo đợt thực tập</div>
+          <div class="card-code">MH-PDT-04</div>
+        </div>
+      </a>
+      <a class="card" href="Output/UI/MH-PDT-05_StudentEligibility.html">
+        <span class="badge badge-pdt">PDT</span>
+        <div>
+          <div class="card-name">Điều kiện sinh viên</div>
+          <div class="card-code">MH-PDT-05</div>
+        </div>
+      </a>
+      <a class="card" href="Output/UI/MH-PDT-06_InternshipStudents.html">
+        <span class="badge badge-pdt">PDT</span>
+        <div>
+          <div class="card-name">Danh sách SV thực tập</div>
+          <div class="card-code">MH-PDT-06</div>
+        </div>
+      </a>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="section-title">Sinh viên (SV)</div>
+    <div class="grid">
+      <a class="card" href="Output/UI/MH-SV-01_MyInternships.html">
+        <span class="badge badge-sv">SV</span>
+        <div>
+          <div class="card-name">Thực tập của tôi</div>
+          <div class="card-code">MH-SV-01</div>
+        </div>
+      </a>
+    </div>
+  </div>
+
+</main>
+<footer>TTTN UI Prototype · vienbkademy2305-hub</footer>
+</body>
+</html>

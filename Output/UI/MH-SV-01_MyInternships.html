@@ -1,0 +1,1228 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Quản lý tốt nghiệp | Sinh viên</title>
+  <link rel="stylesheet" href="_styles.css">
+  <style>
+    .tab-panel { display: none; }
+    .tab-panel.active { display: block; }
+    /* Row highlight */
+    tr.row-fail td { background: #fff8f8; }
+    tr.row-fail:hover td { background: #fff2f0; }
+
+    /* Badge trạng thái 8 bước — đồng bộ PDT-06 */
+    [class^="tpd-"]{padding:2px 10px;border-radius:10px;font-size:12px;white-space:nowrap;border:1px solid}
+    .tpd-0{background:#f5f5f5;color:#8c8c8c;border-color:#d9d9d9}
+    .tpd-1{background:#e6fffb;color:#08979c;border-color:#87e8de}
+    .tpd-2{background:#fff7e6;color:#d46b08;border-color:#ffd591}
+    .tpd-3{background:#fff1f0;color:#cf1322;border-color:#ffa39e}
+    .tpd-4{background:#f9f0ff;color:#722ed1;border-color:#d3adf7}
+    .tpd-5{background:#e6f4ff;color:#1677ff;border-color:#91caff}
+    .tpd-6{background:#f6ffed;color:#389e0d;border-color:#b7eb8f}
+    .tpd-7{background:#f0f5ff;color:#2f54eb;border-color:#adc6ff}
+
+    .cell-link{color:var(--primary);text-decoration:underline;cursor:pointer;font-size:13px}
+    .cell-na{color:var(--text-3);font-style:italic;font-size:13px}
+    .cell-score{font-weight:600;font-size:13px;color:var(--text-1)}
+    .cell-score-empty{color:var(--text-3);font-size:13px}
+    .note-warn{color:var(--error);font-size:12px;font-style:italic}
+    .tbl td{vertical-align:middle;padding:8px 10px}
+
+    /* Upload */
+    .upload-zone{border:2px dashed var(--border);border-radius:8px;padding:20px 16px;text-align:center;cursor:pointer;transition:border-color .2s,background .2s;background:#fafafa}
+    .upload-zone:hover{border-color:var(--primary);background:#e6f4ff}
+    .upload-zone .uz-icon{font-size:28px;line-height:1;margin-bottom:6px}
+    .upload-zone .uz-text{font-size:13px;color:var(--text-2);font-weight:500}
+    .upload-zone .uz-hint{font-size:12px;color:var(--text-3);margin-top:2px}
+    .upload-list{margin-top:10px;display:flex;flex-direction:column;gap:6px}
+    .upload-item{display:flex;align-items:center;gap:8px;padding:7px 10px;border:1px solid var(--border);border-radius:6px;background:#fff;font-size:13px}
+    .upload-item .ui-icon{font-size:16px;flex-shrink:0}
+    .upload-item .ui-name{flex:1;color:var(--primary);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+    .upload-item .ui-size{font-size:11px;color:var(--text-3);flex-shrink:0}
+    .upload-item .ui-del{color:var(--error);cursor:pointer;flex-shrink:0;background:none;border:none;font-size:16px;padding:0;line-height:1}
+
+    /* Plan table (read-only view) */
+    .plan-tbl{width:100%;border-collapse:collapse;font-size:13px}
+    .plan-tbl th,.plan-tbl td{padding:8px 10px;border:1px solid var(--border);vertical-align:middle}
+    .plan-tbl th{background:#fafafa;font-weight:500;white-space:nowrap}
+  </style>
+</head>
+<body>
+<div class="app">
+
+  <!-- Sidebar Sinh viên -->
+  <nav class="sidebar">
+    <div class="sb-logo">
+      <div class="sb-logo-icon">🎓</div>
+      <div>
+        <div style="font-weight:700;font-size:14px">HTQT Đại học</div>
+        <div class="text-muted text-sm">Cổng Sinh viên</div>
+      </div>
+    </div>
+    <div class="sb-user">
+      <div class="av">SV</div>
+      <div>
+        <div style="font-size:13px;font-weight:600">Nguyễn Văn An</div>
+        <span class="text-muted text-sm">B22DCCN001 · K68</span>
+      </div>
+    </div>
+    <ul class="sb-menu">
+      <li><a href="#">🏠&nbsp; Trang chủ</a></li>
+      <li class="active">
+        <a href="#">🎓&nbsp; Quản lý tốt nghiệp</a>
+        <ul class="sb-sub open">
+          <li class="active" id="sub-dot-hoc-tap">
+            <a href="#" onclick="switchSub(event,'dot-hoc-tap')">📚 Đợt học tập</a>
+          </li>
+          <li id="sub-thuc-tap">
+            <a href="#" onclick="switchSub(event,'thuc-tap')">🏢 Thực tập</a>
+          </li>
+        </ul>
+      </li>
+      <li><a href="#">👤&nbsp; Hồ sơ cá nhân</a></li>
+      <li><a href="#">📰&nbsp; Thông báo</a></li>
+      <li><a href="#">❓&nbsp; Hỗ trợ</a></li>
+    </ul>
+  </nav>
+
+  <!-- Main -->
+  <div class="main">
+    <header class="app-header">
+      <span class="h-breadcrumb">🎓 <strong>Quản lý tốt nghiệp</strong></span>
+      <div class="h-right">
+        <div class="bw">
+          <button class="btn btn-link" style="font-size:18px">🔔</button>
+          <span class="bc">1</span>
+        </div>
+        <div class="av">SV</div>
+      </div>
+    </header>
+
+    <main class="content">
+
+      <!-- ===== TAB: Đợt học tập ===== -->
+      <div class="tab-panel active" id="tab-dot-hoc-tap">
+        <div class="card" style="padding:0;overflow:auto">
+          <div style="padding:14px 20px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between">
+            <span style="font-weight:600;font-size:14px">B22DCCN001 — Nguyễn Văn An</span>
+            <span class="text-muted text-sm">Tổng: 4 đợt</span>
+          </div>
+          <div class="tbl-wrap">
+            <table class="tbl" style="min-width:780px">
+              <thead>
+                <tr>
+                  <th style="width:52px;text-align:center">STT</th>
+                  <th style="min-width:150px">Mã đợt</th>
+                  <th style="min-width:240px">Tên đợt</th>
+                  <th style="min-width:160px">Loại hình</th>
+                  <th style="min-width:150px">TT Điều kiện</th>
+                  <th style="text-align:center;min-width:130px">Thao tác</th>
+                </tr>
+              </thead>
+              <tbody>
+
+                <!-- Đợt 1: Đủ điều kiện -->
+                <tr>
+                  <td style="text-align:center;color:var(--text-3)">1</td>
+                  <td><span style="font-weight:600;font-size:12px;font-family:monospace;letter-spacing:.3px">TTTN_2526_K1</span></td>
+                  <td>Thực tập tốt nghiệp HK1 2025-2026</td>
+                  <td><span class="tag" style="color:#531dab;background:#f9f0ff;border-color:#d3adf7">Thực tập tốt nghiệp</span></td>
+                  <td><span class="tag tag-success">✓ Đủ điều kiện</span></td>
+                  <td style="text-align:center">
+                    <button class="btn btn-link btn-sm" onclick="openCondPopup('TTTN_2526_K1')">🔍 Chi tiết</button>
+                  </td>
+                </tr>
+
+                <!-- Đợt 2: Không đủ ĐK -->
+                <tr class="row-fail">
+                  <td style="text-align:center;color:var(--text-3)">2</td>
+                  <td><span style="font-weight:600;font-size:12px;font-family:monospace;letter-spacing:.3px">TTTN_2425_K2</span></td>
+                  <td>Thực tập tốt nghiệp HK2 2024-2025</td>
+                  <td><span class="tag" style="color:#531dab;background:#f9f0ff;border-color:#d3adf7">Thực tập tốt nghiệp</span></td>
+                  <td><span class="tag tag-error">✗ Không đủ ĐK</span></td>
+                  <td style="text-align:center">
+                    <button class="btn btn-link btn-sm" onclick="openCondPopup('TTTN_2425_K2')">🔍 Chi tiết</button>
+                  </td>
+                </tr>
+
+                <!-- Đợt 3: Đủ điều kiện -->
+                <tr>
+                  <td style="text-align:center;color:var(--text-3)">3</td>
+                  <td><span style="font-weight:600;font-size:12px;font-family:monospace;letter-spacing:.3px">KIEN_2324_HE</span></td>
+                  <td>Kiến tập HK hè 2023-2024</td>
+                  <td><span class="tag" style="color:#0958d9;background:#e6f4ff;border-color:#91caff">Kiến tập</span></td>
+                  <td><span class="tag tag-success">✓ Đủ điều kiện</span></td>
+                  <td style="text-align:center">
+                    <button class="btn btn-link btn-sm" onclick="openCondPopup('KIEN_2324_HE')">🔍 Chi tiết</button>
+                  </td>
+                </tr>
+
+                <!-- Đợt 4: Đủ điều kiện – đã hoàn thành -->
+                <tr>
+                  <td style="text-align:center;color:var(--text-3)">4</td>
+                  <td><span style="font-weight:600;font-size:12px;font-family:monospace;letter-spacing:.3px">TTTN_2324_K1</span></td>
+                  <td>Thực tập tốt nghiệp HK1 2023-2024</td>
+                  <td><span class="tag" style="color:#531dab;background:#f9f0ff;border-color:#d3adf7">Thực tập tốt nghiệp</span></td>
+                  <td><span class="tag tag-success">✓ Đủ điều kiện</span></td>
+                  <td style="text-align:center">
+                    <button class="btn btn-link btn-sm" onclick="openCondPopup('TTTN_2324_K1')">🔍 Chi tiết</button>
+                  </td>
+                </tr>
+
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+      <!-- /TAB: Đợt học tập -->
+
+      <!-- ===== TAB: Thực tập ===== -->
+      <div class="tab-panel" id="tab-thuc-tap">
+        <div class="card" style="padding:0">
+          <div style="padding:14px 20px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between">
+            <span style="font-weight:600;font-size:14px">B22DCCN001 — Nguyễn Văn An &nbsp;|&nbsp; <span class="text-muted" style="font-weight:400">Sắp xếp: Đợt mới nhất lên đầu</span></span>
+          </div>
+          <div class="tbl-wrap" style="overflow-x:auto">
+            <table class="tbl" style="min-width:1260px">
+              <thead>
+                <tr>
+                  <th style="width:44px;text-align:center">STT</th>
+                  <th style="min-width:140px">Đợt TT</th>
+                  <th style="min-width:150px">Cơ sở TT</th>
+                  <th style="min-width:170px">Giảng viên HD</th>
+                  <th style="text-align:center;min-width:130px">Đề cương</th>
+                  <th style="text-align:center;min-width:110px">File Báo cáo</th>
+                  <th style="text-align:center;min-width:80px">Điểm QT</th>
+                  <th style="text-align:center;min-width:80px">Điểm BC</th>
+                  <th style="text-align:center;min-width:170px">Trạng thái</th>
+                  <th style="min-width:180px">Ghi chú</th>
+                  <th style="text-align:center;min-width:100px">Thao tác</th>
+                </tr>
+              </thead>
+              <tbody>
+
+                <!-- Dòng 1: Chờ GVHD duyệt đề cương -->
+                <tr>
+                  <td style="text-align:center;color:var(--text-3)">1</td>
+                  <td>
+                    <div style="font-weight:600;font-size:12px;font-family:monospace">TTTN_2526_K1</div>
+                    <div class="text-muted text-sm">TTTN HK1 2025-2026</div>
+                  </td>
+                  <td style="font-size:13px">FPT Software</td>
+                  <td style="font-size:12px;color:var(--text-2)">TS. Trần Triệu Long</td>
+                  <td style="text-align:center">
+                    <span class="cell-link" onclick="openSvDeCanvas('TTTN_2526_K1')">Chi tiết</span>
+                  </td>
+                  <td style="text-align:center">
+                    <span class="cell-na" title="Chỉ mở sau khi đề cương được duyệt">N/A</span>
+                  </td>
+                  <td style="text-align:center"><span class="cell-score-empty">_._</span></td>
+                  <td style="text-align:center"><span class="cell-score-empty">_._</span></td>
+                  <td style="text-align:center"><span class="tpd-2">● Chờ GVHD duyệt</span></td>
+                  <td style="color:var(--text-3);font-style:italic;font-size:12px">—</td>
+                  <td style="text-align:center">
+                    <div style="display:flex;gap:6px;justify-content:center">
+                      <button class="btn btn-link btn-sm" title="Yêu cầu gia hạn" onclick="openYeuCauGiaHan('TTTN_2526_K1')" style="font-size:16px;padding:2px 4px">⏰</button>
+                      <button class="btn btn-link btn-sm" title="Yêu cầu đổi cơ sở TT" onclick="openYeuCauDoiCstt('TTTN_2526_K1')" style="font-size:16px;padding:2px 4px">🔄</button>
+                      <button class="btn btn-link btn-sm" title="Yêu cầu đổi đề tài" onclick="openYeuCauDoiDeTai('TTTN_2526_K1')" style="font-size:16px;padding:2px 4px">📝</button>
+                    </div>
+                  </td>
+                </tr>
+
+                <!-- Dòng 2: Yêu cầu chỉnh sửa đề cương -->
+                <tr class="row-fail">
+                  <td style="text-align:center;color:var(--text-3)">2</td>
+                  <td>
+                    <div style="font-weight:600;font-size:12px;font-family:monospace">TTTN_2425_K2</div>
+                    <div class="text-muted text-sm">TTTN HK2 2024-2025</div>
+                  </td>
+                  <td style="font-size:13px">Viettel IDC</td>
+                  <td style="font-size:12px;color:var(--text-2)">TS. Trần Triệu Long<br><span style="color:var(--text-3)">ThS. Nguyễn Đình Hùng</span></td>
+                  <td style="text-align:center">
+                    <button class="btn btn-sm" style="background:var(--warning);color:#fff;border-color:var(--warning);font-size:11px" onclick="openSvSubmitDc('TTTN_2425_K2')">📤 Nộp lại</button>
+                  </td>
+                  <td style="text-align:center">
+                    <span class="cell-na" title="Chỉ mở sau khi đề cương được duyệt">N/A</span>
+                  </td>
+                  <td style="text-align:center"><span class="cell-score-empty">_._</span></td>
+                  <td style="text-align:center"><span class="cell-score-empty">_._</span></td>
+                  <td style="text-align:center"><span class="tpd-3">● Yêu cầu chỉnh sửa</span></td>
+                  <td>
+                    <span class="note-warn">⚠️ Bổ sung chi tiết Tuần 3-4. Kiểm tra lại mục tiêu công việc.</span>
+                  </td>
+                  <td style="text-align:center">
+                    <div style="display:flex;gap:6px;justify-content:center">
+                      <button class="btn btn-link btn-sm" title="Yêu cầu gia hạn" onclick="openYeuCauGiaHan('TTTN_2425_K2')" style="font-size:16px;padding:2px 4px">⏰</button>
+                      <button class="btn btn-link btn-sm" title="Yêu cầu đổi cơ sở TT" onclick="openYeuCauDoiCstt('TTTN_2425_K2')" style="font-size:16px;padding:2px 4px">🔄</button>
+                      <button class="btn btn-link btn-sm" title="Yêu cầu đổi đề tài" onclick="openYeuCauDoiDeTai('TTTN_2425_K2')" style="font-size:16px;padding:2px 4px">📝</button>
+                    </div>
+                  </td>
+                </tr>
+
+                <!-- Dòng 3: Đang thực hiện — đề cương đã duyệt, chờ nộp BC -->
+                <tr>
+                  <td style="text-align:center;color:var(--text-3)">3</td>
+                  <td>
+                    <div style="font-weight:600;font-size:12px;font-family:monospace">KIEN_2324_HE</div>
+                    <div class="text-muted text-sm">Kiến tập HK hè 2023-2024</div>
+                  </td>
+                  <td style="font-size:13px">Tập đoàn VNPT</td>
+                  <td style="font-size:12px;color:var(--text-2)">ThS. Lê Thị Thu Hương</td>
+                  <td style="text-align:center">
+                    <span class="cell-link" onclick="openSvDeCanvas('KIEN_2324_HE')">Chi tiết</span>
+                  </td>
+                  <td style="text-align:center">
+                    <button class="btn btn-primary btn-sm" onclick="openSvFileBc('KIEN_2324_HE')">📎 Nộp BC</button>
+                  </td>
+                  <td style="text-align:center"><span class="cell-score-empty">_._</span></td>
+                  <td style="text-align:center"><span class="cell-score-empty">_._</span></td>
+                  <td style="text-align:center"><span class="tpd-5">● Đang thực hiện</span></td>
+                  <td style="color:var(--text-3);font-style:italic;font-size:12px">—</td>
+                  <td style="text-align:center">
+                    <div style="display:flex;gap:6px;justify-content:center">
+                      <button class="btn btn-link btn-sm" title="Yêu cầu gia hạn" onclick="openYeuCauGiaHan('KIEN_2324_HE')" style="font-size:16px;padding:2px 4px">⏰</button>
+                      <button class="btn btn-link btn-sm" title="Yêu cầu đổi cơ sở TT" onclick="openYeuCauDoiCstt('KIEN_2324_HE')" style="font-size:16px;padding:2px 4px">🔄</button>
+                      <button class="btn btn-link btn-sm" title="Yêu cầu đổi đề tài" onclick="openYeuCauDoiDeTai('KIEN_2324_HE')" style="font-size:16px;padding:2px 4px">📝</button>
+                    </div>
+                  </td>
+                </tr>
+
+                <!-- Dòng 4: Đã công bố điểm -->
+                <tr>
+                  <td style="text-align:center;color:var(--text-3)">4</td>
+                  <td>
+                    <div style="font-weight:600;font-size:12px;font-family:monospace">TTTN_2324_K1</div>
+                    <div class="text-muted text-sm">TTTN HK1 2023-2024</div>
+                  </td>
+                  <td style="font-size:13px">Công ty ABC Tech</td>
+                  <td style="font-size:12px;color:var(--text-2)">TS. Nguyễn Mạnh Cường</td>
+                  <td style="text-align:center">
+                    <span class="cell-link" onclick="openSvDeCanvas('TTTN_2324_K1')">Chi tiết</span>
+                  </td>
+                  <td style="text-align:center">
+                    <span class="cell-link" onclick="openSvFileBc('TTTN_2324_K1')">Chi tiết</span>
+                  </td>
+                  <td style="text-align:center"><span class="cell-score">8.5</span></td>
+                  <td style="text-align:center"><span class="cell-score">9.0</span></td>
+                  <td style="text-align:center"><span class="tpd-7">● Đã công bố</span></td>
+                  <td style="color:var(--text-3);font-style:italic;font-size:12px">—</td>
+                  <td style="text-align:center">
+                    <span class="cell-na" style="font-size:12px">—</span>
+                  </td>
+                </tr>
+
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+      <!-- /TAB: Thực tập -->
+
+    </main>
+  </div>
+</div>
+
+<!-- ======================== POPUP: CHI TIẾT ĐIỀU KIỆN ======================== -->
+<div class="overlay hidden" id="modal-cond">
+  <div class="modal-box w640">
+    <div class="modal-hd">
+      <span class="modal-title">🔍 Chi tiết Điều kiện — <span id="cond-title-ten"></span> (<span id="cond-title-ma"></span>)</span>
+      <button class="modal-close" onclick="closeModal('modal-cond')">✕</button>
+    </div>
+    <div class="modal-bd">
+      <div id="cond-alert" style="margin-bottom:16px"></div>
+      <div class="tbl-wrap">
+        <table class="tbl">
+          <thead>
+            <tr>
+              <th>Điều kiện</th>
+              <th style="width:140px">Giá trị yêu cầu</th>
+              <th style="width:140px">Giá trị thực tế</th>
+              <th style="text-align:center;width:100px">Kết quả</th>
+            </tr>
+          </thead>
+          <tbody id="cond-tbody"></tbody>
+        </table>
+      </div>
+    </div>
+    <div class="modal-ft">
+      <button class="btn btn-default" onclick="closeModal('modal-cond')">Đóng</button>
+    </div>
+  </div>
+</div>
+
+<!-- ======================== POPUP: XEM ĐỀ CƯƠNG (SV — read-only) ======================== -->
+<div class="overlay hidden" id="modal-sv-decanvas">
+  <div class="modal-box" style="width:860px;max-height:92vh">
+    <div class="modal-hd">
+      <span class="modal-title">📄 Xem Đề cương / Kế hoạch — <span id="svdc-dot"></span></span>
+      <button class="modal-close" onclick="closeModal('modal-sv-decanvas')">✕</button>
+    </div>
+    <div class="modal-bd" style="overflow-y:auto">
+
+      <div class="sec-title"><span class="sec-badge">1</span> Thông tin Cơ sở TT</div>
+      <div class="f-row col-2" style="margin-bottom:20px">
+        <div class="fi" style="grid-column:1/-1">
+          <label>Tên Cơ sở TT</label>
+          <input class="fc" type="text" id="svdc-dn" readonly style="background:#fafafa;cursor:default">
+        </div>
+        <div class="fi">
+          <label>Tỉnh / Thành phố</label>
+          <input class="fc" type="text" id="svdc-tinh" readonly style="background:#fafafa;cursor:default">
+        </div>
+        <div class="fi">
+          <label>Phường / Xã</label>
+          <input class="fc" type="text" id="svdc-phuong" readonly style="background:#fafafa;cursor:default">
+        </div>
+        <div class="fi">
+          <label>Địa chỉ chi tiết</label>
+          <input class="fc" type="text" id="svdc-addr" readonly style="background:#fafafa;cursor:default">
+        </div>
+        <div class="fi">
+          <label>Ngày bắt đầu</label>
+          <input class="fc" type="date" id="svdc-from" readonly style="background:#fafafa;cursor:default">
+        </div>
+        <div class="fi">
+          <label>Ngày kết thúc</label>
+          <input class="fc" type="date" id="svdc-to" readonly style="background:#fafafa;cursor:default">
+        </div>
+      </div>
+
+      <div class="sec-title"><span class="sec-badge">2</span> Kế hoạch Công việc theo Tuần</div>
+      <div style="overflow-x:auto;margin-bottom:16px">
+        <table class="plan-tbl">
+          <thead>
+            <tr>
+              <th style="width:36px;text-align:center">#</th>
+              <th style="width:80px">Tuần</th>
+              <th style="min-width:220px">Nhiệm vụ / Công việc</th>
+              <th style="min-width:200px">Kết quả đạt được</th>
+              <th style="min-width:120px">Ghi chú</th>
+            </tr>
+          </thead>
+          <tbody id="svdc-plan-body"></tbody>
+        </table>
+      </div>
+
+      <div id="svdc-alert"></div>
+    </div>
+    <div class="modal-ft">
+      <button class="btn btn-default" onclick="closeModal('modal-sv-decanvas')">Đóng</button>
+    </div>
+  </div>
+</div>
+
+<!-- ======================== POPUP: NỘP / NỘP LẠI ĐỀ CƯƠNG (SV) ======================== -->
+<div class="overlay hidden" id="modal-sv-submit-dc">
+  <div class="modal-box" style="width:860px;max-height:92vh">
+    <div class="modal-hd">
+      <span class="modal-title">📤 Nộp Đề cương / Kế hoạch — <span id="svsdot"></span></span>
+      <button class="modal-close" onclick="closeModal('modal-sv-submit-dc')">✕</button>
+    </div>
+    <div class="modal-bd" style="overflow-y:auto">
+
+      <div id="svs-alert-top" style="margin-bottom:14px"></div>
+
+      <div class="sec-title"><span class="sec-badge">1</span> Thông tin Cơ sở TT</div>
+      <div class="f-row col-2" style="margin-bottom:20px">
+        <div class="fi" style="grid-column:1/-1">
+          <label>Tên Cơ sở TT <span class="req">*</span></label>
+          <input class="fc" type="text" id="svs-dn" placeholder="Tên công ty / tổ chức thực tập">
+        </div>
+        <div class="fi">
+          <label>Tỉnh / Thành phố <span class="req">*</span></label>
+          <select class="fc" id="svs-tinh">
+            <option>-- Chọn --</option>
+            <option>Hà Nội</option>
+            <option>TP Hồ Chí Minh</option>
+            <option>Đà Nẵng</option>
+            <option>Khác</option>
+          </select>
+        </div>
+        <div class="fi">
+          <label>Phường / Xã <span class="req">*</span></label>
+          <input class="fc" type="text" id="svs-phuong" placeholder="Tên phường / xã">
+        </div>
+        <div class="fi">
+          <label>Địa chỉ chi tiết</label>
+          <input class="fc" type="text" id="svs-addr" placeholder="Số nhà, tên đường...">
+        </div>
+        <div class="fi">
+          <label>Ngày bắt đầu <span class="req">*</span></label>
+          <input class="fc" type="date" id="svs-from">
+        </div>
+        <div class="fi">
+          <label>Ngày kết thúc <span class="req">*</span></label>
+          <input class="fc" type="date" id="svs-to">
+        </div>
+      </div>
+
+      <div class="sec-title"><span class="sec-badge">2</span> Kế hoạch Công việc theo Tuần</div>
+      <div style="overflow-x:auto;margin-bottom:8px">
+        <table class="plan-tbl" id="svs-plan-table">
+          <thead>
+            <tr>
+              <th style="width:36px;text-align:center">#</th>
+              <th style="width:80px">Tuần <span class="req">*</span></th>
+              <th style="min-width:220px">Nhiệm vụ / Công việc <span class="req">*</span></th>
+              <th style="min-width:120px">Ghi chú</th>
+              <th style="width:40px"></th>
+            </tr>
+          </thead>
+          <tbody id="svs-plan-body">
+            <tr>
+              <td style="text-align:center;color:var(--text-3)">1</td>
+              <td><input class="fc" type="text" placeholder="Tuần 1"></td>
+              <td><textarea class="fc" style="height:52px;resize:none" placeholder="Mô tả nhiệm vụ..."></textarea></td>
+              <td><input class="fc" type="text" placeholder="Ghi chú..."></td>
+              <td style="text-align:center"><button class="btn btn-link" style="color:var(--error)" onclick="svsPlanDel(this)" title="Xóa dòng">🗑️</button></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <div style="display:flex;align-items:center;gap:8px;margin-top:8px">
+        <button class="btn btn-default btn-sm" onclick="svsPlanAdd()">➕ Thêm tuần</button>
+        <span class="text-muted text-sm">STT tự động tăng</span>
+      </div>
+    </div>
+    <div class="modal-ft">
+      <button class="btn btn-default" onclick="closeModal('modal-sv-submit-dc')">Hủy</button>
+      <button class="btn btn-primary" onclick="submitSvDc()">🚀 Gửi Đề cương</button>
+    </div>
+  </div>
+</div>
+
+<!-- ======================== POPUP: NỘP FILE BÁO CÁO (SV) ======================== -->
+<div class="overlay hidden" id="modal-sv-filebc">
+  <div class="modal-box" style="width:540px">
+    <div class="modal-hd">
+      <span class="modal-title">📋 Báo cáo cuối kỳ — <span id="svbc-dot"></span></span>
+      <button class="modal-close" onclick="closeModal('modal-sv-filebc')">✕</button>
+    </div>
+    <div class="modal-bd">
+
+      <!-- Nếu đã nộp (view mode) -->
+      <div id="svbc-view" style="display:none">
+        <div class="fi">
+          <label>File báo cáo đã nộp</label>
+          <div style="display:flex;align-items:center;gap:10px;padding:10px 12px;border:1px solid var(--border);border-radius:6px;background:#fafafa">
+            <span style="font-size:20px">📄</span>
+            <div style="flex:1">
+              <div id="svbc-filename" style="font-size:13px;font-weight:500;color:var(--primary)"></div>
+              <div id="svbc-submitted" class="text-muted text-sm"></div>
+            </div>
+            <button class="btn btn-default btn-sm">👁️ Xem</button>
+            <button class="btn btn-default btn-sm">⬇️ Tải</button>
+          </div>
+        </div>
+        <div class="fi" id="svbc-link-wrap">
+          <label>Mã nguồn / Sản phẩm</label>
+          <div style="display:flex;align-items:center;gap:8px">
+            <span style="font-size:13px;color:var(--primary);text-decoration:underline;cursor:pointer" id="svbc-link"></span>
+            <button class="btn btn-default btn-sm">🔗 Mở</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Nếu chưa nộp (upload mode) -->
+      <div id="svbc-upload">
+        <div class="alert alert-info" style="margin-bottom:14px">
+          <span class="alert-ico">ℹ️</span>
+          <div class="alert-body"><span class="alert-desc">Chỉ được nộp <strong>1 lần</strong>. Đảm bảo file đúng định dạng và đầy đủ nội dung trước khi gửi.</span></div>
+        </div>
+        <div class="fi">
+          <label>File Báo cáo <span class="req">*</span> &nbsp;<span style="font-weight:400;color:var(--text-3)">(PDF · tối đa 20MB)</span></label>
+          <div class="upload-zone" onclick="document.getElementById('svbc-file-input').click()">
+            <input type="file" id="svbc-file-input" accept=".pdf" style="display:none" onchange="onSvBcFileSelect(this)">
+            <div class="uz-icon">📄</div>
+            <div class="uz-text">Nhấn để chọn hoặc kéo thả file PDF</div>
+            <div class="uz-hint">Chỉ chấp nhận .pdf · Tối đa 20 MB</div>
+          </div>
+          <div class="upload-list" id="svbc-file-list"></div>
+        </div>
+        <div class="fi">
+          <label>Link Mã nguồn / Sản phẩm &nbsp;<span style="font-weight:400;color:var(--text-3)">(không bắt buộc)</span></label>
+          <input class="fc" type="url" id="svbc-link-input" placeholder="https://github.com/...">
+        </div>
+      </div>
+
+    </div>
+    <div class="modal-ft" id="svbc-footer">
+      <button class="btn btn-default" onclick="closeModal('modal-sv-filebc')">Đóng</button>
+      <button class="btn btn-primary" id="svbc-submit-btn" onclick="submitSvBc()">🚀 Nộp Báo cáo</button>
+    </div>
+  </div>
+</div>
+
+<!-- ======================== POPUP: YÊU CẦU GIA HẠN ======================== -->
+<div class="overlay hidden" id="modal-giahan">
+  <div class="modal-box" style="width:560px">
+    <div class="modal-hd">
+      <span class="modal-title">⏰ Yêu cầu Gia hạn — <span id="gh-dot"></span></span>
+      <button class="modal-close" onclick="closeModal('modal-giahan')">✕</button>
+    </div>
+    <div class="modal-bd">
+      <div class="alert alert-info" style="margin-bottom:14px">
+        <span class="alert-ico">ℹ️</span>
+        <div class="alert-body"><span class="alert-desc">Yêu cầu gia hạn sẽ được gửi đến Giảng viên HD và Phòng đào tạo để xem xét. Vui lòng điền đầy đủ lý do.</span></div>
+      </div>
+
+      <div class="sec-title" style="font-size:13px;margin-bottom:10px"><span class="sec-badge">1</span> Thông tin gia hạn</div>
+      <div class="f-row col-2" style="margin-bottom:16px">
+        <div class="fi" style="grid-column:1/-1">
+          <label>Loại hình</label>
+          <input class="fc" type="text" id="gh-loaihinh" readonly style="background:#e6f4ff;cursor:default;font-weight:600;color:#0958d9">
+        </div>
+        <div class="fi">
+          <label>Ngày kết thúc hiện tại</label>
+          <input class="fc" type="date" id="gh-to-cu" readonly style="background:#fafafa;cursor:default">
+        </div>
+        <div class="fi">
+          <label>Ngày kết thúc đề nghị <span class="req">*</span></label>
+          <input class="fc" type="date" id="gh-to-moi">
+        </div>
+      </div>
+
+      <div class="sec-title" style="font-size:13px;margin-bottom:10px"><span class="sec-badge">2</span> Lý do gia hạn</div>
+      <div class="fi" style="margin-bottom:16px">
+        <textarea class="fc" id="gh-lydo" style="height:80px;resize:none" placeholder="Nêu rõ lý do cần gia hạn thời gian thực tập..."></textarea>
+        <div class="fe" id="gh-lydo-err" style="display:none">Vui lòng nhập lý do gia hạn</div>
+      </div>
+
+      <div class="sec-title" style="font-size:13px;margin-bottom:10px"><span class="sec-badge">3</span> Tài liệu minh chứng</div>
+      <div class="fi" style="margin-bottom:4px">
+        <label style="font-weight:400;color:var(--text-3);font-size:12px">Không bắt buộc · PDF/Word · tối đa 5MB</label>
+        <div class="upload-zone" onclick="document.getElementById('gh-file-input').click()">
+          <input type="file" id="gh-file-input" accept=".pdf,.doc,.docx" style="display:none" onchange="onGhFileSelect(this)">
+          <div class="uz-icon">📎</div>
+          <div class="uz-text">Nhấn để chọn hoặc kéo thả file</div>
+          <div class="uz-hint">PDF / Word · Tối đa 5 MB</div>
+        </div>
+        <div class="upload-list" id="gh-file-list"></div>
+      </div>
+    </div>
+    <div class="modal-ft">
+      <button class="btn btn-default" onclick="closeModal('modal-giahan')">Hủy</button>
+      <button class="btn btn-primary" onclick="submitGiaHan()">📨 Gửi yêu cầu</button>
+    </div>
+  </div>
+</div>
+
+<!-- ======================== POPUP: YÊU CẦU ĐỔI CƠ SỞ TT ======================== -->
+<div class="overlay hidden" id="modal-doicstt">
+  <div class="modal-box" style="width:620px;max-height:92vh">
+    <div class="modal-hd">
+      <span class="modal-title">🔄 Yêu cầu Đổi Cơ sở TT — <span id="doi-dot"></span></span>
+      <button class="modal-close" onclick="closeModal('modal-doicstt')">✕</button>
+    </div>
+    <div class="modal-bd" style="overflow-y:auto">
+      <div class="alert alert-info" style="margin-bottom:14px">
+        <span class="alert-ico">ℹ️</span>
+        <div class="alert-body"><span class="alert-desc">Yêu cầu đổi cơ sở TT sẽ được gửi đến Phòng đào tạo xem xét. Vui lòng điền thông tin cơ sở TT mới và lý do đổi.</span></div>
+      </div>
+
+      <div class="sec-title" style="font-size:13px;margin-bottom:10px"><span class="sec-badge">1</span> Cơ sở TT hiện tại</div>
+      <div class="f-row col-2" style="margin-bottom:16px">
+        <div class="fi" style="grid-column:1/-1">
+          <label>Tên Cơ sở TT</label>
+          <input class="fc" type="text" id="doi-cu-dn" readonly style="background:#fafafa;cursor:default">
+        </div>
+        <div class="fi">
+          <label>Tỉnh / Thành phố</label>
+          <input class="fc" type="text" id="doi-cu-tinh" readonly style="background:#fafafa;cursor:default">
+        </div>
+        <div class="fi">
+          <label>Phường / Xã</label>
+          <input class="fc" type="text" id="doi-cu-phuong" readonly style="background:#fafafa;cursor:default">
+        </div>
+        <div class="fi">
+          <label>Địa chỉ chi tiết</label>
+          <input class="fc" type="text" id="doi-cu-addr" readonly style="background:#fafafa;cursor:default">
+        </div>
+        <div class="fi">
+          <label>Ngày bắt đầu</label>
+          <input class="fc" type="date" id="doi-cu-from" readonly style="background:#fafafa;cursor:default">
+        </div>
+        <div class="fi">
+          <label>Ngày kết thúc</label>
+          <input class="fc" type="date" id="doi-cu-to" readonly style="background:#fafafa;cursor:default">
+        </div>
+      </div>
+
+      <div class="sec-title" style="font-size:13px;margin-bottom:10px"><span class="sec-badge">2</span> Cơ sở TT mới đề nghị</div>
+      <div class="f-row col-2" style="margin-bottom:16px">
+        <div class="fi" style="grid-column:1/-1">
+          <label>Tên Cơ sở TT mới <span class="req">*</span></label>
+          <input class="fc" type="text" id="doi-moi-dn" placeholder="Tên công ty / tổ chức thực tập mới">
+        </div>
+        <div class="fi">
+          <label>Tỉnh / Thành phố <span class="req">*</span></label>
+          <select class="fc" id="doi-moi-tinh">
+            <option>-- Chọn --</option>
+            <option>Hà Nội</option>
+            <option>TP Hồ Chí Minh</option>
+            <option>Đà Nẵng</option>
+            <option>Khác</option>
+          </select>
+        </div>
+        <div class="fi">
+          <label>Phường / Xã <span class="req">*</span></label>
+          <input class="fc" type="text" id="doi-moi-phuong" placeholder="Tên phường / xã">
+        </div>
+        <div class="fi">
+          <label>Địa chỉ chi tiết</label>
+          <input class="fc" type="text" id="doi-moi-addr" placeholder="Số nhà, tên đường...">
+        </div>
+        <div class="fi">
+          <label>Người liên hệ tại cơ sở</label>
+          <input class="fc" type="text" id="doi-moi-contact" placeholder="Họ tên người hướng dẫn tại cơ sở">
+        </div>
+      </div>
+
+      <div class="sec-title" style="font-size:13px;margin-bottom:10px"><span class="sec-badge">3</span> Lý do đề nghị đổi</div>
+      <div class="f-row col-2">
+        <div class="fi" style="grid-column:1/-1">
+          <label>Lý do <span class="req">*</span></label>
+          <textarea class="fc" id="doi-lydo" style="height:80px;resize:none" placeholder="Nêu rõ lý do cần đổi cơ sở thực tập..."></textarea>
+        </div>
+        <div class="fi" style="grid-column:1/-1">
+          <label>Tài liệu đính kèm &nbsp;<span style="font-weight:400;color:var(--text-3)">(không bắt buộc · PDF/Word · tối đa 5MB)</span></label>
+          <div class="upload-zone" onclick="document.getElementById('doi-file-input').click()">
+            <input type="file" id="doi-file-input" accept=".pdf,.doc,.docx" style="display:none" onchange="onDoiFileSelect(this)">
+            <div class="uz-icon">📎</div>
+            <div class="uz-text">Nhấn để chọn hoặc kéo thả file</div>
+            <div class="uz-hint">PDF / Word · Tối đa 5 MB</div>
+          </div>
+          <div class="upload-list" id="doi-file-list"></div>
+        </div>
+      </div>
+    </div>
+    <div class="modal-ft">
+      <button class="btn btn-default" onclick="closeModal('modal-doicstt')">Hủy</button>
+      <button class="btn btn-primary" onclick="submitDoiCstt()">📨 Gửi yêu cầu</button>
+    </div>
+  </div>
+</div>
+
+<!-- ======================== POPUP: YÊU CẦU ĐỔI ĐỀ TÀI ======================== -->
+<div class="overlay hidden" id="modal-doidetai">
+  <div class="modal-box" style="width:620px;max-height:92vh">
+    <div class="modal-hd">
+      <span class="modal-title">📝 Yêu cầu Đổi Đề tài — <span id="ddt-dot"></span></span>
+      <button class="modal-close" onclick="closeModal('modal-doidetai')">✕</button>
+    </div>
+    <div class="modal-bd" style="overflow-y:auto">
+      <div class="alert alert-info" style="margin-bottom:14px">
+        <span class="alert-ico">ℹ️</span>
+        <div class="alert-body"><span class="alert-desc">Yêu cầu đổi đề tài sẽ được gửi đến Giảng viên HD và Phòng đào tạo xem xét. Vui lòng điền đầy đủ thông tin đề tài mới và lý do đổi.</span></div>
+      </div>
+
+      <div class="sec-title" style="font-size:13px;margin-bottom:10px"><span class="sec-badge">1</span> Đề tài hiện tại</div>
+      <div class="f-row col-2" style="margin-bottom:16px">
+        <div class="fi" style="grid-column:1/-1">
+          <label>Tên đề tài</label>
+          <input class="fc" type="text" id="ddt-cu-ten" readonly style="background:#fafafa;cursor:default">
+        </div>
+        <div class="fi" style="grid-column:1/-1">
+          <label>Mô tả ngắn</label>
+          <textarea class="fc" id="ddt-cu-mota" readonly style="height:60px;resize:none;background:#fafafa;cursor:default"></textarea>
+        </div>
+      </div>
+
+      <div class="sec-title" style="font-size:13px;margin-bottom:10px"><span class="sec-badge">2</span> Đề tài mới đề nghị</div>
+      <div class="f-row col-2" style="margin-bottom:16px">
+        <div class="fi" style="grid-column:1/-1">
+          <label>Tên đề tài mới <span class="req">*</span></label>
+          <input class="fc" type="text" id="ddt-moi-ten" placeholder="Nhập tên đề tài mới...">
+        </div>
+        <div class="fi" style="grid-column:1/-1">
+          <label>Mô tả / Phạm vi đề tài <span class="req">*</span></label>
+          <textarea class="fc" id="ddt-moi-mota" style="height:80px;resize:none" placeholder="Mô tả ngắn gọn nội dung, phạm vi thực hiện đề tài mới..."></textarea>
+        </div>
+      </div>
+
+      <div class="sec-title" style="font-size:13px;margin-bottom:10px"><span class="sec-badge">3</span> Lý do đề nghị đổi</div>
+      <div class="f-row col-2">
+        <div class="fi" style="grid-column:1/-1">
+          <label>Lý do <span class="req">*</span></label>
+          <textarea class="fc" id="ddt-lydo" style="height:80px;resize:none" placeholder="Nêu rõ lý do cần thay đổi đề tài thực tập..."></textarea>
+          <div class="fe" id="ddt-lydo-err" style="display:none">Vui lòng nhập lý do đổi đề tài</div>
+        </div>
+        <div class="fi" style="grid-column:1/-1">
+          <label>Tài liệu đính kèm &nbsp;<span style="font-weight:400;color:var(--text-3)">(không bắt buộc · PDF/Word · tối đa 5MB)</span></label>
+          <div class="upload-zone" onclick="document.getElementById('ddt-file-input').click()">
+            <input type="file" id="ddt-file-input" accept=".pdf,.doc,.docx" style="display:none" onchange="onDdtFileSelect(this)">
+            <div class="uz-icon">📎</div>
+            <div class="uz-text">Nhấn để chọn hoặc kéo thả file</div>
+            <div class="uz-hint">PDF / Word · Tối đa 5 MB</div>
+          </div>
+          <div class="upload-list" id="ddt-file-list"></div>
+        </div>
+      </div>
+    </div>
+    <div class="modal-ft">
+      <button class="btn btn-default" onclick="closeModal('modal-doidetai')">Hủy</button>
+      <button class="btn btn-primary" onclick="submitDoiDeTai()">📨 Gửi yêu cầu</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast-box" id="toast-box"></div>
+
+<script>
+/* ---- Sidebar sub-nav switching ---- */
+function switchSub(e, tab) {
+  e.preventDefault();
+  document.querySelectorAll('.sb-sub li').forEach(li => li.classList.remove('active'));
+  document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+  e.currentTarget.closest('li').classList.add('active');
+  document.getElementById('tab-' + tab).classList.add('active');
+  // Update breadcrumb label
+  const labels = { 'dot-hoc-tap': 'Đợt học tập', 'thuc-tap': 'Thực tập' };
+  document.querySelector('.h-breadcrumb').innerHTML =
+    '🎓 Quản lý tốt nghiệp &nbsp;/&nbsp; <strong>' + labels[tab] + '</strong>';
+}
+
+/* ---- Condition data (table format — đồng bộ PDT-05) ---- */
+const COND_DB = {
+  'TTTN_2526_K1': {
+    ten: 'Nguyễn Văn An',
+    pass: true,
+    rows: [
+      { dk: 'GPA',                              yc: '>= 2.50', tt: '3.20', ok: true  },
+      { dk: 'Số tín chỉ tích lũy',              yc: '>= 80',   tt: '95',   ok: true  },
+      { dk: 'Số học phần nợ',                   yc: '<= 2',    tt: '1',    ok: true  },
+      { dk: 'Không thuộc diện cảnh báo học vụ', yc: '= Không', tt: 'Không',ok: true  },
+      { dk: 'Đạt chuẩn đầu ra ngoại ngữ',       yc: '= Đạt',   tt: 'Đạt',  ok: true  },
+      { dk: 'Học phí học kỳ hiện tại',          yc: 'Đã nộp',  tt: 'Đã nộp',ok: true },
+    ]
+  },
+  'TTTN_2425_K2': {
+    ten: 'Nguyễn Văn An',
+    pass: false,
+    rows: [
+      { dk: 'GPA',                              yc: '>= 2.50', tt: '2.10', ok: false },
+      { dk: 'Số tín chỉ tích lũy',              yc: '>= 80',   tt: '88',   ok: true  },
+      { dk: 'Số học phần nợ',                   yc: '<= 2',    tt: '3',    ok: false },
+      { dk: 'Không thuộc diện cảnh báo học vụ', yc: '= Không', tt: 'Không',ok: true  },
+      { dk: 'Đạt chuẩn đầu ra ngoại ngữ',       yc: '= Đạt',   tt: 'Chưa', ok: false },
+      { dk: 'Học phí học kỳ hiện tại',          yc: 'Đã nộp',  tt: 'Đã nộp',ok: true },
+    ]
+  },
+  'KIEN_2324_HE': {
+    ten: 'Nguyễn Văn An',
+    pass: true,
+    rows: [
+      { dk: 'GPA',                              yc: '>= 2.00', tt: '3.10', ok: true  },
+      { dk: 'Số tín chỉ tích lũy',              yc: '>= 60',   tt: '75',   ok: true  },
+      { dk: 'Số học phần nợ',                   yc: '<= 3',    tt: '1',    ok: true  },
+      { dk: 'Không thuộc diện cảnh báo học vụ', yc: '= Không', tt: 'Không',ok: true  },
+      { dk: 'Học phí học kỳ hiện tại',          yc: 'Đã nộp',  tt: 'Đã nộp',ok: true },
+    ]
+  },
+  'TTTN_2324_K1': {
+    ten: 'Nguyễn Văn An',
+    pass: true,
+    rows: [
+      { dk: 'GPA',                              yc: '>= 2.50', tt: '3.40', ok: true  },
+      { dk: 'Số tín chỉ tích lũy',              yc: '>= 80',   tt: '102',  ok: true  },
+      { dk: 'Số học phần nợ',                   yc: '<= 2',    tt: '0',    ok: true  },
+      { dk: 'Không thuộc diện cảnh báo học vụ', yc: '= Không', tt: 'Không',ok: true  },
+      { dk: 'Đạt chuẩn đầu ra ngoại ngữ',       yc: '= Đạt',   tt: 'Đạt',  ok: true  },
+      { dk: 'Học phí học kỳ hiện tại',          yc: 'Đã nộp',  tt: 'Đã nộp',ok: true },
+    ]
+  }
+};
+
+function openCondPopup(maDot) {
+  const d = COND_DB[maDot];
+  document.getElementById('cond-title-ma').textContent = maDot;
+  document.getElementById('cond-title-ten').textContent = d.ten;
+
+  const alertHtml = d.pass
+    ? `<div class="alert alert-info"><span class="alert-ico">ℹ️</span><div class="alert-body"><span class="alert-desc">Chỉ hiển thị các điều kiện đang được kích hoạt (Áp dụng = Bật) trong cấu hình đợt.</span></div></div>`
+    : `<div class="alert alert-info"><span class="alert-ico">ℹ️</span><div class="alert-body"><span class="alert-desc">Chỉ hiển thị các điều kiện đang được kích hoạt (Áp dụng = Bật) trong cấu hình đợt.</span></div></div>`;
+  document.getElementById('cond-alert').innerHTML = alertHtml;
+
+  let rows = '';
+  d.rows.forEach(r => {
+    const tag = r.ok
+      ? `<span class="tag tag-success">Đạt</span>`
+      : `<span class="tag tag-error">Không đạt</span>`;
+    const ttStyle = r.ok ? '' : 'color:var(--error);font-weight:600';
+    rows += `<tr>
+      <td>${r.dk}</td>
+      <td>${r.yc}</td>
+      <td style="${ttStyle}">${r.tt}</td>
+      <td style="text-align:center">${tag}</td>
+    </tr>`;
+  });
+  document.getElementById('cond-tbody').innerHTML = rows;
+  document.getElementById('modal-cond').classList.remove('hidden');
+}
+
+function closeModal(id) { document.getElementById(id).classList.add('hidden'); }
+
+/* ---- Dữ liệu đề cương theo đợt ---- */
+const DC_DB = {
+  'TTTN_2526_K1': {
+    dn:'FPT Software', tinh:'Hà Nội', quan:'Cầu Giấy', phuong:'Dịch Vọng Hậu', addr:'Tòa nhà FPT, Phố Duy Tân', from:'2025-09-01', to:'2025-12-31',
+    status:'wait', statusMsg:'Đề cương đang chờ GVHD phê duyệt.',
+    plan:[
+      {tuan:'Tuần 1', cv:'Tìm hiểu quy trình phát triển phần mềm Agile tại FPT', kq:'', gc:''},
+      {tuan:'Tuần 2', cv:'Tham gia sprint planning và thiết kế CSDL module A', kq:'', gc:''},
+      {tuan:'Tuần 3', cv:'Coding backend API RESTful cho module quản lý người dùng', kq:'', gc:''},
+    ]
+  },
+  'TTTN_2425_K2': {
+    dn:'Viettel IDC', tinh:'Hà Nội', quan:'Ba Đình', phuong:'Điện Biên', addr:'Số 1 Giang Văn Minh', from:'2025-02-01', to:'2025-06-30',
+    status:'reject', statusMsg:'Đề cương bị yêu cầu chỉnh sửa.', rejectReason:'Bổ sung chi tiết Tuần 3-4. Kiểm tra lại mục tiêu công việc.',
+    plan:[
+      {tuan:'Tuần 1', cv:'Nghiên cứu hệ thống hạ tầng Viettel IDC', kq:'', gc:''},
+      {tuan:'Tuần 2', cv:'Thiết kế mô hình dữ liệu cho module giám sát', kq:'', gc:''},
+      {tuan:'Tuần 3', cv:'Phát triển module cảnh báo tự động', kq:'', gc:'Cần bổ sung'},
+      {tuan:'Tuần 4', cv:'Kiểm thử và hoàn thiện tài liệu', kq:'', gc:'Cần bổ sung'},
+    ]
+  },
+  'KIEN_2324_HE': {
+    dn:'Tập đoàn VNPT', tinh:'Hà Nội', quan:'Đống Đa', phuong:'Láng Hạ', addr:'Số 57 Huỳnh Thúc Kháng', from:'2024-07-01', to:'2024-09-30',
+    status:'approved', statusMsg:'Đề cương đã được GVHD phê duyệt ngày 10/07/2024.',
+    plan:[
+      {tuan:'Tuần 1', cv:'Tìm hiểu quy trình vận hành hạ tầng mạng VNPT', kq:'Hoàn thành báo cáo tổng quan', gc:''},
+      {tuan:'Tuần 2', cv:'Hỗ trợ cấu hình thiết bị mạng tầng access', kq:'Cấu hình 5 switch', gc:''},
+      {tuan:'Tuần 3', cv:'Viết tài liệu kỹ thuật và báo cáo kiến tập', kq:'', gc:''},
+    ]
+  },
+  'TTTN_2324_K1': {
+    dn:'Công ty ABC Tech', tinh:'TP Hồ Chí Minh', quan:'Quận 1', phuong:'Bến Nghé', addr:'12 Nguyễn Huệ', from:'2023-09-01', to:'2023-12-31',
+    status:'approved', statusMsg:'Đề cương đã được phê duyệt. Đợt đã hoàn thành.',
+    plan:[
+      {tuan:'Tuần 1', cv:'Khảo sát yêu cầu hệ thống quản lý kho', kq:'Tài liệu yêu cầu', gc:''},
+      {tuan:'Tuần 2', cv:'Thiết kế cơ sở dữ liệu', kq:'ERD hoàn chỉnh', gc:''},
+      {tuan:'Tuần 3', cv:'Phát triển module nhập xuất hàng', kq:'Module hoạt động', gc:''},
+      {tuan:'Tuần 4', cv:'Kiểm thử và triển khai', kq:'Sản phẩm bàn giao', gc:''},
+    ]
+  }
+};
+
+function openSvDeCanvas(maDot) {
+  const d = DC_DB[maDot];
+  document.getElementById('svdc-dot').textContent = maDot;
+  document.getElementById('svdc-dn').value     = d.dn;
+  document.getElementById('svdc-tinh').value   = d.tinh;
+  document.getElementById('svdc-phuong').value = d.phuong || '';
+  document.getElementById('svdc-addr').value   = d.addr;
+  document.getElementById('svdc-from').value   = d.from;
+  document.getElementById('svdc-to').value     = d.to;
+
+  let rows = '';
+  d.plan.forEach((r, i) => {
+    rows += `<tr>
+      <td style="text-align:center;color:var(--text-3)">${i+1}</td>
+      <td><input class="fc" value="${r.tuan}" readonly style="background:#fafafa;cursor:default"></td>
+      <td><textarea class="fc" readonly style="background:#fafafa;cursor:default;height:52px">${r.cv}</textarea></td>
+      <td><textarea class="fc" readonly style="background:#fafafa;cursor:default;height:52px">${r.kq}</textarea></td>
+      <td><input class="fc" value="${r.gc}" readonly style="background:#fafafa;cursor:default"></td>
+    </tr>`;
+  });
+  document.getElementById('svdc-plan-body').innerHTML = rows;
+
+  const alertMap = {
+    wait:     `<div class="alert alert-info"><span class="alert-ico">⏳</span><div class="alert-body"><div class="alert-title">Chờ phê duyệt</div><span class="alert-desc">${d.statusMsg}</span></div></div>`,
+    reject:   `<div class="alert" style="border-color:#ffa39e;background:#fff1f0"><span class="alert-ico">⚠️</span><div class="alert-body"><div class="alert-title" style="color:var(--error)">Yêu cầu chỉnh sửa</div><span class="alert-desc">${d.statusMsg}</span></div></div>`,
+    approved: `<div class="alert alert-success"><span class="alert-ico">✅</span><div class="alert-body"><div class="alert-title">Đã phê duyệt</div><span class="alert-desc">${d.statusMsg}</span></div></div>`,
+  };
+  document.getElementById('svdc-alert').innerHTML = alertMap[d.status] || '';
+  document.getElementById('modal-sv-decanvas').classList.remove('hidden');
+}
+
+/* ---- Nộp / Nộp lại Đề cương ---- */
+function openSvSubmitDc(maDot) {
+  const d = DC_DB[maDot];
+  document.getElementById('svsdot').textContent = maDot;
+
+  // Nếu là nộp lại (reject) → điền sẵn dữ liệu cũ
+  const isResubmit = d && d.status === 'reject';
+  const alertTop = document.getElementById('svs-alert-top');
+  alertTop.innerHTML = isResubmit
+    ? `<div class="alert" style="border-color:#ffa39e;background:#fff1f0"><span class="alert-ico">⚠️</span><div class="alert-body"><div class="alert-title" style="color:var(--error)">Nộp lại đề cương</div><span class="alert-desc">GVHD yêu cầu chỉnh sửa: <strong>${d.statusMsg.replace('GVHD yêu cầu chỉnh sửa: ','')}</strong>. Vui lòng chỉnh sửa và nộp lại.</span></div></div>`
+    : '';
+
+  if (d) {
+    document.getElementById('svs-dn').value     = d.dn     || '';
+    document.getElementById('svs-phuong').value = d.phuong || '';
+    document.getElementById('svs-addr').value   = d.addr   || '';
+    document.getElementById('svs-from').value   = d.from   || '';
+    document.getElementById('svs-to').value     = d.to     || '';
+    // Điền kế hoạch cũ nếu có
+    if (d.plan && d.plan.length) {
+      let rows = '';
+      d.plan.forEach((r, i) => {
+        rows += `<tr>
+          <td style="text-align:center;color:var(--text-3)">${i+1}</td>
+          <td><input class="fc" type="text" value="${r.tuan}" placeholder="Tuần ${i+1}"></td>
+          <td><textarea class="fc" style="height:52px;resize:none">${r.cv}</textarea></td>
+          <td><input class="fc" type="text" value="${r.gc}" placeholder="Ghi chú..."></td>
+          <td style="text-align:center"><button class="btn btn-link" style="color:var(--error)" onclick="svsPlanDel(this)">🗑️</button></td>
+        </tr>`;
+      });
+      document.getElementById('svs-plan-body').innerHTML = rows;
+    }
+  } else {
+    document.getElementById('svs-dn').value     = '';
+    document.getElementById('svs-phuong').value = '';
+    document.getElementById('svs-addr').value   = '';
+    document.getElementById('svs-from').value   = '';
+    document.getElementById('svs-to').value     = '';
+    document.getElementById('svs-plan-body').innerHTML = `<tr>
+      <td style="text-align:center;color:var(--text-3)">1</td>
+      <td><input class="fc" type="text" placeholder="Tuần 1"></td>
+      <td><textarea class="fc" style="height:52px;resize:none" placeholder="Mô tả nhiệm vụ..."></textarea></td>
+      <td><input class="fc" type="text" placeholder="Ghi chú..."></td>
+      <td style="text-align:center"><button class="btn btn-link" style="color:var(--error)" onclick="svsPlanDel(this)">🗑️</button></td>
+    </tr>`;
+  }
+  document.getElementById('modal-sv-submit-dc').classList.remove('hidden');
+}
+
+let svsRowCount = 1;
+function svsPlanAdd() {
+  const tbody = document.getElementById('svs-plan-body');
+  svsRowCount = tbody.querySelectorAll('tr').length + 1;
+  const tr = document.createElement('tr');
+  tr.innerHTML = `
+    <td style="text-align:center;color:var(--text-3)">${svsRowCount}</td>
+    <td><input class="fc" type="text" placeholder="Tuần ${svsRowCount}"></td>
+    <td><textarea class="fc" style="height:52px;resize:none" placeholder="Mô tả nhiệm vụ..."></textarea></td>
+    <td><input class="fc" type="text" placeholder="Ghi chú..."></td>
+    <td style="text-align:center"><button class="btn btn-link" style="color:var(--error)" onclick="svsPlanDel(this)">🗑️</button></td>`;
+  tbody.appendChild(tr);
+  svsReindex();
+}
+function svsPlanDel(btn) {
+  const rows = document.querySelectorAll('#svs-plan-body tr');
+  if (rows.length <= 1) { toast('Cần ít nhất 1 tuần', 'warning'); return; }
+  btn.closest('tr').remove();
+  svsReindex();
+}
+function svsReindex() {
+  document.querySelectorAll('#svs-plan-body tr').forEach((tr, i) => {
+    tr.querySelector('td:first-child').textContent = i + 1;
+  });
+}
+function submitSvDc() {
+  if (!document.getElementById('svs-dn').value.trim())     { toast('Vui lòng nhập tên Cơ sở TT', 'error'); return; }
+  if (!document.getElementById('svs-phuong').value.trim()) { toast('Vui lòng nhập Phường / Xã', 'error'); return; }
+  closeModal('modal-sv-submit-dc');
+  toast('Đã gửi đề cương thành công. Chờ Giảng viên HD phê duyệt.');
+}
+
+/* ---- Dữ liệu file BC theo đợt ---- */
+const BC_DB = {
+  'KIEN_2324_HE': { submitted: false },
+  'TTTN_2324_K1': {
+    submitted: true,
+    filename: 'BaoCao_B22DCCN001_KIEN2324.pdf',
+    date: 'Nộp lúc: 20/09/2024 08:45 — đúng hạn',
+    link: 'github.com/nva001/kientap-vnpt'
+  }
+};
+
+function openSvFileBc(maDot) {
+  const d = BC_DB[maDot];
+  document.getElementById('svbc-dot').textContent = maDot;
+  const viewEl   = document.getElementById('svbc-view');
+  const uploadEl = document.getElementById('svbc-upload');
+  const submitBtn = document.getElementById('svbc-submit-btn');
+
+  if (d && d.submitted) {
+    viewEl.style.display = '';
+    uploadEl.style.display = 'none';
+    submitBtn.style.display = 'none';
+    document.getElementById('svbc-filename').textContent = d.filename;
+    document.getElementById('svbc-submitted').textContent = d.date;
+    const linkEl = document.getElementById('svbc-link');
+    const linkWrap = document.getElementById('svbc-link-wrap');
+    if (d.link) { linkEl.textContent = d.link; linkWrap.style.display = ''; }
+    else         { linkWrap.style.display = 'none'; }
+  } else {
+    viewEl.style.display = 'none';
+    uploadEl.style.display = '';
+    submitBtn.style.display = '';
+    document.getElementById('svbc-file-list').innerHTML = '';
+    document.getElementById('svbc-link-input').value = '';
+    document.getElementById('svbc-file-input').value = '';
+  }
+  document.getElementById('modal-sv-filebc').classList.remove('hidden');
+}
+
+function onSvBcFileSelect(input) {
+  const list = document.getElementById('svbc-file-list');
+  list.innerHTML = '';
+  if (!input.files.length) return;
+  const f = input.files[0];
+  list.innerHTML = `<div class="upload-item">
+    <span class="ui-icon">📄</span>
+    <span class="ui-name">${f.name}</span>
+    <span class="ui-size">${(f.size/1024/1024).toFixed(2)} MB</span>
+    <button class="ui-del" onclick="document.getElementById('svbc-file-input').value='';document.getElementById('svbc-file-list').innerHTML=''">✕</button>
+  </div>`;
+}
+
+function submitSvBc() {
+  const fileInput = document.getElementById('svbc-file-input');
+  if (!fileInput.files.length) { toast('Vui lòng chọn file báo cáo','error'); return; }
+  closeModal('modal-sv-filebc');
+  toast('Nộp báo cáo thành công. Chờ giảng viên chấm điểm.');
+}
+
+/* ---- Yêu cầu gia hạn ---- */
+const LOAI_HINH_MAP = {
+  'TTTN': 'Thực tập tốt nghiệp',
+  'KIEN': 'Kiến tập',
+};
+function _loaiHinhFromMaDot(maDot) {
+  const prefix = maDot.split('_')[0];
+  return LOAI_HINH_MAP[prefix] || maDot;
+}
+
+function openYeuCauGiaHan(maDot) {
+  const d = DC_DB[maDot];
+  document.getElementById('gh-dot').textContent = maDot;
+  document.getElementById('gh-loaihinh').value  = _loaiHinhFromMaDot(maDot);
+  document.getElementById('gh-to-cu').value     = d ? d.to : '';
+  document.getElementById('gh-to-moi').value    = '';
+  document.getElementById('gh-lydo').value      = '';
+  document.getElementById('gh-lydo-err').style.display = 'none';
+  document.getElementById('gh-file-list').innerHTML = '';
+  document.getElementById('gh-file-input').value = '';
+  document.getElementById('modal-giahan').classList.remove('hidden');
+}
+function onGhFileSelect(input) {
+  const list = document.getElementById('gh-file-list');
+  list.innerHTML = '';
+  if (!input.files.length) return;
+  const f = input.files[0];
+  list.innerHTML = `<div class="upload-item">
+    <span class="ui-icon">📎</span>
+    <span class="ui-name">${f.name}</span>
+    <span class="ui-size">${(f.size/1024/1024).toFixed(2)} MB</span>
+    <button class="ui-del" onclick="document.getElementById('gh-file-input').value='';document.getElementById('gh-file-list').innerHTML=''">✕</button>
+  </div>`;
+}
+function submitGiaHan() {
+  if (!document.getElementById('gh-to-moi').value) { toast('Vui lòng chọn ngày kết thúc đề nghị', 'error'); return; }
+  const lyddoEl = document.getElementById('gh-lydo');
+  const errEl   = document.getElementById('gh-lydo-err');
+  if (!lyddoEl.value.trim()) { errEl.style.display = 'block'; lyddoEl.focus(); return; }
+  errEl.style.display = 'none';
+  closeModal('modal-giahan');
+  toast('Đã gửi yêu cầu gia hạn. Chờ Phòng đào tạo xem xét.');
+}
+
+/* ---- Yêu cầu đổi cơ sở TT ---- */
+function openYeuCauDoiCstt(maDot) {
+  const d = DC_DB[maDot];
+  document.getElementById('doi-dot').textContent = maDot;
+  document.getElementById('doi-cu-dn').value     = d ? d.dn     : '';
+  document.getElementById('doi-cu-tinh').value   = d ? d.tinh   : '';
+  document.getElementById('doi-cu-phuong').value = d ? (d.phuong || '') : '';
+  document.getElementById('doi-cu-addr').value   = d ? (d.addr   || '') : '';
+  document.getElementById('doi-cu-from').value   = d ? (d.from   || '') : '';
+  document.getElementById('doi-cu-to').value     = d ? (d.to     || '') : '';
+  document.getElementById('doi-moi-dn').value      = '';
+  document.getElementById('doi-moi-tinh').value    = '-- Chọn --';
+  document.getElementById('doi-moi-phuong').value  = '';
+  document.getElementById('doi-moi-addr').value    = '';
+  document.getElementById('doi-moi-contact').value = '';
+  document.getElementById('doi-lydo').value        = '';
+  document.getElementById('doi-file-list').innerHTML = '';
+  document.getElementById('doi-file-input').value    = '';
+  document.getElementById('modal-doicstt').classList.remove('hidden');
+}
+function onDoiFileSelect(input) {
+  const list = document.getElementById('doi-file-list');
+  list.innerHTML = '';
+  if (!input.files.length) return;
+  const f = input.files[0];
+  list.innerHTML = `<div class="upload-item">
+    <span class="ui-icon">📎</span>
+    <span class="ui-name">${f.name}</span>
+    <span class="ui-size">${(f.size/1024/1024).toFixed(2)} MB</span>
+    <button class="ui-del" onclick="document.getElementById('doi-file-input').value='';document.getElementById('doi-file-list').innerHTML=''">✕</button>
+  </div>`;
+}
+function submitDoiCstt() {
+  if (!document.getElementById('doi-moi-dn').value.trim())     { toast('Vui lòng nhập tên Cơ sở TT mới', 'error'); return; }
+  if (document.getElementById('doi-moi-tinh').value === '-- Chọn --') { toast('Vui lòng chọn Tỉnh / Thành phố', 'error'); return; }
+  if (!document.getElementById('doi-moi-phuong').value.trim()) { toast('Vui lòng nhập Phường / Xã', 'error'); return; }
+  if (!document.getElementById('doi-lydo').value.trim())       { toast('Vui lòng nhập lý do đổi cơ sở TT', 'error'); return; }
+  closeModal('modal-doicstt');
+  toast('Đã gửi yêu cầu đổi cơ sở TT. Chờ Phòng đào tạo xem xét.');
+}
+
+/* ---- Yêu cầu đổi đề tài ---- */
+const DETAI_DB = {
+  'TTTN_2526_K1': {
+    ten: 'Xây dựng hệ thống API quản lý người dùng',
+    mota: 'Thiết kế và phát triển RESTful API cho module quản lý người dùng, phân quyền trên nền tảng Node.js / Spring Boot tại FPT Software.',
+  },
+  'TTTN_2425_K2': {
+    ten: 'Phát triển module giám sát và cảnh báo tự động',
+    mota: 'Xây dựng module thu thập metric, phân tích ngưỡng và gửi cảnh báo tự động cho hệ thống hạ tầng tại Viettel IDC.',
+  },
+  'KIEN_2324_HE': {
+    ten: 'Kiến tập vận hành hạ tầng mạng',
+    mota: 'Tìm hiểu quy trình vận hành, hỗ trợ cấu hình thiết bị mạng tầng access và viết tài liệu kỹ thuật tại Tập đoàn VNPT.',
+  },
+};
+
+function openYeuCauDoiDeTai(maDot) {
+  const d = DETAI_DB[maDot];
+  document.getElementById('ddt-dot').textContent   = maDot;
+  document.getElementById('ddt-cu-ten').value      = d ? d.ten  : '';
+  document.getElementById('ddt-cu-mota').value     = d ? d.mota : '';
+  document.getElementById('ddt-moi-ten').value     = '';
+  document.getElementById('ddt-moi-mota').value    = '';
+  document.getElementById('ddt-lydo').value        = '';
+  document.getElementById('ddt-lydo-err').style.display = 'none';
+  document.getElementById('ddt-file-list').innerHTML = '';
+  document.getElementById('ddt-file-input').value    = '';
+  document.getElementById('modal-doidetai').classList.remove('hidden');
+}
+function onDdtFileSelect(input) {
+  const list = document.getElementById('ddt-file-list');
+  list.innerHTML = '';
+  if (!input.files.length) return;
+  const f = input.files[0];
+  list.innerHTML = `<div class="upload-item">
+    <span class="ui-icon">📎</span>
+    <span class="ui-name">${f.name}</span>
+    <span class="ui-size">${(f.size/1024/1024).toFixed(2)} MB</span>
+    <button class="ui-del" onclick="document.getElementById('ddt-file-input').value='';document.getElementById('ddt-file-list').innerHTML=''">✕</button>
+  </div>`;
+}
+function submitDoiDeTai() {
+  if (!document.getElementById('ddt-moi-ten').value.trim())  { toast('Vui lòng nhập tên đề tài mới', 'error'); return; }
+  if (!document.getElementById('ddt-moi-mota').value.trim()) { toast('Vui lòng nhập mô tả đề tài mới', 'error'); return; }
+  const lyddoEl = document.getElementById('ddt-lydo');
+  const errEl   = document.getElementById('ddt-lydo-err');
+  if (!lyddoEl.value.trim()) { errEl.style.display = 'block'; lyddoEl.focus(); return; }
+  errEl.style.display = 'none';
+  closeModal('modal-doidetai');
+  toast('Đã gửi yêu cầu đổi đề tài. Chờ Giảng viên HD và Phòng đào tạo xem xét.');
+}
+
+function toast(msg, type = 'success') {
+  const box = document.getElementById('toast-box');
+  const t = document.createElement('div');
+  t.className = 'toast' + (type === 'error' ? ' err' : type === 'warning' ? ' warn' : '');
+  t.innerHTML = (type === 'success' ? '✅ ' : type === 'error' ? '❌ ' : '⚠️ ') + msg;
+  box.appendChild(t);
+  setTimeout(() => t.remove(), 3500);
+}
+</script>
+</body>
+</html>

@@ -1,0 +1,304 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Quản lý đợt thực tập | Phòng Đào tạo</title>
+  <link rel="stylesheet" href="_styles.css">
+</head>
+<body>
+<div class="app">
+
+  <!-- Sidebar -->
+  <nav class="sidebar">
+    <div class="sb-logo">
+      <div class="sb-logo-icon">🎓</div>
+      <div><div class="sb-logo-text">HTQT Đại học</div><div class="text-muted text-sm">Phòng Đào tạo</div></div>
+    </div>
+    <div class="sb-user">
+      <div class="av" style="background:#1677ff">PĐT</div>
+      <div><div style="font-size:13px;font-weight:600">Nguyễn Thị Lan</div><span class="tag tag-blue" style="font-size:11px">Phòng Đào tạo</span></div>
+    </div>
+    <ul class="sb-menu">
+      <li><a href="MH-PDT-00_Dashboard.html">🏠&nbsp; Trang chủ</a></li>
+      <li><span class="mn-group">🗓️&nbsp; Đợt thực tập &nbsp;▾</span>
+        <ul class="sb-sub open">
+          <li class="active"><a href="MH-PDT-01_InternshipRound.html">Danh sách đợt</a></li>
+          <li><a href="MH-PDT-04_InternshipRound_Create.html">Tạo đợt mới</a></li>
+        </ul>
+      </li>
+      <li><span class="mn-group">👥&nbsp; Xét điều kiện SV &nbsp;▾</span>
+        <ul class="sb-sub open">
+          <li><a href="MH-PDT-05_StudentEligibility.html">Danh sách xét</a></li>
+        </ul>
+      </li>
+      <li><span class="mn-group">📋&nbsp; Sinh viên thực tập &nbsp;▾</span>
+        <ul class="sb-sub open">
+          <li><a href="MH-PDT-06_InternshipStudents.html">Quản lý DS thực tập</a></li>
+        </ul>
+      </li>
+      <li><span class="mn-group">👨‍🏫&nbsp; Phân công GVHD &nbsp;▾</span>
+        <ul class="sb-sub open">
+          <li><a href="MH-PDT-07_InstructorAssignment.html">Theo GVHD</a></li>
+        </ul>
+      </li>
+      <li><span class="mn-group">📁&nbsp; Hồ sơ thực tập &nbsp;▾</span>
+        <ul class="sb-sub open">
+          <li><a href="MH-PDT-03_ReviewProfile.html">Kiểm tra hồ sơ</a></li>
+        </ul>
+      </li>
+      <li><span class="mn-group">📜&nbsp; Quyết định &nbsp;▾</span>
+        <ul class="sb-sub open">
+          <li><a href="MH-PDT-02_Decision.html">Quản lý quyết định</a></li>
+        </ul>
+      </li>
+    </ul>
+  </nav>
+
+  <!-- Main -->
+  <div class="main">
+    <header class="app-header">
+      <span class="h-breadcrumb">Đợt thực tập &rsaquo; Danh sách đợt</span>
+      <div class="h-right">
+        <div class="bw"><button class="btn btn-link" style="font-size:18px">🔔</button><span class="bc">3</span></div>
+        <div class="av" style="background:#1677ff">PĐT</div>
+      </div>
+    </header>
+    <main class="content">
+
+      <!-- Filter + Action -->
+      <div class="filter-bar" style="margin-bottom:16px">
+        <select class="fc" style="width:160px">
+          <option>Tất cả năm học</option>
+          <option selected>2024-2025</option>
+          <option>2023-2024</option>
+        </select>
+        <select class="fc" style="width:160px">
+          <option>Tất cả trạng thái</option>
+          <option>Đang mở</option>
+          <option>Kết thúc</option>
+          <option>Nháp</option>
+        </select>
+        <div class="input-search" style="flex:1;max-width:280px">
+          <input class="fc" type="text" placeholder="Tìm tên đợt...">
+        </div>
+        <button class="btn btn-primary" onclick="window.location='MH-PDT-04_InternshipRound_Create.html'">+ Tạo đợt mới</button>
+      </div>
+
+      <!-- Table -->
+      <div class="card" style="padding:0">
+        <div class="tbl-wrap">
+          <table class="tbl">
+            <thead>
+              <tr>
+                <th>#</th>
+                <th>Tên đợt thực tập</th>
+                <th>Học kỳ</th>
+                <th>Năm học</th>
+                <th>Thời gian TT</th>
+                <th>Trạng thái</th>
+                <th style="text-align:center">Thao tác</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>1</td>
+                <td><a href="#" onclick="openDetail()">TTTN HK1 2024-2025</a></td>
+                <td>HK1</td>
+                <td>2024-2025</td>
+                <td>01/11/2024 – 15/01/2025</td>
+                <td><span class="tag tag-success">Đang mở</span></td>
+                <td>
+                  <div class="tbl-actions" style="justify-content:center;gap:4px;flex-wrap:wrap">
+                    <button class="btn btn-link btn-sm" onclick="openDetail()" title="Chi tiết đợt">👁️</button>
+                    <button class="btn btn-link btn-sm" onclick="window.location='MH-PDT-05_StudentEligibility.html'" title="Xem DS điều kiện xét duyệt" style="color:var(--blue)">👥 DS ĐK</button>
+                    <button class="btn btn-link btn-sm" onclick="window.location='MH-PDT-04_InternshipRound_Create.html'" title="Chỉnh sửa">✏️</button>
+                    <button class="btn btn-link btn-sm" style="color:var(--error)" title="Đóng đợt">🔒</button>
+                  </div>
+                </td>
+              </tr>
+              <tr>
+                <td>2</td>
+                <td><a href="#">TTTN HK2 2023-2024</a></td>
+                <td>HK2</td>
+                <td>2023-2024</td>
+                <td>01/04/2024 – 15/06/2024</td>
+                <td><span class="tag tag-default">Kết thúc</span></td>
+                <td>
+                  <div class="tbl-actions" style="justify-content:center;gap:4px">
+                    <button class="btn btn-link btn-sm" onclick="openDetail()" title="Chi tiết đợt">👁️</button>
+                    <button class="btn btn-link btn-sm" onclick="window.location='MH-PDT-05_StudentEligibility.html'" title="Xem DS điều kiện xét duyệt" style="color:var(--blue)">👥 DS ĐK</button>
+                    <button class="btn btn-default btn-sm">⬇️ Excel</button>
+                  </div>
+                </td>
+              </tr>
+              <tr>
+                <td>3</td>
+                <td><a href="#">TTTN HK1 2023-2024</a></td>
+                <td>HK1</td>
+                <td>2023-2024</td>
+                <td>01/11/2023 – 15/01/2024</td>
+                <td><span class="tag tag-default">Kết thúc</span></td>
+                <td>
+                  <div class="tbl-actions" style="justify-content:center;gap:4px">
+                    <button class="btn btn-link btn-sm" onclick="openDetail()" title="Chi tiết đợt">👁️</button>
+                    <button class="btn btn-link btn-sm" onclick="window.location='MH-PDT-05_StudentEligibility.html'" title="Xem DS điều kiện xét duyệt" style="color:var(--blue)">👥 DS ĐK</button>
+                    <button class="btn btn-default btn-sm">⬇️ Excel</button>
+                  </div>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="pagination">
+          <span class="pg-info">Tổng 3 đợt</span>
+          <button class="pg-btn active">1</button>
+        </div>
+      </div>
+
+    </main>
+  </div>
+</div>
+
+<!-- Modal: Tạo/Sửa đợt thực tập -->
+<div class="overlay hidden" id="modal-create">
+  <div class="modal-box w700">
+    <div class="modal-hd">
+      <span class="modal-title">Tạo đợt thực tập mới</span>
+      <button class="modal-close" onclick="document.getElementById('modal-create').classList.add('hidden')">✕</button>
+    </div>
+    <div class="modal-bd">
+      <div class="f-row col-2">
+        <div class="fi">
+          <label>Tên đợt thực tập <span class="req">*</span></label>
+          <input class="fc" type="text" placeholder="VD: TTTN HK1 2024-2025" value="TTTN HK1 2024-2025">
+        </div>
+        <div class="fi">
+          <label>Năm học <span class="req">*</span></label>
+          <input class="fc" type="text" placeholder="VD: 2024-2025" value="2024-2025">
+        </div>
+      </div>
+      <div class="f-row col-3">
+        <div class="fi">
+          <label>Học kỳ <span class="req">*</span></label>
+          <select class="fc">
+            <option selected>HK1</option>
+            <option>HK2</option>
+            <option>HK3</option>
+          </select>
+        </div>
+        <div class="fi">
+          <label>Số lượng SV tối đa</label>
+          <input class="fc" type="number" placeholder="VD: 500" value="500">
+        </div>
+        <div class="fi">
+          <label>Trạng thái</label>
+          <select class="fc">
+            <option>Nháp</option>
+            <option selected>Kích hoạt</option>
+          </select>
+        </div>
+      </div>
+
+      <div style="border-top:1px solid var(--border);padding-top:16px;margin-top:4px">
+        <div style="font-size:13px;font-weight:600;color:var(--primary);margin-bottom:12px">⏰ Thiết lập Deadline</div>
+        <div class="f-row col-2">
+          <div class="fi">
+            <label>Mở đăng ký nguyện vọng <span class="req">*</span></label>
+            <input class="fc" type="date" value="2024-09-15">
+          </div>
+          <div class="fi">
+            <label>Hạn đăng ký nguyện vọng <span class="req">*</span></label>
+            <input class="fc" type="date" value="2024-10-15">
+          </div>
+          <div class="fi">
+            <label>Hạn phê duyệt nguyện vọng <span class="req">*</span></label>
+            <input class="fc" type="date" value="2024-10-25">
+          </div>
+          <div class="fi">
+            <label>Hạn nộp báo cáo <span class="req">*</span></label>
+            <input class="fc" type="date" value="2025-01-20">
+          </div>
+        </div>
+        <div class="f-row col-2">
+          <div class="fi">
+            <label>Ngày bắt đầu thực tập <span class="req">*</span></label>
+            <input class="fc" type="date" value="2024-11-01">
+          </div>
+          <div class="fi">
+            <label>Ngày kết thúc thực tập <span class="req">*</span></label>
+            <input class="fc" type="date" value="2025-01-15">
+          </div>
+        </div>
+      </div>
+
+      <div class="fi">
+        <label>Ghi chú</label>
+        <textarea class="fc" rows="2" placeholder="Thông tin bổ sung về đợt thực tập..."></textarea>
+      </div>
+    </div>
+    <div class="modal-ft">
+      <button class="btn btn-default" onclick="document.getElementById('modal-create').classList.add('hidden')">Hủy</button>
+      <button class="btn btn-primary" onclick="showToast('Đã lưu đợt thực tập thành công!');document.getElementById('modal-create').classList.add('hidden')">Lưu đợt thực tập</button>
+    </div>
+  </div>
+</div>
+
+<!-- Modal: Chi tiết đợt -->
+<div class="overlay hidden" id="modal-detail">
+  <div class="modal-box w700">
+    <div class="modal-hd">
+      <span class="modal-title">Chi tiết: TTTN HK1 2024-2025</span>
+      <button class="modal-close" onclick="document.getElementById('modal-detail').classList.add('hidden')">✕</button>
+    </div>
+    <div class="modal-bd">
+      <table class="desc-tbl" style="margin-bottom:16px">
+        <tr><th>Năm học</th><td>2024-2025</td><th>Học kỳ</th><td>HK1</td></tr>
+        <tr><th>Ngày bắt đầu TT</th><td>01/11/2024</td><th>Ngày kết thúc TT</th><td>15/01/2025</td></tr>
+        <tr><th>Hạn nộp báo cáo</th><td>20/01/2025</td><th>Trạng thái</th><td><span class="tag tag-success">Đang mở</span></td></tr>
+      </table>
+      <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:12px">
+        <div style="text-align:center;padding:12px;background:#f6ffed;border-radius:6px;border:1px solid #b7eb8f">
+          <div style="font-size:22px;font-weight:700;color:var(--success)">312</div>
+          <div style="font-size:12px;color:var(--text-3)">Tổng đăng ký</div>
+        </div>
+        <div style="text-align:center;padding:12px;background:#fff7e6;border-radius:6px;border:1px solid #ffd591">
+          <div style="font-size:22px;font-weight:700;color:var(--warning)">127</div>
+          <div style="font-size:12px;color:var(--text-3)">Chờ duyệt</div>
+        </div>
+        <div style="text-align:center;padding:12px;background:#f6ffed;border-radius:6px;border:1px solid #b7eb8f">
+          <div style="font-size:22px;font-weight:700;color:var(--success)">155</div>
+          <div style="font-size:12px;color:var(--text-3)">Đã duyệt</div>
+        </div>
+        <div style="text-align:center;padding:12px;background:#fff2f0;border-radius:6px;border:1px solid #ffa39e">
+          <div style="font-size:22px;font-weight:700;color:var(--error)">30</div>
+          <div style="font-size:12px;color:var(--text-3)">Từ chối</div>
+        </div>
+      </div>
+    </div>
+    <div class="modal-ft">
+      <button class="btn btn-default" onclick="document.getElementById('modal-detail').classList.add('hidden')">Đóng</button>
+      <button class="btn btn-default" onclick="window.location='MH-PDT-05_StudentEligibility.html'">👥 Xem DS Điều kiện xét duyệt</button>
+      <button class="btn btn-primary">⬇️ Xuất danh sách</button>
+    </div>
+  </div>
+</div>
+
+<!-- Toast -->
+<div class="toast-box" id="toast-box"></div>
+
+<script>
+function openDetail() {
+  document.getElementById('modal-detail').classList.remove('hidden');
+}
+function showToast(msg, type) {
+  const box = document.getElementById('toast-box');
+  const t = document.createElement('div');
+  t.className = 'toast' + (type === 'err' ? ' err' : '');
+  t.innerHTML = (type === 'err' ? '❌' : '✅') + ' ' + msg;
+  box.appendChild(t);
+  setTimeout(() => t.remove(), 3000);
+}
+</script>
+</body>
+</html>

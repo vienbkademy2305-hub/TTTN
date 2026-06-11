@@ -1,0 +1,533 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Tạo Đợt Đăng ký | Phòng Đào tạo</title>
+  <link rel="stylesheet" href="_styles.css">
+  <style>
+    .steps{display:flex;align-items:flex-start;margin-bottom:32px}
+    .step{display:flex;flex-direction:column;align-items:center;gap:6px;flex-shrink:0;min-width:110px}
+    .step-circle{width:36px;height:36px;border-radius:50%;border:2px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:700;background:#fff;color:var(--text-3);transition:all .3s}
+    .step.done .step-circle{background:var(--success);border-color:var(--success);color:#fff}
+    .step.active .step-circle{background:var(--primary);border-color:var(--primary);color:#fff}
+    .step-label{font-size:12px;color:var(--text-3);text-align:center;line-height:1.4}
+    .step.active .step-label{color:var(--primary);font-weight:600}
+    .step.done .step-label{color:var(--success)}
+    .step-line{flex:1;height:2px;background:var(--border);margin:18px 4px 0;transition:background .3s}
+    .step-line.done{background:var(--success)}
+    .step-panel{display:none}
+    .step-panel.active{display:block}
+    .cond-tbl{width:100%;border-collapse:collapse;font-size:13px}
+    .cond-tbl th,.cond-tbl td{padding:9px 10px;border:1px solid var(--border);vertical-align:middle}
+    .cond-tbl th{background:#fafafa;font-weight:500;text-align:center;white-space:nowrap}
+    .cond-tbl td:first-child{font-weight:500}
+    .cond-tbl td:nth-child(2){text-align:center}
+    .fc[disabled]{background:#fafafa;color:var(--text-3)}
+    .picker-list{display:flex;flex-direction:column;gap:6px;max-height:340px;overflow-y:auto}
+    .picker-item{display:flex;align-items:center;gap:10px;padding:10px 12px;border-radius:6px;border:1px solid var(--border);background:#fff;cursor:pointer;font-size:13px;transition:all .15s}
+    .picker-item:hover:not(.added){background:var(--primary-light);border-color:var(--primary)}
+    .picker-item.added{background:#f6ffed;border-color:#b7eb8f;cursor:default}
+    .picker-item input[type=checkbox]{width:15px;height:15px;flex-shrink:0}
+    .cond-empty{text-align:center;padding:18px;color:var(--text-3);font-size:13px;font-style:italic}
+  </style>
+</head>
+<body>
+<div class="app">
+
+  <!-- Sidebar -->
+  <nav class="sidebar">
+    <div class="sb-logo">
+      <div class="sb-logo-icon">🎓</div>
+      <div><div class="sb-logo-text">HTQT Đại học</div><div class="text-muted text-sm">Phòng Đào tạo</div></div>
+    </div>
+    <div class="sb-user">
+      <div class="av" style="background:#1677ff">PĐT</div>
+      <div><div style="font-size:13px;font-weight:600">Nguyễn Thị Lan</div><span class="tag tag-blue" style="font-size:11px">Phòng Đào tạo</span></div>
+    </div>
+    <ul class="sb-menu">
+      <li><a href="MH-PDT-00_Dashboard.html">🏠&nbsp; Trang chủ</a></li>
+      <li><span class="mn-group">🗓️&nbsp; Đợt thực tập &nbsp;▾</span>
+        <ul class="sb-sub open">
+          <li><a href="MH-PDT-01_InternshipRound.html">Danh sách đợt</a></li>
+          <li class="active"><a href="#">Tạo đợt mới</a></li>
+        </ul>
+      </li>
+      <li><span class="mn-group">👥&nbsp; Xét điều kiện SV &nbsp;▾</span>
+        <ul class="sb-sub open">
+          <li><a href="MH-PDT-05_StudentEligibility.html">Danh sách xét</a></li>
+        </ul>
+      </li>
+      <li><span class="mn-group">📋&nbsp; Sinh viên thực tập &nbsp;▾</span>
+        <ul class="sb-sub open">
+          <li><a href="MH-PDT-06_InternshipStudents.html">Quản lý DS thực tập</a></li>
+        </ul>
+      </li>
+      <li><span class="mn-group">👨‍🏫&nbsp; Phân công GVHD &nbsp;▾</span>
+        <ul class="sb-sub open">
+          <li><a href="MH-PDT-07_InstructorAssignment.html">Theo GVHD</a></li>
+        </ul>
+      </li>
+      <li><span class="mn-group">📁&nbsp; Hồ sơ thực tập &nbsp;▾</span>
+        <ul class="sb-sub open">
+          <li><a href="MH-PDT-03_ReviewProfile.html">Kiểm tra hồ sơ</a></li>
+        </ul>
+      </li>
+      <li><span class="mn-group">📜&nbsp; Quyết định &nbsp;▾</span>
+        <ul class="sb-sub open">
+          <li><a href="MH-PDT-02_Decision.html">Quản lý quyết định</a></li>
+        </ul>
+      </li>
+    </ul>
+  </nav>
+
+  <!-- Main -->
+  <div class="main">
+    <header class="app-header">
+      <div style="display:flex;align-items:center;gap:12px">
+        <a href="MH-PDT-01_InternshipRound.html" class="btn btn-default btn-sm">← Quay lại</a>
+        <span class="h-breadcrumb">Quản lý Đợt &rsaquo; <strong>Tạo đợt mới</strong></span>
+      </div>
+      <div class="h-right">
+        <div class="bw"><button class="btn btn-link" style="font-size:18px">🔔</button><span class="bc">2</span></div>
+        <div class="av" style="background:#1677ff">PĐT</div>
+      </div>
+    </header>
+
+    <main class="content">
+      <div style="max-width:880px;margin:0 auto">
+        <div class="card">
+          <div class="card-hd" style="margin-bottom:28px">
+            <h2 class="card-title" style="font-size:17px">✨ Tạo Đợt Đăng ký Thực tập / Đồ án Tốt nghiệp</h2>
+          </div>
+
+          <!-- Steps -->
+          <div class="steps">
+            <div class="step active" id="si-1">
+              <div class="step-circle" id="sc-1">1</div>
+              <div class="step-label">Thông tin chung</div>
+            </div>
+            <div class="step-line" id="sl-1"></div>
+            <div class="step" id="si-2">
+              <div class="step-circle" id="sc-2">2</div>
+              <div class="step-label">Đối tượng áp dụng</div>
+            </div>
+            <div class="step-line" id="sl-2"></div>
+            <div class="step" id="si-3">
+              <div class="step-circle" id="sc-3">3</div>
+              <div class="step-label">Chỉ tiêu &amp; Điều kiện</div>
+            </div>
+          </div>
+
+          <!-- ===== PANEL 1: Thông tin chung ===== -->
+          <div class="step-panel active" id="panel-1">
+            <div class="sec-title"><span class="sec-badge">1</span> Thông tin chung</div>
+            <div class="f-row col-2">
+              <div class="fi" style="grid-column:1/-1">
+                <label>Tên đợt <span class="req">*</span></label>
+                <input class="fc" type="text" id="f-ten" placeholder="VD: Thực tập tốt nghiệp HK1 2025-2026">
+                <div class="fe">Vui lòng nhập tên đợt</div>
+              </div>
+              <div class="fi">
+                <label>Loại hình <span class="req">*</span></label>
+                <select class="fc" id="f-loai" onchange="onLoaiHinhChange()">
+                  <option value="">-- Chọn loại hình --</option>
+                  <option>Kiến tập</option>
+                  <option>Thực tập</option>
+                  <option selected>Thực tập tốt nghiệp</option>
+                  <option>Đồ án</option>
+                  <option>Đồ án tốt nghiệp</option>
+                  <option>Khóa luận tốt nghiệp</option>
+                </select>
+              </div>
+              <div class="fi">
+                <label>Năm học <span class="req">*</span></label>
+                <select class="fc">
+                  <option value="">-- Chọn --</option>
+                  <option selected>2025-2026</option>
+                  <option>2024-2025</option>
+                  <option>2023-2024</option>
+                </select>
+              </div>
+              <div class="fi">
+                <label>Học kỳ <span class="req">*</span></label>
+                <select class="fc">
+                  <option value="">-- Chọn --</option>
+                  <option selected>HK1</option>
+                  <option>HK2</option>
+                  <option>HK3</option>
+                </select>
+              </div>
+              <div class="fi">
+                <label>Thời gian bắt đầu</label>
+                <input class="fc" type="datetime-local" id="f-start" value="2025-09-01T08:00">
+                <div class="f-hint">Nếu để trống, đợt ở trạng thái đóng đến khi cập nhật thủ công</div>
+              </div>
+              <div class="fi">
+                <label>Thời gian kết thúc</label>
+                <input class="fc" type="datetime-local" id="f-end" value="2025-09-30T17:00">
+              </div>
+              <div class="fi" style="grid-column:1/-1">
+                <label>Mô tả</label>
+                <textarea class="fc" rows="3" placeholder="Thông tin bổ sung về đợt đăng ký..." maxlength="1000"></textarea>
+                <div class="f-hint">Tối đa 1000 ký tự</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- ===== PANEL 2: Đối tượng áp dụng ===== -->
+          <div class="step-panel" id="panel-2">
+            <div class="sec-title"><span class="sec-badge">2</span> Đối tượng áp dụng</div>
+            <div class="f-row col-2">
+              <div class="fi">
+                <label>Đơn vị áp dụng <span class="req">*</span></label>
+                <select class="fc" size="5" multiple style="height:auto">
+                  <option selected>Khoa Công nghệ Thông tin</option>
+                  <option>Khoa Điện tử - Viễn thông</option>
+                  <option>Khoa Cơ điện tử</option>
+                  <option>Khoa Kinh tế</option>
+                  <option>Khoa Ngoại ngữ</option>
+                </select>
+                <div class="f-hint">Giữ Ctrl để chọn nhiều đơn vị</div>
+              </div>
+              <div class="fi">
+                <label>Khóa học áp dụng <span class="req">*</span></label>
+                <select class="fc" size="5" multiple style="height:auto">
+                  <option selected>K68 (2023-2027)</option>
+                  <option selected>K69 (2024-2028)</option>
+                  <option>K67 (2022-2026)</option>
+                  <option>K66 (2021-2025)</option>
+                </select>
+              </div>
+              <div class="fi">
+                <label>Hệ đào tạo <span class="req">*</span></label>
+                <select class="fc" size="3" multiple style="height:auto">
+                  <option selected>Chính quy</option>
+                  <option>Liên thông</option>
+                  <option>Văn bằng 2</option>
+                </select>
+              </div>
+              <div class="fi">
+                <label>Chương trình đào tạo <span class="req">*</span></label>
+                <select class="fc" size="4" multiple style="height:auto">
+                  <option selected>Kỹ thuật Phần mềm</option>
+                  <option selected>Khoa học Máy tính</option>
+                  <option>Hệ thống Thông tin</option>
+                  <option>Trí tuệ Nhân tạo</option>
+                </select>
+                <div class="f-hint">Danh sách lọc theo Đơn vị đã chọn</div>
+              </div>
+              <div class="fi" style="grid-column:1/-1">
+                <label>Danh sách sinh viên riêng lẻ (MSSV) <span class="text-muted text-sm">— Tùy chọn</span></label>
+                <textarea class="fc" rows="3" placeholder="Nhập MSSV cách nhau bằng dấu phẩy. VD: B21DCCN001, B21DCCN002, B21DCCN003"></textarea>
+                <div class="f-hint">⚠️ Khi nhập danh sách MSSV: chỉ SV vừa có trong danh sách VỪA thỏa mãn điều kiện trên mới được tham gia đợt (giao tập hợp).</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- ===== PANEL 3: Chỉ tiêu & Điều kiện ===== -->
+          <div class="step-panel" id="panel-3">
+            <div class="sec-title"><span class="sec-badge">3</span> Chỉ tiêu &amp; Điều kiện đăng ký</div>
+
+            <!-- 3.1 -->
+            <div style="font-size:13px;font-weight:600;color:var(--text-2);margin-bottom:10px">3.1 Chỉ tiêu đăng ký</div>
+            <div class="f-row col-2" style="margin-bottom:24px">
+              <div class="fi" id="fi-nv" style="display:none">
+                <label>Số lượng nguyện vọng tối đa <span class="req">*</span></label>
+                <input class="fc" type="number" min="1" placeholder="VD: 3">
+                <div class="f-hint">Chỉ áp dụng cho Đồ án / Khóa luận</div>
+              </div>
+              <div class="fi">
+                <label>Số SV tối đa / GVHD <span class="req">*</span></label>
+                <input class="fc" type="number" min="1" value="10">
+              </div>
+            </div>
+
+            <!-- 3.2 -->
+            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px">
+              <div style="font-size:13px;font-weight:600;color:var(--text-2)">3.2 Điều kiện tham số</div>
+              <button class="btn btn-default btn-sm" onclick="openPicker32()">➕ Thêm tiêu chí</button>
+            </div>
+            <div class="tbl-wrap" style="margin-bottom:6px">
+              <table class="cond-tbl">
+                <thead>
+                  <tr>
+                    <th style="text-align:left;width:34%">Tiêu chí</th>
+                    <th style="width:140px">Toán tử</th>
+                    <th>Giá trị</th>
+                    <th style="width:44px"></th>
+                  </tr>
+                </thead>
+                <tbody id="cond32-body">
+                  <tr data-id="gpa">
+                    <td>GPA</td>
+                    <td><select class="fc"><option>--</option><option>=</option><option>&lt;</option><option>&lt;=</option><option>&gt;</option><option selected>&gt;=</option><option>!=</option></select></td>
+                    <td><input class="fc" type="number" step="0.1" min="0" max="4" placeholder="VD: 2.5"></td>
+                    <td style="text-align:center"><button class="btn btn-link btn-sm" style="color:var(--danger)" onclick="removeCond32(this)" title="Xóa">✕</button></td>
+                  </tr>
+                  <tr data-id="cpa">
+                    <td>CPA</td>
+                    <td><select class="fc"><option>--</option><option>=</option><option>&lt;</option><option>&lt;=</option><option>&gt;</option><option>&gt;=</option><option>!=</option></select></td>
+                    <td><input class="fc" type="number" step="0.1" min="0" max="4" placeholder="VD: 2.0"></td>
+                    <td style="text-align:center"><button class="btn btn-link btn-sm" style="color:var(--danger)" onclick="removeCond32(this)" title="Xóa">✕</button></td>
+                  </tr>
+                  <tr data-id="tinchi">
+                    <td>Số tín chỉ tích lũy</td>
+                    <td><select class="fc"><option>--</option><option>=</option><option>&lt;</option><option>&lt;=</option><option>&gt;</option><option>&gt;=</option><option>!=</option></select></td>
+                    <td><input class="fc" type="number" min="0" placeholder="VD: 90"></td>
+                    <td style="text-align:center"><button class="btn btn-link btn-sm" style="color:var(--danger)" onclick="removeCond32(this)" title="Xóa">✕</button></td>
+                  </tr>
+                  <tr data-id="nohp">
+                    <td>Số học phần nợ</td>
+                    <td><select class="fc"><option>--</option><option>=</option><option>&lt;</option><option>&lt;=</option><option>&gt;</option><option>&gt;=</option><option>!=</option></select></td>
+                    <td><input class="fc" type="number" min="0" placeholder="VD: 0"></td>
+                    <td style="text-align:center"><button class="btn btn-link btn-sm" style="color:var(--danger)" onclick="removeCond32(this)" title="Xóa">✕</button></td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            <div class="f-hint" style="margin-bottom:24px">💡 Tiêu chí nào xuất hiện trong bảng là đang áp dụng — chọn Toán tử và nhập Giá trị tương ứng. Nhấn <strong>✕</strong> để xóa tiêu chí không cần dùng.</div>
+
+            <!-- 3.3 -->
+            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px">
+              <div style="font-size:13px;font-weight:600;color:var(--text-2)">3.3 Điều kiện hệ thống</div>
+              <button class="btn btn-default btn-sm" onclick="openPicker33()">➕ Thêm điều kiện</button>
+            </div>
+            <div id="cond33-list" style="display:flex;flex-direction:column;gap:6px;margin-bottom:6px">
+              <!-- default 2 items -->
+              <div class="sys-cond-row" data-id="canh-bao" style="display:flex;align-items:center;justify-content:space-between;padding:9px 12px;border:1px solid var(--border);border-radius:6px;font-size:13px;background:#fff">
+                <span>🔒 Không thuộc diện cảnh báo học vụ</span>
+                <button class="btn btn-link btn-sm" style="color:var(--danger)" onclick="removeCond33(this)">✕</button>
+              </div>
+              <div class="sys-cond-row" data-id="tam-dung" style="display:flex;align-items:center;justify-content:space-between;padding:9px 12px;border:1px solid var(--border);border-radius:6px;font-size:13px;background:#fff">
+                <span>🔒 Không thuộc diện tạm dừng học tập</span>
+                <button class="btn btn-link btn-sm" style="color:var(--danger)" onclick="removeCond33(this)">✕</button>
+              </div>
+            </div>
+            <div id="cond33-empty" class="cond-empty" style="display:none">Chưa có điều kiện nào — nhấn <strong>➕ Thêm điều kiện</strong> để chọn từ hệ thống.</div>
+            <div class="f-hint">🔒 Nội dung tiêu chí là cố định — Giáo vụ chỉ Bật/Tắt trạng thái áp dụng cho từng đợt.</div>
+          </div>
+
+          <!-- Footer buttons -->
+          <div class="f-actions" style="margin-top:28px">
+            <button class="btn btn-default" id="btn-back" onclick="prevStep()" style="display:none">← Quay lại</button>
+            <div style="flex:1"></div>
+            <button class="btn btn-default" onclick="if(confirm('Hủy tạo đợt và quay lại?')) window.location='MH-PDT-01_InternshipRound.html'">Hủy</button>
+            <button class="btn btn-primary" id="btn-next" onclick="nextStep()">Tiếp theo →</button>
+            <button class="btn btn-primary" id="btn-save" onclick="saveForm()" style="display:none">💾 Lưu</button>
+          </div>
+        </div>
+      </div>
+    </main>
+  </div>
+</div>
+
+<!-- ===== PICKER 3.2: Tiêu chí tham số ===== -->
+<div class="overlay hidden" id="modal-picker32">
+  <div class="modal-box" style="width:520px">
+    <div class="modal-hd">
+      <span class="modal-title">➕ Thêm Tiêu chí Tham số</span>
+      <button class="modal-close" onclick="closeModal('modal-picker32')">✕</button>
+    </div>
+    <div class="modal-bd">
+      <div class="f-hint" style="margin-bottom:12px">Chọn tiêu chí muốn thêm vào đợt. Tiêu chí đã có trong bảng được hiển thị mờ.</div>
+      <div class="picker-list" id="picker32-list"></div>
+    </div>
+    <div class="modal-ft">
+      <button class="btn btn-default" onclick="closeModal('modal-picker32')">Hủy</button>
+      <button class="btn btn-primary" onclick="confirmPicker32()">➕ Thêm vào đợt</button>
+    </div>
+  </div>
+</div>
+
+<!-- ===== PICKER 3.3: Điều kiện hệ thống ===== -->
+<div class="overlay hidden" id="modal-picker33">
+  <div class="modal-box" style="width:520px">
+    <div class="modal-hd">
+      <span class="modal-title">➕ Thêm Điều kiện Hệ thống</span>
+      <button class="modal-close" onclick="closeModal('modal-picker33')">✕</button>
+    </div>
+    <div class="modal-bd">
+      <div class="input-search" style="margin-bottom:12px">
+        <input class="fc" type="text" id="picker33-search" placeholder="🔍 Tìm nhanh điều kiện..." oninput="filterPicker33(this.value)">
+      </div>
+      <div class="picker-list" id="picker33-list"></div>
+    </div>
+    <div class="modal-ft">
+      <button class="btn btn-default" onclick="closeModal('modal-picker33')">Hủy</button>
+      <button class="btn btn-primary" onclick="confirmPicker33()">➕ Thêm vào đợt</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast-box" id="toast-box"></div>
+
+<script>
+let curStep = 1;
+const TOTAL = 3;
+
+function goStep(n) {
+  document.querySelectorAll('.step-panel').forEach((p,i)=>p.classList.toggle('active',i+1===n));
+  [1,2,3].forEach(i=>{
+    const si=document.getElementById('si-'+i), sc=document.getElementById('sc-'+i);
+    si.classList.remove('active','done');
+    if(i<n){si.classList.add('done'); sc.innerHTML='✓';}
+    else{sc.innerHTML=i;}
+    if(i===n) si.classList.add('active');
+    if(i<TOTAL) document.getElementById('sl-'+i).classList.toggle('done',i<n);
+  });
+  document.getElementById('btn-back').style.display = n>1?'':'none';
+  document.getElementById('btn-next').style.display = n<TOTAL?'':'none';
+  document.getElementById('btn-save').style.display = n===TOTAL?'':'none';
+  curStep=n;
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+
+function nextStep(){ if(curStep<TOTAL) goStep(curStep+1); }
+function prevStep(){ if(curStep>1) goStep(curStep-1); }
+
+function onLoaiHinhChange() {
+  const v = document.getElementById('f-loai').value;
+  const show = v.includes('Đồ án')||v.includes('Khóa luận');
+  document.getElementById('fi-nv').style.display = show?'':'none';
+  // Also sync to panel 3 if already there
+}
+
+function toggleCond(cb) {
+  const row=cb.closest('tr');
+  row.querySelectorAll('select,input[type=number]').forEach(el=>el.disabled=!cb.checked);
+  if(!cb.checked) row.querySelectorAll('input[type=number]').forEach(el=>el.value='');
+}
+
+function toast(msg,type='success'){
+  const box=document.getElementById('toast-box');
+  const t=document.createElement('div');
+  t.className='toast'+(type==='error'?' err':type==='warning'?' warn':'');
+  t.innerHTML=(type==='success'?'✅ ':type==='error'?'❌ ':'⚠️ ')+msg;
+  box.appendChild(t);
+  setTimeout(()=>t.remove(),3500);
+}
+
+function saveForm(){
+  const start=document.getElementById('f-start').value;
+  toast('Đợt đăng ký đã được tạo thành công. Hệ thống sẽ tự động mở lúc '+
+    (start ? new Date(start).toLocaleString('vi-VN') : '(chưa cấu hình)'));
+  setTimeout(()=>window.location='MH-PDT-01_InternshipRound.html',2500);
+}
+
+function closeModal(id){ document.getElementById(id).classList.add('hidden'); }
+
+// ───── 3.2 Tiêu chí tham số ─────
+const POOL32 = [
+  { id:'gpa',      label:'GPA',                     type:'decimal', placeholder:'VD: 2.5', min:0, max:4, step:0.1 },
+  { id:'cpa',      label:'CPA',                     type:'decimal', placeholder:'VD: 2.0', min:0, max:4, step:0.1 },
+  { id:'tinchi',   label:'Số tín chỉ tích lũy',     type:'int',     placeholder:'VD: 90',  min:0 },
+  { id:'nohp',     label:'Số học phần nợ',           type:'int',     placeholder:'VD: 0',   min:0 },
+  { id:'renluyen', label:'Điểm rèn luyện',           type:'int',     placeholder:'VD: 65',  min:0, max:100 },
+  { id:'caiThien', label:'Số HP cần cải thiện',      type:'int',     placeholder:'VD: 3',   min:0 },
+  { id:'chinhSach',label:'Thuộc đối tượng chính sách',type:'bool',   placeholder:'' },
+];
+
+function getAdded32(){ return [...document.querySelectorAll('#cond32-body tr')].map(r=>r.dataset.id); }
+
+function openPicker32(){
+  const added = getAdded32();
+  const list = document.getElementById('picker32-list');
+  list.innerHTML = POOL32.map(c=>`
+    <label class="picker-item${added.includes(c.id)?' added':''}" data-id="${c.id}">
+      <input type="checkbox" ${added.includes(c.id)?'checked disabled':''}>
+      <span style="flex:1">${c.label}</span>
+      ${added.includes(c.id)?'<span style="font-size:11px;color:var(--success)">Đã thêm</span>':''}
+    </label>`).join('');
+  document.getElementById('modal-picker32').classList.remove('hidden');
+}
+
+function confirmPicker32(){
+  const added = getAdded32();
+  document.querySelectorAll('#picker32-list .picker-item:not(.added) input:checked').forEach(cb=>{
+    const id = cb.closest('.picker-item').dataset.id;
+    const cfg = POOL32.find(c=>c.id===id);
+    if(!cfg || added.includes(id)) return;
+    const isDecimal = cfg.type==='decimal';
+    const tr = document.createElement('tr');
+    tr.dataset.id = id;
+    tr.innerHTML = `
+      <td>${cfg.label}</td>
+      <td><select class="fc"><option>--</option><option>=</option><option>&lt;</option><option>&lt;=</option><option>&gt;</option><option>&gt;=</option><option>!=</option></select></td>
+      <td><input class="fc" type="number" ${isDecimal?'step="0.1"':''} min="${cfg.min||0}" ${cfg.max!=null?'max="'+cfg.max+'"':''} placeholder="${cfg.placeholder}"></td>
+      <td style="text-align:center"><button class="btn btn-link btn-sm" style="color:var(--danger)" onclick="removeCond32(this)" title="Xóa">✕</button></td>`;
+    document.getElementById('cond32-body').appendChild(tr);
+  });
+  closeModal('modal-picker32');
+}
+
+function removeCond32(btn){
+  btn.closest('tr').remove();
+}
+
+// ───── 3.3 Điều kiện hệ thống ─────
+const POOL33 = [
+  { id:'kthcs',     label:'Hoàn thành khối KT cơ sở ngành' },
+  { id:'ktcn',      label:'Hoàn thành khối KT chuyên ngành' },
+  { id:'ttcs',      label:'Hoàn thành thực tập cơ sở' },
+  { id:'ngoaingu',  label:'Đạt chuẩn đầu ra ngoại ngữ' },
+  { id:'tinhhoc',   label:'Đạt chuẩn đầu ra tin học' },
+  { id:'canh-bao',  label:'Không thuộc diện cảnh báo học vụ' },
+  { id:'tam-dung',  label:'Không thuộc diện tạm dừng học tập' },
+  { id:'ky-luat',   label:'Không có quyết định kỷ luật còn hiệu lực' },
+  { id:'tai-chinh', label:'Không nợ học phí (đã hoàn thành nghĩa vụ tài chính)' },
+  { id:'dang-ky-hp',label:'Đã đăng ký học phần học kỳ hiện tại' },
+];
+
+function getAdded33(){ return [...document.querySelectorAll('#cond33-list .sys-cond-row')].map(r=>r.dataset.id); }
+
+function renderPicker33(filter=''){
+  const added = getAdded33();
+  const q = filter.toLowerCase();
+  document.getElementById('picker33-list').innerHTML = POOL33
+    .filter(c=>!q||c.label.toLowerCase().includes(q))
+    .map(c=>`
+      <label class="picker-item${added.includes(c.id)?' added':''}" data-id="${c.id}">
+        <input type="checkbox" ${added.includes(c.id)?'checked disabled':''}>
+        <span style="flex:1">${c.label}</span>
+        ${added.includes(c.id)?'<span style="font-size:11px;color:var(--success)">Đã thêm</span>':''}
+      </label>`).join('') || '<div class="cond-empty">Không tìm thấy điều kiện phù hợp</div>';
+}
+
+function openPicker33(){
+  document.getElementById('picker33-search').value='';
+  renderPicker33();
+  document.getElementById('modal-picker33').classList.remove('hidden');
+}
+function filterPicker33(q){ renderPicker33(q); }
+
+function confirmPicker33(){
+  const added = getAdded33();
+  const list = document.getElementById('cond33-list');
+  document.querySelectorAll('#picker33-list .picker-item:not(.added) input:checked').forEach(cb=>{
+    const id = cb.closest('.picker-item').dataset.id;
+    const cfg = POOL33.find(c=>c.id===id);
+    if(!cfg || added.includes(id)) return;
+    const div = document.createElement('div');
+    div.className='sys-cond-row';
+    div.dataset.id=id;
+    div.style.cssText='display:flex;align-items:center;justify-content:space-between;padding:9px 12px;border:1px solid var(--border);border-radius:6px;font-size:13px;background:#fff';
+    div.innerHTML=`<span>🔒 ${cfg.label}</span><button class="btn btn-link btn-sm" style="color:var(--danger)" onclick="removeCond33(this)">✕</button>`;
+    list.appendChild(div);
+  });
+  syncCond33Empty();
+  closeModal('modal-picker33');
+}
+
+function removeCond33(btn){
+  btn.closest('.sys-cond-row').remove();
+  syncCond33Empty();
+}
+function syncCond33Empty(){
+  const isEmpty = document.querySelectorAll('#cond33-list .sys-cond-row').length===0;
+  document.getElementById('cond33-empty').style.display = isEmpty?'':'none';
+  document.getElementById('cond33-list').style.display = isEmpty?'none':'flex';
+}
+</script>
+</body>
+</html>

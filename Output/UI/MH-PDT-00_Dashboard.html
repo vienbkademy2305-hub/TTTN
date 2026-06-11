@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Trang chủ | Phòng Đào tạo</title>
+  <link rel="stylesheet" href="_styles.css">
+</head>
+<body>
+<div class="app">
+
+  <!-- Sidebar -->
+  <nav class="sidebar">
+    <div class="sb-logo">
+      <div class="sb-logo-icon">🎓</div>
+      <div><div class="sb-logo-text">HTQT Đại học</div><div class="text-muted text-sm">Phòng Đào tạo</div></div>
+    </div>
+    <div class="sb-user">
+      <div class="av" style="background:#1677ff">PĐT</div>
+      <div><div style="font-size:13px;font-weight:600">Nguyễn Thị Lan</div><span class="tag tag-blue" style="font-size:11px">Phòng Đào tạo</span></div>
+    </div>
+    <ul class="sb-menu">
+      <li class="active"><a href="MH-PDT-00_Dashboard.html">🏠&nbsp; Trang chủ</a></li>
+      <li><span class="mn-group">🗓️&nbsp; Đợt thực tập &nbsp;▾</span>
+        <ul class="sb-sub open">
+          <li><a href="MH-PDT-01_InternshipRound.html">Danh sách đợt</a></li>
+          <li><a href="MH-PDT-04_InternshipRound_Create.html">Tạo đợt mới</a></li>
+        </ul>
+      </li>
+      <li><span class="mn-group">👥&nbsp; Xét điều kiện SV &nbsp;▾</span>
+        <ul class="sb-sub open">
+          <li><a href="MH-PDT-05_StudentEligibility.html">Danh sách xét</a></li>
+        </ul>
+      </li>
+      <li><span class="mn-group">📋&nbsp; Sinh viên thực tập &nbsp;▾</span>
+        <ul class="sb-sub open">
+          <li><a href="MH-PDT-06_InternshipStudents.html">Quản lý DS thực tập</a></li>
+        </ul>
+      </li>
+      <li><span class="mn-group">👨‍🏫&nbsp; Phân công GVHD &nbsp;▾</span>
+        <ul class="sb-sub open">
+          <li><a href="MH-PDT-07_InstructorAssignment.html">Theo GVHD</a></li>
+        </ul>
+      </li>
+      <li><span class="mn-group">📁&nbsp; Hồ sơ thực tập &nbsp;▾</span>
+        <ul class="sb-sub open">
+          <li><a href="MH-PDT-03_ReviewProfile.html">Kiểm tra hồ sơ</a></li>
+        </ul>
+      </li>
+      <li><span class="mn-group">📜&nbsp; Quyết định &nbsp;▾</span>
+        <ul class="sb-sub open">
+          <li><a href="MH-PDT-02_Decision.html">Quản lý quyết định</a></li>
+        </ul>
+      </li>
+    </ul>
+  </nav>
+
+  <!-- Main -->
+  <div class="main">
+    <header class="app-header">
+      <span class="h-breadcrumb">Trang chủ</span>
+      <div class="h-right">
+        <div class="bw"><button class="btn btn-link" style="font-size:18px">🔔</button><span class="bc">3</span></div>
+        <div class="av" style="background:#1677ff">PĐT</div>
+      </div>
+    </header>
+    <main class="content">
+
+      <div style="font-size:15px;font-weight:600;margin-bottom:16px">Chào mừng, Phòng Đào tạo! 👋</div>
+
+      <!-- Alert đợt đang mở -->
+      <div class="alert alert-info">
+        <span class="alert-ico">📢</span>
+        <div class="alert-body">
+          <div class="alert-title">Đợt TTTN HK1 2024-2025 đang mở đăng ký</div>
+          <div class="alert-desc">Hạn đăng ký nguyện vọng: <strong>15/10/2024</strong> — Hiện có <strong>127</strong> sinh viên đã đăng ký.
+            <a href="MH-PDT-01_InternshipRound.html" style="margin-left:8px">Xem chi tiết →</a>
+          </div>
+        </div>
+      </div>
+
+      <!-- Stats -->
+      <div class="stat-grid" style="grid-template-columns:repeat(4,1fr)">
+        <a href="MH-PDT-01_InternshipRound.html" class="stat-card">
+          <div class="text-muted text-sm">Đợt thực tập</div>
+          <div class="stat-num" style="color:var(--primary)">1</div>
+          <div class="text-muted text-sm" style="margin-top:4px">🟢 Đang hoạt động</div>
+        </a>
+        <a href="MH-PDT-03_ReviewProfile.html" class="stat-card">
+          <div class="text-muted text-sm">Hồ sơ cần kiểm tra</div>
+          <div class="stat-num" style="color:var(--warning)">24</div>
+          <div class="text-muted text-sm" style="margin-top:4px">📁 Chờ xác nhận</div>
+        </a>
+        <a href="MH-PDT-02_Decision.html" class="stat-card">
+          <div class="text-muted text-sm">Quyết định thực tập</div>
+          <div class="stat-num" style="color:var(--blue)">2</div>
+          <div class="text-muted text-sm" style="margin-top:4px">📜 Đã ban hành</div>
+        </a>
+        <div class="stat-card">
+          <div class="text-muted text-sm">Tổng sinh viên TTTN</div>
+          <div class="stat-num" style="color:var(--success)">312</div>
+          <div class="text-muted text-sm" style="margin-top:4px">🎓 Năm học 2024-2025</div>
+        </div>
+      </div>
+
+      <!-- Timeline đợt thực tập -->
+      <div class="card mb-16">
+        <div class="card-hd">
+          <span class="card-title">📅 Tiến độ đợt TTTN HK1 2024-2025</span>
+          <a href="MH-PDT-01_InternshipRound.html" class="btn btn-default btn-sm">Quản lý đợt</a>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:12px">
+          <div style="display:flex;align-items:center;gap:16px">
+            <div style="width:160px;font-size:13px;color:var(--text-2)">Đăng ký nguyện vọng</div>
+            <div style="flex:1;background:#f0f0f0;border-radius:4px;height:8px;overflow:hidden">
+              <div style="width:75%;height:100%;background:var(--success);border-radius:4px"></div>
+            </div>
+            <span class="tag tag-success">Đang mở</span>
+            <span style="font-size:12px;color:var(--text-3);white-space:nowrap">Hết 15/10/2024</span>
+          </div>
+          <div style="display:flex;align-items:center;gap:16px">
+            <div style="width:160px;font-size:13px;color:var(--text-2)">Phê duyệt nguyện vọng</div>
+            <div style="flex:1;background:#f0f0f0;border-radius:4px;height:8px;overflow:hidden">
+              <div style="width:0%;height:100%;background:var(--primary);border-radius:4px"></div>
+            </div>
+            <span class="tag tag-default">Chưa mở</span>
+            <span style="font-size:12px;color:var(--text-3);white-space:nowrap">16 – 25/10/2024</span>
+          </div>
+          <div style="display:flex;align-items:center;gap:16px">
+            <div style="width:160px;font-size:13px;color:var(--text-2)">Thực tập</div>
+            <div style="flex:1;background:#f0f0f0;border-radius:4px;height:8px;overflow:hidden">
+              <div style="width:0%;height:100%;background:var(--blue);border-radius:4px"></div>
+            </div>
+            <span class="tag tag-default">Chưa bắt đầu</span>
+            <span style="font-size:12px;color:var(--text-3);white-space:nowrap">01/11 – 15/01/2025</span>
+          </div>
+          <div style="display:flex;align-items:center;gap:16px">
+            <div style="width:160px;font-size:13px;color:var(--text-2)">Nộp báo cáo</div>
+            <div style="flex:1;background:#f0f0f0;border-radius:4px;height:8px;overflow:hidden">
+              <div style="width:0%;height:100%;background:var(--warning);border-radius:4px"></div>
+            </div>
+            <span class="tag tag-default">Chưa mở</span>
+            <span style="font-size:12px;color:var(--text-3);white-space:nowrap">Hết 20/01/2025</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Thống kê nguyện vọng -->
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px">
+        <div class="card">
+          <div class="card-hd">
+            <span class="card-title">📊 Trạng thái nguyện vọng</span>
+          </div>
+          <table class="tbl">
+            <thead><tr><th>Trạng thái</th><th>Số lượng</th><th>%</th></tr></thead>
+            <tbody>
+              <tr><td><span class="tag tag-warning">Chờ duyệt</span></td><td>127</td><td>40.7%</td></tr>
+              <tr><td><span class="tag tag-success">Đã duyệt</span></td><td>155</td><td>49.7%</td></tr>
+              <tr><td><span class="tag tag-error">Từ chối</span></td><td>30</td><td>9.6%</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="card">
+          <div class="card-hd">
+            <span class="card-title">🔔 Công việc cần xử lý</span>
+          </div>
+          <div style="display:flex;flex-direction:column;gap:10px">
+            <div style="display:flex;justify-content:space-between;align-items:center;padding:10px 12px;background:#fffbe6;border-radius:6px;border-left:3px solid var(--warning)">
+              <span style="font-size:13px">Kiểm tra hồ sơ thực tập</span>
+              <div style="display:flex;align-items:center;gap:8px">
+                <span class="tag tag-warning">24 hồ sơ</span>
+                <a href="MH-PDT-03_ReviewProfile.html" class="btn btn-default btn-sm">Xử lý</a>
+              </div>
+            </div>
+            <div style="display:flex;justify-content:space-between;align-items:center;padding:10px 12px;background:#e6f4ff;border-radius:6px;border-left:3px solid var(--blue)">
+              <span style="font-size:13px">Ban hành quyết định thực tập</span>
+              <div style="display:flex;align-items:center;gap:8px">
+                <span class="tag tag-blue">Chờ nhập</span>
+                <a href="MH-PDT-02_Decision.html" class="btn btn-default btn-sm">Nhập</a>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </main>
+  </div>
+</div>
+</body>
+</html>

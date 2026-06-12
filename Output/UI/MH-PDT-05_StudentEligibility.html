@@ -27,6 +27,26 @@
     .bulk-bar{display:none;background:#e6f4ff;border:1px solid #91caff;border-radius:6px;padding:8px 16px;margin-bottom:12px;align-items:center;gap:12px;font-size:13px}
     .bulk-bar.visible{display:flex}
     .bulk-count{font-weight:600;color:#0958d9}
+    /* Sync status bar */
+    .sync-bar{background:#fff;border:1px solid var(--border);border-radius:8px;padding:12px 16px;margin-bottom:12px;display:flex;align-items:center;gap:16px;flex-wrap:wrap}
+    .sync-sources{display:flex;gap:20px;flex:1;flex-wrap:wrap}
+    .sync-source{display:flex;align-items:center;gap:8px;font-size:13px}
+    .sync-source-name{font-weight:600;color:var(--text-1);min-width:80px}
+    .sync-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
+    .sync-dot.ok{background:#52c41a}
+    .sync-dot.syncing{background:#1677ff;animation:pulse 1s infinite}
+    .sync-dot.error{background:#ff4d4f}
+    .sync-dot.stale{background:#faad14}
+    .sync-time{color:var(--text-3);font-size:12px}
+    .sync-badge{font-size:11px;padding:2px 8px;border-radius:4px;font-weight:500}
+    .sync-badge.ok{background:#f6ffed;color:#389e0d}
+    .sync-badge.syncing{background:#e6f4ff;color:#0958d9}
+    .sync-badge.error{background:#fff2f0;color:#cf1322}
+    .sync-badge.stale{background:#fffbe6;color:#d46b08}
+    .sync-divider{width:1px;height:32px;background:var(--border);flex-shrink:0}
+    @keyframes pulse{0%,100%{opacity:1}50%{opacity:.3}}
+    /* Công bố column */
+    .col-cb{width:130px;text-align:center}
     /* Column width controls */
     .col-chk{width:40px}
     .col-masv{width:120px}
@@ -103,7 +123,7 @@
         </div>
       </div>
       <div class="h-right">
-        <button class="btn btn-default btn-sm" onclick="syncTuition()">🔄 Đồng bộ học phí</button>
+        <button class="btn btn-primary btn-sm" onclick="openPublishModal()">📢 Công bố kết quả</button>
         <button class="btn btn-default btn-sm">⬇️ Xuất Excel</button>
         <div class="bw"><button class="btn btn-link" style="font-size:18px">🔔</button><span class="bc">2</span></div>
         <div class="av" style="background:#1677ff">PĐT</div>
@@ -144,6 +164,40 @@
         </div>
       </div>
 
+      <!-- Sync Status Bar -->
+      <div class="sync-bar" id="sync-bar">
+        <div class="sync-sources">
+          <!-- Nguồn 1: Hệ thống Học vụ -->
+          <div class="sync-source">
+            <span class="sync-dot ok" id="dot-hv"></span>
+            <span class="sync-source-name">Học vụ</span>
+            <span class="sync-badge ok" id="badge-hv">Đã đồng bộ</span>
+            <span class="sync-time" id="time-hv">08:30, 12/06/2026</span>
+          </div>
+          <div class="sync-divider"></div>
+          <!-- Nguồn 2: Phân hệ Tài chính -->
+          <div class="sync-source">
+            <span class="sync-dot stale" id="dot-tc"></span>
+            <span class="sync-source-name">Tài chính</span>
+            <span class="sync-badge stale" id="badge-tc">Cần cập nhật</span>
+            <span class="sync-time" id="time-tc">07:00, 12/06/2026</span>
+          </div>
+          <div class="sync-divider"></div>
+          <!-- Nguồn 3: Phân hệ Điểm / CTĐT -->
+          <div class="sync-source">
+            <span class="sync-dot ok" id="dot-diem"></span>
+            <span class="sync-source-name">Điểm &amp; CTĐT</span>
+            <span class="sync-badge ok" id="badge-diem">Đã đồng bộ</span>
+            <span class="sync-time" id="time-diem">08:30, 12/06/2026</span>
+          </div>
+        </div>
+        <!-- Actions -->
+        <div style="display:flex;gap:8px;flex-shrink:0">
+          <button class="btn btn-default btn-sm" onclick="syncSource('tc')" id="btn-sync-tc">🔄 Đồng bộ Tài chính</button>
+          <button class="btn btn-primary btn-sm" onclick="syncAll()" id="btn-sync-all">🔄 Đồng bộ tất cả</button>
+        </div>
+      </div>
+
       <!-- Filter -->
       <div class="filter-bar">
         <div class="input-search" style="width:220px">
@@ -175,6 +229,12 @@
           <option selected>K68</option>
           <option>K69</option>
         </select>
+        <select class="fc" style="width:160px">
+          <option>Tất cả TT Công bố</option>
+          <option>Đã công bố</option>
+          <option>Chưa công bố</option>
+          <option>Không áp dụng</option>
+        </select>
       </div>
 
       <!-- Bulk action bar (visible when rows selected) -->
@@ -185,6 +245,7 @@
         <div style="width:1px;height:16px;background:var(--border);margin:0 4px"></div>
         <button class="btn btn-default btn-sm">⬇️ Xuất danh sách đã chọn</button>
         <button class="btn btn-default btn-sm" onclick="bulkUpdate()">✏️ Cập nhật TT hàng loạt</button>
+        <button class="btn btn-primary btn-sm" onclick="bulkPublish()">📢 Công bố đã chọn</button>
         <button class="btn btn-link btn-sm" style="color:var(--text-3);margin-left:auto" onclick="clearAll()">✕ Bỏ chọn tất cả</button>
       </div>
 
@@ -209,6 +270,7 @@
                 <th class="col-hp">TT Học phí</th>
                 <th class="col-nv">TT Nguyện vọng</th>
                 <th class="col-note">Ghi chú</th>
+                <th class="col-cb">TT Công bố</th>
                 <th class="col-act">Thao tác</th>
               </tr>
             </thead>
@@ -227,9 +289,11 @@
                 <td><span class="tag tag-success">Đã nộp</span></td>
                 <td><span class="tag tag-success">Đã đăng ký</span></td>
                 <td style="font-style:italic;color:var(--text-3);font-size:12px">—</td>
+                <td style="text-align:center"><span class="tag tag-default" id="cb-B22DCCN001">Chưa công bố</span></td>
                 <td>
                   <div class="tbl-actions" style="justify-content:center">
                     <button class="btn btn-link btn-sm" onclick="openDetailPopup('B22DCCN001','Nguyễn Văn An')">🔍 Chi tiết</button>
+                    <button class="btn btn-link btn-sm" style="color:var(--primary)" onclick="publishOne('B22DCCN001')">📢</button>
                   </div>
                 </td>
               </tr>
@@ -247,10 +311,10 @@
                 <td><span class="tag tag-success">Đã nộp</span></td>
                 <td><span class="tag tag-default">Chưa đăng ký</span></td>
                 <td style="font-style:italic;color:var(--text-3);font-size:12px" title="GPA 2.1 < 2.5">GPA 2.1 &lt; 2.5</td>
+                <td style="text-align:center"><span class="tag tag-default" style="color:var(--text-3)" id="cb-B22DCCN015">Không áp dụng</span></td>
                 <td>
                   <div class="tbl-actions" style="justify-content:center">
                     <button class="btn btn-link btn-sm" onclick="openDetailPopup('B22DCCN015','Trần Thị Bích')">🔍 Chi tiết</button>
-                    <button class="btn btn-link btn-sm" style="color:var(--warning)" onclick="openUpdatePopup('B22DCCN015','Trần Thị Bích')">✏️ Cập nhật</button>
                   </div>
                 </td>
               </tr>
@@ -268,10 +332,10 @@
                 <td><span class="tag tag-warning">Chưa nộp</span></td>
                 <td><span class="tag tag-success">Đã đăng ký</span></td>
                 <td style="font-style:italic;color:var(--text-3);font-size:12px" title="Đã đăng ký nguyện vọng nhưng chưa hoàn thành học phí quá hạn 15/09">Đã đăng ký NV nhưng chưa nộp HP...</td>
+                <td style="text-align:center"><span class="tag tag-default" style="color:var(--text-3)" id="cb-B22DCCN033">Không áp dụng</span></td>
                 <td>
                   <div class="tbl-actions" style="justify-content:center">
                     <button class="btn btn-link btn-sm" onclick="openDetailPopup('B22DCCN033','Lê Quốc Cường')">🔍 Chi tiết</button>
-                    <button class="btn btn-link btn-sm" style="color:var(--warning)" onclick="openUpdatePopup('B22DCCN033','Lê Quốc Cường')">✏️ Cập nhật</button>
                   </div>
                 </td>
               </tr>
@@ -289,6 +353,7 @@
                 <td><span class="tag tag-success">Đã nộp</span></td>
                 <td><span class="tag tag-default">Chưa đăng ký</span></td>
                 <td style="font-style:italic;color:var(--text-3);font-size:12px">—</td>
+                <td style="text-align:center"><span class="tag tag-success" id="cb-B22DCCN047">Đã công bố</span></td>
                 <td>
                   <div class="tbl-actions" style="justify-content:center">
                     <button class="btn btn-link btn-sm" onclick="openDetailPopup('B22DCCN047','Phạm Thị Dung')">🔍 Chi tiết</button>
@@ -309,10 +374,10 @@
                 <td><span class="tag tag-warning">Chưa nộp</span></td>
                 <td><span class="tag tag-default">Chưa đăng ký</span></td>
                 <td style="font-style:italic;color:var(--text-3);font-size:12px" title="Nợ 3 học phần cơ sở ngành">Nợ 3 học phần cơ sở ngành</td>
+                <td style="text-align:center"><span class="tag tag-default" style="color:var(--text-3)" id="cb-B22DCCN058">Không áp dụng</span></td>
                 <td>
                   <div class="tbl-actions" style="justify-content:center">
                     <button class="btn btn-link btn-sm" onclick="openDetailPopup('B22DCCN058','Hoàng Minh Đức')">🔍 Chi tiết</button>
-                    <button class="btn btn-link btn-sm" style="color:var(--warning)" onclick="openUpdatePopup('B22DCCN058','Hoàng Minh Đức')">✏️ Cập nhật</button>
                   </div>
                 </td>
               </tr>
@@ -441,6 +506,44 @@
   </div>
 </div>
 
+<!-- Popup Công bố kết quả -->
+<div class="overlay hidden" id="modal-publish">
+  <div class="modal-box" style="width:500px">
+    <div class="modal-hd">
+      <span class="modal-title">📢 Công bố kết quả Xét Điều kiện</span>
+      <button class="modal-close" onclick="closeModal('modal-publish')">✕</button>
+    </div>
+    <div class="modal-bd">
+      <div class="alert alert-info" style="margin-bottom:16px">
+        <span class="alert-ico">ℹ️</span>
+        <div class="alert-body">
+          <span class="alert-title" id="pub-summary">98 sinh viên đủ điều kiện sẽ nhận thông báo</span>
+          <span class="alert-desc">Hệ thống sẽ gửi thông báo qua email và ứng dụng. Sinh viên đã công bố sẽ không gửi lại.</span>
+        </div>
+      </div>
+      <div class="fi">
+        <label>Hình thức thông báo <span class="req">*</span></label>
+        <div style="display:flex;flex-direction:column;gap:8px;margin-top:4px">
+          <label style="display:flex;align-items:center;gap:8px;font-weight:400;cursor:pointer">
+            <input type="checkbox" checked> Thông báo trong ứng dụng
+          </label>
+          <label style="display:flex;align-items:center;gap:8px;font-weight:400;cursor:pointer">
+            <input type="checkbox" checked> Gửi email
+          </label>
+        </div>
+      </div>
+      <div class="fi">
+        <label>Nội dung thông báo bổ sung <span style="color:var(--text-3);font-weight:400">(tuỳ chọn)</span></label>
+        <textarea class="fc" rows="3" placeholder="VD: Sinh viên đủ điều kiện vui lòng đăng ký nguyện vọng trước 30/09/2025..."></textarea>
+      </div>
+    </div>
+    <div class="modal-ft">
+      <button class="btn btn-default" onclick="closeModal('modal-publish')">Hủy</button>
+      <button class="btn btn-primary" onclick="confirmPublish()">📢 Xác nhận Công bố</button>
+    </div>
+  </div>
+</div>
+
 <div class="toast-box" id="toast-box"></div>
 
 <script>
@@ -535,6 +638,58 @@ function saveBulk(){
   const n = getChecked().length;
   clearAll();
   toast('Đã cập nhật trạng thái cho ' + n + ' sinh viên');
+}
+
+/* ── Công bố logic ── */
+let _publishTarget = 'all'; // 'all' | 'selected' | svId
+
+function openPublishModal(){
+  _publishTarget = 'all';
+  document.getElementById('pub-summary').textContent = '98 sinh viên đủ điều kiện chưa công bố sẽ nhận thông báo';
+  document.getElementById('modal-publish').classList.remove('hidden');
+}
+
+function bulkPublish(){
+  const ids = Array.from(getChecked()).map(c => c.closest('tr').dataset.id);
+  if(!ids.length){ toast('Chưa chọn sinh viên nào','error'); return; }
+  _publishTarget = 'selected';
+  document.getElementById('pub-summary').textContent = ids.length + ' sinh viên đã chọn sẽ nhận thông báo công bố';
+  document.getElementById('modal-publish').classList.remove('hidden');
+}
+
+function publishOne(id){
+  _publishTarget = id;
+  document.getElementById('pub-summary').textContent = 'Công bố kết quả cho sinh viên ' + id;
+  document.getElementById('modal-publish').classList.remove('hidden');
+}
+
+function confirmPublish(){
+  closeModal('modal-publish');
+  if(_publishTarget === 'all'){
+    // Cập nhật tất cả Chưa công bố → Đã công bố (chỉ tag-default non-NA)
+    document.querySelectorAll('[id^="cb-"]').forEach(el => {
+      if(el.textContent.trim() === 'Chưa công bố'){
+        el.textContent = 'Đã công bố';
+        el.className = 'tag tag-success';
+      }
+    });
+    toast('Đã công bố kết quả — thông báo gửi đến 98 sinh viên đủ điều kiện');
+  } else if(_publishTarget === 'selected'){
+    const ids = Array.from(getChecked()).map(c => c.closest('tr').dataset.id);
+    ids.forEach(id => {
+      const el = document.getElementById('cb-' + id);
+      if(el && el.textContent.trim() !== 'Không áp dụng'){
+        el.textContent = 'Đã công bố';
+        el.className = 'tag tag-success';
+      }
+    });
+    toast('Đã công bố kết quả cho ' + ids.length + ' sinh viên đã chọn');
+    clearAll();
+  } else {
+    const el = document.getElementById('cb-' + _publishTarget);
+    if(el){ el.textContent = 'Đã công bố'; el.className = 'tag tag-success'; }
+    toast('Đã công bố kết quả cho sinh viên ' + _publishTarget);
+  }
 }
 
 function syncTuition(){

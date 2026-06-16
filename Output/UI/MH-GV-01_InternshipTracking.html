@@ -617,7 +617,7 @@
 
 <!-- Modal: Nhập Điểm -->
 <div class="overlay hidden" id="modal-diem">
-  <div class="modal-box" style="width:800px;max-height:92vh">
+  <div class="modal-box" style="width:860px;max-height:92vh">
     <div class="modal-hd">
       <span class="modal-title">📊 Nhập Điểm — <span id="d-sv"></span></span>
       <button class="modal-close" onclick="closeModal('modal-diem')">✕</button>
@@ -625,7 +625,7 @@
     <div class="modal-bd" style="overflow-y:auto">
       <div class="score-tabs">
         <button class="score-tab active" id="stab-0" onclick="switchScoreTab(0)">🏢 Điểm Cơ sở TT</button>
-        <button class="score-tab" id="stab-1" onclick="switchScoreTab(1)">👨‍🏫 Phiếu đánh giá GVHD</button>
+        <button class="score-tab" id="stab-1" onclick="switchScoreTab(1)">👨‍🏫 GV Chấm 1 (GVHD)</button>
       </div>
       <div id="score-pane-0">
         <div class="alert alert-info" style="margin-bottom:16px">
@@ -664,13 +664,17 @@
         </div>
       </div>
       <div id="score-pane-1" style="display:none">
+        <div class="alert alert-info" style="margin-bottom:12px">
+          <span class="alert-ico">ℹ️</span>
+          <div class="alert-body"><span class="alert-desc">Phiếu chấm báo cáo của <strong>GV Chấm 1 (GVHD)</strong> — trọng số <strong>30%</strong> điểm tổng kết. Báo cáo được chấm song song và độc lập bởi GV Chấm 2 (30%) do Khoa phân công.</span></div>
+        </div>
         <div style="display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:14px;gap:12px">
           <div>
-            <div style="font-size:13px;font-weight:600;color:var(--text-1)">Phiếu đánh giá theo tiêu chí &mdash; CTĐT: <span id="d-ctdt" style="color:var(--primary)">KTPM</span></div>
-            <div class="text-muted text-sm" style="margin-top:2px">Tổng trọng số = 100% · Điểm mỗi tiêu chí từ 0 – 10</div>
+            <div style="font-size:13px;font-weight:600;color:var(--text-1)">Phiếu GV Chấm 1 &mdash; CTĐT: <span id="d-ctdt" style="color:var(--primary)">KTPM</span></div>
+            <div class="text-muted text-sm" style="margin-top:2px">Tiêu chí từ đề cương CTĐT · Điểm mỗi tiêu chí từ 0 – điểm tối đa</div>
           </div>
           <div style="text-align:right;flex-shrink:0">
-            <div style="font-size:12px;color:var(--text-3)">Giảng viên HD</div>
+            <div style="font-size:12px;color:var(--text-3)">GV Chấm 1 (GVHD)</div>
             <div id="d-gv-name" style="font-size:13px;font-weight:500;color:var(--text-2)">TS. Trần Triệu Long</div>
           </div>
         </div>
@@ -693,22 +697,44 @@
           </tfoot>
         </table>
         <div class="fi" style="margin-top:16px">
-          <label>Nhận xét của Giảng viên</label>
-          <textarea class="fc" id="d-gv-nxet" rows="3" placeholder="Nhận xét, góp ý, khuyến nghị của GVHD..."></textarea>
+          <label>Nhận xét của GV Chấm 1 (GVHD)</label>
+          <textarea class="fc" id="d-gv-nxet" rows="3" placeholder="Nhận xét, góp ý của GV Chấm 1 về nội dung báo cáo..."></textarea>
+        </div>
+
+        <!-- GV Chấm 2 — chỉ hiển thị, không nhập -->
+        <div style="margin-top:14px;padding:12px 14px;background:#fffbe6;border:1px solid #ffe58f;border-radius:8px">
+          <div style="font-size:12px;font-weight:600;color:#d46b08;margin-bottom:8px">👩‍🏫 GV Chấm 2 (Khoa phân công)</div>
+          <div style="display:flex;gap:32px;font-size:13px">
+            <div>
+              <div style="color:var(--text-3);font-size:11px;margin-bottom:2px">GV Chấm 2</div>
+              <div id="d-gv-c2-name" style="color:var(--text-2);font-weight:500">—</div>
+            </div>
+            <div>
+              <div style="color:var(--text-3);font-size:11px;margin-bottom:2px">Điểm BC (GV Chấm 2)</div>
+              <div id="d-gv-c2-score" style="color:var(--text-2);font-weight:500">—</div>
+            </div>
+          </div>
+          <div style="font-size:11px;color:var(--text-3);margin-top:8px">Trọng số 30% · GV Chấm 2 tự nhập sau khi chấm báo cáo — Khoa/PDT quản lý kết quả.</div>
         </div>
       </div>
-      <div class="score-summary">
-        <div class="ss-item">
-          <div class="ss-label">Điểm DN &nbsp;(trọng số 40%)</div>
+
+      <div class="score-summary" style="gap:10px;flex-wrap:wrap">
+        <div class="ss-item" style="min-width:76px">
+          <div class="ss-label">Điểm QT (DN)&nbsp;40%</div>
           <div class="ss-val" id="ss-dn">—</div>
         </div>
-        <div class="ss-op">×&thinsp;0.4&nbsp;+</div>
-        <div class="ss-item">
-          <div class="ss-label">Điểm GVHD &nbsp;(trọng số 60%)</div>
+        <div class="ss-op" style="font-size:16px">×0.4&nbsp;+</div>
+        <div class="ss-item" style="min-width:76px">
+          <div class="ss-label">GV Chấm 1&nbsp;30%</div>
           <div class="ss-val" id="ss-gv">—</div>
         </div>
-        <div class="ss-op">×&thinsp;0.6&nbsp;=</div>
-        <div class="ss-item final">
+        <div class="ss-op" style="font-size:16px">×0.3&nbsp;+</div>
+        <div class="ss-item" style="min-width:76px">
+          <div class="ss-label">GV Chấm 2&nbsp;30%</div>
+          <div class="ss-val" id="ss-c2" style="font-size:15px;color:var(--text-3)">—</div>
+        </div>
+        <div class="ss-op" style="font-size:16px">×0.3&nbsp;=</div>
+        <div class="ss-item final" style="min-width:76px">
           <div class="ss-label">Điểm Tổng kết</div>
           <div class="ss-val" id="ss-final">—</div>
         </div>
@@ -999,6 +1025,15 @@ const studentCtdt = {
   'B22DCCN033': 'HTTT', 'B22DCCN047': 'KTPM', 'B22DCCN058': 'KTPM',
 };
 
+// GV Chấm 2 do Khoa phân công (read-only với GVHD)
+const studentGVC2Info = {
+  'B22DCCN001': { name: 'TS. Lê Quốc Hùng',       score: '9.0' },
+  'B22DCCN033': { name: 'ThS. Hoàng Minh Tuấn',   score: null  },
+  'B22DCCN058': { name: null,                       score: null  },
+  'B22DCCN015': { name: null,                       score: null  },
+  'B22DCCN047': { name: null,                       score: null  },
+};
+
 function switchScoreTab(idx) {
   [0, 1].forEach(i => {
     document.getElementById('score-pane-' + i).style.display = i === idx ? '' : 'none';
@@ -1037,10 +1072,13 @@ function recalcFinal() {
   const dn  = parseFloat(document.getElementById('d-dn').value);
   const gvT = document.getElementById('crit-total-s').textContent;
   const gv  = parseFloat(gvT);
-  document.getElementById('ss-dn').textContent  = !isNaN(dn) ? dn.toFixed(1) : '—';
-  document.getElementById('ss-gv').textContent  = !isNaN(gv) ? gv.toFixed(1) : '—';
+  const pbScoreEl = document.getElementById('d-gv-c2-score');
+  const pb  = pbScoreEl ? parseFloat(pbScoreEl.textContent) : NaN;
+  document.getElementById('ss-dn').textContent = !isNaN(dn) ? dn.toFixed(1) : '—';
+  document.getElementById('ss-gv').textContent = !isNaN(gv) ? gv.toFixed(1) : '—';
+  document.getElementById('ss-c2').textContent = !isNaN(pb) ? pb.toFixed(1) : '—';
   document.getElementById('ss-final').textContent =
-    (!isNaN(dn) && !isNaN(gv)) ? (dn * 0.4 + gv * 0.6).toFixed(1) : '—';
+    (!isNaN(dn) && !isNaN(gv) && !isNaN(pb)) ? (dn * 0.4 + gv * 0.3 + pb * 0.3).toFixed(1) : '—';
 }
 
 let dnUploadFiles = [];
@@ -1094,6 +1132,11 @@ function openDiem(id, name, dnScore) {
   document.getElementById('d-dn-nguoi').value = '';
   document.getElementById('d-dn-nxet').value = '';
   document.getElementById('d-gv-nxet').value = '';
+  // GV Chấm 2 (read-only với GVHD)
+  const pbInfo = studentGVC2Info[id] || {};
+  document.getElementById('d-gv-c2-name').textContent  = pbInfo.name  || '— Khoa chưa phân công';
+  document.getElementById('d-gv-c2-score').textContent = pbInfo.score || '— Chưa chấm';
+  recalcFinal();
   dnUploadFiles = (existingDNFiles[id] || []).map(f => Object.assign({}, f));
   renderDNUploadList();
   document.getElementById('dn-upload-err').style.display = 'none';

@@ -1,0 +1,358 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Xét Điều kiện Sinh viên | Khoa CNTT</title>
+  <link rel="stylesheet" href="_styles.css">
+  <style>
+    .summary-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:16px}
+    .sum-card{background:#fff;border:1px solid var(--border);border-radius:8px;padding:14px 18px;display:flex;align-items:center;gap:12px}
+    .sum-icon{width:40px;height:40px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0}
+    .sum-icon.blue{background:#e6f4ff}
+    .sum-icon.green{background:#f6ffed}
+    .sum-icon.red{background:#fff2f0}
+    .sum-icon.orange{background:#fff7e6}
+    .sum-val{font-size:22px;font-weight:700;line-height:1.2}
+    .sum-label{font-size:12px;color:var(--text-3);margin-top:2px}
+    tr.row-fail td{background:#fff8f8}
+    tr.row-fail:hover td{background:#fff2f0}
+    tr.row-cancel td{background:#fafafa}
+    tr.row-cancel:hover td{background:#f5f5f5}
+    .col-masv{width:120px}
+    .col-ten{min-width:130px}
+    .col-lop{width:110px}
+    .col-khoa{width:70px}
+    .col-ctdt{width:70px}
+    .col-tc{width:80px;text-align:center}
+    .col-pct{width:80px;text-align:center}
+    .col-tt{width:130px}
+    .col-hp{width:100px}
+    .col-nv{width:110px}
+    .col-note{max-width:150px}
+    .col-cb{width:130px;text-align:center}
+    .col-act{width:100px;text-align:center}
+  </style>
+</head>
+<body>
+<div class="app">
+
+  <!-- Sidebar -->
+  <nav class="sidebar">
+    <div class="sb-logo">
+      <div class="sb-logo-icon">🎓</div>
+      <div><div class="sb-logo-text">HTQT Đại học</div><div class="text-muted text-sm">Khoa CNTT</div></div>
+    </div>
+    <div class="sb-user">
+      <div class="av">KC</div>
+      <div>
+        <div style="font-size:13px;font-weight:600">TS. Trần Văn Bình</div>
+        <div style="font-size:11px;color:var(--text-3)">Giáo vụ Khoa</div>
+      </div>
+    </div>
+    <ul class="sb-menu">
+      <li><a href="#">🏠&nbsp; Trang chủ</a></li>
+
+      <li class="active">
+        <span class="mn-group">📅&nbsp; Quản lý đợt &nbsp;▾</span>
+        <ul class="sb-sub open">
+          <li><a href="#">Danh sách đợt</a></li>
+          <li class="active"><a href="MH-KCM-04_StudentEligibility.html">DS Xét điều kiện</a></li>
+        </ul>
+      </li>
+
+      <li>
+        <span class="mn-group">📋&nbsp; Đề tài &nbsp;▾</span>
+        <ul class="sb-sub open">
+          <li><a href="#">DS đề tài của tôi</a></li>
+          <li><a href="#">DS nguyện vọng đề tài</a></li>
+          <li><a href="#">DS nguyện vọng hướng dẫn</a></li>
+          <li><a href="MH-KCM-03_TopicApproval.html">Xét duyệt đề tài</a></li>
+        </ul>
+      </li>
+
+      <li>
+        <span class="mn-group">👨‍🏫&nbsp; Hướng dẫn &nbsp;▾</span>
+        <ul class="sb-sub open">
+          <li><a href="MH-GV-01_InternshipTracking.html">QL DS thực tập</a></li>
+          <li><a href="#">QL DS đồ án tốt nghiệp</a></li>
+          <li><a href="#">QL DS khoá luận tốt nghiệp</a></li>
+          <li><a href="MH-GV-02_ChangeRequestApproval.html">Quản lý yêu cầu thay đổi</a></li>
+        </ul>
+      </li>
+    </ul>
+  </nav>
+
+  <!-- Main -->
+  <div class="main">
+    <header class="app-header">
+      <div style="display:flex;align-items:center;gap:12px">
+        <a href="MH-KCM-03_TopicApproval.html" class="btn btn-default btn-sm">← Quay lại</a>
+        <div>
+          <div style="font-weight:600;font-size:14px">Danh sách Sinh viên — Xét Điều kiện</div>
+          <div class="text-muted text-sm">Đợt: TTTN HK1 2025-2026 &nbsp;|&nbsp; K68, K69 &nbsp;|&nbsp; Khoa CNTT</div>
+        </div>
+      </div>
+      <div class="h-right">
+        <button class="btn btn-default btn-sm">⬇️ Xuất Excel</button>
+        <div class="bw"><button class="btn btn-link" style="font-size:18px">🔔</button><span class="bc">2</span></div>
+        <div class="av">KC</div>
+      </div>
+    </header>
+
+    <main class="content">
+
+      <!-- Stat summary -->
+      <div class="summary-grid">
+        <div class="sum-card">
+          <div class="sum-icon blue">👥</div>
+          <div>
+            <div class="sum-val">142</div>
+            <div class="sum-label">Tổng sinh viên</div>
+          </div>
+        </div>
+        <div class="sum-card">
+          <div class="sum-icon green">✅</div>
+          <div>
+            <div class="sum-val" style="color:var(--success)">98</div>
+            <div class="sum-label">Đủ điều kiện</div>
+          </div>
+        </div>
+        <div class="sum-card">
+          <div class="sum-icon red">❌</div>
+          <div>
+            <div class="sum-val" style="color:var(--error)">31</div>
+            <div class="sum-label">Không đủ ĐK</div>
+          </div>
+        </div>
+        <div class="sum-card">
+          <div class="sum-icon orange">💰</div>
+          <div>
+            <div class="sum-val" style="color:var(--warning)">18</div>
+            <div class="sum-label">Chưa nộp học phí</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Filter -->
+      <div class="filter-bar" style="margin-bottom:16px">
+        <div class="input-search" style="width:220px">
+          <input class="fc" type="text" placeholder="Tìm theo mã SV, họ tên...">
+        </div>
+        <select class="fc" style="width:170px">
+          <option>Tất cả TT Điều kiện</option>
+          <option>Đủ điều kiện</option>
+          <option>Không đủ ĐK</option>
+          <option>Đã hủy</option>
+        </select>
+        <select class="fc" style="width:145px">
+          <option>Tất cả Học phí</option>
+          <option>Đã nộp</option>
+          <option>Chưa nộp</option>
+        </select>
+        <select class="fc" style="width:155px">
+          <option>Tất cả Nguyện vọng</option>
+          <option>Đã đăng ký</option>
+          <option>Chưa đăng ký</option>
+        </select>
+        <select class="fc" style="width:120px">
+          <option>Tất cả Khóa</option>
+          <option selected>K68</option>
+          <option>K69</option>
+        </select>
+        <select class="fc" style="width:160px">
+          <option>Tất cả TT Công bố</option>
+          <option>Đã công bố</option>
+          <option>Chưa công bố</option>
+          <option>Không áp dụng</option>
+        </select>
+      </div>
+
+      <!-- Table -->
+      <div class="card" style="padding:0">
+        <div class="tbl-wrap">
+          <table class="tbl">
+            <thead>
+              <tr>
+                <th class="col-masv">Mã SV</th>
+                <th class="col-ten">Họ và tên</th>
+                <th class="col-lop">Lớp học phần</th>
+                <th class="col-khoa">Khóa</th>
+                <th class="col-ctdt">CTĐT</th>
+                <th class="col-tc" title="Số tín chỉ tích luỹ">TC Tích luỹ</th>
+                <th class="col-tc" title="Số tín chỉ theo Chương trình đào tạo">TC CTĐT</th>
+                <th class="col-pct" title="Tỷ lệ tín chỉ tích luỹ / tín chỉ CTĐT">Tỷ lệ TC</th>
+                <th class="col-tt">TT Điều kiện</th>
+                <th class="col-hp">TT Học phí</th>
+                <th class="col-nv">TT Nguyện vọng</th>
+                <th class="col-note">Ghi chú</th>
+                <th class="col-cb">TT Công bố</th>
+                <th class="col-act">Thao tác</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><strong>B22DCCN001</strong></td>
+                <td>Nguyễn Văn An</td>
+                <td>INT3110_1</td>
+                <td>K68</td>
+                <td>KTPM</td>
+                <td style="text-align:center">95</td>
+                <td style="text-align:center">120</td>
+                <td style="text-align:center"><span class="tag tag-success">79%</span></td>
+                <td><span class="tag tag-success">✓ Đủ điều kiện</span></td>
+                <td><span class="tag tag-success">Đã nộp</span></td>
+                <td><span class="tag tag-success">Đã đăng ký</span></td>
+                <td style="font-style:italic;color:var(--text-3);font-size:12px">—</td>
+                <td style="text-align:center"><span class="tag tag-default">Chưa công bố</span></td>
+                <td>
+                  <div class="tbl-actions" style="justify-content:center">
+                    <button class="btn btn-link btn-sm" onclick="openDetailPopup('B22DCCN001','Nguyễn Văn An')">🔍 Chi tiết</button>
+                  </div>
+                </td>
+              </tr>
+              <tr class="row-fail">
+                <td><strong>B22DCCN015</strong></td>
+                <td>Trần Thị Bích</td>
+                <td>INT3110_1</td>
+                <td>K68</td>
+                <td>KTPM</td>
+                <td style="text-align:center">88</td>
+                <td style="text-align:center">120</td>
+                <td style="text-align:center"><span class="tag tag-success">73%</span></td>
+                <td><span class="tag tag-error">✗ Không đủ ĐK</span></td>
+                <td><span class="tag tag-success">Đã nộp</span></td>
+                <td><span class="tag tag-default">Chưa đăng ký</span></td>
+                <td style="font-style:italic;color:var(--text-3);font-size:12px" title="GPA 2.1 < 2.5">GPA 2.1 &lt; 2.5</td>
+                <td style="text-align:center"><span class="tag tag-default" style="color:var(--text-3)">Không áp dụng</span></td>
+                <td>
+                  <div class="tbl-actions" style="justify-content:center">
+                    <button class="btn btn-link btn-sm" onclick="openDetailPopup('B22DCCN015','Trần Thị Bích')">🔍 Chi tiết</button>
+                  </div>
+                </td>
+              </tr>
+              <tr class="row-cancel">
+                <td><strong>B22DCCN033</strong></td>
+                <td>Lê Quốc Cường</td>
+                <td>INT3110_2</td>
+                <td>K68</td>
+                <td>KHMT</td>
+                <td style="text-align:center">75</td>
+                <td style="text-align:center">120</td>
+                <td style="text-align:center"><span class="tag tag-warning">63%</span></td>
+                <td><span class="tag tag-default">⊘ Đã hủy</span></td>
+                <td><span class="tag tag-warning">Chưa nộp</span></td>
+                <td><span class="tag tag-success">Đã đăng ký</span></td>
+                <td style="font-style:italic;color:var(--text-3);font-size:12px" title="Đã đăng ký nguyện vọng nhưng chưa hoàn thành học phí">Đã đăng ký NV nhưng chưa nộp HP...</td>
+                <td style="text-align:center"><span class="tag tag-default" style="color:var(--text-3)">Không áp dụng</span></td>
+                <td>
+                  <div class="tbl-actions" style="justify-content:center">
+                    <button class="btn btn-link btn-sm" onclick="openDetailPopup('B22DCCN033','Lê Quốc Cường')">🔍 Chi tiết</button>
+                  </div>
+                </td>
+              </tr>
+              <tr>
+                <td><strong>B22DCCN047</strong></td>
+                <td>Phạm Thị Dung</td>
+                <td>INT3110_2</td>
+                <td>K68</td>
+                <td>KTPM</td>
+                <td style="text-align:center">102</td>
+                <td style="text-align:center">120</td>
+                <td style="text-align:center"><span class="tag tag-success">85%</span></td>
+                <td><span class="tag tag-success">✓ Đủ điều kiện</span></td>
+                <td><span class="tag tag-success">Đã nộp</span></td>
+                <td><span class="tag tag-default">Chưa đăng ký</span></td>
+                <td style="font-style:italic;color:var(--text-3);font-size:12px">—</td>
+                <td style="text-align:center"><span class="tag tag-success">Đã công bố</span></td>
+                <td>
+                  <div class="tbl-actions" style="justify-content:center">
+                    <button class="btn btn-link btn-sm" onclick="openDetailPopup('B22DCCN047','Phạm Thị Dung')">🔍 Chi tiết</button>
+                  </div>
+                </td>
+              </tr>
+              <tr class="row-fail">
+                <td><strong>B22DCCN058</strong></td>
+                <td>Hoàng Minh Đức</td>
+                <td>INT3110_1</td>
+                <td>K68</td>
+                <td>HTTT</td>
+                <td style="text-align:center">68</td>
+                <td style="text-align:center">120</td>
+                <td style="text-align:center"><span class="tag tag-error">57%</span></td>
+                <td><span class="tag tag-error">✗ Không đủ ĐK</span></td>
+                <td><span class="tag tag-warning">Chưa nộp</span></td>
+                <td><span class="tag tag-default">Chưa đăng ký</span></td>
+                <td style="font-style:italic;color:var(--text-3);font-size:12px" title="Nợ 3 học phần cơ sở ngành">Nợ 3 học phần cơ sở ngành</td>
+                <td style="text-align:center"><span class="tag tag-default" style="color:var(--text-3)">Không áp dụng</span></td>
+                <td>
+                  <div class="tbl-actions" style="justify-content:center">
+                    <button class="btn btn-link btn-sm" onclick="openDetailPopup('B22DCCN058','Hoàng Minh Đức')">🔍 Chi tiết</button>
+                  </div>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="pagination">
+          <span class="pg-info">Tổng 142 sinh viên</span>
+          <button class="pg-btn active">1</button>
+          <button class="pg-btn">2</button>
+          <button class="pg-btn">3</button>
+          <button class="pg-btn">···</button>
+          <button class="pg-btn">8</button>
+        </div>
+      </div>
+    </main>
+  </div>
+</div>
+
+<!-- Modal: Chi tiết điều kiện (view only) -->
+<div class="overlay hidden" id="modal-detail">
+  <div class="modal-box w640">
+    <div class="modal-hd">
+      <span class="modal-title">🔍 Chi tiết Điều kiện — <span id="d-sv-name"></span> (<span id="d-sv-id"></span>)</span>
+      <button class="modal-close" onclick="document.getElementById('modal-detail').classList.add('hidden')">✕</button>
+    </div>
+    <div class="modal-bd">
+      <div class="alert alert-info" style="margin-bottom:16px">
+        <span class="alert-ico">ℹ️</span>
+        <div class="alert-body"><span class="alert-desc">Chỉ hiển thị các điều kiện đang được kích hoạt trong cấu hình đợt.</span></div>
+      </div>
+      <div class="tbl-wrap">
+        <table class="tbl">
+          <thead>
+            <tr>
+              <th>Điều kiện</th>
+              <th>Giá trị yêu cầu</th>
+              <th>Giá trị thực tế</th>
+              <th style="text-align:center">Kết quả</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr><td>GPA</td><td>&gt;= 2.50</td><td>2.10</td><td style="text-align:center"><span class="tag tag-error">Không đạt</span></td></tr>
+            <tr><td>Số tín chỉ tích lũy</td><td>&gt;= 80</td><td>95</td><td style="text-align:center"><span class="tag tag-success">Đạt</span></td></tr>
+            <tr><td>Số học phần nợ</td><td>&lt;= 2</td><td>1</td><td style="text-align:center"><span class="tag tag-success">Đạt</span></td></tr>
+            <tr><td>Không thuộc diện cảnh báo HV</td><td>= Không</td><td>Không</td><td style="text-align:center"><span class="tag tag-success">Đạt</span></td></tr>
+            <tr><td>Đạt chuẩn đầu ra ngoại ngữ</td><td>= Đạt</td><td>Đạt</td><td style="text-align:center"><span class="tag tag-success">Đạt</span></td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+    <div class="modal-ft">
+      <button class="btn btn-default" onclick="document.getElementById('modal-detail').classList.add('hidden')">Đóng</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast-box" id="toast-box"></div>
+
+<script>
+function openDetailPopup(id, name) {
+  document.getElementById('d-sv-id').textContent = id;
+  document.getElementById('d-sv-name').textContent = name;
+  document.getElementById('modal-detail').classList.remove('hidden');
+}
+</script>
+</body>
+</html>

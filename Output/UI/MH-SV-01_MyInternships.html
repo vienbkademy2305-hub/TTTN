@@ -47,6 +47,12 @@
     .plan-tbl{width:100%;border-collapse:collapse;font-size:13px}
     .plan-tbl th,.plan-tbl td{padding:8px 10px;border:1px solid var(--border);vertical-align:middle}
     .plan-tbl th{background:#fafafa;font-weight:500;white-space:nowrap}
+
+    /* Module tab bar */
+    .module-tabbar{display:flex;background:#fff;border-bottom:1px solid var(--border);padding:0 24px;overflow-x:auto;flex-shrink:0}
+    .mtab{display:flex;align-items:center;padding:10px 16px;font-size:13px;color:var(--text-2);text-decoration:none;border-bottom:2px solid transparent;white-space:nowrap;cursor:pointer;transition:color .15s,border-color .15s;gap:5px}
+    .mtab:hover{color:var(--primary)}
+    .mtab.active{color:var(--primary);border-bottom-color:var(--primary);font-weight:600}
   </style>
 </head>
 <body>
@@ -71,13 +77,22 @@
     <ul class="sb-menu">
       <li><a href="#">🏠&nbsp; Trang chủ</a></li>
       <li class="active">
-        <a href="#">🎓&nbsp; Quản lý tốt nghiệp</a>
+        <a href="#">🎓&nbsp; Đồ án &amp; Thực tập</a>
         <ul class="sb-sub open">
           <li class="active" id="sub-dot-hoc-tap">
-            <a href="#" onclick="switchSub(event,'dot-hoc-tap')">📚 Đợt học tập</a>
+            <a href="javascript:void(0)" onclick="switchTab('dot-hoc-tap')">📚 Đợt học tập</a>
           </li>
           <li id="sub-thuc-tap">
-            <a href="#" onclick="switchSub(event,'thuc-tap')">🏢 Thực tập</a>
+            <a href="javascript:void(0)" onclick="switchTab('thuc-tap')">🏢 Thực tập</a>
+          </li>
+          <li id="sub-do-an-kl">
+            <a href="javascript:void(0)" onclick="switchTab('do-an-kl')">📖 Đồ án / Khoá luận</a>
+          </li>
+          <li id="sub-do-an-co-so">
+            <a href="javascript:void(0)" onclick="switchTab('do-an-co-so')">🔬 Đồ án cơ sở</a>
+          </li>
+          <li>
+            <a href="MH-SV-02_TopicBrowse.html">📝 Quản lý nguyện vọng</a>
           </li>
         </ul>
       </li>
@@ -90,7 +105,7 @@
   <!-- Main -->
   <div class="main">
     <header class="app-header">
-      <span class="h-breadcrumb">🎓 <strong>Quản lý tốt nghiệp</strong></span>
+      <span class="h-breadcrumb">🎓 Đồ án &amp; Thực tập &nbsp;/&nbsp; <strong>Đợt học tập</strong></span>
       <div class="h-right">
         <div class="bw">
           <button class="btn btn-link" style="font-size:18px">🔔</button>
@@ -131,7 +146,10 @@
                   <td><span class="tag" style="color:#531dab;background:#f9f0ff;border-color:#d3adf7">Thực tập tốt nghiệp</span></td>
                   <td><span class="tag tag-success">✓ Đủ điều kiện</span></td>
                   <td style="text-align:center">
-                    <button class="btn btn-link btn-sm" onclick="openCondPopup('TTTN_2526_K1')">🔍 Chi tiết</button>
+                    <div style="display:flex;gap:6px;justify-content:center;flex-wrap:wrap">
+                      <button class="btn btn-link btn-sm" onclick="openCondPopup('TTTN_2526_K1')">🔍 Chi tiết</button>
+                      <button class="btn btn-primary btn-sm" onclick="truyCapDot('thuc-tap')">📂 Truy cập</button>
+                    </div>
                   </td>
                 </tr>
 
@@ -143,7 +161,9 @@
                   <td><span class="tag" style="color:#531dab;background:#f9f0ff;border-color:#d3adf7">Thực tập tốt nghiệp</span></td>
                   <td><span class="tag tag-error">✗ Không đủ ĐK</span></td>
                   <td style="text-align:center">
-                    <button class="btn btn-link btn-sm" onclick="openCondPopup('TTTN_2425_K2')">🔍 Chi tiết</button>
+                    <div style="display:flex;gap:6px;justify-content:center;flex-wrap:wrap">
+                      <button class="btn btn-link btn-sm" onclick="openCondPopup('TTTN_2425_K2')">🔍 Chi tiết</button>
+                    </div>
                   </td>
                 </tr>
 
@@ -155,7 +175,10 @@
                   <td><span class="tag" style="color:#0958d9;background:#e6f4ff;border-color:#91caff">Kiến tập</span></td>
                   <td><span class="tag tag-success">✓ Đủ điều kiện</span></td>
                   <td style="text-align:center">
-                    <button class="btn btn-link btn-sm" onclick="openCondPopup('KIEN_2324_HE')">🔍 Chi tiết</button>
+                    <div style="display:flex;gap:6px;justify-content:center;flex-wrap:wrap">
+                      <button class="btn btn-link btn-sm" onclick="openCondPopup('KIEN_2324_HE')">🔍 Chi tiết</button>
+                      <button class="btn btn-primary btn-sm" onclick="truyCapDot('thuc-tap')">📂 Truy cập</button>
+                    </div>
                   </td>
                 </tr>
 
@@ -167,7 +190,10 @@
                   <td><span class="tag" style="color:#531dab;background:#f9f0ff;border-color:#d3adf7">Thực tập tốt nghiệp</span></td>
                   <td><span class="tag tag-success">✓ Đủ điều kiện</span></td>
                   <td style="text-align:center">
-                    <button class="btn btn-link btn-sm" onclick="openCondPopup('TTTN_2324_K1')">🔍 Chi tiết</button>
+                    <div style="display:flex;gap:6px;justify-content:center;flex-wrap:wrap">
+                      <button class="btn btn-link btn-sm" onclick="openCondPopup('TTTN_2324_K1')">🔍 Chi tiết</button>
+                      <button class="btn btn-primary btn-sm" onclick="truyCapDot('thuc-tap')">📂 Truy cập</button>
+                    </div>
                   </td>
                 </tr>
 
@@ -185,14 +211,15 @@
             <span style="font-weight:600;font-size:14px">B22DCCN001 — Nguyễn Văn An &nbsp;|&nbsp; <span class="text-muted" style="font-weight:400">Sắp xếp: Đợt mới nhất lên đầu</span></span>
           </div>
           <div class="tbl-wrap" style="overflow-x:auto">
-            <table class="tbl" style="min-width:1260px">
+            <table class="tbl" style="min-width:1400px">
               <thead>
                 <tr>
                   <th style="width:44px;text-align:center">STT</th>
                   <th style="min-width:140px">Đợt TT</th>
+                  <th style="min-width:130px">CTĐT</th>
                   <th style="min-width:150px">Cơ sở TT</th>
                   <th style="min-width:170px">Giảng viên HD</th>
-                  <th style="text-align:center;min-width:130px">Đề cương</th>
+                  <th style="text-align:center;min-width:130px">Kế hoạch</th>
                   <th style="text-align:center;min-width:110px">File Báo cáo</th>
                   <th style="text-align:center;min-width:80px">Điểm QT</th>
                   <th style="text-align:center;min-width:80px">Điểm BC</th>
@@ -210,6 +237,7 @@
                     <div style="font-weight:600;font-size:12px;font-family:monospace">TTTN_2526_K1</div>
                     <div class="text-muted text-sm">TTTN HK1 2025-2026</div>
                   </td>
+                  <td style="font-size:12px;color:var(--text-2)">Kỹ thuật phần mềm</td>
                   <td style="font-size:13px">FPT Software</td>
                   <td style="font-size:12px;color:var(--text-2)">TS. Trần Triệu Long</td>
                   <td style="text-align:center">
@@ -226,7 +254,6 @@
                     <div style="display:flex;gap:6px;justify-content:center">
                       <button class="btn btn-link btn-sm" title="Yêu cầu gia hạn" onclick="openYeuCauGiaHan('TTTN_2526_K1')" style="font-size:16px;padding:2px 4px">⏰</button>
                       <button class="btn btn-link btn-sm" title="Yêu cầu đổi cơ sở TT" onclick="openYeuCauDoiCstt('TTTN_2526_K1')" style="font-size:16px;padding:2px 4px">🔄</button>
-                      <button class="btn btn-link btn-sm" title="Yêu cầu đổi đề tài" onclick="openYeuCauDoiDeTai('TTTN_2526_K1')" style="font-size:16px;padding:2px 4px">📝</button>
                     </div>
                   </td>
                 </tr>
@@ -238,10 +265,11 @@
                     <div style="font-weight:600;font-size:12px;font-family:monospace">TTTN_2425_K2</div>
                     <div class="text-muted text-sm">TTTN HK2 2024-2025</div>
                   </td>
+                  <td style="font-size:12px;color:var(--text-2)">Kỹ thuật phần mềm</td>
                   <td style="font-size:13px">Viettel IDC</td>
                   <td style="font-size:12px;color:var(--text-2)">TS. Trần Triệu Long<br><span style="color:var(--text-3)">ThS. Nguyễn Đình Hùng</span></td>
                   <td style="text-align:center">
-                    <button class="btn btn-sm" style="background:var(--warning);color:#fff;border-color:var(--warning);font-size:11px" onclick="openSvSubmitDc('TTTN_2425_K2')">📤 Nộp lại</button>
+                    <button class="btn btn-sm" style="background:var(--warning);color:#fff;border-color:var(--warning);font-size:11px" onclick="openSvSubmitDc('TTTN_2425_K2')">📤 Nộp</button>
                   </td>
                   <td style="text-align:center">
                     <span class="cell-na" title="Chỉ mở sau khi đề cương được duyệt">N/A</span>
@@ -256,18 +284,46 @@
                     <div style="display:flex;gap:6px;justify-content:center">
                       <button class="btn btn-link btn-sm" title="Yêu cầu gia hạn" onclick="openYeuCauGiaHan('TTTN_2425_K2')" style="font-size:16px;padding:2px 4px">⏰</button>
                       <button class="btn btn-link btn-sm" title="Yêu cầu đổi cơ sở TT" onclick="openYeuCauDoiCstt('TTTN_2425_K2')" style="font-size:16px;padding:2px 4px">🔄</button>
-                      <button class="btn btn-link btn-sm" title="Yêu cầu đổi đề tài" onclick="openYeuCauDoiDeTai('TTTN_2425_K2')" style="font-size:16px;padding:2px 4px">📝</button>
                     </div>
                   </td>
                 </tr>
 
-                <!-- Dòng 3: Đang thực hiện — đề cương đã duyệt, chờ nộp BC -->
+                <!-- Dòng 3: Đang thực hiện — kế hoạch đã duyệt, chỉ cập nhật kết quả tuần -->
                 <tr>
                   <td style="text-align:center;color:var(--text-3)">3</td>
+                  <td>
+                    <div style="font-weight:600;font-size:12px;font-family:monospace">TTTN_2425_K1</div>
+                    <div class="text-muted text-sm">TTTN HK1 2024-2025</div>
+                  </td>
+                  <td style="font-size:12px;color:var(--text-2)">Kỹ thuật phần mềm</td>
+                  <td style="font-size:13px">Samsung SDS Việt Nam</td>
+                  <td style="font-size:12px;color:var(--text-2)">PGS.TS. Đinh Thế Hiển</td>
+                  <td style="text-align:center">
+                    <span class="cell-link" onclick="openSvKetQua('TTTN_2425_K1')">Chi tiết</span>
+                  </td>
+                  <td style="text-align:center">
+                    <span class="cell-na" title="Chỉ mở sau khi kết thúc đợt thực tập">Chưa mở</span>
+                  </td>
+                  <td style="text-align:center"><span class="cell-score-empty">_._</span></td>
+                  <td style="text-align:center"><span class="cell-score-empty">_._</span></td>
+                  <td style="text-align:center"><span class="tpd-5">● Đang thực hiện</span></td>
+                  <td style="font-size:12px;color:var(--text-2)">Kế hoạch duyệt ngày 02/09/2024</td>
+                  <td style="text-align:center">
+                    <div style="display:flex;gap:6px;justify-content:center">
+                      <button class="btn btn-link btn-sm" title="Yêu cầu gia hạn" onclick="openYeuCauGiaHan('TTTN_2425_K1')" style="font-size:16px;padding:2px 4px">⏰</button>
+                      <button class="btn btn-link btn-sm" title="Yêu cầu đổi cơ sở TT" onclick="openYeuCauDoiCstt('TTTN_2425_K1')" style="font-size:16px;padding:2px 4px">🔄</button>
+                    </div>
+                  </td>
+                </tr>
+
+                <!-- Dòng 4: Đang thực hiện — đề cương đã duyệt, chờ nộp BC -->
+                <tr>
+                  <td style="text-align:center;color:var(--text-3)">4</td>
                   <td>
                     <div style="font-weight:600;font-size:12px;font-family:monospace">KIEN_2324_HE</div>
                     <div class="text-muted text-sm">Kiến tập HK hè 2023-2024</div>
                   </td>
+                  <td style="font-size:12px;color:var(--text-2)">Kỹ thuật phần mềm</td>
                   <td style="font-size:13px">Tập đoàn VNPT</td>
                   <td style="font-size:12px;color:var(--text-2)">ThS. Lê Thị Thu Hương</td>
                   <td style="text-align:center">
@@ -284,18 +340,18 @@
                     <div style="display:flex;gap:6px;justify-content:center">
                       <button class="btn btn-link btn-sm" title="Yêu cầu gia hạn" onclick="openYeuCauGiaHan('KIEN_2324_HE')" style="font-size:16px;padding:2px 4px">⏰</button>
                       <button class="btn btn-link btn-sm" title="Yêu cầu đổi cơ sở TT" onclick="openYeuCauDoiCstt('KIEN_2324_HE')" style="font-size:16px;padding:2px 4px">🔄</button>
-                      <button class="btn btn-link btn-sm" title="Yêu cầu đổi đề tài" onclick="openYeuCauDoiDeTai('KIEN_2324_HE')" style="font-size:16px;padding:2px 4px">📝</button>
                     </div>
                   </td>
                 </tr>
 
-                <!-- Dòng 4: Đã công bố điểm -->
+                <!-- Dòng 5: Đã công bố điểm -->
                 <tr>
-                  <td style="text-align:center;color:var(--text-3)">4</td>
+                  <td style="text-align:center;color:var(--text-3)">5</td>
                   <td>
                     <div style="font-weight:600;font-size:12px;font-family:monospace">TTTN_2324_K1</div>
                     <div class="text-muted text-sm">TTTN HK1 2023-2024</div>
                   </td>
+                  <td style="font-size:12px;color:var(--text-2)">Kỹ thuật phần mềm</td>
                   <td style="font-size:13px">Công ty ABC Tech</td>
                   <td style="font-size:12px;color:var(--text-2)">TS. Nguyễn Mạnh Cường</td>
                   <td style="text-align:center">
@@ -319,6 +375,26 @@
         </div>
       </div>
       <!-- /TAB: Thực tập -->
+
+      <!-- ===== TAB: Đồ án / Khoá luận ===== -->
+      <div class="tab-panel" id="tab-do-an-kl">
+        <div class="card" style="text-align:center;padding:60px 20px;color:var(--text-3)">
+          <div style="font-size:48px;margin-bottom:12px">📖</div>
+          <div style="font-size:16px;font-weight:600;margin-bottom:6px;color:var(--text-2)">Đồ án / Khoá luận</div>
+          <div class="text-sm">Tính năng đang được phát triển</div>
+        </div>
+      </div>
+      <!-- /TAB: Đồ án / Khoá luận -->
+
+      <!-- ===== TAB: Đồ án cơ sở ===== -->
+      <div class="tab-panel" id="tab-do-an-co-so">
+        <div class="card" style="text-align:center;padding:60px 20px;color:var(--text-3)">
+          <div style="font-size:48px;margin-bottom:12px">🔬</div>
+          <div style="font-size:16px;font-weight:600;margin-bottom:6px;color:var(--text-2)">Đồ án cơ sở</div>
+          <div class="text-sm">Tính năng đang được phát triển</div>
+        </div>
+      </div>
+      <!-- /TAB: Đồ án cơ sở -->
 
     </main>
   </div>
@@ -769,21 +845,116 @@
   </div>
 </div>
 
+<!-- ======================== POPUP: CẬP NHẬT KẾT QUẢ TUẦN (SV) ======================== -->
+<div class="overlay hidden" id="modal-sv-ketqua">
+  <div class="modal-box" style="width:860px;max-height:92vh">
+    <div class="modal-hd">
+      <span class="modal-title">📋 Chi tiết Kế hoạch & Kết quả — <span id="svkq-dot"></span></span>
+      <button class="modal-close" onclick="closeModal('modal-sv-ketqua')">✕</button>
+    </div>
+    <div class="modal-bd" style="overflow-y:auto">
+
+      <div class="alert alert-info" style="margin-bottom:16px">
+        <span class="alert-ico">ℹ️</span>
+        <div class="alert-body"><span class="alert-desc">Chỉ cột <strong>Kết quả đạt được</strong> có thể chỉnh sửa. Điền kết quả của tuần đã hoàn thành, để trống nếu chưa thực hiện.</span></div>
+      </div>
+
+      <div class="sec-title"><span class="sec-badge">1</span> Thông tin Cơ sở TT</div>
+      <div class="f-row col-2" style="margin-bottom:20px">
+        <div class="fi" style="grid-column:1/-1">
+          <label>Tên Cơ sở TT</label>
+          <input class="fc" type="text" id="svkq-dn" readonly style="background:#fafafa;cursor:default">
+        </div>
+        <div class="fi">
+          <label>Tỉnh / Thành phố</label>
+          <input class="fc" type="text" id="svkq-tinh" readonly style="background:#fafafa;cursor:default">
+        </div>
+        <div class="fi">
+          <label>Phường / Xã</label>
+          <input class="fc" type="text" id="svkq-phuong" readonly style="background:#fafafa;cursor:default">
+        </div>
+        <div class="fi">
+          <label>Địa chỉ chi tiết</label>
+          <input class="fc" type="text" id="svkq-addr" readonly style="background:#fafafa;cursor:default">
+        </div>
+        <div class="fi">
+          <label>Ngày bắt đầu</label>
+          <input class="fc" type="date" id="svkq-from" readonly style="background:#fafafa;cursor:default">
+        </div>
+        <div class="fi">
+          <label>Ngày kết thúc</label>
+          <input class="fc" type="date" id="svkq-to" readonly style="background:#fafafa;cursor:default">
+        </div>
+      </div>
+
+      <div class="sec-title"><span class="sec-badge">2</span> Kết quả Công việc theo Tuần</div>
+      <div style="overflow-x:auto;margin-bottom:16px">
+        <table class="plan-tbl">
+          <thead>
+            <tr>
+              <th style="width:36px;text-align:center">#</th>
+              <th style="width:90px">Tuần</th>
+              <th style="min-width:200px">Nhiệm vụ / Công việc</th>
+              <th style="min-width:220px;background:#f6ffed">Kết quả đạt được <span class="req">*</span></th>
+              <th style="min-width:110px">Ghi chú</th>
+            </tr>
+          </thead>
+          <tbody id="svkq-plan-body"></tbody>
+        </table>
+      </div>
+
+    </div>
+    <div class="modal-ft">
+      <button class="btn btn-default" onclick="closeModal('modal-sv-ketqua')">Hủy</button>
+      <button class="btn btn-primary" onclick="submitSvKetQua()">💾 Lưu kết quả</button>
+    </div>
+  </div>
+</div>
+
 <div class="toast-box" id="toast-box"></div>
 
 <script>
-/* ---- Sidebar sub-nav switching ---- */
-function switchSub(e, tab) {
-  e.preventDefault();
+/* ---- Tab switching (sidebar + horizontal tab bar) ---- */
+function switchTab(tabName) {
+  // Horizontal tab bar
+  document.querySelectorAll('.mtab[data-tab]').forEach(t => t.classList.remove('active'));
+  const activeTab = document.querySelector('.mtab[data-tab="' + tabName + '"]');
+  if (activeTab) activeTab.classList.add('active');
+
+  // Sidebar sub items
   document.querySelectorAll('.sb-sub li').forEach(li => li.classList.remove('active'));
+  const subItem = document.getElementById('sub-' + tabName);
+  if (subItem) subItem.classList.add('active');
+
+  // Content panels
   document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
-  e.currentTarget.closest('li').classList.add('active');
-  document.getElementById('tab-' + tab).classList.add('active');
-  // Update breadcrumb label
-  const labels = { 'dot-hoc-tap': 'Đợt học tập', 'thuc-tap': 'Thực tập' };
+  const panel = document.getElementById('tab-' + tabName);
+  if (panel) panel.classList.add('active');
+
+  // Breadcrumb
+  const labels = {
+    'dot-hoc-tap': 'Đợt học tập',
+    'thuc-tap': 'Thực tập',
+    'do-an-kl': 'Đồ án / Khoá luận',
+    'do-an-co-so': 'Đồ án cơ sở'
+  };
   document.querySelector('.h-breadcrumb').innerHTML =
-    '🎓 Quản lý tốt nghiệp &nbsp;/&nbsp; <strong>' + labels[tab] + '</strong>';
+    '🎓 Đồ án &amp; Thực tập &nbsp;/&nbsp; <strong>' + (labels[tabName] || tabName) + '</strong>';
+
+  // Update URL hash (no page reload)
+  history.replaceState(null, '', '#' + tabName);
 }
+
+function truyCapDot(tabName) {
+  switchTab(tabName);
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+// Handle URL hash on load (e.g. MH-SV-01.html#thuc-tap)
+window.addEventListener('DOMContentLoaded', () => {
+  const hash = location.hash.replace('#', '');
+  if (hash && document.getElementById('tab-' + hash)) switchTab(hash);
+});
 
 /* ---- Condition data (table format — đồng bộ PDT-05) ---- */
 const COND_DB = {
@@ -874,6 +1045,17 @@ const DC_DB = {
       {tuan:'Tuần 1', cv:'Tìm hiểu quy trình phát triển phần mềm Agile tại FPT', kq:'', gc:''},
       {tuan:'Tuần 2', cv:'Tham gia sprint planning và thiết kế CSDL module A', kq:'', gc:''},
       {tuan:'Tuần 3', cv:'Coding backend API RESTful cho module quản lý người dùng', kq:'', gc:''},
+    ]
+  },
+  'TTTN_2425_K1': {
+    dn:'Samsung SDS Việt Nam', tinh:'Hà Nội', quan:'Nam Từ Liêm', phuong:'Mỹ Đình 1', addr:'Tầng 12, Tòa nhà HH4, Mỹ Đình', from:'2024-09-02', to:'2025-01-10',
+    status:'approved', statusMsg:'Kế hoạch đã được GVHD phê duyệt ngày 02/09/2024.',
+    plan:[
+      {tuan:'Tuần 1–2', cv:'Tìm hiểu kiến trúc hệ thống CI/CD tại Samsung SDS', kq:'Hoàn thành báo cáo tổng quan kiến trúc CI/CD (4 trang). Tham dự 2 buổi onboarding.', gc:''},
+      {tuan:'Tuần 3–4', cv:'Hỗ trợ viết script automation test cho module đặt hàng', kq:'Viết 12 test case tự động, tỷ lệ pass đạt 92%. Ghi nhận 3 bug mới.', gc:''},
+      {tuan:'Tuần 5–6', cv:'Tham gia code review và bug fixing sprint 3', kq:'Đã review 8 PR, fix 5 bug ưu tiên cao. Ghi chú lại pattern lỗi phổ biến.', gc:'Đang tiếp tục'},
+      {tuan:'Tuần 7–8', cv:'Phát triển tính năng export báo cáo PDF', kq:'', gc:''},
+      {tuan:'Tuần 9–10', cv:'Viết tài liệu kỹ thuật và báo cáo tổng kết thực tập', kq:'', gc:''},
     ]
   },
   'TTTN_2425_K2': {
@@ -1169,6 +1351,10 @@ const DETAI_DB = {
     ten: 'Xây dựng hệ thống API quản lý người dùng',
     mota: 'Thiết kế và phát triển RESTful API cho module quản lý người dùng, phân quyền trên nền tảng Node.js / Spring Boot tại FPT Software.',
   },
+  'TTTN_2425_K1': {
+    ten: 'Xây dựng pipeline CI/CD tự động cho ứng dụng microservices',
+    mota: 'Nghiên cứu và triển khai pipeline CI/CD sử dụng Jenkins, Docker, Kubernetes cho ứng dụng microservices tại Samsung SDS Việt Nam.',
+  },
   'TTTN_2425_K2': {
     ten: 'Phát triển module giám sát và cảnh báo tự động',
     mota: 'Xây dựng module thu thập metric, phân tích ngưỡng và gửi cảnh báo tự động cho hệ thống hạ tầng tại Viettel IDC.',
@@ -1213,6 +1399,39 @@ function submitDoiDeTai() {
   errEl.style.display = 'none';
   closeModal('modal-doidetai');
   toast('Đã gửi yêu cầu đổi đề tài. Chờ Giảng viên HD và Phòng đào tạo xem xét.');
+}
+
+/* ---- Cập nhật kết quả tuần ---- */
+const GV_MAP = {
+  'TTTN_2425_K1': 'PGS.TS. Đinh Thế Hiển',
+};
+function openSvKetQua(maDot) {
+  const d = DC_DB[maDot];
+  document.getElementById('svkq-dot').textContent  = maDot;
+  document.getElementById('svkq-dn').value         = d.dn;
+  document.getElementById('svkq-tinh').value       = d.tinh   || '';
+  document.getElementById('svkq-phuong').value     = d.phuong || '';
+  document.getElementById('svkq-addr').value       = d.addr   || '';
+  document.getElementById('svkq-from').value       = d.from   || '';
+  document.getElementById('svkq-to').value         = d.to     || '';
+
+  let rows = '';
+  d.plan.forEach((r, i) => {
+    const rowBg = r.kq ? '' : 'background:#fffbe6';
+    rows += `<tr>
+      <td style="text-align:center;color:var(--text-3)">${i+1}</td>
+      <td><input class="fc" value="${r.tuan}" readonly style="background:#fafafa;cursor:default;font-size:12px"></td>
+      <td><textarea class="fc" readonly style="background:#fafafa;cursor:default;height:60px;font-size:12px;resize:none">${r.cv}</textarea></td>
+      <td style="${rowBg}"><textarea class="fc" style="height:60px;font-size:12px;resize:none" placeholder="Nhập kết quả đạt được...">${r.kq}</textarea></td>
+      <td><input class="fc" value="${r.gc}" readonly style="background:#fafafa;cursor:default;font-size:12px"></td>
+    </tr>`;
+  });
+  document.getElementById('svkq-plan-body').innerHTML = rows;
+  document.getElementById('modal-sv-ketqua').classList.remove('hidden');
+}
+function submitSvKetQua() {
+  closeModal('modal-sv-ketqua');
+  toast('Đã lưu kết quả tuần thành công.');
 }
 
 function toast(msg, type = 'success') {

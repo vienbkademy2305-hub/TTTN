@@ -674,7 +674,7 @@
 
 <!-- Modal: Nhập Điểm -->
 <div class="overlay hidden" id="modal-diem">
-  <div class="modal-box" style="width:800px;max-height:92vh">
+  <div class="modal-box" style="width:880px;max-height:92vh">
     <div class="modal-hd">
       <span class="modal-title">📊 Nhập Điểm — <span id="d-sv"></span></span>
       <button class="modal-close" onclick="closeModal('modal-diem')">✕</button>
@@ -684,7 +684,8 @@
       <!-- Tabs -->
       <div class="score-tabs">
         <button class="score-tab active" id="stab-0" onclick="switchScoreTab(0)">🏢 Điểm Cơ sở TT</button>
-        <button class="score-tab" id="stab-1" onclick="switchScoreTab(1)">👨‍🏫 Phiếu đánh giá GVHD</button>
+        <button class="score-tab" id="stab-1" onclick="switchScoreTab(1)">👨‍🏫 GV Chấm 1 (GVHD)</button>
+        <button class="score-tab" id="stab-2" onclick="switchScoreTab(2)">👩‍🏫 GV Chấm 2</button>
       </div>
 
       <!-- Pane 0 — Điểm Cơ sở TT -->
@@ -727,15 +728,19 @@
         </div>
       </div>
 
-      <!-- Pane 1 — Phiếu GVHD -->
+      <!-- Pane 1 — GVHD chấm Báo cáo -->
       <div id="score-pane-1" style="display:none">
+        <div class="alert alert-info" style="margin-bottom:12px">
+          <span class="alert-ico">ℹ️</span>
+          <div class="alert-body"><span class="alert-desc">Phiếu chấm báo cáo của <strong>GV Chấm 1 (GVHD)</strong> — người đã trực tiếp hướng dẫn sinh viên trong suốt đợt thực tập. Trọng số: <strong>30%</strong> điểm tổng kết.</span></div>
+        </div>
         <div style="display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:14px;gap:12px">
           <div>
-            <div style="font-size:13px;font-weight:600;color:var(--text-1)">Phiếu đánh giá theo tiêu chí &mdash; CTĐT: <span id="d-ctdt" style="color:var(--primary)">KTPM</span></div>
-            <div class="text-muted text-sm" style="margin-top:2px">Tiêu chí lấy từ đề cương CTĐT · Tổng trọng số = 100% · Điểm mỗi tiêu chí từ 0 – 10</div>
+            <div style="font-size:13px;font-weight:600;color:var(--text-1)">Phiếu GV Chấm 1 &mdash; CTĐT: <span id="d-ctdt" style="color:var(--primary)">KTPM</span></div>
+            <div class="text-muted text-sm" style="margin-top:2px">Tiêu chí từ đề cương CTĐT · Điểm mỗi tiêu chí từ 0 – điểm tối đa</div>
           </div>
           <div style="text-align:right;flex-shrink:0">
-            <div style="font-size:12px;color:var(--text-3)">Giảng viên HD</div>
+            <div style="font-size:12px;color:var(--text-3)">GV Chấm 1 (GVHD)</div>
             <div id="d-gv-name" style="font-size:13px;font-weight:500;color:var(--text-2)">TS. Trần Triệu Long</div>
           </div>
         </div>
@@ -761,24 +766,79 @@
         <div class="fe" id="crit-weight-err" style="display:none;margin-top:6px">Tổng trọng số phải đúng 100%!</div>
 
         <div class="fi" style="margin-top:16px">
-          <label>Nhận xét của Giảng viên</label>
-          <textarea class="fc" id="d-gv-nxet" rows="3" placeholder="Nhận xét, góp ý, khuyến nghị của GVHD..."></textarea>
+          <label>Nhận xét của GV Chấm 1 (GVHD)</label>
+          <textarea class="fc" id="d-gv-nxet" rows="3" placeholder="Nhận xét, góp ý của GV Chấm 1 về nội dung báo cáo..."></textarea>
+        </div>
+      </div>
+
+      <!-- Pane 2 — GV Chấm 2 -->
+      <div id="score-pane-2" style="display:none">
+        <div class="alert alert-info" style="margin-bottom:14px">
+          <span class="alert-ico">ℹ️</span>
+          <div class="alert-body"><span class="alert-desc">Phiếu chấm báo cáo của <strong>GV Chấm 2</strong> — do Khoa phân công, có chuyên môn phù hợp, chấm độc lập với GV Chấm 1. Trọng số: <strong>30%</strong> điểm tổng kết.</span></div>
+        </div>
+        <div class="f-row col-2" style="margin-bottom:14px;align-items:flex-end">
+          <div class="fi">
+            <label>GV Chấm 2 <span class="req">*</span></label>
+            <select class="fc" id="d-gv-c2">
+              <option value="">— Khoa chưa phân công —</option>
+              <option>TS. Lê Quốc Hùng</option>
+              <option>ThS. Hoàng Minh Tuấn</option>
+              <option>TS. Nguyễn Văn Minh</option>
+              <option>ThS. Trần Thị Lan Anh</option>
+            </select>
+            <div class="f-hint">GV có chuyên môn phù hợp — Khoa phân công, không được trùng với GV Chấm 1 (GVHD).</div>
+          </div>
+          <div class="fi">
+            <div style="font-size:12px;color:var(--text-3)">CTĐT áp dụng</div>
+            <div id="d-ctdt-c2" style="font-size:14px;font-weight:600;color:var(--primary);margin-top:4px">KTPM</div>
+          </div>
+        </div>
+
+        <table class="crit-tbl">
+          <thead>
+            <tr>
+              <th style="width:36px">#</th>
+              <th style="text-align:left;min-width:240px">Tiêu chí đánh giá</th>
+              <th style="width:120px">Điểm tối đa</th>
+              <th style="width:150px">Điểm nhập</th>
+            </tr>
+          </thead>
+          <tbody id="criteria-body-c2"></tbody>
+          <tfoot>
+            <tr>
+              <td colspan="2" style="text-align:right;color:var(--text-2)">Tổng cộng</td>
+              <td style="text-align:center;color:var(--text-3)" id="crit-total-max-c2">10.0</td>
+              <td style="text-align:center;font-size:16px;color:var(--primary)" id="crit-total-c2">—</td>
+            </tr>
+          </tfoot>
+        </table>
+        <div class="fe" id="crit-err-c2" style="display:none;margin-top:6px">Vui lòng nhập đủ điểm các tiêu chí cho GV Chấm 2!</div>
+
+        <div class="fi" style="margin-top:16px">
+          <label>Nhận xét của GV Chấm 2</label>
+          <textarea class="fc" id="d-c2-nxet" rows="3" placeholder="Nhận xét, đánh giá của GV Chấm 2 về nội dung báo cáo..."></textarea>
         </div>
       </div>
 
       <!-- Summary tổng kết -->
-      <div class="score-summary">
-        <div class="ss-item">
-          <div class="ss-label">Điểm DN &nbsp;(trọng số 40%)</div>
+      <div class="score-summary" style="gap:10px;flex-wrap:wrap">
+        <div class="ss-item" style="min-width:76px">
+          <div class="ss-label">Điểm QT (DN)&nbsp;40%</div>
           <div class="ss-val" id="ss-dn">—</div>
         </div>
-        <div class="ss-op">×&thinsp;0.4&nbsp;+</div>
-        <div class="ss-item">
-          <div class="ss-label">Điểm GVHD &nbsp;(trọng số 60%)</div>
+        <div class="ss-op" style="font-size:16px">×0.4&nbsp;+</div>
+        <div class="ss-item" style="min-width:76px">
+          <div class="ss-label">GV Chấm 1&nbsp;30%</div>
           <div class="ss-val" id="ss-gv">—</div>
         </div>
-        <div class="ss-op">×&thinsp;0.6&nbsp;=</div>
-        <div class="ss-item final">
+        <div class="ss-op" style="font-size:16px">×0.3&nbsp;+</div>
+        <div class="ss-item" style="min-width:76px">
+          <div class="ss-label">GV Chấm 2&nbsp;30%</div>
+          <div class="ss-val" id="ss-c2">—</div>
+        </div>
+        <div class="ss-op" style="font-size:16px">×0.3&nbsp;=</div>
+        <div class="ss-item final" style="min-width:76px">
           <div class="ss-label">Điểm Tổng kết</div>
           <div class="ss-val" id="ss-final">—</div>
         </div>
@@ -1312,8 +1372,17 @@ const studentCtdt = {
   'B22DCCN033': 'HTTT', 'B22DCCN047': 'KTPM', 'B22DCCN058': 'KTPM',
 };
 
+// Map studentId → GV Chấm 2 do Khoa phân công
+const studentGVC2 = {
+  'B22DCCN001': 'TS. Lê Quốc Hùng',
+  'B22DCCN033': 'ThS. Hoàng Minh Tuấn',
+  'B22DCCN058': '',
+  'B22DCCN015': '',
+  'B22DCCN047': '',
+};
+
 function switchScoreTab(idx) {
-  [0, 1].forEach(i => {
+  [0, 1, 2].forEach(i => {
     document.getElementById('score-pane-' + i).style.display = i === idx ? '' : 'none';
     document.getElementById('stab-' + i).classList.toggle('active', i === idx);
   });
@@ -1333,6 +1402,22 @@ function loadCriteria(ctdt) {
           data-max="${c.maxScore}" oninput="recalcCriteria()" style="text-align:center;width:100%"></td>
     </tr>`).join('');
   recalcCriteria();
+}
+
+function loadCriteriaC2(ctdt) {
+  const list = criteriaByCtdt[ctdt] || criteriaByCtdt['KTPM'];
+  document.getElementById('d-ctdt-c2').textContent = ctdt;
+  const totalMax = list.reduce((s, c) => s + c.maxScore, 0);
+  document.getElementById('crit-total-max-c2').textContent = totalMax.toFixed(1);
+  document.getElementById('criteria-body-c2').innerHTML = list.map((c, i) => `
+    <tr>
+      <td style="text-align:center;color:var(--text-3)">${i + 1}</td>
+      <td>${c.name}</td>
+      <td style="text-align:center;color:var(--text-3)">${c.maxScore.toFixed(1)}</td>
+      <td><input class="fc" type="number" min="0" max="${c.maxScore}" step="0.1" placeholder="0 – ${c.maxScore.toFixed(1)}"
+          data-max="${c.maxScore}" oninput="recalcCriteriaC2()" style="text-align:center;width:100%"></td>
+    </tr>`).join('');
+  recalcCriteriaC2();
 }
 
 function recalcCriteria() {
@@ -1357,14 +1442,40 @@ function recalcCriteria() {
   recalcFinal();
 }
 
+function recalcCriteriaC2() {
+  let total = 0, allFilled = true;
+  document.querySelectorAll('#criteria-body-c2 tr').forEach(tr => {
+    const inp = tr.querySelector('input');
+    if (!inp) return;
+    const max = parseFloat(inp.dataset.max);
+    const v   = parseFloat(inp.value);
+    if (!isNaN(v) && v >= 0 && v <= max) {
+      inp.style.borderColor = '';
+      total += v;
+    } else if (inp.value !== '') {
+      inp.style.borderColor = 'var(--danger)';
+      allFilled = false;
+    } else {
+      inp.style.borderColor = '';
+      allFilled = false;
+    }
+  });
+  const el = document.getElementById('crit-total-c2');
+  el.textContent = allFilled ? total.toFixed(1) : '—';
+  recalcFinal();
+}
+
 function recalcFinal() {
   const dn  = parseFloat(document.getElementById('d-dn').value);
   const gvT = document.getElementById('crit-total-s').textContent;
+  const pbT = document.getElementById('crit-total-c2').textContent;
   const gv  = parseFloat(gvT);
+  const pb  = parseFloat(pbT);
   document.getElementById('ss-dn').textContent  = !isNaN(dn) ? dn.toFixed(1) : '—';
   document.getElementById('ss-gv').textContent  = !isNaN(gv) ? gv.toFixed(1) : '—';
+  document.getElementById('ss-c2').textContent  = !isNaN(pb) ? pb.toFixed(1) : '—';
   document.getElementById('ss-final').textContent =
-    (!isNaN(dn) && !isNaN(gv)) ? (dn * 0.4 + gv * 0.6).toFixed(1) : '—';
+    (!isNaN(dn) && !isNaN(gv) && !isNaN(pb)) ? (dn * 0.4 + gv * 0.3 + pb * 0.3).toFixed(1) : '—';
 }
 
 // Upload minh chứng cơ sở TT
@@ -1432,12 +1543,19 @@ function openDiem(id, name, dnScore) {
   document.getElementById('d-dn-nguoi').value = '';
   document.getElementById('d-dn-nxet').value = '';
   document.getElementById('d-gv-nxet').value = '';
+  document.getElementById('d-c2-nxet').value = '';
+  // GV Chấm 2
+  const pbGV = studentGVC2[id] || '';
+  const pbSel = document.getElementById('d-gv-c2');
+  pbSel.value = pbGV;
+  if (!pbGV) pbSel.selectedIndex = 0;
   // Reset upload
   dnUploadFiles = (existingDNFiles[id] || []).map(f => Object.assign({}, f));
   renderDNUploadList();
   document.getElementById('dn-upload-err').style.display = 'none';
   const ctdt = studentCtdt[id] || 'KTPM';
   loadCriteria(ctdt);
+  loadCriteriaC2(ctdt);
   switchScoreTab(0);
   recalcFinal();
   document.getElementById('modal-diem').classList.remove('hidden');
@@ -1446,15 +1564,27 @@ function openDiem(id, name, dnScore) {
 function saveDiem() {
   const dn = parseFloat(document.getElementById('d-dn').value);
   if (isNaN(dn) || dn < 0 || dn > 10) {
+    switchScoreTab(0);
     toast('Vui lòng nhập Điểm Cơ sở TT hợp lệ (0.0 – 10.0)', 'error'); return;
   }
   const gvT = document.getElementById('crit-total-s').textContent;
   if (gvT === '—') {
-    toast('Vui lòng nhập đủ điểm cho tất cả tiêu chí GVHD', 'error'); return;
+    switchScoreTab(1);
+    toast('Vui lòng nhập đủ điểm tiêu chí cho GV Chấm 1 (tab "GV Chấm 1")', 'error'); return;
+  }
+  const pbGV = document.getElementById('d-gv-c2').value;
+  if (!pbGV) {
+    switchScoreTab(2);
+    toast('Vui lòng chọn GV Chấm 2 do Khoa phân công', 'error'); return;
+  }
+  const pbT = document.getElementById('crit-total-c2').textContent;
+  if (pbT === '—') {
+    switchScoreTab(2);
+    toast('Vui lòng nhập đủ điểm tiêu chí cho GV Chấm 2', 'error'); return;
   }
   closeModal('modal-diem');
   const fileMsg = dnUploadFiles.length ? ` · ${dnUploadFiles.length} file minh chứng đã lưu` : '';
-  toast('Đã lưu điểm — sinh viên chuyển trạng thái Đã chấm điểm' + fileMsg);
+  toast('Đã lưu điểm — QT×40% + GV Chấm 1×30% + GV Chấm 2×30% → Đã chấm điểm' + fileMsg);
 }
 
 // Checkbox / Bulk
@@ -1641,7 +1771,8 @@ const historyData = {
     { time: '05/09/2025 14:32', actor: 'Nguyễn Thị Lan',      result: 'ok',   action: 'Phê duyệt đề cương / kế hoạch thực tập' },
     { time: '10/09/2025 09:00', actor: 'Nguyễn Thị Lan',      result: 'ok',   action: 'Phân công GVHD → TS. Trần Triệu Long' },
     { time: '20/11/2025 09:15', actor: 'Hệ thống',            result: 'ok',   action: 'Ghi nhận nộp báo cáo cuối kỳ — đúng hạn' },
-    { time: '25/11/2025 16:00', actor: 'TS. Trần Triệu Long', result: 'ok',   action: 'Cập nhật điểm: QT = 8.5 · BC = 9.0 · Tổng kết = 8.8' },
+    { time: '25/11/2025 16:00', actor: 'TS. Trần Triệu Long (GV Chấm 1)',  result: 'ok', action: 'Nhập điểm báo cáo — GV Chấm 1: 9.0' },
+    { time: '26/11/2025 09:30', actor: 'TS. Lê Quốc Hùng (GV Chấm 2)',    result: 'ok', action: 'Nhập điểm báo cáo — GV Chấm 2: 9.0 · QT = 8.5 · Tổng kết = 8.8 (8.5×0.4 + 9.0×0.3 + 9.0×0.3)' },
     { time: '28/11/2025 10:00', actor: 'Nguyễn Thị Lan',      result: 'ok',   action: 'Công bố kết quả thực tập → Trạng thái: Đã công bố' },
   ],
   'B22DCCN015': [
@@ -1664,7 +1795,7 @@ const historyData = {
     { time: '06/09/2025 15:20', actor: 'Nguyễn Thị Lan',        result: 'ok', action: 'Phê duyệt đề cương / kế hoạch thực tập' },
     { time: '12/09/2025 11:00', actor: 'Nguyễn Thị Lan',        result: 'ok', action: 'Phân công GVHD → ThS. Nguyễn Đình Hùng' },
     { time: '22/11/2025 08:50', actor: 'Hệ thống',              result: 'ok', action: 'Ghi nhận nộp báo cáo cuối kỳ — đúng hạn' },
-    { time: '26/11/2025 14:00', actor: 'ThS. Nguyễn Đình Hùng', result: 'ok', action: 'Cập nhật điểm quá trình: QT = 7.5 · Điểm BC chưa nhập' },
+    { time: '26/11/2025 14:00', actor: 'ThS. Nguyễn Đình Hùng (GV Chấm 1)', result: 'ok', action: 'Nhập điểm quá trình (Cơ sở TT): QT = 7.5 · Điểm BC chưa chấm (chờ GV Chấm 1 và GV Chấm 2)' },
   ],
 };
 
@@ -1699,7 +1830,7 @@ const svDetailData = {
     status:'tpd-7', statusText:'Đã công bố',
     cstt:'FPT Software', cstt_addr:'Tòa nhà FPT, Duy Tân, Cầu Giấy, Hà Nội',
     tt_from:'01/09/2025', tt_to:'31/12/2025',
-    gv:'TS. Trần Triệu Long', gv_email:'longttt@ptit.edu.vn',
+    gv:'TS. Trần Triệu Long', gv_email:'longttt@ptit.edu.vn', gv_pb:'TS. Lê Quốc Hùng',
     tt_note:'Thực tập toàn thời gian tại FPT Software (Thứ 2 – Thứ 6, 08:00 – 17:00).',
     tt_rows:[
       {buoi:'Sáng (7:30–11:30)', cells:[{t:'tt',v:'FPT Software'},{t:'tt',v:'FPT Software'},{t:'tt',v:'FPT Software'},{t:'tt',v:'FPT Software'},{t:'tt',v:'FPT Software'},{t:'',v:''}]},
@@ -1724,7 +1855,7 @@ const svDetailData = {
     status:'tpd-3', statusText:'Yêu cầu chỉnh sửa',
     cstt:'Tập đoàn Viettel', cstt_addr:'Ngõ 11 Duy Tân, Cầu Giấy, Hà Nội',
     tt_from:'02/09/2025', tt_to:'31/12/2025',
-    gv:'TS. Trần Triệu Long / ThS. Nguyễn Đình Hùng', gv_email:'—',
+    gv:'TS. Trần Triệu Long / ThS. Nguyễn Đình Hùng', gv_email:'—', gv_pb:'— Chưa phân công',
     tt_note:'Thực tập toàn thời gian tại Tập đoàn Viettel (Thứ 2 – Thứ 6, 08:00 – 17:30). Phân công đa GVHD — chưa cấu hình trọng số.',
     tt_rows:[
       {buoi:'Sáng (7:30–11:30)', cells:[{t:'tt',v:'Viettel'},{t:'tt',v:'Viettel'},{t:'tt',v:'Viettel'},{t:'tt',v:'Viettel'},{t:'tt',v:'Viettel'},{t:'',v:''}]},
@@ -1746,7 +1877,7 @@ const svDetailData = {
     status:'tpd-4', statusText:'Chờ Khoa/Trường duyệt',
     cstt:'VNPT Technology', cstt_addr:'Phố Láng Hạ, Ba Đình, Hà Nội',
     tt_from:'01/09/2025', tt_to:'31/12/2025',
-    gv:'TS. Phạm Văn Đức', gv_email:'ducpv@ptit.edu.vn',
+    gv:'TS. Phạm Văn Đức', gv_email:'ducpv@ptit.edu.vn', gv_pb:'ThS. Hoàng Minh Tuấn',
     tt_note:'Thực tập toàn thời gian tại VNPT Technology (Thứ 2 – Thứ 6, 08:00 – 17:00).',
     tt_rows:[
       {buoi:'Sáng (7:30–11:30)', cells:[{t:'tt',v:'VNPT Tech'},{t:'tt',v:'VNPT Tech'},{t:'tt',v:'VNPT Tech'},{t:'tt',v:'VNPT Tech'},{t:'tt',v:'VNPT Tech'},{t:'',v:''}]},
@@ -1768,7 +1899,7 @@ const svDetailData = {
     status:'tpd-0', statusText:'Chưa phân công GVHD',
     cstt:'— Chưa đăng ký', cstt_addr:'—',
     tt_from:'—', tt_to:'—',
-    gv:'— Chưa phân công', gv_email:'—',
+    gv:'— Chưa phân công', gv_email:'—', gv_pb:'— Chưa phân công',
     tt_note:'Sinh viên chưa đăng ký cơ sở thực tập. Hiện đang học 3 môn bù trước khi được tham gia đợt thực tập.',
     tt_rows:[
       {buoi:'Sáng (7:30–11:30)', cells:[{t:'sub',v:'QTDA PM\nA202 · T1-3'},{t:'',v:''},{t:'sub',v:'CSDL NC\nB106 · T1-3'},{t:'',v:''},{t:'sub',v:'PTPM\nA303 · T1-3'},{t:'',v:''}]},
@@ -1788,7 +1919,7 @@ const svDetailData = {
     status:'tpd-6', statusText:'Đã chấm điểm',
     cstt:'KMS Technology', cstt_addr:'Quận 3, TP. Hồ Chí Minh',
     tt_from:'01/09/2025', tt_to:'31/12/2025',
-    gv:'ThS. Nguyễn Đình Hùng', gv_email:'hungnd@ptit.edu.vn',
+    gv:'ThS. Nguyễn Đình Hùng', gv_email:'hungnd@ptit.edu.vn', gv_pb:'— Chưa phân công',
     tt_note:'Thực tập toàn thời gian tại KMS Technology, TP. Hồ Chí Minh (Thứ 2 – Thứ 6, 08:00 – 17:00).',
     tt_rows:[
       {buoi:'Sáng (7:30–11:30)', cells:[{t:'tt',v:'KMS Tech'},{t:'tt',v:'KMS Tech'},{t:'tt',v:'KMS Tech'},{t:'tt',v:'KMS Tech'},{t:'tt',v:'KMS Tech'},{t:'',v:''}]},
@@ -1841,12 +1972,12 @@ function openSVInfo(id) {
      </div>`).join('');
 
   const internItems = [
-    {lbl:'Cơ sở thực tập',    val: d.cstt},
-    {lbl:'Giảng viên HD',     val: d.gv},
-    {lbl:'Địa chỉ cơ sở',    val: d.cstt_addr},
-    {lbl:'Email GVHD',        val: d.gv_email},
-    {lbl:'Ngày bắt đầu',      val: d.tt_from},
-    {lbl:'Ngày kết thúc',     val: d.tt_to},
+    {lbl:'Cơ sở thực tập',      val: d.cstt},
+    {lbl:'Giảng viên HD',        val: d.gv},
+    {lbl:'Địa chỉ cơ sở',       val: d.cstt_addr},
+    {lbl:'GV Chấm 2 (Khoa phân công)',  val: d.gv_pb || '— Chưa phân công'},
+    {lbl:'Ngày bắt đầu',         val: d.tt_from},
+    {lbl:'Ngày kết thúc',        val: d.tt_to},
   ];
   document.getElementById('svd-intern-card').innerHTML = internItems.map(r =>
     `<div class="sv-info-row">

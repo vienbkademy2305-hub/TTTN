@@ -1,0 +1,612 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Xét duyệt Nguyện vọng Hướng dẫn | Giảng viên</title>
+  <link rel="stylesheet" href="_styles.css">
+  <style>
+    .sum-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:16px}
+    .sum-card{background:#fff;border:1px solid var(--border);border-radius:8px;padding:14px 18px;display:flex;align-items:center;gap:12px}
+    .sum-ico{width:40px;height:40px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0}
+    .sum-val{font-size:22px;font-weight:700;line-height:1.2}
+    .sum-label{font-size:12px;color:var(--text-3);margin-top:2px}
+
+    .slot-bar{background:#fff;border:1px solid var(--border);border-radius:8px;padding:12px 18px;margin-bottom:16px;display:flex;align-items:center;gap:16px;font-size:13px}
+    .slot-track{flex:1;height:8px;background:#f0f0f0;border-radius:4px;overflow:hidden}
+    .slot-fill{height:100%;background:var(--primary);border-radius:4px;transition:width .3s}
+    .slot-fill.warn{background:var(--warning)}
+    .slot-fill.full{background:var(--error)}
+
+    /* NV số badge */
+    .nv-badge{display:inline-flex;align-items:center;justify-content:center;width:22px;height:22px;border-radius:50%;background:var(--primary);color:#fff;font-size:11px;font-weight:700;flex-shrink:0}
+
+    /* Topic type tag */
+    .type-tag{font-size:11px;padding:2px 8px;border-radius:10px;border:1px solid;white-space:nowrap}
+    .type-gv{background:#e6f4ff;color:#1677ff;border-color:#91caff}
+    .type-dn{background:#fff7e6;color:#d46b08;border-color:#ffd591}
+    .type-self{background:#f9f0ff;color:#722ed1;border-color:#d3adf7}
+
+    /* info table inside modal */
+    .info-tbl{width:100%;border-collapse:collapse;font-size:13px;margin-bottom:4px}
+    .info-tbl td{padding:8px 12px;border:1px solid #e8e8e8;vertical-align:top;line-height:1.5}
+    .info-tbl .itl{background:#fafafa;color:var(--text-3);font-weight:500;width:140px;white-space:nowrap}
+
+    .section-title{font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.06em;color:var(--text-3);margin:16px 0 8px;padding-bottom:6px;border-bottom:1px solid var(--border)}
+
+    /* NV progress timeline (trong modal) */
+    .nv-timeline{display:flex;flex-direction:column;gap:0}
+    .nv-tl-item{display:flex;align-items:flex-start;gap:10px;padding:10px 0;border-bottom:1px solid var(--border)}
+    .nv-tl-item:last-child{border-bottom:none}
+    .nv-tl-num{width:26px;height:26px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;flex-shrink:0;margin-top:1px}
+    .nv-tl-num.active{background:var(--primary);color:#fff}
+    .nv-tl-num.waiting{background:#f0f0f0;color:var(--text-3);border:1px dashed #d9d9d9}
+    .nv-tl-gv{font-size:13px;font-weight:600;color:var(--text-1)}
+    .nv-tl-meta{font-size:12px;color:var(--text-3);margin-top:2px}
+
+    .name-cell{display:block;overflow:hidden;white-space:nowrap;text-overflow:ellipsis;max-width:220px}
+  </style>
+</head>
+<body>
+<div class="app">
+
+  <!-- ═══ SIDEBAR ═══ -->
+  <nav class="sidebar">
+    <div class="sb-logo">
+      <div class="sb-logo-icon">🎓</div>
+      <div><div class="sb-logo-text">HTQT Đại học</div><div class="text-muted text-sm">Giảng viên</div></div>
+    </div>
+    <div class="sb-user">
+      <div class="av" style="background:#722ed1">GV</div>
+      <div>
+        <div style="font-size:13px;font-weight:600">TS. Nguyễn Minh Tuấn</div>
+        <div style="font-size:11px;color:var(--text-3)">BM. Công nghệ phần mềm</div>
+      </div>
+    </div>
+    <ul class="sb-menu">
+      <li><a href="#">🏠&nbsp; Trang chủ</a></li>
+      <li>
+        <span class="mn-group">📋&nbsp; Đề tài &nbsp;▾</span>
+        <ul class="sb-sub open">
+          <li><a href="MH-GV-04_MyTopics.html">DS đề tài của tôi</a></li>
+          <li class="active"><a href="#">SV đề nghị tôi hướng dẫn</a></li>
+        </ul>
+      </li>
+      <li>
+        <span class="mn-group">👨‍🏫&nbsp; Hướng dẫn &nbsp;▾</span>
+        <ul class="sb-sub open">
+          <li><a href="MH-GV-01_InternshipTracking.html">QL DS thực tập</a></li>
+          <li><a href="MH-GV-02_ChangeRequestApproval.html">Quản lý yêu cầu thay đổi</a></li>
+        </ul>
+      </li>
+    </ul>
+  </nav>
+
+  <!-- ═══ MAIN ═══ -->
+  <div class="main">
+    <header class="app-header">
+      <span class="h-breadcrumb">👨‍🏫 <strong>Xét duyệt Nguyện vọng Hướng dẫn</strong></span>
+      <div class="h-right">
+        <div class="bw"><button class="btn btn-link" style="font-size:18px">🔔</button><span class="bc">3</span></div>
+        <div class="av" style="background:#722ed1">GV</div>
+      </div>
+    </header>
+
+    <main class="content">
+
+      <!-- Slot bar -->
+      <div class="slot-bar">
+        <span style="color:var(--text-2)">Slot hướng dẫn đợt <strong>HK1 2025-2026</strong>:</span>
+        <div class="slot-track">
+          <div class="slot-fill warn" id="slot-fill" style="width:60%"></div>
+        </div>
+        <span><strong id="slot-used">3</strong> / <strong id="slot-max">5</strong> đã nhận</span>
+        <span style="color:var(--success);font-weight:600">Còn nhận thêm: <span id="slot-remain">2</span></span>
+      </div>
+
+      <!-- Summary -->
+      <div class="sum-grid">
+        <div class="sum-card">
+          <div class="sum-ico" style="background:#fff7e6">⏳</div>
+          <div><div class="sum-val" style="color:var(--warning)">3</div><div class="sum-label">Chờ xét</div></div>
+        </div>
+        <div class="sum-card">
+          <div class="sum-ico" style="background:#f6ffed">✅</div>
+          <div><div class="sum-val" style="color:var(--success)">3</div><div class="sum-label">Đã chấp nhận</div></div>
+        </div>
+        <div class="sum-card">
+          <div class="sum-ico" style="background:#fff2f0">❌</div>
+          <div><div class="sum-val" style="color:var(--error)">1</div><div class="sum-label">Đã từ chối</div></div>
+        </div>
+        <div class="sum-card">
+          <div class="sum-ico" style="background:#f9f0ff">🎓</div>
+          <div><div class="sum-val" style="color:#722ed1">3</div><div class="sum-label">Đang hướng dẫn</div></div>
+        </div>
+      </div>
+
+      <!-- Card + Tabs -->
+      <div class="card">
+        <div class="tab-container">
+          <div class="tabs-nav">
+            <button class="tab-btn active" data-tab="tab-pending">
+              Chờ xét&nbsp;<span class="tag tag-warning" style="font-size:11px;padding:0 7px">3</span>
+            </button>
+            <button class="tab-btn" data-tab="tab-all">Tất cả</button>
+          </div>
+
+          <!-- ── Tab: Chờ xét ── -->
+          <div class="tab-pane active" id="tab-pending">
+            <div class="filter-bar">
+              <select class="fc" style="width:160px">
+                <option>Tất cả loại đề tài</option>
+                <option>Đề tài từ GV</option>
+                <option>Đề tài từ DN</option>
+                <option>Tự đề xuất</option>
+              </select>
+              <div class="input-search" style="flex:1;max-width:300px">
+                <input class="fc" type="text" placeholder="Tìm tên sinh viên, MSSV, đề tài...">
+              </div>
+            </div>
+            <div class="tbl-wrap">
+              <table class="tbl">
+                <thead>
+                  <tr>
+                    <th style="width:40px;text-align:center">NV</th>
+                    <th style="width:160px">Sinh viên</th>
+                    <th>Đề tài</th>
+                    <th style="width:120px">Loại đề tài</th>
+                    <th style="width:90px">Ngày gửi</th>
+                    <th style="width:110px;text-align:center">Thao tác</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td style="text-align:center"><span class="nv-badge">1</span></td>
+                    <td>
+                      <div style="font-size:13px;font-weight:600">Trần Văn An</div>
+                      <div style="font-size:11px;color:var(--text-3)">21IT001 · CNTT</div>
+                    </td>
+                    <td style="max-width:0">
+                      <a class="name-cell" href="#" title="Xây dựng ứng dụng quản lý kho hàng với React &amp; Node.js" onclick="openReview(1);return false">Xây dựng ứng dụng quản lý kho hàng với React &amp; Node.js</a>
+                    </td>
+                    <td><span class="type-tag type-gv">Đề tài GV</span></td>
+                    <td style="font-size:12px;color:var(--text-3)">10/06/2026</td>
+                    <td style="text-align:center">
+                      <button class="btn btn-primary btn-sm" onclick="openReview(1)">Xét duyệt</button>
+                    </td>
+                  </tr>
+                  <tr>
+                    <td style="text-align:center"><span class="nv-badge">2</span></td>
+                    <td>
+                      <div style="font-size:13px;font-weight:600">Nguyễn Thị Bích</div>
+                      <div style="font-size:11px;color:var(--text-3)">21IT045 · CNTT</div>
+                    </td>
+                    <td style="max-width:0">
+                      <a class="name-cell" href="#" title="Hệ thống phân tích dữ liệu bán hàng bằng Machine Learning" onclick="openReview(2);return false">Hệ thống phân tích dữ liệu bán hàng bằng Machine Learning</a>
+                    </td>
+                    <td><span class="type-tag type-self">Tự đề xuất</span></td>
+                    <td style="font-size:12px;color:var(--text-3)">11/06/2026</td>
+                    <td style="text-align:center">
+                      <button class="btn btn-primary btn-sm" onclick="openReview(2)">Xét duyệt</button>
+                    </td>
+                  </tr>
+                  <tr>
+                    <td style="text-align:center"><span class="nv-badge">1</span></td>
+                    <td>
+                      <div style="font-size:13px;font-weight:600">Lê Minh Khoa</div>
+                      <div style="font-size:11px;color:var(--text-3)">21IT078 · CNTT</div>
+                    </td>
+                    <td style="max-width:0">
+                      <a class="name-cell" href="#" title="Ứng dụng đặt lịch khám bệnh trực tuyến với React Native" onclick="openReview(3);return false">Ứng dụng đặt lịch khám bệnh trực tuyến với React Native</a>
+                    </td>
+                    <td><span class="type-tag type-dn">Đề tài DN</span></td>
+                    <td style="font-size:12px;color:var(--text-3)">12/06/2026</td>
+                    <td style="text-align:center">
+                      <button class="btn btn-primary btn-sm" onclick="openReview(3)">Xét duyệt</button>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            <div class="pagination">
+              <span class="pg-info">3 nguyện vọng chờ xét</span>
+              <button class="pg-btn active">1</button>
+            </div>
+          </div>
+
+          <!-- ── Tab: Tất cả ── -->
+          <div class="tab-pane" id="tab-all">
+            <div class="filter-bar">
+              <select class="fc" style="width:160px">
+                <option>Tất cả loại đề tài</option>
+                <option>Đề tài từ GV</option>
+                <option>Đề tài từ DN</option>
+                <option>Tự đề xuất</option>
+              </select>
+              <select class="fc" style="width:150px">
+                <option>Tất cả trạng thái</option>
+                <option>Chờ xét</option>
+                <option>Đã chấp nhận</option>
+                <option>Đã từ chối</option>
+              </select>
+              <div class="input-search" style="flex:1;max-width:280px">
+                <input class="fc" type="text" placeholder="Tìm sinh viên, đề tài...">
+              </div>
+            </div>
+            <div class="tbl-wrap">
+              <table class="tbl">
+                <thead>
+                  <tr>
+                    <th style="width:40px;text-align:center">NV</th>
+                    <th style="width:160px">Sinh viên</th>
+                    <th>Đề tài</th>
+                    <th style="width:120px">Loại đề tài</th>
+                    <th style="width:90px">Ngày gửi</th>
+                    <th style="width:120px">Trạng thái</th>
+                    <th style="width:90px;text-align:center">Thao tác</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td style="text-align:center"><span class="nv-badge">1</span></td>
+                    <td>
+                      <div style="font-size:13px;font-weight:600">Trần Văn An</div>
+                      <div style="font-size:11px;color:var(--text-3)">21IT001 · CNTT</div>
+                    </td>
+                    <td style="max-width:0"><a class="name-cell" href="#" onclick="openReview(1);return false">Xây dựng ứng dụng quản lý kho hàng với React &amp; Node.js</a></td>
+                    <td><span class="type-tag type-gv">Đề tài GV</span></td>
+                    <td style="font-size:12px;color:var(--text-3)">10/06/2026</td>
+                    <td><span class="tag tag-warning">Chờ xét</span></td>
+                    <td style="text-align:center"><button class="btn btn-primary btn-sm" onclick="openReview(1)">Xét duyệt</button></td>
+                  </tr>
+                  <tr>
+                    <td style="text-align:center"><span class="nv-badge">2</span></td>
+                    <td>
+                      <div style="font-size:13px;font-weight:600">Nguyễn Thị Bích</div>
+                      <div style="font-size:11px;color:var(--text-3)">21IT045 · CNTT</div>
+                    </td>
+                    <td style="max-width:0"><a class="name-cell" href="#" onclick="openReview(2);return false">Hệ thống phân tích dữ liệu bán hàng bằng Machine Learning</a></td>
+                    <td><span class="type-tag type-self">Tự đề xuất</span></td>
+                    <td style="font-size:12px;color:var(--text-3)">11/06/2026</td>
+                    <td><span class="tag tag-warning">Chờ xét</span></td>
+                    <td style="text-align:center"><button class="btn btn-primary btn-sm" onclick="openReview(2)">Xét duyệt</button></td>
+                  </tr>
+                  <tr>
+                    <td style="text-align:center"><span class="nv-badge">1</span></td>
+                    <td>
+                      <div style="font-size:13px;font-weight:600">Lê Minh Khoa</div>
+                      <div style="font-size:11px;color:var(--text-3)">21IT078 · CNTT</div>
+                    </td>
+                    <td style="max-width:0"><a class="name-cell" href="#" onclick="openReview(3);return false">Ứng dụng đặt lịch khám bệnh trực tuyến với React Native</a></td>
+                    <td><span class="type-tag type-dn">Đề tài DN</span></td>
+                    <td style="font-size:12px;color:var(--text-3)">12/06/2026</td>
+                    <td><span class="tag tag-warning">Chờ xét</span></td>
+                    <td style="text-align:center"><button class="btn btn-primary btn-sm" onclick="openReview(3)">Xét duyệt</button></td>
+                  </tr>
+                  <tr>
+                    <td style="text-align:center"><span class="nv-badge">1</span></td>
+                    <td>
+                      <div style="font-size:13px;font-weight:600">Phạm Thu Hà</div>
+                      <div style="font-size:11px;color:var(--text-3)">21IT033 · CNTT</div>
+                    </td>
+                    <td style="max-width:0"><a class="name-cell" href="#" onclick="openView(4);return false">Website thương mại điện tử tích hợp AI gợi ý sản phẩm</a></td>
+                    <td><span class="type-tag type-gv">Đề tài GV</span></td>
+                    <td style="font-size:12px;color:var(--text-3)">08/06/2026</td>
+                    <td><span class="tag tag-success">Đã chấp nhận</span></td>
+                    <td style="text-align:center"><button class="btn btn-link btn-sm" onclick="openView(4)">👁 Xem</button></td>
+                  </tr>
+                  <tr>
+                    <td style="text-align:center"><span class="nv-badge">1</span></td>
+                    <td>
+                      <div style="font-size:13px;font-weight:600">Vũ Đức Thành</div>
+                      <div style="font-size:11px;color:var(--text-3)">21IT092 · CNTT</div>
+                    </td>
+                    <td style="max-width:0"><a class="name-cell" href="#" onclick="openView(5);return false">Hệ thống chatbot hỗ trợ sinh viên bằng NLP</a></td>
+                    <td><span class="type-tag type-self">Tự đề xuất</span></td>
+                    <td style="font-size:12px;color:var(--text-3)">07/06/2026</td>
+                    <td><span class="tag tag-error">Đã từ chối</span></td>
+                    <td style="text-align:center"><button class="btn btn-link btn-sm" onclick="openView(5)">👁 Xem</button></td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            <div class="pagination">
+              <span class="pg-info">5 nguyện vọng</span>
+              <button class="pg-btn active">1</button>
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+    </main>
+  </div>
+</div>
+
+<!-- ═══ MODAL: Xét duyệt ═══ -->
+<div class="overlay hidden" id="modal-review">
+  <div class="modal-box w700" style="max-height:88vh">
+    <div class="modal-hd">
+      <span class="modal-title" id="rv-modal-title">Xét duyệt Nguyện vọng Hướng dẫn</span>
+      <button class="modal-close" data-close="modal-review">✕</button>
+    </div>
+    <div class="modal-bd">
+
+      <div class="section-title">Thông tin sinh viên</div>
+      <table class="info-tbl" style="margin-bottom:14px">
+        <tr><td class="itl">Họ tên</td><td><strong id="rv-sv-name"></strong></td></tr>
+        <tr><td class="itl">MSSV</td><td id="rv-sv-mssv"></td></tr>
+        <tr><td class="itl">Ngành / Lớp</td><td id="rv-sv-nganh"></td></tr>
+        <tr><td class="itl">Email</td><td id="rv-sv-email"></td></tr>
+      </table>
+
+      <div class="section-title">Thông tin đề tài</div>
+      <table class="info-tbl" style="margin-bottom:14px">
+        <tr><td class="itl">Tên đề tài</td><td><strong id="rv-dt-name"></strong></td></tr>
+        <tr><td class="itl">Loại đề tài</td><td id="rv-dt-type"></td></tr>
+        <tr><td class="itl">Mô tả / Phạm vi</td><td id="rv-dt-desc" style="line-height:1.7"></td></tr>
+        <tr><td class="itl">Công nghệ</td><td id="rv-dt-tech"></td></tr>
+        <tr><td class="itl">Kết quả mong đợi</td><td id="rv-dt-output" style="line-height:1.7"></td></tr>
+        <tr><td class="itl">DN phối hợp</td><td id="rv-dt-dn"></td></tr>
+      </table>
+
+      <div class="section-title">Vị trí trong danh sách nguyện vọng của SV</div>
+      <div class="nv-timeline" id="rv-nv-timeline"></div>
+
+    </div>
+    <div class="modal-ft">
+      <button class="btn btn-default" data-close="modal-review">Đóng</button>
+      <div style="flex:1"></div>
+      <button class="btn btn-danger" onclick="openReject()">✗&nbsp; Từ chối</button>
+      <button class="btn btn-success" onclick="confirmAccept()">✓&nbsp; Chấp nhận hướng dẫn</button>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ MODAL: Xem (read-only) ═══ -->
+<div class="overlay hidden" id="modal-view">
+  <div class="modal-box w700" style="max-height:88vh">
+    <div class="modal-hd">
+      <span class="modal-title">Chi tiết Nguyện vọng</span>
+      <button class="modal-close" data-close="modal-view">✕</button>
+    </div>
+    <div class="modal-bd">
+      <div class="section-title">Thông tin sinh viên</div>
+      <table class="info-tbl" style="margin-bottom:14px">
+        <tr><td class="itl">Họ tên</td><td><strong id="vw-sv-name"></strong></td></tr>
+        <tr><td class="itl">MSSV</td><td id="vw-sv-mssv"></td></tr>
+        <tr><td class="itl">Ngành / Lớp</td><td id="vw-sv-nganh"></td></tr>
+      </table>
+      <div class="section-title">Thông tin đề tài</div>
+      <table class="info-tbl" style="margin-bottom:14px">
+        <tr><td class="itl">Tên đề tài</td><td><strong id="vw-dt-name"></strong></td></tr>
+        <tr><td class="itl">Loại đề tài</td><td id="vw-dt-type"></td></tr>
+        <tr><td class="itl">Mô tả</td><td id="vw-dt-desc" style="line-height:1.7"></td></tr>
+        <tr><td class="itl">Công nghệ</td><td id="vw-dt-tech"></td></tr>
+      </table>
+      <div class="section-title">Kết quả xét duyệt</div>
+      <div id="vw-result"></div>
+    </div>
+    <div class="modal-ft">
+      <button class="btn btn-default" data-close="modal-view">Đóng</button>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ MODAL: Từ chối ═══ -->
+<div class="overlay hidden" id="modal-reject">
+  <div class="modal-box" style="width:460px">
+    <div class="modal-hd">
+      <span class="modal-title">Từ chối Nguyện vọng</span>
+      <button class="modal-close" data-close="modal-reject">✕</button>
+    </div>
+    <div class="modal-bd">
+      <div style="margin-bottom:12px;font-size:13px;color:var(--text-2);background:#fff7e6;border:1px solid #ffd591;border-radius:6px;padding:10px 12px">
+        ⚠ Sau khi từ chối, hệ thống sẽ tự động chuyển sang nguyện vọng tiếp theo của sinh viên (nếu có).
+      </div>
+      <div class="fi" id="fi-reject-reason">
+        <label>Lý do từ chối <span class="req">*</span></label>
+        <textarea class="fc" id="reject-reason" rows="4" data-maxlength="500"
+          placeholder="Nêu lý do để sinh viên biết..."></textarea>
+        <div class="f-hint" id="reject-cnt">0 / 500</div>
+        <div class="fe">Vui lòng nhập lý do từ chối.</div>
+      </div>
+    </div>
+    <div class="modal-ft">
+      <button class="btn btn-default" data-close="modal-reject">Hủy</button>
+      <button class="btn btn-danger" onclick="submitReject()">Xác nhận từ chối</button>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ MODAL: Xác nhận chấp nhận ═══ -->
+<div class="overlay hidden" id="modal-accept">
+  <div class="modal-box" style="width:420px">
+    <div class="modal-hd">
+      <span class="modal-title">Xác nhận Chấp nhận Hướng dẫn</span>
+      <button class="modal-close" data-close="modal-accept">✕</button>
+    </div>
+    <div class="modal-bd">
+      <div style="font-size:13px;color:var(--text-2);margin-bottom:12px">
+        Bạn xác nhận chấp nhận hướng dẫn đề tài:
+      </div>
+      <div style="font-size:14px;font-weight:600;color:var(--text-1);margin-bottom:8px" id="accept-topic-name"></div>
+      <div style="font-size:13px;color:var(--text-2)">Sinh viên: <strong id="accept-sv-name"></strong></div>
+      <div style="margin-top:12px;font-size:13px;color:var(--text-3);background:#f6ffed;border:1px solid #b7eb8f;border-radius:6px;padding:10px 12px">
+        ✅ Nguyện vọng sẽ chuyển sang <strong>Chờ KCM phê duyệt</strong> sau khi bạn xác nhận.
+      </div>
+    </div>
+    <div class="modal-ft">
+      <button class="btn btn-default" data-close="modal-accept">Hủy</button>
+      <button class="btn btn-success" onclick="submitAccept()">✓ Xác nhận</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast-box" id="toast-box"></div>
+<script src="_utils.js"></script>
+<script>
+const WISHES = {
+  1:{
+    svName:'Trần Văn An', svMssv:'21IT001', svNganh:'Công nghệ Thông tin · Lớp CNTT01', svEmail:'an.tv@student.edu.vn',
+    dtName:'Xây dựng ứng dụng quản lý kho hàng với React & Node.js',
+    dtType:'<span class="type-tag type-gv">Đề tài GV</span>',
+    dtDesc:'Xây dựng hệ thống quản lý kho hàng cho doanh nghiệp vừa và nhỏ, bao gồm nhập/xuất kho, tồn kho, báo cáo và cảnh báo.',
+    dtTech:'ReactJS, Node.js, MongoDB',
+    dtOutput:'Hệ thống web quản lý kho, báo cáo thống kê, hướng dẫn triển khai.',
+    dtDn:'Không',
+    nvPos:1,
+    nvList:['TS. Nguyễn Minh Tuấn (bạn)', 'ThS. Trần Thị Bình', 'TS. Lê Văn Cường'],
+    status:'pending'
+  },
+  2:{
+    svName:'Nguyễn Thị Bích', svMssv:'21IT045', svNganh:'Công nghệ Thông tin · Lớp CNTT02', svEmail:'bich.nt@student.edu.vn',
+    dtName:'Hệ thống phân tích dữ liệu bán hàng bằng Machine Learning',
+    dtType:'<span class="type-tag type-self">Tự đề xuất</span>',
+    dtDesc:'Nghiên cứu và xây dựng mô hình dự đoán doanh thu, phân tích hành vi mua sắm từ dữ liệu lịch sử bán hàng.',
+    dtTech:'Python, Scikit-learn, Power BI',
+    dtOutput:'Mô hình ML, dashboard phân tích, báo cáo nghiên cứu.',
+    dtDn:'Công ty ABC Technology',
+    nvPos:2,
+    nvList:['ThS. Lê Thị Hoa (đã từ chối)', 'TS. Nguyễn Minh Tuấn (bạn)', 'TS. Phạm Quốc Hùng'],
+    status:'pending'
+  },
+  3:{
+    svName:'Lê Minh Khoa', svMssv:'21IT078', svNganh:'Công nghệ Thông tin · Lớp CNTT03', svEmail:'khoa.lm@student.edu.vn',
+    dtName:'Ứng dụng đặt lịch khám bệnh trực tuyến với React Native',
+    dtType:'<span class="type-tag type-dn">Đề tài DN</span>',
+    dtDesc:'Phát triển ứng dụng di động cho phép bệnh nhân đặt lịch, nhận nhắc nhở và xem lịch sử khám bệnh.',
+    dtTech:'React Native, Firebase, Node.js',
+    dtOutput:'Ứng dụng iOS/Android, backend API, tài liệu kỹ thuật.',
+    dtDn:'Phòng khám Đa khoa XYZ',
+    nvPos:1,
+    nvList:['TS. Nguyễn Minh Tuấn (bạn)', 'ThS. Nguyễn Thu Hà'],
+    status:'pending'
+  },
+  4:{
+    svName:'Phạm Thu Hà', svMssv:'21IT033', svNganh:'Công nghệ Thông tin · Lớp CNTT01', svEmail:'ha.pt@student.edu.vn',
+    dtName:'Website thương mại điện tử tích hợp AI gợi ý sản phẩm',
+    dtType:'<span class="type-tag type-gv">Đề tài GV</span>',
+    dtDesc:'Xây dựng website TMĐT với module AI gợi ý sản phẩm cá nhân hoá dựa trên lịch sử mua sắm.',
+    dtTech:'ReactJS, Spring Boot, TensorFlow Lite',
+    dtOutput:'Website TMĐT hoàn chỉnh, API gợi ý, báo cáo đánh giá mô hình.',
+    dtDn:'Không',
+    nvPos:1,
+    nvList:['TS. Nguyễn Minh Tuấn (bạn)'],
+    status:'accepted', acceptedAt:'09/06/2026'
+  },
+  5:{
+    svName:'Vũ Đức Thành', svMssv:'21IT092', svNganh:'Công nghệ Thông tin · Lớp CNTT04', svEmail:'thanh.vd@student.edu.vn',
+    dtName:'Hệ thống chatbot hỗ trợ sinh viên bằng NLP',
+    dtType:'<span class="type-tag type-self">Tự đề xuất</span>',
+    dtDesc:'Xây dựng chatbot tích hợp website trường để hỗ trợ sinh viên tra cứu thông tin, thời khoá biểu.',
+    dtTech:'Python, Rasa, FastAPI',
+    dtOutput:'Chatbot web, tài liệu tích hợp.',
+    dtDn:'Không',
+    nvPos:1,
+    nvList:['TS. Nguyễn Minh Tuấn (bạn)', 'ThS. Trần Văn Nam'],
+    status:'rejected', rejectedAt:'08/06/2026', rejectReason:'Đề tài chưa có tính mới, tương tự nhiều đề tài đã thực hiện trong khoa.'
+  }
+};
+
+let currentId = null;
+
+function buildTimeline(wish) {
+  return wish.nvList.map((gv, i) => {
+    const isActive = (i + 1) === wish.nvPos;
+    const isPast = (i + 1) < wish.nvPos;
+    let cls = isActive ? 'active' : 'waiting';
+    let statusHtml = '';
+    if (isPast) statusHtml = '<span class="tag tag-error" style="font-size:11px">Đã từ chối</span>';
+    else if (isActive && wish.status === 'pending') statusHtml = '<span class="tag tag-warning" style="font-size:11px">Đang xét</span>';
+    else statusHtml = '<span style="font-size:11px;color:var(--text-3)">Chờ</span>';
+    return `<div class="nv-tl-item">
+      <div class="nv-tl-num ${cls}">${i+1}</div>
+      <div style="flex:1">
+        <div class="nv-tl-gv">${gv}</div>
+        <div class="nv-tl-meta">${statusHtml}</div>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function openReview(id) {
+  currentId = id;
+  const w = WISHES[id];
+  document.getElementById('rv-modal-title').textContent = 'Xét duyệt Nguyện vọng — ' + w.svName;
+  document.getElementById('rv-sv-name').textContent = w.svName;
+  document.getElementById('rv-sv-mssv').textContent = w.svMssv;
+  document.getElementById('rv-sv-nganh').textContent = w.svNganh;
+  document.getElementById('rv-sv-email').textContent = w.svEmail;
+  document.getElementById('rv-dt-name').textContent = w.dtName;
+  document.getElementById('rv-dt-type').innerHTML = w.dtType;
+  document.getElementById('rv-dt-desc').textContent = w.dtDesc;
+  document.getElementById('rv-dt-tech').textContent = w.dtTech;
+  document.getElementById('rv-dt-output').textContent = w.dtOutput;
+  document.getElementById('rv-dt-dn').textContent = w.dtDn;
+  document.getElementById('rv-nv-timeline').innerHTML = buildTimeline(w);
+  showModal('modal-review');
+}
+
+function openView(id) {
+  const w = WISHES[id];
+  document.getElementById('vw-sv-name').textContent = w.svName;
+  document.getElementById('vw-sv-mssv').textContent = w.svMssv;
+  document.getElementById('vw-sv-nganh').textContent = w.svNganh;
+  document.getElementById('vw-dt-name').textContent = w.dtName;
+  document.getElementById('vw-dt-type').innerHTML = w.dtType;
+  document.getElementById('vw-dt-desc').textContent = w.dtDesc;
+  document.getElementById('vw-dt-tech').textContent = w.dtTech;
+  let resultHtml = '';
+  if (w.status === 'accepted') {
+    resultHtml = `<div style="background:#f6ffed;border:1px solid #b7eb8f;border-radius:6px;padding:10px 14px;font-size:13px">
+      <strong style="color:var(--success)">✅ Đã chấp nhận hướng dẫn</strong><br>
+      <span style="color:var(--text-3)">Ngày: ${w.acceptedAt} · Chờ KCM phê duyệt</span>
+    </div>`;
+  } else if (w.status === 'rejected') {
+    resultHtml = `<div style="background:#fff2f0;border:1px solid #ffa39e;border-radius:6px;padding:10px 14px;font-size:13px">
+      <strong style="color:var(--error)">❌ Đã từ chối</strong><br>
+      <span style="color:var(--text-3)">Ngày: ${w.rejectedAt}</span><br>
+      <span style="color:var(--text-2);margin-top:4px;display:block">Lý do: ${w.rejectReason}</span>
+    </div>`;
+  }
+  document.getElementById('vw-result').innerHTML = resultHtml;
+  showModal('modal-view');
+}
+
+function confirmAccept() {
+  const w = WISHES[currentId];
+  document.getElementById('accept-topic-name').textContent = w.dtName;
+  document.getElementById('accept-sv-name').textContent = w.svName;
+  closeModal('modal-review');
+  showModal('modal-accept');
+}
+
+function submitAccept() {
+  closeModal('modal-accept');
+  showToast('✅ Đã chấp nhận hướng dẫn. Đang chờ KCM phê duyệt.', 'success');
+}
+
+function openReject() {
+  document.getElementById('reject-reason').value = '';
+  document.getElementById('reject-cnt').textContent = '0 / 500';
+  document.getElementById('fi-reject-reason').classList.remove('has-error');
+  closeModal('modal-review');
+  showModal('modal-reject');
+}
+
+function submitReject() {
+  const reason = document.getElementById('reject-reason').value.trim();
+  const fi = document.getElementById('fi-reject-reason');
+  if (!reason) { fi.classList.add('has-error'); return; }
+  fi.classList.remove('has-error');
+  closeModal('modal-reject');
+  showToast('❌ Đã từ chối. Hệ thống tự động chuyển sang nguyện vọng tiếp theo của sinh viên.', 'warning');
+}
+
+document.getElementById('reject-reason').addEventListener('input', function() {
+  document.getElementById('reject-cnt').textContent = this.value.length + ' / 500';
+});
+</script>
+</body>
+</html>

@@ -124,6 +124,27 @@
     .award-kk{background:#fffbe6;color:#d48806;border:1px solid #ffe58f;padding:2px 10px;border-radius:10px;font-size:11px;white-space:nowrap}
     .award-sv{background:#f0f5ff;color:#2f54eb;border:1px solid #adc6ff;padding:2px 10px;border-radius:10px;font-size:11px;white-space:nowrap}
     .award-ks{background:#f9f0ff;color:#722ed1;border:1px solid #d3adf7;padding:2px 10px;border-radius:10px;font-size:11px;white-space:nowrap}
+
+    /* ── Main tab bar ── */
+    .main-tabs{display:flex;gap:0;border-bottom:2px solid var(--border);background:#fff;padding:0 24px;flex-shrink:0}
+    .main-tab{padding:12px 22px;font-size:14px;background:none;border:none;border-bottom:3px solid transparent;margin-bottom:-2px;cursor:pointer;color:var(--text-3);transition:all .15s;font-family:inherit;font-weight:500;white-space:nowrap}
+    .main-tab:hover{color:var(--primary);background:#f5f8ff}
+    .main-tab.active{color:var(--primary);border-bottom-color:var(--primary);font-weight:700}
+    /* ── Sub-navigation pills ── */
+    .sub-nav{display:flex;gap:6px;flex-wrap:wrap;padding:14px 0 4px}
+    .sub-nav-btn{padding:6px 14px;font-size:13px;background:#fafafa;border:1px solid var(--border);border-radius:6px;cursor:pointer;color:var(--text-2);transition:all .15s;font-family:inherit;white-space:nowrap}
+    .sub-nav-btn:hover{color:var(--primary);background:#f0f7ff;border-color:#91caff}
+    .sub-nav-btn.active{color:var(--primary);background:#e6f4ff;border-color:#91caff;font-weight:600}
+    /* ── Tab / sub-tab panes ── */
+    .t-pane{display:none;padding:0 24px 24px}
+    .t-pane.show{display:block}
+    .sp-pane{display:none}
+    .sp-pane.show{display:block}
+    /* ── Placeholder ── */
+    .ph-box{text-align:center;padding:80px 24px;color:var(--text-3);background:#fafafa;border-radius:8px;border:1px dashed var(--border);margin-top:16px}
+    .ph-box .ph-ico{font-size:36px;margin-bottom:10px}
+    .ph-box .ph-txt{font-size:15px;font-weight:500;color:var(--text-2)}
+    .ph-box .ph-sub{font-size:12px;margin-top:4px}
   </style>
 </head>
 <body>
@@ -192,7 +213,59 @@
       </div>
     </header>
 
-    <main class="content">
+    <main class="content" style="padding:0">
+      <!-- ═══ Main Tab Bar ═══ -->
+      <div class="main-tabs">
+        <button class="main-tab" id="mtab-0" onclick="switchMainTab(0)">Quản lý đợt</button>
+        <button class="main-tab" id="mtab-1" onclick="switchMainTab(1)">Đề tài</button>
+        <button class="main-tab active" id="mtab-2" onclick="switchMainTab(2)">Hướng dẫn</button>
+      </div>
+
+      <!-- ═══ Tab 0: Quản lý đợt — Danh sách đợt / DS xét duyệt ═══ -->
+      <div class="t-pane" id="tpane-0">
+        <div class="sub-nav">
+          <button class="sub-nav-btn active" id="snav-0-0" onclick="switchSubNav(0,0,2)">Danh sách đợt</button>
+          <button class="sub-nav-btn" id="snav-0-1" onclick="switchSubNav(0,1,2)">DS xét duyệt</button>
+        </div>
+        <div class="sp-pane show" id="spane-0-0">
+          <div class="ph-box"><div class="ph-ico">🗓️</div><div class="ph-txt">Danh sách Đợt thực tập</div><div class="ph-sub">Quản lý các đợt thực tập trong hệ thống</div></div>
+        </div>
+        <div class="sp-pane" id="spane-0-1">
+          <div class="ph-box"><div class="ph-ico">✅</div><div class="ph-txt">Danh sách Xét duyệt</div><div class="ph-sub">Xem xét và duyệt điều kiện thực tập của sinh viên</div></div>
+        </div>
+      </div>
+
+      <!-- ═══ Tab 1: Đề tài ═══ -->
+      <div class="t-pane" id="tpane-1">
+        <div class="sub-nav">
+          <button class="sub-nav-btn active" id="snav-1-0" onclick="switchSubNav(1,0,3)">DS đề tài của tôi</button>
+          <button class="sub-nav-btn" id="snav-1-1" onclick="switchSubNav(1,1,3)">DS nguyện vọng đề tài</button>
+          <button class="sub-nav-btn" id="snav-1-2" onclick="switchSubNav(1,2,3)">DS nguyện vọng hướng dẫn</button>
+        </div>
+        <div class="sp-pane show" id="spane-1-0">
+          <div class="ph-box"><div class="ph-ico">📁</div><div class="ph-txt">Danh sách Đề tài của tôi</div><div class="ph-sub">Các đề tài đang quản lý</div></div>
+        </div>
+        <div class="sp-pane" id="spane-1-1">
+          <div class="ph-box"><div class="ph-ico">📝</div><div class="ph-txt">DS Nguyện vọng Đề tài</div><div class="ph-sub">Sinh viên đăng ký nguyện vọng đề tài</div></div>
+        </div>
+        <div class="sp-pane" id="spane-1-2">
+          <div class="ph-box"><div class="ph-ico">🎯</div><div class="ph-txt">DS Nguyện vọng Hướng dẫn</div><div class="ph-sub">Sinh viên đăng ký nguyện vọng được hướng dẫn</div></div>
+        </div>
+      </div>
+
+      <!-- ═══ Tab 2: Hướng dẫn — QL DS TT / Đồ án / Luận văn... (active) ═══ -->
+      <div class="t-pane show" id="tpane-2">
+        <div class="sub-nav">
+          <button class="sub-nav-btn active" id="snav-2-0" onclick="switchSubNav(2,0,6)">QL DS thực tập</button>
+          <button class="sub-nav-btn" id="snav-2-1" onclick="switchSubNav(2,1,6)">QL đồ án / khoá luận TN</button>
+          <button class="sub-nav-btn" id="snav-2-2" onclick="switchSubNav(2,2,6)">QL thạc sĩ</button>
+          <button class="sub-nav-btn" id="snav-2-3" onclick="switchSubNav(2,3,6)">QL tiến sĩ</button>
+          <button class="sub-nav-btn" id="snav-2-4" onclick="switchSubNav(2,4,6)">QL đồ án cơ sở / liên ngành</button>
+          <button class="sub-nav-btn" id="snav-2-5" onclick="switchSubNav(2,5,6)">QL yêu cầu thay đổi</button>
+        </div>
+
+        <!-- Sub-pane 0: QL DS thực tập (nội dung hiện tại) -->
+        <div class="sp-pane show" id="spane-2-0">
       <!-- Stats -->
       <div class="stat-row">
         <div class="stat-box">
@@ -454,6 +527,33 @@
           <button class="pg-btn">8</button>
         </div>
       </div>
+        </div><!-- end sp-pane 2-0: QL DS thực tập -->
+
+        <!-- Sub-pane 2-1: QL đồ án / khoá luận TN -->
+        <div class="sp-pane" id="spane-2-1">
+          <div class="ph-box"><div class="ph-ico">🎓</div><div class="ph-txt">QL Đồ án / Khoá luận Tốt nghiệp</div><div class="ph-sub">Quản lý danh sách sinh viên thực hiện đồ án / khoá luận</div></div>
+        </div>
+
+        <!-- Sub-pane 2-2: QL thạc sĩ -->
+        <div class="sp-pane" id="spane-2-2">
+          <div class="ph-box"><div class="ph-ico">🏛️</div><div class="ph-txt">QL Thạc sĩ</div><div class="ph-sub">Quản lý danh sách học viên cao học đang hướng dẫn</div></div>
+        </div>
+
+        <!-- Sub-pane 2-3: QL tiến sĩ -->
+        <div class="sp-pane" id="spane-2-3">
+          <div class="ph-box"><div class="ph-ico">🔬</div><div class="ph-txt">QL Tiến sĩ</div><div class="ph-sub">Quản lý danh sách nghiên cứu sinh đang hướng dẫn</div></div>
+        </div>
+
+        <!-- Sub-pane 2-4: QL đồ án cơ sở / liên ngành -->
+        <div class="sp-pane" id="spane-2-4">
+          <div class="ph-box"><div class="ph-ico">📐</div><div class="ph-txt">QL Đồ án Cơ sở / Liên ngành</div><div class="ph-sub">Quản lý đồ án cơ sở và liên ngành</div></div>
+        </div>
+
+        <!-- Sub-pane 2-5: QL yêu cầu thay đổi -->
+        <div class="sp-pane" id="spane-2-5">
+          <div class="ph-box"><div class="ph-ico">🔄</div><div class="ph-txt">QL Yêu cầu Thay đổi</div><div class="ph-sub">Xử lý các yêu cầu thay đổi từ sinh viên và giảng viên</div></div>
+        </div>
+      </div><!-- end tpane-2 -->
     </main>
   </div>
 </div>
@@ -549,7 +649,7 @@
 <div class="overlay hidden" id="modal-decanvas">
   <div class="modal-box" style="width:860px;max-height:90vh">
     <div class="modal-hd">
-      <span class="modal-title">📄 Xem xét Đề cương / Kế hoạch — <span id="dc-sv"></span></span>
+      <span class="modal-title">📄 Xem xét Đề cương / Kế hoạch — <span id="dc-sv">Nguyễn Văn An (B22DCCN001)</span> - KTPM</span>
       <button class="modal-close" onclick="closeModal('modal-decanvas')">✕</button>
     </div>
     <div class="modal-bd">
@@ -1195,6 +1295,22 @@
 <div class="toast-box" id="toast-box"></div>
 
 <script>
+// Tab bar switching
+function switchMainTab(idx) {
+  [0,1,2].forEach(i=>{
+    document.getElementById('mtab-'+i).classList.toggle('active',i===idx);
+    document.getElementById('tpane-'+i).classList.toggle('show',i===idx);
+  });
+}
+function switchSubNav(tabIdx,subIdx,total) {
+  for(let i=0;i<total;i++){
+    const b=document.getElementById('snav-'+tabIdx+'-'+i);
+    const p=document.getElementById('spane-'+tabIdx+'-'+i);
+    if(b) b.classList.toggle('active',i===subIdx);
+    if(p) p.classList.toggle('show',i===subIdx);
+  }
+}
+
 let currentGVCell = null;
 
 function closeModal(id){ document.getElementById(id).classList.add('hidden'); }

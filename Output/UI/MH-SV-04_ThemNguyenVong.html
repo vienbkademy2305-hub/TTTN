@@ -1,0 +1,557 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Thêm nguyện vọng | Sinh viên | HTQT Đại học</title>
+  <link rel="stylesheet" href="_styles.css">
+  <style>
+    /* Context bar */
+    .ctx-bar{background:#fff7e6;border:1px solid #ffd591;border-radius:8px;padding:12px 18px;margin-bottom:16px;display:flex;align-items:center;gap:12px;font-size:13px}
+    .ctx-round{font-weight:700;color:var(--text-1)}
+    .ctx-sep{color:var(--text-3)}
+    .ctx-prog{display:flex;align-items:center;gap:6px}
+    .ctx-prog-code{font-family:monospace;font-size:12px;background:#fff0c8;border:1px solid #ffd591;border-radius:4px;padding:2px 7px;color:#874d00}
+    .ctx-prog-name{font-weight:600;color:#874d00}
+
+    /* Topic table slot indicator */
+    .slsv-full{color:var(--error);font-weight:600}
+    .slsv-ok{color:var(--text-2)}
+
+    /* Selected priority list */
+    .sel-card{background:#fff;border:1px solid var(--border);border-radius:8px;margin-bottom:16px;overflow:hidden}
+    .sel-hd{padding:12px 20px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;background:#fafafa}
+    .sel-title{font-size:14px;font-weight:700}
+    .sel-count-badge{background:var(--primary);color:#fff;font-size:12px;font-weight:700;padding:2px 9px;border-radius:10px}
+
+    .prio-num{width:28px;height:28px;border-radius:50%;background:var(--primary);color:#fff;font-size:13px;font-weight:700;display:inline-flex;align-items:center;justify-content:center;flex-shrink:0}
+    .prio-num.self-type{background:#722ed1}
+
+    .arr-btn{width:26px;height:26px;border:1px solid var(--border);background:#fff;border-radius:4px;cursor:pointer;font-size:13px;display:inline-flex;align-items:center;justify-content:center;color:var(--text-2);transition:all .15s;padding:0}
+    .arr-btn:hover:not(:disabled){background:#fff7e6;border-color:var(--primary);color:var(--primary)}
+    .arr-btn:disabled{opacity:.35;cursor:not-allowed}
+
+    /* Selected — empty state */
+    .sel-empty{padding:28px;text-align:center;color:var(--text-3);font-size:13px}
+    .sel-empty .ico{font-size:32px;margin-bottom:8px}
+
+    /* Action footer */
+    .action-footer{display:flex;justify-content:flex-end;gap:10px;padding-top:4px;margin-bottom:24px}
+
+    /* Self-propose form section */
+    .sp-section{border:2px dashed #d9d9d9;border-radius:8px;padding:18px 20px}
+
+    /* Already-selected indicator in table */
+    .tbl-added{color:var(--success);font-size:12px;font-weight:600;display:inline-flex;align-items:center;gap:3px}
+  </style>
+</head>
+<body>
+<div class="app">
+
+  <!-- ═══ SIDEBAR ═══ -->
+  <nav class="sidebar">
+    <div class="sb-logo">
+      <div class="sb-logo-icon">🎓</div>
+      <div>
+        <div class="sb-logo-text">HTQT Đại học</div>
+        <div class="text-muted text-sm">Sinh viên</div>
+      </div>
+    </div>
+    <div class="sb-user">
+      <div class="av">SV</div>
+      <div>
+        <div style="font-size:13px;font-weight:600">Lê Thị Mai Anh</div>
+        <div style="font-size:11px;color:var(--text-3)">20110001 · CNTT &amp; QTKD K20</div>
+      </div>
+    </div>
+    <ul class="sb-menu">
+      <li><a href="#">🏠&nbsp; Trang chủ</a></li>
+      <li class="active">
+        <a href="#">🎓&nbsp; Đồ án &amp; Thực tập</a>
+        <ul class="sb-sub open">
+          <li><a href="MH-SV-01_MyInternships.html">📚 Đợt học tập</a></li>
+          <li><a href="MH-SV-01_MyInternships.html#thuc-tap">🏢 Thực tập</a></li>
+          <li><a href="#">📖 Đồ án / Khoá luận</a></li>
+          <li class="active"><a href="MH-SV-02_TopicBrowse.html">📝 Quản lý nguyện vọng</a></li>
+        </ul>
+      </li>
+      <li><a href="#">👤&nbsp; Hồ sơ cá nhân</a></li>
+      <li><a href="#">📰&nbsp; Thông báo</a></li>
+    </ul>
+  </nav>
+
+  <!-- ═══ MAIN ═══ -->
+  <div class="main">
+    <header class="app-header">
+      <span class="h-breadcrumb">
+        <a href="MH-SV-02_TopicBrowse.html">Quản lý nguyện vọng</a>
+        &rsaquo; <strong>Thêm nguyện vọng</strong>
+      </span>
+      <div class="h-right">
+        <div class="bw">
+          <button class="btn btn-link" style="font-size:18px">🔔</button>
+        </div>
+        <div class="av">SV</div>
+      </div>
+    </header>
+
+    <main class="content">
+
+      <!-- Context bar -->
+      <div class="ctx-bar">
+        <span>🗓</span>
+        <span class="ctx-round" id="ctx-round-name">Đợt Đồ án tốt nghiệp HK1 2025-2026</span>
+        <span class="ctx-sep">·</span>
+        <div class="ctx-prog">
+          <span>Thêm nguyện vọng cho</span>
+          <span class="ctx-prog-code" id="ctx-prog-code">CT002</span>
+          <span class="ctx-prog-name" id="ctx-prog-name">Quản trị kinh doanh</span>
+        </div>
+      </div>
+
+      <!-- Card 1: Chọn đề tài -->
+      <div class="card mb-16">
+        <div class="card-hd" style="margin-bottom:14px">
+          <h3 class="card-title">Chọn đề tài</h3>
+          <span style="font-size:12px;color:var(--text-3)">Đã chọn: <strong id="top-count">0</strong> / <span id="top-max">3</span> nguyện vọng</span>
+        </div>
+
+        <div class="tab-container">
+          <div class="tabs-nav">
+            <button class="tab-btn active" data-tab="tab-gv">🏫 Đề tài GV</button>
+            <button class="tab-btn"        data-tab="tab-self">📝 Tự đề xuất</button>
+          </div>
+
+          <!-- Tab 1: Đề tài GV -->
+          <div id="tab-gv" class="tab-pane active">
+            <div class="filter-bar">
+              <div class="input-search" style="flex:1;min-width:200px">
+                <input type="text" class="fc" id="q-topic" placeholder="Tìm tên đề tài, giảng viên...">
+              </div>
+              <select class="fc" style="width:180px" id="q-field">
+                <option value="">Tất cả lĩnh vực</option>
+              </select>
+              <select class="fc" style="width:160px" id="q-slots">
+                <option value="">Tất cả tình trạng</option>
+                <option value="ok">Còn chỗ</option>
+                <option value="full">Đã đủ chỗ</option>
+              </select>
+            </div>
+            <div class="tbl-wrap">
+              <table class="tbl" id="topic-tbl">
+                <thead>
+                  <tr>
+                    <th>Tên đề tài</th>
+                    <th style="width:170px">Giảng viên hướng dẫn</th>
+                    <th style="width:80px;text-align:center">SLSV</th>
+                    <th style="width:150px">Lĩnh vực</th>
+                    <th style="width:76px;text-align:center">Chọn</th>
+                  </tr>
+                </thead>
+                <tbody id="topic-tbody"></tbody>
+              </table>
+            </div>
+          </div>
+
+          <!-- Tab 2: Tự đề xuất -->
+          <div id="tab-self" class="tab-pane">
+            <div class="sp-section">
+              <div class="f-row col-2" style="margin-bottom:12px">
+                <div class="fi" style="margin:0">
+                  <label>Tên đề tài <span class="req">*</span></label>
+                  <input type="text" class="fc" id="sp-name" placeholder="Nhập tên đề tài đề xuất...">
+                </div>
+                <div class="fi" style="margin:0">
+                  <label>Giảng viên hướng dẫn mong muốn <span class="req">*</span></label>
+                  <select class="fc" id="sp-gv">
+                    <option value="">— Chọn giảng viên —</option>
+                  </select>
+                </div>
+              </div>
+              <div class="fi">
+                <label>Tóm tắt đề tài <span class="req">*</span>
+                  <span style="font-size:11px;color:var(--text-3);font-weight:400">&nbsp;(Mô tả, mục tiêu)</span>
+                </label>
+                <textarea class="fc" id="sp-summary" rows="3"
+                  placeholder="Mô tả ngắn gọn về đề tài, mục tiêu, phạm vi nghiên cứu..."></textarea>
+              </div>
+              <div class="fi">
+                <label>Sản phẩm / Kết quả dự kiến <span class="req">*</span></label>
+                <textarea class="fc" id="sp-products" rows="2"
+                  placeholder="Hệ thống, báo cáo, bài báo, phần mềm..."></textarea>
+              </div>
+              <div class="f-row col-2">
+                <div class="fi" style="margin:0">
+                  <label>Công nghệ / Công cụ dự kiến</label>
+                  <input type="text" class="fc" id="sp-tech"
+                    placeholder="Python, React, Arduino...">
+                </div>
+                <div class="fi" style="margin:0">
+                  <label>Tài liệu đính kèm</label>
+                  <input type="file" class="fc" id="sp-file" accept=".pdf,.doc,.docx">
+                  <div class="f-hint">PDF hoặc Word, tối đa 5 MB</div>
+                </div>
+              </div>
+              <div style="display:flex;justify-content:flex-end;margin-top:14px">
+                <button class="btn btn-primary" onclick="addSelf()">
+                  ＋ Thêm vào danh sách
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Card 2: Danh sách đã chọn -->
+      <div class="sel-card">
+        <div class="sel-hd">
+          <span class="sel-title">Danh sách nguyện vọng đã chọn</span>
+          <div style="display:flex;align-items:center;gap:8px">
+            <span style="font-size:12px;color:var(--text-3)">
+              Nguyện vọng 1 = ưu tiên cao nhất
+            </span>
+            <span class="sel-count-badge"><span id="sel-count">0</span> / <span id="sel-max">3</span></span>
+          </div>
+        </div>
+        <div id="sel-body"></div>
+      </div>
+
+      <!-- Footer actions -->
+      <div class="action-footer">
+        <button class="btn btn-default btn-lg" onclick="cancelBack()">Hủy</button>
+        <button class="btn btn-primary btn-lg" id="btn-send" onclick="submitNV()">
+          Gửi nguyện vọng <span id="send-code">CT002</span> ▶
+        </button>
+      </div>
+
+    </main>
+  </div>
+</div>
+
+<script src="_utils.js"></script>
+<script>
+/* ══ CONSTANTS ══ */
+const STORAGE_KEY = 'tttn_nv_state';
+const MAX_NV      = 3;
+
+/* ══ TOPIC DATA — keyed by CTĐT code ══ */
+const TOPICS_DB = {
+  CT001: [
+    { id:101, code:'DT-2026-0001', name:'Xây dựng hệ thống gợi ý học phần thông minh bằng Machine Learning',         gv:'TS. Nguyễn Minh Tuấn', field:'Trí tuệ nhân tạo', approved:1, maxQty:2 },
+    { id:102, code:'DT-2026-0002', name:'Nghiên cứu và triển khai giải pháp bảo mật Zero Trust cho doanh nghiệp',    gv:'PGS. Lê Thị Hoa',      field:'Mạng & Bảo mật',    approved:0, maxQty:1 },
+    { id:103, code:'DT-2026-0003', name:'Ứng dụng Blockchain trong quản lý chuỗi cung ứng thực phẩm',                gv:'ThS. Nguyễn Thu Hà',   field:'Công nghệ PM',       approved:1, maxQty:2 },
+    { id:104, code:'DT-2026-0004', name:'Xây dựng hệ thống phân tích log và phát hiện xâm nhập mạng bằng AI',       gv:'TS. Nguyễn Minh Tuấn', field:'Mạng & Bảo mật',    approved:0, maxQty:1 },
+    { id:105, code:'DT-2026-0005', name:'Nghiên cứu tối ưu hóa hiệu năng truy vấn cơ sở dữ liệu phân tán',         gv:'TS. Trần Văn Bình',    field:'Công nghệ PM',       approved:0, maxQty:2 },
+    { id:106, code:'DT-2026-0006', name:'Xây dựng hệ thống giám sát IoT trong nông nghiệp thông minh',              gv:'ThS. Lê Minh Đức',     field:'Công nghệ PM',       approved:1, maxQty:3 },
+    { id:107, code:'DT-2026-0007', name:'Phát triển ứng dụng di động hỗ trợ người khiếm thị nhận diện môi trường',  gv:'TS. Phạm Quốc Hùng',   field:'Trí tuệ nhân tạo', approved:2, maxQty:2 },
+  ],
+  CT002: [
+    { id:201, code:'DT-2026-Q01', name:'Phân tích chiến lược marketing số cho doanh nghiệp SME',                     gv:'TS. Lê Văn Nam',       field:'Marketing số',         approved:1, maxQty:3 },
+    { id:202, code:'DT-2026-Q02', name:'Mô hình kinh doanh B2B2C: cơ sở lý thuyết và ứng dụng thực tiễn',           gv:'PGS. Nguyễn Thị Hồng', field:'Chiến lược KD',        approved:2, maxQty:2 },
+    { id:203, code:'DT-2026-Q03', name:'Tối ưu hóa chuỗi cung ứng cho doanh nghiệp bán lẻ hiện đại',               gv:'TS. Trần Minh Khoa',   field:'Quản lý chuỗi cung ứng', approved:0, maxQty:2 },
+    { id:204, code:'DT-2026-Q04', name:'Ứng dụng Power BI trong phân tích dữ liệu kinh doanh',                       gv:'ThS. Phạm Thị Linh',   field:'Kinh doanh số',        approved:1, maxQty:3 },
+    { id:205, code:'DT-2026-Q05', name:'Thiết kế hệ thống CRM cho doanh nghiệp vừa và nhỏ',                         gv:'TS. Lê Văn Nam',       field:'Quản trị khách hàng', approved:0, maxQty:3 },
+    { id:206, code:'DT-2026-Q06', name:'Quản lý dự án Agile trong môi trường startup công nghệ',                     gv:'TS. Trần Minh Khoa',   field:'Quản lý dự án',       approved:1, maxQty:2 },
+    { id:207, code:'DT-2026-Q07', name:'Ứng dụng AI trong phân tích hành vi mua sắm khách hàng trực tuyến',         gv:'PGS. Nguyễn Thị Hồng', field:'Kinh doanh số',        approved:0, maxQty:2 },
+  ],
+};
+
+const GV_DB = {
+  CT001: ['TS. Nguyễn Minh Tuấn','PGS. Lê Thị Hoa','TS. Phạm Quốc Hùng','ThS. Nguyễn Thu Hà','TS. Trần Văn Bình','ThS. Lê Minh Đức'],
+  CT002: ['TS. Lê Văn Nam','PGS. Nguyễn Thị Hồng','TS. Trần Minh Khoa','ThS. Phạm Thị Linh'],
+};
+
+/* ══ PAGE STATE ══ */
+const params    = new URLSearchParams(window.location.search);
+const ctdtCode  = params.get('ctdt') || 'CT002';
+
+let topics      = [];
+let selList     = [];   // [{ id, type:'gv'|'self', topicId?, topicCode?, topicName, gvName, ... }]
+
+/* ══ STORAGE ══ */
+function loadState() {
+  try { const s = localStorage.getItem(STORAGE_KEY); return s ? JSON.parse(s) : null; } catch { return null; }
+}
+function saveState(st) { localStorage.setItem(STORAGE_KEY, JSON.stringify(st)); }
+
+function getDefaultState() {
+  return {
+    programs: [
+      { code:'CT001', name:'Công nghệ thông tin',  submitted:true,  wishes:[
+        { id:'ct1_w1', priority:1, type:'gv',   topicCode:'DT-2026-0007',
+          topicName:'Phát triển ứng dụng di động hỗ trợ người khiếm thị nhận diện môi trường',
+          gvName:'TS. Phạm Quốc Hùng', result:'rejected' },
+        { id:'ct1_w2', priority:2, type:'self',
+          topicName:'Hệ thống gợi ý học tập thích ứng bằng AI',
+          gvName:'TS. Nguyễn Minh Tuấn', result:'approved' },
+        { id:'ct1_w3', priority:3, type:'gv',   topicCode:'DT-2026-0004',
+          topicName:'Xây dựng hệ thống phân tích log và phát hiện xâm nhập mạng bằng AI',
+          gvName:'TS. Nguyễn Minh Tuấn', result:'skipped' },
+      ]},
+      { code:'CT002', name:'Quản trị kinh doanh', submitted:false, wishes:[] },
+    ],
+  };
+}
+
+/* ══ INIT ══ */
+(function init() {
+  let st = loadState();
+  if (!st) { st = getDefaultState(); saveState(st); }
+
+  const prog = st.programs.find(p => p.code === ctdtCode);
+
+  // If already submitted → redirect back
+  if (prog && prog.submitted) {
+    showToast('Nguyện vọng đã được gửi. Đang chuyển về danh sách...', 'warn');
+    setTimeout(() => { window.location.href = 'MH-SV-02_TopicBrowse.html'; }, 1500);
+    return;
+  }
+
+  // Setup context bar
+  document.getElementById('ctx-prog-code').textContent = ctdtCode;
+  if (prog) document.getElementById('ctx-prog-name').textContent = prog.name;
+  document.getElementById('send-code').textContent  = ctdtCode;
+  document.getElementById('sel-max').textContent    = MAX_NV;
+  document.getElementById('top-max').textContent    = MAX_NV;
+
+  // Load topic data for this CTĐT
+  topics = TOPICS_DB[ctdtCode] || TOPICS_DB['CT002'];
+
+  // Populate field filter dropdown
+  const fields   = [...new Set(topics.map(t => t.field))].sort();
+  const fieldSel = document.getElementById('q-field');
+  fields.forEach(f => {
+    const o = document.createElement('option');
+    o.value = f; o.textContent = f;
+    fieldSel.appendChild(o);
+  });
+
+  // Populate GV dropdown for self-propose
+  const gvs   = GV_DB[ctdtCode] || [];
+  const gvSel = document.getElementById('sp-gv');
+  gvs.forEach(g => {
+    const o = document.createElement('option');
+    o.value = g; o.textContent = g;
+    gvSel.appendChild(o);
+  });
+
+  // Wire up filters
+  document.getElementById('q-topic').addEventListener('input', renderTopicTable);
+  document.getElementById('q-field').addEventListener('change', renderTopicTable);
+  document.getElementById('q-slots').addEventListener('change', renderTopicTable);
+
+  renderTopicTable();
+  renderSelList();
+})();
+
+/* ══ TOPIC TABLE ══ */
+function isFull(t) { return t.approved >= t.maxQty; }
+
+function renderTopicTable() {
+  const q    = document.getElementById('q-topic').value.toLowerCase();
+  const qf   = document.getElementById('q-field').value;
+  const qs   = document.getElementById('q-slots').value;
+
+  const list = topics.filter(t =>
+    (!q  || t.name.toLowerCase().includes(q) || t.gv.toLowerCase().includes(q)) &&
+    (!qf || t.field === qf) &&
+    (!qs || (qs === 'ok' && !isFull(t)) || (qs === 'full' && isFull(t)))
+  );
+
+  const tbody = document.getElementById('topic-tbody');
+  if (!list.length) {
+    tbody.innerHTML = `<tr><td colspan="5" class="tbl-empty">Không tìm thấy đề tài phù hợp.</td></tr>`;
+    return;
+  }
+
+  tbody.innerHTML = list.map(t => {
+    const full    = isFull(t);
+    const already = selList.some(s => s.type === 'gv' && s.topicId === t.id);
+    const slsv    = `<span class="${full ? 'slsv-full' : 'slsv-ok'}">${t.approved}/${t.maxQty}</span>`;
+
+    let action;
+    if (already) {
+      action = `<span class="tbl-added">✓ Đã chọn</span>`;
+    } else if (full) {
+      action = `<button class="btn btn-default btn-sm" disabled title="Đã đủ sinh viên">Đủ chỗ</button>`;
+    } else {
+      action = `<button class="btn btn-primary btn-sm" onclick="addTopic(${t.id})">＋ Chọn</button>`;
+    }
+
+    const codeHtml = `<div style="font-size:11px;color:var(--text-3);font-family:monospace;margin-bottom:2px">${t.code}</div>`;
+
+    return `<tr${full ? ' style="opacity:.7"' : ''}>
+      <td>${codeHtml}<span style="font-size:13px;font-weight:${already?600:400}">${t.name}</span></td>
+      <td style="font-size:13px;color:var(--text-2)">${t.gv}</td>
+      <td style="text-align:center">${slsv}</td>
+      <td><span class="tag tag-default" style="font-size:11px">${t.field}</span></td>
+      <td style="text-align:center">${action}</td>
+    </tr>`;
+  }).join('');
+}
+
+/* ══ ADD TOPIC ══ */
+function addTopic(topicId) {
+  if (selList.length >= MAX_NV) {
+    showToast(`Bạn chỉ được chọn tối đa ${MAX_NV} nguyện vọng`, 'warn'); return;
+  }
+  if (selList.some(s => s.type === 'gv' && s.topicId === topicId)) {
+    showToast('Đề tài này đã có trong danh sách', 'warn'); return;
+  }
+  const t = topics.find(x => x.id === topicId);
+  if (!t) return;
+  selList.push({ id: 'gv_' + Date.now(), type: 'gv',
+    topicId: t.id, topicCode: t.code, topicName: t.name, gvName: t.gv });
+  renderTopicTable();
+  renderSelList();
+  showToast('Đã thêm vào danh sách nguyện vọng');
+}
+
+/* ══ ADD SELF-PROPOSE ══ */
+function addSelf() {
+  const name     = document.getElementById('sp-name').value.trim();
+  const summary  = document.getElementById('sp-summary').value.trim();
+  const products = document.getElementById('sp-products').value.trim();
+  const gv       = document.getElementById('sp-gv').value;
+
+  if (!name)     { showToast('Nhập tên đề tài', 'warn');                    return; }
+  if (!summary)  { showToast('Nhập tóm tắt đề tài', 'warn');                return; }
+  if (!products) { showToast('Nhập sản phẩm / kết quả dự kiến', 'warn');   return; }
+  if (!gv)       { showToast('Chọn giảng viên hướng dẫn mong muốn', 'warn'); return; }
+
+  if (selList.length >= MAX_NV) {
+    showToast(`Bạn chỉ được chọn tối đa ${MAX_NV} nguyện vọng`, 'warn'); return;
+  }
+
+  selList.push({
+    id: 'self_' + Date.now(), type: 'self',
+    topicName: name, gvName: gv,
+    summary, products, tech: document.getElementById('sp-tech').value.trim(),
+  });
+
+  // Clear form
+  ['sp-name','sp-summary','sp-products','sp-tech'].forEach(id => { document.getElementById(id).value = ''; });
+  document.getElementById('sp-gv').value = '';
+
+  renderSelList();
+  showToast('Đã thêm đề tài tự đề xuất vào danh sách');
+}
+
+/* ══ SELECTED LIST ══ */
+function removeSelItem(itemId) {
+  selList = selList.filter(s => s.id !== itemId);
+  renderTopicTable();
+  renderSelList();
+}
+
+function moveSelItem(itemId, dir) {
+  const idx = selList.findIndex(s => s.id === itemId);
+  const ni  = idx + dir;
+  if (ni < 0 || ni >= selList.length) return;
+  [selList[idx], selList[ni]] = [selList[ni], selList[idx]];
+  renderSelList();
+}
+
+function renderSelList() {
+  const cnt = selList.length;
+  document.getElementById('sel-count').textContent = cnt;
+  document.getElementById('top-count').textContent = cnt;
+
+  const body = document.getElementById('sel-body');
+  if (!cnt) {
+    body.innerHTML = `
+      <div class="sel-empty">
+        <div class="ico">📋</div>
+        Chưa chọn nguyện vọng nào. Chọn đề tài từ bảng bên trên hoặc tự đề xuất.
+      </div>`;
+    return;
+  }
+
+  const rows = selList.map((item, i) => {
+    const prio = `<span class="prio-num${item.type === 'self' ? ' self-type' : ''}">${i + 1}</span>`;
+    const code = item.topicCode
+      ? `<div style="font-size:11px;color:var(--text-3);font-family:monospace;margin-bottom:2px">${item.topicCode}</div>` : '';
+    const typeBadge = item.type === 'self'
+      ? `<span class="tag" style="color:#722ed1;background:#f9f0ff;border-color:#d3adf7;font-size:11px">📝 Tự đề xuất</span>`
+      : `<span class="tag tag-blue" style="font-size:11px">🏫 GV đề xuất</span>`;
+
+    return `
+      <tr>
+        <td style="text-align:center;width:56px">${prio}</td>
+        <td>
+          ${code}
+          <span style="font-size:13px;font-weight:600">${item.topicName}</span>
+        </td>
+        <td style="white-space:nowrap;font-size:13px;color:var(--text-2)">${item.gvName}</td>
+        <td>${typeBadge}</td>
+        <td style="text-align:center;width:100px">
+          <div class="tbl-actions" style="justify-content:center">
+            <button class="arr-btn" title="Tăng ưu tiên" onclick="moveSelItem('${item.id}',-1)"
+              ${i === 0 ? 'disabled' : ''}>↑</button>
+            <button class="arr-btn" title="Giảm ưu tiên" onclick="moveSelItem('${item.id}',1)"
+              ${i === selList.length - 1 ? 'disabled' : ''}>↓</button>
+            <button class="icon-btn danger" title="Xóa" onclick="removeSelItem('${item.id}')">🗑</button>
+          </div>
+        </td>
+      </tr>`;
+  }).join('');
+
+  body.innerHTML = `
+    <div class="tbl-wrap">
+      <table class="tbl">
+        <thead>
+          <tr>
+            <th style="text-align:center;width:56px">Ưu tiên</th>
+            <th>Tên đề tài</th>
+            <th style="width:180px">Giảng viên hướng dẫn</th>
+            <th style="width:130px">Loại</th>
+            <th style="text-align:center;width:100px">Sắp xếp / Xóa</th>
+          </tr>
+        </thead>
+        <tbody>${rows}</tbody>
+      </table>
+    </div>`;
+}
+
+/* ══ SUBMIT ══ */
+function submitNV() {
+  if (!selList.length) {
+    showToast('Chưa có nguyện vọng nào. Vui lòng chọn ít nhất 1 đề tài.', 'warn');
+    return;
+  }
+
+  const labelCode = ctdtCode;
+  const st        = loadState() || getDefaultState();
+  const prog      = st.programs.find(p => p.code === ctdtCode);
+  const progName  = prog ? prog.name : '';
+
+  showConfirm(
+    `Gửi ${selList.length} nguyện vọng cho ${labelCode} - ${progName}?`,
+    () => {
+      if (prog) {
+        prog.submitted = true;
+        prog.wishes    = selList.map((item, i) => ({
+          id:        item.id,
+          priority:  i + 1,
+          type:      item.type,
+          topicCode: item.topicCode || null,
+          topicName: item.topicName,
+          gvName:    item.gvName,
+          result:    'pending',
+        }));
+        saveState(st);
+      }
+      window.location.href = `MH-SV-02_TopicBrowse.html?submitted=${ctdtCode}`;
+    },
+    'Gửi nguyện vọng',
+    'btn-primary'
+  );
+}
+
+/* ══ CANCEL ══ */
+function cancelBack() {
+  window.location.href = 'MH-SV-02_TopicBrowse.html';
+}
+</script>
+</body>
+</html>

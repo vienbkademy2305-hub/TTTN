@@ -635,6 +635,7 @@ let wCtdtCode = '';
 let wTopics   = [];
 let wSelList  = [];
 let wStep     = 1;
+const openCoP = new Set(); /* tracks which co-advisor panels are expanded */
 
 const MAX_NV = () => currentRound ? currentRound.maxNV : 3;
 
@@ -725,6 +726,13 @@ function wizNext() {
     if (!wSelList.length) { showToast('Chọn ít nhất 1 đề tài để tiếp tục', 'warn'); return; }
     gotoWizStep(2);
   } else {
+    for (const item of wSelList) {
+      const total = (item.coGvList || []).reduce((s, c) => s + (c.weight || 0), 0);
+      if (total >= 100) {
+        showToast(`Trọng số GV đồng HD của "${item.topicName.slice(0,25)}…" ≥ 100%. Vui lòng điều chỉnh.`, 'warn');
+        return;
+      }
+    }
     doSubmitNV();
   }
 }
@@ -787,7 +795,7 @@ function addTopic(topicId) {
     id: 'gv_' + Date.now(), type: 'gv',
     topicId: t.id, topicCode: t.code, topicName: t.name,
     topicType: t.type, gvName: t.gv,
-    coGv: null,
+    coGvList: [],
   });
   renderTopicTable();
   updateSelBanner();
@@ -836,7 +844,7 @@ function addSelf() {
     gvName: gv,
     summary, products,
     tech: document.getElementById('sp-tech').value.trim(),
-    coGv: null,
+    coGvList: [],
   });
 
   ['sp-name', 'sp-summary', 'sp-products', 'sp-tech'].forEach(id => { document.getElementById(id).value = ''; });
@@ -889,18 +897,49 @@ function renderSortCards() {
   }
 
   c.innerHTML = wSelList.map((item, i) => {
-    const prio     = `<span class="prio-num${item.type==='self'?' self-type':''}">${i+1}</span>`;
-    const code     = item.topicCode
-      ? `<div class="wc-code">${item.topicCode}</div>` : '';
-    const typeBadge = ``;
-    const pri = item.coGv ? (item.coGv.weightPrimary ?? 60) : 60;
-    const co  = item.coGv ? (item.coGv.weightCo      ?? 40) : 40;
-    const coGvDisplay = item.coGv
-      ? `<span style="color:#722ed1;font-weight:600">GV đồng HD:</span> ${item.coGv.name}
-         <span class="tag" style="color:#722ed1;background:#f9f0ff;border-color:#d3adf7;font-size:11px;margin-left:6px">HD ${pri}% / ĐHD ${co}%</span>`
-      : `<span style="font-size:12px;color:var(--text-2)">GV hướng dẫn:</span>
-         <span class="tag tag-blue" style="font-size:11px;margin-left:4px">100%</span>
-         <span style="font-size:12px;color:var(--text-3);margin-left:8px">— Chưa có GV đồng hướng dẫn</span>`;
+    const prio      = `<span class="prio-num${item.type==='self'?' self-type':''}">${i+1}</span>`;
+    const code      = item.topicCode ? `<div class="wc-code">${item.topicCode}</div>` : '';
+    const coGvList  = item.coGvList || [];
+    const totalCo   = coGvList.reduce((s, c) => s + (c.weight || 0), 0);
+    const priWeight = 100 - totalCo;
+    const panelOpen = openCoP.has(item.id);
+    const totalOk   = priWeight >= 1 && priWeight <= 99;
+
+    /* ── Collapsed summary ── */
+    let coGvDisplay;
+    if (!coGvList.length) {
+      coGvDisplay = `<span style="font-size:12px;color:var(--text-2)">GV hướng dẫn:</span>
+        <span class="tag tag-blue" style="font-size:11px;margin-left:4px">100%</span>
+        <span style="font-size:12px;color:var(--text-3);margin-left:8px">— Chưa có GV đồng hướng dẫn</span>`;
+    } else {
+      const tags  = [`HD ${priWeight}%`, ...coGvList.map((cg,ci)=>`ĐHD${coGvList.length>1?ci+1:''} ${cg.weight}%`)].join(' / ');
+      const names = coGvList.length === 1 ? coGvList[0].name : `${coGvList.length} GV đồng HD`;
+      coGvDisplay = `<span style="color:#722ed1;font-weight:600">GV đồng HD:</span> ${names}
+        <span class="tag" style="color:#722ed1;background:#f9f0ff;border-color:#d3adf7;font-size:11px;margin-left:6px">${tags}</span>`;
+    }
+
+    /* ── Existing co-advisor weight rows ── */
+    const coRows = coGvList.map((cg, ci) => `
+      <div style="display:flex;align-items:center;gap:8px;margin-top:6px;padding:8px 10px;border-radius:6px;background:#f9f0ff;border:1px solid #d3adf7">
+        <div style="flex:1;min-width:0">
+          <div style="font-size:12px;font-weight:600;color:#722ed1">ĐHD ${ci+1}: ${cg.name}</div>
+          <div style="font-size:11px;color:var(--text-3)">${cg.type==='internal'?'🏫 Trong trường':'🌐 Ngoài trường'}</div>
+        </div>
+        <div style="display:flex;align-items:center;gap:4px;flex-shrink:0">
+          <input type="number" class="fc" id="co-wt-${item.id}-${ci}"
+            value="${cg.weight}" min="1" max="99"
+            style="width:64px;text-align:center;font-size:14px;font-weight:700;color:#722ed1;padding:4px 8px"
+            oninput="updateCoWeight('${item.id}')">
+          <span style="font-size:12px;color:var(--text-3)">%</span>
+        </div>
+        <button class="btn btn-default btn-sm" style="flex-shrink:0;padding:3px 8px;color:var(--error);border-color:var(--error)"
+          onclick="removeOneCoGv('${item.id}',${ci})">✕</button>
+      </div>`).join('');
+
+    /* ── "Add new" defaults ── */
+    const suggestWt = Math.min(30, Math.max(1, priWeight > 1 ? Math.floor(priWeight / 2) : 1));
+    const usedNames = new Set([item.gvName, ...coGvList.map(c => c.name)]);
+    const availGV   = ALL_GV.filter(g => !usedNames.has(g));
 
     return `
     <div class="wish-card" id="wcard-${item.id}">
@@ -910,10 +949,9 @@ function renderSortCards() {
           ${code}
           <div class="wc-name">${item.topicName}</div>
           <div class="wc-gv">GV HD: <strong>${item.gvName}</strong>
-            ${item.topicType ? `<span class="tag tag-default" style="font-size:11px;margin-left:6px">${item.topicType}</span>` : ''}
+            ${item.topicType?`<span class="tag tag-default" style="font-size:11px;margin-left:6px">${item.topicType}</span>`:''}
           </div>
         </div>
-        <div style="display:flex;align-items:center;gap:6px;flex-shrink:0">${typeBadge}</div>
         <div class="wc-actions">
           <button class="arr-btn" title="Tăng ưu tiên" onclick="moveSel('${item.id}',-1)" ${i===0?'disabled':''}>↑</button>
           <button class="arr-btn" title="Giảm ưu tiên" onclick="moveSel('${item.id}',1)"  ${i===wSelList.length-1?'disabled':''}>↓</button>
@@ -921,192 +959,228 @@ function renderSortCards() {
         </div>
       </div>
 
-      <!-- Co-advisor area -->
       <div class="co-area">
         <div style="display:flex;align-items:center;justify-content:space-between">
           <div style="font-size:12px">${coGvDisplay}</div>
           <button class="co-toggle-btn" onclick="toggleCoPanel('${item.id}')">
-            ${item.coGv ? '✎ Sửa GV đồng HD' : '＋ Thêm GV đồng hướng dẫn'}
+            ${coGvList.length ? '✎ Sửa GV đồng HD' : '＋ Thêm GV đồng hướng dẫn'}
           </button>
         </div>
 
-        <!-- Expandable co-advisor panel -->
-        <div class="co-panel" id="co-panel-${item.id}">
-          <!-- Weight editable -->
-          <div style="display:flex;align-items:flex-end;gap:10px;margin-top:12px;margin-bottom:4px">
-            <div class="wt-item wt-primary" style="flex:1">
-              <div class="wt-lbl" style="margin-bottom:6px">Trọng số GV hướng dẫn (%)</div>
-              <div style="display:flex;align-items:center;gap:6px">
-                <input type="number" class="fc" id="co-wt-pri-${item.id}"
-                  value="${pri}" min="0" max="100"
-                  style="width:72px;text-align:center;font-size:16px;font-weight:700;color:var(--primary)"
-                  oninput="syncCoWeight('${item.id}','pri')">
-                <span style="font-size:13px;color:var(--text-3)">%</span>
-              </div>
-              <div style="font-size:11px;color:var(--text-3);margin-top:4px">${item.gvName}</div>
-            </div>
-            <div style="padding-bottom:28px;font-size:18px;color:var(--text-3)">+</div>
-            <div class="wt-item wt-co" style="flex:1">
-              <div class="wt-lbl" style="margin-bottom:6px">Trọng số GV đồng HD (%)</div>
-              <div style="display:flex;align-items:center;gap:6px">
-                <input type="number" class="fc" id="co-wt-co-${item.id}"
-                  value="${co}" min="0" max="100"
-                  style="width:72px;text-align:center;font-size:16px;font-weight:700;color:#722ed1"
-                  oninput="syncCoWeight('${item.id}','co')">
-                <span style="font-size:13px;color:var(--text-3)">%</span>
-              </div>
-              <div style="font-size:11px;color:var(--text-3);margin-top:4px">GV đồng hướng dẫn</div>
-            </div>
-            <div style="padding-bottom:28px;font-size:14px;color:var(--text-3);white-space:nowrap">= 100%</div>
-          </div>
+        <div class="co-panel${panelOpen?' open':''}" id="co-panel-${item.id}"${panelOpen?' style="display:block"':''}>
 
-          <!-- Co-advisor type toggle -->
-          <div style="margin-bottom:10px">
-            <label style="font-size:12px;font-weight:600;color:var(--text-2);display:block;margin-bottom:6px">
-              Loại GV đồng hướng dẫn
-            </label>
-            <div class="seg-group">
-              <button class="seg-btn active" id="co-seg-in-${item.id}"
-                onclick="setCoType('${item.id}','internal')">🏫 Trong trường</button>
-              <button class="seg-btn" id="co-seg-out-${item.id}"
-                onclick="setCoType('${item.id}','external')">🌐 Ngoài trường</button>
+          <!-- Phân bổ trọng số -->
+          <div style="margin-top:12px">
+            <div style="font-size:12px;font-weight:600;color:var(--text-2);margin-bottom:8px">Phân bổ trọng số hướng dẫn</div>
+
+            <!-- GV HD chính (read-only, tự tính) -->
+            <div style="display:flex;align-items:center;gap:8px;padding:8px 10px;border-radius:6px;background:#e6f4ff;border:1px solid #91caff">
+              <div style="flex:1;min-width:0">
+                <div style="font-size:12px;font-weight:600;color:var(--primary)">${item.gvName}</div>
+                <div style="font-size:11px;color:var(--text-3)">GV hướng dẫn chính</div>
+              </div>
+              <div style="display:flex;align-items:center;gap:4px;flex-shrink:0">
+                <span id="co-pri-display-${item.id}"
+                  style="font-size:16px;font-weight:700;min-width:32px;text-align:right;color:${totalOk?'var(--primary)':'var(--error)'}">${priWeight}</span>
+                <span style="font-size:12px;color:var(--text-3)">%</span>
+              </div>
+            </div>
+
+            <!-- Hàng từng GV đồng HD -->
+            ${coRows}
+
+            <!-- Dòng tổng -->
+            <div style="display:flex;justify-content:flex-end;align-items:center;gap:6px;margin-top:6px;padding-top:6px;border-top:1px solid var(--border)">
+              <span style="font-size:12px;color:var(--text-2)">Tổng:</span>
+              <strong id="co-total-${item.id}" style="font-size:13px;color:${totalOk?'var(--success)':'var(--error)'}">
+                ${totalOk ? '100% ✓' : `GV đồng HD = ${totalCo}% — vượt 99%`}
+              </strong>
             </div>
           </div>
 
-          <!-- Internal: select -->
-          <div id="co-int-${item.id}">
-            <div class="fi" style="margin-bottom:10px">
-              <label style="font-size:12px">Giảng viên đồng hướng dẫn</label>
-              <select class="fc" id="co-sel-${item.id}" style="max-width:360px">
-                <option value="">— Chọn giảng viên —</option>
-                ${ALL_GV.filter(g => g !== item.gvName).map(g => `<option value="${g}">${g}</option>`).join('')}
-              </select>
-            </div>
-          </div>
+          <!-- Form thêm GV đồng HD mới -->
+          <div style="border-top:1px dashed var(--border);padding-top:12px;margin-top:12px">
+            <div style="font-size:12px;font-weight:600;color:var(--text-2);margin-bottom:8px">＋ Thêm GV đồng hướng dẫn</div>
 
-          <!-- External: form fields -->
-          <div id="co-ext-${item.id}" style="display:none">
-            <div class="f-row col-2" style="margin-bottom:10px">
-              <div class="fi" style="margin:0">
-                <label style="font-size:12px">Họ và tên <span class="req">*</span></label>
-                <input type="text" class="fc fc-sm" id="co-ext-name-${item.id}" placeholder="Nguyễn Văn A">
-              </div>
-              <div class="fi" style="margin:0">
-                <label style="font-size:12px">Nơi công tác <span class="req">*</span></label>
-                <input type="text" class="fc fc-sm" id="co-ext-nct-${item.id}" placeholder="Công ty / Trường / Viện...">
+            <!-- Loại GV -->
+            <div style="margin-bottom:10px">
+              <label style="font-size:12px;font-weight:600;color:var(--text-2);display:block;margin-bottom:6px">Loại GV đồng hướng dẫn</label>
+              <div class="seg-group">
+                <button class="seg-btn active" id="co-seg-in-${item.id}"  onclick="setCoType('${item.id}','internal')">🏫 Trong trường</button>
+                <button class="seg-btn"        id="co-seg-out-${item.id}" onclick="setCoType('${item.id}','external')">🌐 Ngoài trường</button>
               </div>
             </div>
-            <div class="f-row col-3" style="margin-bottom:10px">
-              <div class="fi" style="margin:0">
-                <label style="font-size:12px">Học hàm</label>
-                <select class="fc" id="co-ext-hh-${item.id}">
-                  <option value="">— Không có —</option>
-                  <option>GS.</option><option>PGS.</option>
+
+            <!-- Trọng số GV mới -->
+            <div style="display:flex;align-items:center;gap:8px;margin-bottom:10px">
+              <label style="font-size:12px;color:var(--text-2);white-space:nowrap">Trọng số GV mới (%):</label>
+              <input type="number" class="fc" id="co-new-wt-${item.id}"
+                value="${suggestWt}" min="1" max="99"
+                style="width:72px;text-align:center">
+            </div>
+
+            <!-- Trong trường: dropdown -->
+            <div id="co-int-${item.id}">
+              <div class="fi" style="margin-bottom:10px">
+                <label style="font-size:12px">Giảng viên đồng hướng dẫn</label>
+                <select class="fc" id="co-sel-${item.id}" style="max-width:360px">
+                  <option value="">— Chọn giảng viên —</option>
+                  ${availGV.map(g=>`<option value="${g}">${g}</option>`).join('')}
                 </select>
               </div>
-              <div class="fi" style="margin:0">
-                <label style="font-size:12px">Học vị</label>
-                <select class="fc" id="co-ext-hv-${item.id}">
-                  <option value="">— Không có —</option>
-                  <option>TS.</option><option>ThS.</option><option>CN.</option><option>KS.</option>
-                </select>
+            </div>
+
+            <!-- Ngoài trường: form -->
+            <div id="co-ext-${item.id}" style="display:none">
+              <div class="f-row col-2" style="margin-bottom:10px">
+                <div class="fi" style="margin:0">
+                  <label style="font-size:12px">Họ và tên <span class="req">*</span></label>
+                  <input type="text" class="fc fc-sm" id="co-ext-name-${item.id}" placeholder="Nguyễn Văn A">
+                </div>
+                <div class="fi" style="margin:0">
+                  <label style="font-size:12px">Nơi công tác <span class="req">*</span></label>
+                  <input type="text" class="fc fc-sm" id="co-ext-nct-${item.id}" placeholder="Công ty / Trường / Viện...">
+                </div>
               </div>
-              <div class="fi" style="margin:0">
-                <label style="font-size:12px">Chuyên ngành</label>
-                <input type="text" class="fc" id="co-ext-cn-${item.id}" placeholder="CNTT, Kinh tế...">
+              <div class="f-row col-3" style="margin-bottom:10px">
+                <div class="fi" style="margin:0">
+                  <label style="font-size:12px">Học hàm</label>
+                  <select class="fc" id="co-ext-hh-${item.id}">
+                    <option value="">— Không có —</option><option>GS.</option><option>PGS.</option>
+                  </select>
+                </div>
+                <div class="fi" style="margin:0">
+                  <label style="font-size:12px">Học vị</label>
+                  <select class="fc" id="co-ext-hv-${item.id}">
+                    <option value="">— Không có —</option><option>TS.</option><option>ThS.</option><option>CN.</option><option>KS.</option>
+                  </select>
+                </div>
+                <div class="fi" style="margin:0">
+                  <label style="font-size:12px">Chuyên ngành</label>
+                  <input type="text" class="fc" id="co-ext-cn-${item.id}" placeholder="CNTT, Kinh tế...">
+                </div>
+              </div>
+              <div class="f-row col-3" style="margin-bottom:10px">
+                <div class="fi" style="margin:0">
+                  <label style="font-size:12px">Điện thoại <span class="req">*</span></label>
+                  <input type="text" class="fc" id="co-ext-phone-${item.id}" placeholder="09xxxxxxxx">
+                </div>
+                <div class="fi" style="margin:0">
+                  <label style="font-size:12px">Email <span class="req">*</span></label>
+                  <input type="email" class="fc" id="co-ext-email-${item.id}" placeholder="abc@example.com">
+                </div>
+                <div class="fi" style="margin:0">
+                  <label style="font-size:12px">CCCD <span class="req">*</span></label>
+                  <input type="text" class="fc" id="co-ext-cccd-${item.id}" placeholder="0xxxxxxxxx">
+                </div>
               </div>
             </div>
-            <div class="f-row col-3" style="margin-bottom:10px">
-              <div class="fi" style="margin:0">
-                <label style="font-size:12px">Điện thoại <span class="req">*</span></label>
-                <input type="text" class="fc" id="co-ext-phone-${item.id}" placeholder="09xxxxxxxx">
-              </div>
-              <div class="fi" style="margin:0">
-                <label style="font-size:12px">Email <span class="req">*</span></label>
-                <input type="email" class="fc" id="co-ext-email-${item.id}" placeholder="abc@example.com">
-              </div>
-              <div class="fi" style="margin:0">
-                <label style="font-size:12px">CCCD <span class="req">*</span></label>
-                <input type="text" class="fc" id="co-ext-cccd-${item.id}" placeholder="0xxxxxxxxx">
-              </div>
+
+            <div style="display:flex;justify-content:flex-end;margin-top:4px">
+              <button class="btn btn-primary btn-sm" onclick="addOneCoGv('${item.id}')">＋ Thêm vào danh sách</button>
             </div>
           </div>
 
-          <div style="display:flex;justify-content:flex-end;gap:8px;margin-top:4px">
-            <button class="btn btn-default btn-sm" onclick="removeCoGv('${item.id}')">Xóa GV đồng HD</button>
-            <button class="btn btn-primary btn-sm" onclick="saveCoGv('${item.id}')">Lưu GV đồng HD</button>
-          </div>
         </div><!-- /co-panel -->
       </div><!-- /co-area -->
     </div>`;
   }).join('');
 }
 
-/* Weight sync: khi sửa 1 ô thì ô kia tự = 100 - giá trị */
-function syncCoWeight(itemId, which) {
-  const priEl = document.getElementById('co-wt-pri-' + itemId);
-  const coEl  = document.getElementById('co-wt-co-'  + itemId);
-  if (!priEl || !coEl) return;
-  let val = Math.min(100, Math.max(0, parseInt((which === 'pri' ? priEl : coEl).value) || 0));
-  if (which === 'pri') { priEl.value = val; coEl.value  = 100 - val; }
-  else                 { coEl.value  = val; priEl.value = 100 - val; }
+/* Cập nhật trọng số GV HD chính (= 100 - tổng các GV đồng HD) */
+function updateCoWeight(itemId) {
+  const item = wSelList.find(s => s.id === itemId);
+  if (!item) return;
+  const coGvList = item.coGvList || [];
+  let totalCo = 0;
+  coGvList.forEach((cg, ci) => {
+    const el = document.getElementById(`co-wt-${itemId}-${ci}`);
+    const w  = Math.min(99, Math.max(1, parseInt(el?.value) || 1));
+    cg.weight = w;
+    totalCo  += w;
+  });
+  const priWeight = 100 - totalCo;
+  const valid     = priWeight >= 1;
+  const priEl     = document.getElementById(`co-pri-display-${itemId}`);
+  const totalEl   = document.getElementById(`co-total-${itemId}`);
+  if (priEl)   { priEl.textContent  = priWeight; priEl.style.color  = valid ? 'var(--primary)' : 'var(--error)'; }
+  if (totalEl) { totalEl.textContent = valid ? '100% ✓' : `GV đồng HD = ${totalCo}% — vượt 99%`; totalEl.style.color = valid ? 'var(--success)' : 'var(--error)'; }
 }
 
-/* Co-advisor helpers */
 function toggleCoPanel(itemId) {
   const panel = document.getElementById('co-panel-' + itemId);
   if (!panel) return;
   const isOpen = panel.classList.contains('open');
   panel.classList.toggle('open', !isOpen);
   panel.style.display = isOpen ? 'none' : 'block';
+  if (isOpen) openCoP.delete(itemId); else openCoP.add(itemId);
 }
 
 function setCoType(itemId, type) {
-  document.getElementById('co-int-' + itemId).style.display  = type === 'internal' ? '' : 'none';
-  document.getElementById('co-ext-' + itemId).style.display  = type === 'external' ? '' : 'none';
-  document.getElementById('co-seg-in-' + itemId).className   = 'seg-btn' + (type === 'internal' ? ' active' : '');
-  document.getElementById('co-seg-out-' + itemId).className  = 'seg-btn' + (type === 'external' ? ' active' : '');
+  document.getElementById('co-int-'    + itemId).style.display = type === 'internal' ? '' : 'none';
+  document.getElementById('co-ext-'    + itemId).style.display = type === 'external' ? '' : 'none';
+  document.getElementById('co-seg-in-' + itemId).className     = 'seg-btn' + (type === 'internal' ? ' active' : '');
+  document.getElementById('co-seg-out-'+ itemId).className     = 'seg-btn' + (type === 'external' ? ' active' : '');
 }
 
-function saveCoGv(itemId) {
-  const item   = wSelList.find(s => s.id === itemId);
+function addOneCoGv(itemId) {
+  const item = wSelList.find(s => s.id === itemId);
   if (!item) return;
 
-  const intEl  = document.getElementById('co-int-' + itemId);
-  const isExt  = intEl && intEl.style.display === 'none';
+  updateCoWeight(itemId); /* lưu trọng số hiện tại trước */
+  const coGvList  = item.coGvList || [];
+  const totalCo   = coGvList.reduce((s, c) => s + c.weight, 0);
+  const priWeight = 100 - totalCo;
 
+  if (priWeight < 2) {
+    showToast('GV hướng dẫn chính phải còn ít nhất 1% trọng số để thêm GV đồng HD', 'warn');
+    return;
+  }
+
+  const newWtEl = document.getElementById(`co-new-wt-${itemId}`);
+  const newWt   = Math.min(priWeight - 1, Math.max(1, parseInt(newWtEl?.value) || 30));
+
+  const intEl = document.getElementById(`co-int-${itemId}`);
+  const isExt = intEl && intEl.style.display === 'none';
+
+  let newCoGv;
   if (!isExt) {
-    const sel = document.getElementById('co-sel-' + itemId);
-    if (!sel.value) { showToast('Chọn giảng viên đồng hướng dẫn', 'warn'); return; }
-    const priW = Math.min(100, Math.max(0, parseInt(document.getElementById('co-wt-pri-' + itemId)?.value) || 60));
-    item.coGv = { type: 'internal', name: sel.value, weightPrimary: priW, weightCo: 100 - priW };
+    const sel = document.getElementById(`co-sel-${itemId}`);
+    if (!sel?.value) { showToast('Chọn giảng viên đồng hướng dẫn', 'warn'); return; }
+    if (coGvList.some(c => c.name === sel.value)) { showToast('GV này đã có trong danh sách', 'warn'); return; }
+    newCoGv = { type: 'internal', name: sel.value, weight: newWt };
   } else {
-    const name  = (document.getElementById('co-ext-name-' + itemId)?.value  || '').trim();
-    const nct   = (document.getElementById('co-ext-nct-' + itemId)?.value   || '').trim();
-    const phone = (document.getElementById('co-ext-phone-' + itemId)?.value || '').trim();
-    const email = (document.getElementById('co-ext-email-' + itemId)?.value || '').trim();
-    const cccd  = (document.getElementById('co-ext-cccd-' + itemId)?.value  || '').trim();
+    const name  = (document.getElementById(`co-ext-name-${itemId}`)?.value  || '').trim();
+    const nct   = (document.getElementById(`co-ext-nct-${itemId}`)?.value   || '').trim();
+    const phone = (document.getElementById(`co-ext-phone-${itemId}`)?.value || '').trim();
+    const email = (document.getElementById(`co-ext-email-${itemId}`)?.value || '').trim();
+    const cccd  = (document.getElementById(`co-ext-cccd-${itemId}`)?.value  || '').trim();
     if (!name)  { showToast('Nhập họ và tên GV đồng HD', 'warn');   return; }
     if (!nct)   { showToast('Nhập nơi công tác', 'warn');            return; }
     if (!phone) { showToast('Nhập số điện thoại', 'warn');           return; }
     if (!email) { showToast('Nhập email', 'warn');                   return; }
     if (!cccd)  { showToast('Nhập số CCCD', 'warn');                 return; }
-    const hh = document.getElementById('co-ext-hh-' + itemId)?.value || '';
-    const hv = document.getElementById('co-ext-hv-' + itemId)?.value || '';
-    const cn = document.getElementById('co-ext-cn-' + itemId)?.value || '';
-    const displayName = [hh, hv, name].filter(Boolean).join(' ');
-    const priW = Math.min(100, Math.max(0, parseInt(document.getElementById('co-wt-pri-' + itemId)?.value) || 60));
-    item.coGv = { type:'external', name: displayName, extName:name, extHocHam:hh, extHocVi:hv, extChuyenNganh:cn, extNoiCongTac:nct, extPhone:phone, extEmail:email, extCCCD:cccd, weightPrimary:priW, weightCo:100-priW };
+    const hh = document.getElementById(`co-ext-hh-${itemId}`)?.value || '';
+    const hv = document.getElementById(`co-ext-hv-${itemId}`)?.value || '';
+    const cn = document.getElementById(`co-ext-cn-${itemId}`)?.value || '';
+    newCoGv = { type:'external', name:[hh,hv,name].filter(Boolean).join(' '),
+      extName:name, extHocHam:hh, extHocVi:hv, extChuyenNganh:cn,
+      extNoiCongTac:nct, extPhone:phone, extEmail:email, extCCCD:cccd, weight:newWt };
   }
 
-  showToast('Đã lưu GV đồng hướng dẫn');
+  item.coGvList.push(newCoGv);
+  showToast('Đã thêm GV đồng hướng dẫn');
+  openCoP.add(itemId);
   renderSortCards();
 }
 
-function removeCoGv(itemId) {
+function removeOneCoGv(itemId, idx) {
   const item = wSelList.find(s => s.id === itemId);
-  if (item) item.coGv = null;
+  if (!item) return;
+  updateCoWeight(itemId);
+  item.coGvList.splice(idx, 1);
   showToast('Đã xóa GV đồng hướng dẫn');
+  openCoP.add(itemId);
   renderSortCards();
 }
 
@@ -1130,7 +1204,7 @@ function doSubmitNV() {
         topicName: item.topicName,
         topicType: item.topicType || null,
         gvName:    item.gvName,
-        coGv:      item.coGv || null,
+        coGvList:  item.coGvList || [],
         result:    'pending',
       }));
       saveState(st);

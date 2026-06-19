@@ -1,0 +1,803 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Nguyện vọng đề tài | Giảng viên | HTQT Đại học</title>
+  <link rel="stylesheet" href="_styles.css">
+  <style>
+    .stat-row{display:flex;gap:12px;margin-bottom:20px}
+    .stat-box{flex:1;background:#fff;border:1px solid var(--border);border-radius:8px;padding:14px 18px;display:flex;align-items:center;gap:14px}
+    .stat-ico{font-size:26px;line-height:1}
+    .stat-num{font-size:22px;font-weight:700;line-height:1}
+    .stat-lbl{font-size:12px;color:var(--text-3);margin-top:2px}
+    .stat-box.primary .stat-num{color:var(--primary)}
+    .stat-box.warn    .stat-num{color:var(--warning)}
+    .stat-box.ok      .stat-num{color:var(--success)}
+    .stat-box.err     .stat-num{color:var(--error)}
+
+    .history-list{list-style:none;padding:0;margin:0}
+    .history-list li{display:flex;gap:10px;padding:8px 0;border-bottom:1px solid var(--border);font-size:13px}
+    .history-list li:last-child{border-bottom:none}
+    .h-dot{width:8px;height:8px;border-radius:50%;margin-top:5px;flex-shrink:0}
+    .h-dot.ok{background:var(--success)}
+    .h-dot.err{background:var(--error)}
+    .h-dot.warn{background:var(--warning)}
+    .h-meta{color:var(--text-3);font-size:12px;margin-top:2px}
+
+    /* ── NV priority badge ── */
+    .nv-order-badge{display:inline-flex;align-items:center;gap:4px;padding:3px 10px;border-radius:12px;font-size:12px;font-weight:700;cursor:pointer;transition:opacity .15s;border:1.5px solid;user-select:none}
+    .nv-order-badge:hover{opacity:.75}
+    .nv-order-badge.nv1{color:#1677ff;border-color:#91caff;background:#e6f4ff}
+    .nv-order-badge.nv2{color:#d46b08;border-color:#ffd591;background:#fff7e6}
+    .nv-order-badge.nv3,.nv-order-badge.nv4{color:#cf1322;border-color:#ffa39e;background:#fff1f0}
+
+    /* ── NV order modal list ── */
+    .nv-order-item{display:flex;gap:14px;align-items:flex-start;padding:12px 16px;border-bottom:1px solid var(--border)}
+    .nv-order-item:last-child{border-bottom:none}
+    .nv-order-item.current{background:#f0f7ff;border-left:3px solid #1677ff}
+    .nv-order-num{width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:13px;flex-shrink:0;margin-top:2px}
+    .nv-order-num.nv1{background:#e6f4ff;color:#1677ff}
+    .nv-order-num.nv2{background:#fff7e6;color:#d46b08}
+    .nv-order-num.nv3{background:#fff1f0;color:#cf1322}
+    .nv-order-num.nv4{background:#f5f5f5;color:#8c8c8c}
+    .nv-order-gv{font-weight:600;font-size:13px;margin-bottom:3px}
+    .nv-order-topic{font-size:12px;color:var(--text-3);margin-bottom:5px}
+    .you-label{font-size:10px;background:#1677ff;color:#fff;padding:1px 7px;border-radius:10px;margin-left:6px;font-weight:700;vertical-align:middle}
+  </style>
+</head>
+<body>
+<div class="app">
+
+  <!-- ═══ SIDEBAR ═══ -->
+  <nav class="sidebar">
+    <div class="sb-logo">
+      <div class="sb-logo-icon">🎓</div>
+      <div><div class="sb-logo-text">HTQT Đại học</div><div class="text-muted text-sm">Giảng viên</div></div>
+    </div>
+    <div class="sb-user">
+      <div class="av">GV</div>
+      <div>
+        <div style="font-size:13px;font-weight:600">TS. Nguyễn Minh Tuấn</div>
+        <div style="font-size:11px;color:var(--text-3)">Khoa CNTT</div>
+      </div>
+    </div>
+    <ul class="sb-menu">
+      <li><a href="#">🏠&nbsp; Trang chủ</a></li>
+      <li class="active">
+        <span class="mn-group">📋&nbsp; Đề tài &nbsp;▾</span>
+        <ul class="sb-sub open">
+          <li><a href="MH-GV-04_MyTopics.html">DS đề tài của tôi</a></li>
+          <li class="active"><a href="MH-GV-05_TopicWishes.html">DS nguyện vọng đề tài</a></li>
+        </ul>
+      </li>
+      <li>
+        <span class="mn-group">👨‍🏫&nbsp; Hướng dẫn &nbsp;▾</span>
+        <ul class="sb-sub open">
+          <li><a href="MH-GV-01_InternshipTracking.html">QL DS thực tập</a></li>
+          <li><a href="#">QL DS đồ án tốt nghiệp</a></li>
+          <li><a href="#">QL DS khoá luận tốt nghiệp</a></li>
+          <li><a href="#">Thạc sĩ</a></li>
+          <li><a href="#">Tiến sĩ</a></li>
+          <li><a href="MH-GV-02_ChangeRequestApproval.html">QL yêu cầu thay đổi</a></li>
+        </ul>
+      </li>
+    </ul>
+  </nav>
+
+  <!-- ═══ MAIN ═══ -->
+  <div class="main">
+    <header class="app-header">
+      <span class="h-breadcrumb">Đề tài &gt; Nguyện vọng đề tài</span>
+      <div class="h-right">
+        <div class="bw"><button class="btn btn-link" style="font-size:18px">🔔</button><span class="bc">3</span></div>
+        <div class="av">GV</div>
+      </div>
+    </header>
+
+    <main class="content">
+
+      <!-- Stats -->
+      <div class="stat-row">
+        <div class="stat-box primary"><div class="stat-ico">📋</div><div><div class="stat-num" id="s-total">0</div><div class="stat-lbl">Tổng nguyện vọng</div></div></div>
+        <div class="stat-box warn">  <div class="stat-ico">⏳</div><div><div class="stat-num" id="s-pending">0</div><div class="stat-lbl">Chờ GV duyệt</div></div></div>
+        <div class="stat-box ok">   <div class="stat-ico">✅</div><div><div class="stat-num" id="s-approved">0</div><div class="stat-lbl">Đã duyệt / Chờ Khoa</div></div></div>
+        <div class="stat-box err">  <div class="stat-ico">❌</div><div><div class="stat-num" id="s-rejected">0</div><div class="stat-lbl">Từ chối</div></div></div>
+      </div>
+
+      <!-- Card -->
+      <div class="card">
+        <div class="card-hd">
+          <h3 class="card-title">Nguyện vọng hướng dẫn đề tài</h3>
+        </div>
+
+        <!-- Note -->
+        <div style="background:#fffbe6;border:1px solid #ffe58f;border-radius:6px;padding:10px 14px;margin-bottom:14px;font-size:12px;color:#613400;line-height:1.5">
+          ℹ️ <strong>Cơ chế nguyện vọng:</strong> Sinh viên đăng ký theo thứ tự ưu tiên. Hệ thống chuyển nguyện vọng đến GV kế tiếp khi GV trước từ chối. Cột <strong>Thứ tự NV</strong> cho biết bạn là lựa chọn thứ mấy của sinh viên — nhấn để xem toàn bộ danh sách ưu tiên.
+        </div>
+
+        <!-- Filter -->
+        <div class="filter-bar">
+          <div class="input-search" style="width:260px">
+            <input type="text" class="fc" id="q" placeholder="Tìm sinh viên, mã SV..." oninput="render()">
+          </div>
+          <select class="fc" style="width:180px" id="f-topic" onchange="render()">
+            <option value="">Tất cả đề tài</option>
+            <option value="1">DT-2026-0001</option>
+            <option value="2">DT-2026-0002</option>
+            <option value="4">DT-2026-0004</option>
+            <option value="0">Đề xuất mới</option>
+          </select>
+          <select class="fc" style="width:190px" id="f-status" onchange="render()">
+            <option value="">Tất cả trạng thái</option>
+            <option value="Chờ GV duyệt">Chờ GV duyệt</option>
+            <option value="Chờ Khoa duyệt">Chờ Khoa duyệt</option>
+            <option value="Đã duyệt">Đã duyệt</option>
+            <option value="Từ chối">Từ chối</option>
+          </select>
+          <button class="btn btn-default" onclick="resetFilter()">🔄 Reset</button>
+        </div>
+
+        <!-- Table -->
+        <div class="tbl-wrap">
+          <table class="tbl">
+            <thead>
+              <tr>
+                <th style="width:44px;text-align:center">STT</th>
+                <th style="width:110px">Mã số SV</th>
+                <th style="width:150px">Họ và tên</th>
+                <th style="width:110px">Lớp học phần</th>
+                <th style="width:70px">CTĐT</th>
+                <th>Đề tài đăng ký</th>
+                <th style="width:110px;text-align:center">Thứ tự NV</th>
+                <th style="width:100px">Ngày đăng ký</th>
+                <th style="width:130px">Trạng thái</th>
+                <th style="width:110px;text-align:center">Hành động</th>
+              </tr>
+            </thead>
+            <tbody id="tbody"></tbody>
+          </table>
+        </div>
+        <div class="pagination"><span class="pg-info" id="pg-info"></span></div>
+      </div>
+
+    </main>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════
+     MODAL: CHI TIẾT NGUYỆN VỌNG SV
+════════════════════════════════════════════ -->
+<div class="overlay hidden" id="m-nv">
+  <div class="modal-box w700">
+    <div class="modal-hd">
+      <h4 class="modal-title" id="nv-modal-title">Chi tiết Nguyện vọng</h4>
+      <button class="modal-close" data-close="m-nv">✕</button>
+    </div>
+    <div class="modal-bd">
+
+      <!-- Thông tin SV -->
+      <div style="background:#f9f9f9;border:1px solid var(--border);border-radius:8px;padding:14px 16px;margin-bottom:16px;display:flex;gap:28px;flex-wrap:wrap">
+        <div><div style="font-size:11px;color:var(--text-3);margin-bottom:3px">Mã sinh viên</div><div style="font-weight:700;font-size:13px" id="nv-masv"></div></div>
+        <div><div style="font-size:11px;color:var(--text-3);margin-bottom:3px">Họ và tên</div><div style="font-weight:600;font-size:13px" id="nv-tensv"></div></div>
+        <div><div style="font-size:11px;color:var(--text-3);margin-bottom:3px">Lớp</div><div style="font-size:13px" id="nv-lop"></div></div>
+        <div><div style="font-size:11px;color:var(--text-3);margin-bottom:3px">GPA</div><div style="font-size:14px;font-weight:700" id="nv-gpa"></div></div>
+        <div><div style="font-size:11px;color:var(--text-3);margin-bottom:3px">CTĐT</div><div style="font-size:13px" id="nv-ctdt"></div></div>
+      </div>
+
+      <!-- Chi tiết nguyện vọng -->
+      <table class="desc-tbl"><tbody id="nv-vw-body"></tbody></table>
+
+      <!-- Lịch sử xử lý -->
+      <div style="margin-top:18px">
+        <div style="font-weight:600;font-size:13px;margin-bottom:10px;color:var(--text-2)">📜 Lịch sử xử lý</div>
+        <ul class="history-list" id="nv-history"></ul>
+      </div>
+
+      <!-- Nhập lý do từ chối -->
+      <div class="fi" id="nv-reject-fi" style="display:none;margin-top:14px">
+        <label>Lý do từ chối <span class="req">*</span></label>
+        <textarea class="fc" id="nv-reject-reason" rows="3" placeholder="Nhập lý do từ chối nguyện vọng này..."></textarea>
+        <div class="fe" id="nv-reject-err" style="display:none">Vui lòng nhập lý do từ chối</div>
+      </div>
+
+    </div>
+    <div class="modal-ft" id="nv-modal-ft"></div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════
+     MODAL: THỨ TỰ NGUYỆN VỌNG CỦA SINH VIÊN
+════════════════════════════════════════════ -->
+<div class="overlay hidden" id="m-nv-order">
+  <div class="modal-box w600">
+    <div class="modal-hd">
+      <h4 class="modal-title" id="nvo-title">Danh sách nguyện vọng</h4>
+      <button class="modal-close" data-close="m-nv-order">✕</button>
+    </div>
+    <div class="modal-bd" style="padding-top:0">
+
+      <!-- SV info -->
+      <div style="background:#f9f9f9;border:1px solid var(--border);border-radius:8px;padding:14px 16px;margin-bottom:16px;display:flex;gap:24px;flex-wrap:wrap">
+        <div><div style="font-size:11px;color:var(--text-3);margin-bottom:3px">Mã sinh viên</div><div style="font-weight:700;font-size:13px;font-family:monospace" id="nvo-masv"></div></div>
+        <div><div style="font-size:11px;color:var(--text-3);margin-bottom:3px">Họ và tên</div><div style="font-weight:600;font-size:13px" id="nvo-tensv"></div></div>
+        <div><div style="font-size:11px;color:var(--text-3);margin-bottom:3px">Lớp</div><div style="font-size:13px" id="nvo-lop"></div></div>
+        <div><div style="font-size:11px;color:var(--text-3);margin-bottom:3px">GPA</div><div style="font-size:14px;font-weight:700" id="nvo-gpa"></div></div>
+      </div>
+
+      <div style="background:#fffbe6;border:1px solid #ffe58f;border-radius:6px;padding:10px 14px;margin-bottom:16px;font-size:12px;color:#613400;line-height:1.5">
+        ℹ️ Hệ thống xử lý nguyện vọng theo thứ tự ưu tiên. Khi GV có thứ tự cao hơn từ chối, nguyện vọng tự động chuyển sang GV tiếp theo.
+      </div>
+
+      <!-- Danh sách thứ tự -->
+      <div id="nvo-list"></div>
+
+    </div>
+    <div class="modal-ft">
+      <button class="btn btn-default" data-close="m-nv-order">Đóng</button>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════
+     MODAL: THÔNG TIN SINH VIÊN
+════════════════════════════════════════════ -->
+<div class="overlay hidden" id="m-sv">
+  <div class="modal-box w600">
+    <div class="modal-hd">
+      <h4 class="modal-title" id="sv-title">Thông tin sinh viên</h4>
+      <button class="modal-close" data-close="m-sv">✕</button>
+    </div>
+    <div class="modal-bd">
+      <table class="desc-tbl"><tbody id="sv-body"></tbody></table>
+    </div>
+    <div class="modal-ft">
+      <button class="btn btn-default" data-close="m-sv">Đóng</button>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════
+     MODAL: CHI TIẾT ĐỀ TÀI
+════════════════════════════════════════════ -->
+<div class="overlay hidden" id="m-topic">
+  <div class="modal-box w700">
+    <div class="modal-hd">
+      <h4 class="modal-title" id="mt-title">Chi tiết đề tài</h4>
+      <button class="modal-close" data-close="m-topic">✕</button>
+    </div>
+    <div class="modal-bd">
+      <table class="desc-tbl"><tbody id="mt-body"></tbody></table>
+    </div>
+    <div class="modal-ft">
+      <button class="btn btn-default" data-close="m-topic">Đóng</button>
+    </div>
+  </div>
+</div>
+
+<script src="_utils.js"></script>
+<script>
+/* ── Topics data ── */
+const topics = [
+  { id:1, code:'DT-2026-0001',
+    name:'Xây dựng hệ thống gợi ý học phần thông minh bằng Machine Learning',
+    types:['Đồ án tốt nghiệp'], ctdt:['Kỹ thuật phần mềm','Trí tuệ nhân tạo'],
+    field:'Trí tuệ nhân tạo & Dữ liệu', qty:2, hoatDong:'Mở',
+    desc:'Nghiên cứu và xây dựng hệ thống gợi ý học phần dựa trên lịch sử học tập và nguyện vọng của sinh viên sử dụng các thuật toán Machine Learning hiện đại.',
+    req:'GPA ≥ 3.0, có kiến thức Python, ML cơ bản, xử lý dữ liệu.',
+    output:'Ứng dụng web + báo cáo nghiên cứu + mô hình ML đã huấn luyện.',
+    tech:'Python, scikit-learn, FastAPI, React', status:'Đã duyệt', created:'05/05/2026',
+    tailieu:'Mo_ta_de_tai_DT2026_0001.pdf' },
+  { id:2, code:'DT-2026-0002',
+    name:'Phân tích cảm xúc người dùng từ đánh giá sản phẩm trực tuyến',
+    types:['Khoá luận tốt nghiệp'], ctdt:['Khoa học máy tính'],
+    field:'Trí tuệ nhân tạo & Dữ liệu', qty:1, hoatDong:'Mở',
+    desc:'Xây dựng mô hình NLP phân tích cảm xúc (tích cực/tiêu cực/trung lập) từ các bình luận người dùng trên sàn thương mại điện tử tiếng Việt.',
+    req:'GPA ≥ 3.2, Python, NLP cơ bản, đã học môn Xử lý ngôn ngữ tự nhiên.',
+    output:'Mô hình phân loại cảm xúc + API + báo cáo so sánh các phương pháp.',
+    tech:'Python, Transformers (BERT), Flask', status:'Chờ duyệt', created:'10/06/2026',
+    tailieu:'' },
+  { id:3, code:'DT-2026-0003',
+    name:'Ứng dụng nhận diện khuôn mặt cho hệ thống điểm danh sinh viên',
+    types:['Đồ án tốt nghiệp'], ctdt:['Kỹ thuật phần mềm','Khoa học máy tính'],
+    field:'Trí tuệ nhân tạo & Dữ liệu', qty:2, hoatDong:'Đóng',
+    desc:'Thiết kế và triển khai hệ thống điểm danh tự động sử dụng nhận diện khuôn mặt thời gian thực, tích hợp với hệ thống quản lý đào tạo hiện có.',
+    req:'GPA ≥ 2.8, Python, OpenCV hoặc TensorFlow, kiến thức cơ bản về xử lý ảnh.',
+    output:'Ứng dụng desktop/web + CSDL + báo cáo đánh giá độ chính xác.',
+    tech:'Python, OpenCV, DeepFace, FastAPI, React', status:'Từ chối', created:'01/04/2026',
+    tailieu:'' },
+  { id:4, code:'DT-2026-0004',
+    name:'Thiết kế kiến trúc microservices cho hệ thống thương mại điện tử quy mô lớn',
+    types:['Khoá luận tốt nghiệp'], ctdt:['Kỹ thuật phần mềm','Hệ thống thông tin'],
+    field:'Công nghệ phần mềm', qty:1, hoatDong:'Mở',
+    desc:'Nghiên cứu, thiết kế và triển khai kiến trúc microservices cho một hệ thống thương mại điện tử có khả năng mở rộng cao, bao gồm service discovery, API gateway và message broker.',
+    req:'GPA ≥ 3.0, Java/Go/Node.js, Docker, kiến trúc phần mềm cơ bản.',
+    output:'Hệ thống demo + tài liệu thiết kế kiến trúc + báo cáo đánh giá hiệu năng.',
+    tech:'Go, Docker, Kubernetes, Kafka, PostgreSQL', status:'Nháp', created:'14/06/2026',
+    tailieu:'De_cuong_DT2026_0004_Microservices.pdf' },
+];
+
+/* ── Wishes data ── */
+const NV_CLR = {
+  'Chờ GV duyệt'  : 'tag-warning',
+  'Chờ Khoa duyệt': 'tag-default',
+  'Đã duyệt'      : 'tag-success',
+  'Từ chối'       : 'tag-error',
+};
+
+const NVO_STATUS_CLR = {
+  'Chờ GV duyệt'  : 'tag-warning',
+  'Chờ Khoa duyệt': 'tag-default',
+  'Đã duyệt'      : 'tag-success',
+  'Từ chối'       : 'tag-error',
+  'Chưa đến lượt' : 'tag-default',
+};
+
+const TOPIC_STATUS_CLR = {
+  'Nháp'     : 'tag-default',
+  'Chờ duyệt': 'tag-warning',
+  'Đã duyệt' : 'tag-success',
+  'Từ chối'  : 'tag-error',
+};
+
+const TYPE_ABBR = {
+  'Đồ án tốt nghiệp'    : 'ĐATN',
+  'Khoá luận tốt nghiệp': 'KLTN',
+  'Thực tập tốt nghiệp' : 'TTTN',
+  'Đồ án chuyên sâu'    : 'ĐACS',
+};
+
+const CTDT_MAP = {
+  'KTPM': 'Kỹ thuật phần mềm',
+  'KHMT': 'Khoa học máy tính',
+  'HTTT': 'Hệ thống thông tin',
+  'CNTT': 'Công nghệ thông tin',
+  'KHDL': 'Khoa học dữ liệu',
+};
+
+let wishes = [
+  {
+    id:1, maSV:'B22DCCN001', tenSV:'Nguyễn Văn An', lop:'INT3110_1', gpa:3.2, ctdt:'KTPM',
+    topicId:1, loai:'Có sẵn', dot:'HK1 2025-2026',
+    status:'Chờ GV duyệt', ngayDK:'05/06/2026',
+    thuTuNV: 2,
+    dsNguyenVong: [
+      { thuTu:1, tenGV:'TS. Lê Thị Mai', topicName:'Ứng dụng ML trong dự báo tài chính', status:'Từ chối', ngayXL:'08/06/2026' },
+      { thuTu:2, tenGV:'TS. Nguyễn Minh Tuấn', topicName:'Hệ thống gợi ý học phần thông minh bằng Machine Learning', status:'Chờ GV duyệt', ngayXL:null, isCurrent:true },
+      { thuTu:3, tenGV:'ThS. Trần Văn Hùng', topicName:'Phân tích dữ liệu hành vi người dùng web', status:'Chưa đến lượt', ngayXL:null },
+    ],
+    lydo:'Em có kiến thức tốt về Python & ML, muốn nghiên cứu về recommender systems.',
+    history:[
+      {action:'Đăng ký nguyện vọng', date:'05/06/2026 08:30', dot:'warn'},
+      {action:'GV1 từ chối', date:'08/06/2026 15:00', result:'GPA không đáp ứng yêu cầu của đề tài', dot:'err'},
+    ]
+  },
+  {
+    id:2, maSV:'B22DCCN022', tenSV:'Phạm Minh Khoa', lop:'INT3110_2', gpa:3.4, ctdt:'KTPM',
+    topicId:1, loai:'Có sẵn', dot:'HK1 2025-2026',
+    status:'Chờ GV duyệt', ngayDK:'11/06/2026',
+    thuTuNV: 1,
+    dsNguyenVong: [
+      { thuTu:1, tenGV:'TS. Nguyễn Minh Tuấn', topicName:'Hệ thống gợi ý học phần thông minh bằng Machine Learning', status:'Chờ GV duyệt', ngayXL:null, isCurrent:true },
+      { thuTu:2, tenGV:'PGS.TS. Hoàng Quốc Việt', topicName:'Thuật toán meta-heuristic trong tối ưu hoá', status:'Chưa đến lượt', ngayXL:null },
+    ],
+    lydo:'Em đã làm dự án nhỏ về collaborative filtering và muốn đi sâu hơn.',
+    history:[{action:'Đăng ký nguyện vọng', date:'11/06/2026 14:00', dot:'warn'}]
+  },
+  {
+    id:3, maSV:'B22DCCN015', tenSV:'Trần Thị Bích', lop:'INT3110_1', gpa:3.5, ctdt:'KTPM',
+    topicId:null, loai:'Đề xuất mới', dot:'HK1 2025-2026',
+    maDeTaiSV:'SV-ĐT-2026-001',
+    topicName:'Xây dựng chatbot hỗ trợ sinh viên bằng LLM',
+    loaiDeTai:'Đồ án tốt nghiệp',
+    moTa:'Nghiên cứu và xây dựng chatbot hỗ trợ sinh viên tra cứu thông tin học tập sử dụng LLM kết hợp kỹ thuật RAG (Retrieval-Augmented Generation) từ tài liệu nội bộ của trường.',
+    svOutput:'Chatbot web + tài liệu kỹ thuật + báo cáo đánh giá chất lượng phản hồi.',
+    svTech:'Python, LangChain, OpenAI API, FastAPI, React',
+    tailieu:{ name:'De_xuat_de_tai_ChatbotLLM_B22DCCN015.pdf', size:'1.2 MB' },
+    status:'Chờ Khoa duyệt', ngayDK:'08/06/2026', gvDuyetDate:'11/06/2026',
+    thuTuNV: 1,
+    dsNguyenVong: [
+      { thuTu:1, tenGV:'TS. Nguyễn Minh Tuấn', topicName:'Xây dựng chatbot hỗ trợ sinh viên bằng LLM (đề xuất mới)', status:'Chờ Khoa duyệt', ngayXL:'11/06/2026', isCurrent:true },
+    ],
+    lydo:'Em muốn nghiên cứu ứng dụng AI trong giáo dục.',
+    history:[
+      {action:'Đăng ký nguyện vọng', date:'08/06/2026 08:30', dot:'warn'},
+      {action:'GV đồng ý hướng dẫn', date:'11/06/2026 10:00', result:'Đề tài phù hợp — chuyển Khoa duyệt', dot:'ok'},
+    ]
+  },
+  {
+    id:4, maSV:'B22DCCN033', tenSV:'Lê Quốc Cường', lop:'INT3110_2', gpa:2.8, ctdt:'KHMT',
+    topicId:2, loai:'Có sẵn', dot:'HK1 2025-2026',
+    status:'Đã duyệt', ngayDK:'05/06/2026', gvDuyetDate:'09/06/2026',
+    thuTuNV: 1,
+    dsNguyenVong: [
+      { thuTu:1, tenGV:'TS. Nguyễn Minh Tuấn', topicName:'Phân tích cảm xúc người dùng từ đánh giá sản phẩm trực tuyến', status:'Đã duyệt', ngayXL:'09/06/2026', isCurrent:true },
+      { thuTu:2, tenGV:'ThS. Nguyễn Thị Lan', topicName:'Khai phá dữ liệu văn bản tiếng Việt', status:'Chưa đến lượt', ngayXL:null },
+    ],
+    lydo:'Em quan tâm đến NLP và muốn áp dụng vào bài toán thực tế.',
+    history:[
+      {action:'Đăng ký nguyện vọng', date:'05/06/2026 14:00', dot:'warn'},
+      {action:'GV đã duyệt', date:'09/06/2026 09:30', result:'Sinh viên đáp ứng yêu cầu — phân công đề tài', dot:'ok'},
+    ]
+  },
+  {
+    id:5, maSV:'B22DCCN058', tenSV:'Hoàng Minh Đức', lop:'INT3110_1', gpa:3.1, ctdt:'HTTT',
+    topicId:4, loai:'Có sẵn', dot:'HK2 2024-2025',
+    status:'Đã duyệt', ngayDK:'10/02/2025', gvDuyetDate:'13/02/2025',
+    thuTuNV: 2,
+    dsNguyenVong: [
+      { thuTu:1, tenGV:'TS. Phạm Quang Hưng', topicName:'Thiết kế hệ thống phân tán với Kafka', status:'Từ chối', ngayXL:'12/02/2025' },
+      { thuTu:2, tenGV:'TS. Nguyễn Minh Tuấn', topicName:'Thiết kế kiến trúc microservices cho TMĐT quy mô lớn', status:'Đã duyệt', ngayXL:'13/02/2025', isCurrent:true },
+    ],
+    lydo:'Em có kinh nghiệm Docker và muốn đi sâu vào kiến trúc hệ thống phân tán.',
+    history:[
+      {action:'Đăng ký nguyện vọng', date:'10/02/2025 08:00', dot:'warn'},
+      {action:'GV1 từ chối', date:'12/02/2025 10:30', result:'Không đúng chuyên ngành đào tạo', dot:'err'},
+      {action:'GV đã duyệt', date:'13/02/2025 10:00', result:'Sinh viên phù hợp, phân công đề tài', dot:'ok'},
+    ]
+  },
+  {
+    id:6, maSV:'B22DCCN047', tenSV:'Ngô Thị Hà', lop:'INT3110_2', gpa:3.0, ctdt:'KHMT',
+    topicId:1, loai:'Có sẵn', dot:'HK1 2025-2026',
+    status:'Chờ GV duyệt', ngayDK:'04/06/2026',
+    thuTuNV: 3,
+    dsNguyenVong: [
+      { thuTu:1, tenGV:'TS. Lê Thị Mai', topicName:'Deep Learning trong nhận diện cảm xúc khuôn mặt', status:'Từ chối', ngayXL:'06/06/2026' },
+      { thuTu:2, tenGV:'ThS. Trần Văn Hùng', topicName:'Ứng dụng CNN trong chẩn đoán hình ảnh y tế', status:'Từ chối', ngayXL:'08/06/2026' },
+      { thuTu:3, tenGV:'TS. Nguyễn Minh Tuấn', topicName:'Hệ thống gợi ý học phần thông minh bằng Machine Learning', status:'Chờ GV duyệt', ngayXL:null, isCurrent:true },
+    ],
+    lydo:'Em rất hứng thú với machine learning và muốn thực hiện đề tài ứng dụng thực tế.',
+    history:[
+      {action:'Đăng ký nguyện vọng', date:'04/06/2026 10:00', dot:'warn'},
+      {action:'GV1 từ chối', date:'06/06/2026 14:00', result:'Đề tài đã đủ SV đăng ký', dot:'err'},
+      {action:'GV2 từ chối', date:'08/06/2026 09:30', result:'GPA không đáp ứng yêu cầu tối thiểu của đề tài', dot:'err'},
+    ]
+  },
+  {
+    id:7, maSV:'B22DCCN071', tenSV:'Vũ Thanh Long', lop:'INT3110_1', gpa:2.6, ctdt:'KHMT',
+    topicId:2, loai:'Có sẵn', dot:'HK1 2025-2026',
+    status:'Từ chối', ngayDK:'04/06/2026',
+    tuChoiLydo:'GPA 2.6 chưa đáp ứng yêu cầu tối thiểu GPA ≥ 3.2 của đề tài. Sinh viên nên đăng ký các đề tài có yêu cầu thấp hơn hoặc cải thiện kết quả học tập.',
+    thuTuNV: 1,
+    dsNguyenVong: [
+      { thuTu:1, tenGV:'TS. Nguyễn Minh Tuấn', topicName:'Phân tích cảm xúc người dùng từ đánh giá sản phẩm trực tuyến', status:'Từ chối', ngayXL:'08/06/2026', isCurrent:true },
+      { thuTu:2, tenGV:'ThS. Nguyễn Thị Lan', topicName:'Khai phá dữ liệu văn bản tiếng Việt', status:'Chờ GV duyệt', ngayXL:null },
+    ],
+    lydo:'Em rất quan tâm đến NLP và phân tích dữ liệu người dùng.',
+    history:[
+      {action:'Đăng ký nguyện vọng', date:'04/06/2026 09:00', dot:'warn'},
+      {action:'GV từ chối', date:'08/06/2026 11:00', result:'GPA 2.6 không đáp ứng yêu cầu tối thiểu GPA ≥ 3.2', dot:'err'},
+    ]
+  },
+];
+
+let _nvId = null;
+let _nvRejectMode = false;
+
+/* ── Render table ── */
+function render() {
+  const q   = document.getElementById('q').value.toLowerCase();
+  const ft  = document.getElementById('f-topic').value;
+  const fs  = document.getElementById('f-status').value;
+
+  const filtered = wishes.filter(w => {
+    const matchQ  = !q || w.tenSV.toLowerCase().includes(q) || w.maSV.toLowerCase().includes(q);
+    const matchT  = !ft || (ft === '0' ? w.loai === 'Đề xuất mới' : w.topicId === parseInt(ft));
+    const matchS  = !fs || w.status === fs;
+    return matchQ && matchT && matchS;
+  });
+
+  document.getElementById('s-total').textContent   = wishes.length;
+  document.getElementById('s-pending').textContent  = wishes.filter(w => w.status === 'Chờ GV duyệt').length;
+  document.getElementById('s-approved').textContent = wishes.filter(w => w.status === 'Đã duyệt' || w.status === 'Chờ Khoa duyệt').length;
+  document.getElementById('s-rejected').textContent = wishes.filter(w => w.status === 'Từ chối').length;
+
+  document.getElementById('tbody').innerHTML = filtered.length ? filtered.map((w, i) => {
+    const linkedTopic = w.topicId ? topics.find(t => t.id === w.topicId) : null;
+
+    const topicDisplay = linkedTopic
+      ? `<span style="font-family:monospace;font-size:13px;font-weight:700;color:var(--primary);cursor:pointer;text-decoration:underline;text-underline-offset:3px"
+            onclick="openTopicDetail(${w.id})" title="Xem chi tiết đề tài">${linkedTopic.code}</span>
+         <div style="font-size:12px;color:var(--text-2);margin-top:3px;line-height:1.4">${linkedTopic.name}</div>`
+      : `<span style="font-family:monospace;font-size:13px;font-weight:700;color:var(--primary);cursor:pointer;text-decoration:underline;text-underline-offset:3px"
+            onclick="openTopicDetail(${w.id})" title="Xem chi tiết đề tài (đề xuất)">${w.maDeTaiSV || 'Đề xuất mới'}</span>
+         <div style="font-size:12px;color:var(--text-2);margin-top:3px;line-height:1.4">${w.topicName || ''}</div>`;
+
+    const nvNum   = w.thuTuNV || 1;
+    const nvClass = nvNum === 1 ? 'nv1' : nvNum === 2 ? 'nv2' : 'nv3';
+    const nvBadge = `<span class="nv-order-badge ${nvClass}" onclick="openNVOrder(${w.id})" title="Xem danh sách ưu tiên">
+      NV&nbsp;${nvNum} <span style="font-size:10px;opacity:.7">▼</span>
+    </span>`;
+
+    const actions = w.status === 'Chờ GV duyệt'
+      ? `<button class="icon-btn" title="Duyệt" onclick="quickApproveWish(${w.id})" style="color:var(--success)">✅</button>
+         <button class="icon-btn" title="Từ chối" onclick="openNVModal(${w.id},true)" style="color:var(--error)">❌</button>`
+      : ``;
+
+    return `
+    <tr>
+      <td style="text-align:center;color:var(--text-3);font-size:13px">${i + 1}</td>
+      <td style="font-family:monospace;font-size:12px;color:var(--text-2);white-space:nowrap">${w.maSV}</td>
+      <td>
+        <span style="font-size:13px;font-weight:600;color:var(--primary);cursor:pointer;text-decoration:underline;text-underline-offset:3px"
+              onclick="openSVDetail(${w.id})" title="Xem thông tin sinh viên">${w.tenSV}</span>
+      </td>
+      <td style="font-size:12px;color:var(--text-2)">${w.lop}</td>
+      <td style="font-size:12px;color:var(--text-2)">${w.ctdt}</td>
+      <td>${topicDisplay}</td>
+      <td style="text-align:center">${nvBadge}</td>
+      <td style="font-size:12px;color:var(--text-3);white-space:nowrap">${w.ngayDK}</td>
+      <td><span class="tag ${NV_CLR[w.status]}">${w.status}</span></td>
+      <td class="tbl-actions">${actions}</td>
+    </tr>`;
+  }).join('')
+  : `<tr><td colspan="10" class="tbl-empty">Không có nguyện vọng nào phù hợp</td></tr>`;
+
+  document.getElementById('pg-info').textContent = `Hiển thị ${filtered.length} / ${wishes.length} nguyện vọng`;
+}
+
+function resetFilter() {
+  ['q','f-topic','f-status'].forEach(id => { document.getElementById(id).value = ''; });
+  render();
+}
+
+/* ── Modal: Thứ tự nguyện vọng ── */
+function openNVOrder(wishId) {
+  const w = wishes.find(x => x.id === wishId);
+
+  document.getElementById('nvo-title').textContent = `Danh sách nguyện vọng — ${w.tenSV}`;
+  document.getElementById('nvo-masv').textContent  = w.maSV;
+  document.getElementById('nvo-tensv').textContent = w.tenSV;
+  document.getElementById('nvo-lop').textContent   = w.lop;
+  document.getElementById('nvo-gpa').textContent   = w.gpa.toFixed(1);
+  document.getElementById('nvo-gpa').style.color   = w.gpa >= 3.0 ? 'var(--success)' : w.gpa >= 2.5 ? 'var(--text-1)' : 'var(--error)';
+
+  document.getElementById('nvo-list').innerHTML = (w.dsNguyenVong || []).map(item => {
+    const numClass = item.thuTu === 1 ? 'nv1' : item.thuTu === 2 ? 'nv2' : item.thuTu === 3 ? 'nv3' : 'nv4';
+    return `
+    <div class="nv-order-item ${item.isCurrent ? 'current' : ''}">
+      <div class="nv-order-num ${numClass}">${item.thuTu}</div>
+      <div style="flex:1;min-width:0">
+        <div class="nv-order-gv">
+          ${item.tenGV}
+          ${item.isCurrent ? '<span class="you-label">BẠN</span>' : ''}
+        </div>
+        <div class="nv-order-topic">📋 ${item.topicName}</div>
+        <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap">
+          <span class="tag ${NVO_STATUS_CLR[item.status] || 'tag-default'}">${item.status}</span>
+          ${item.ngayXL ? `<span style="font-size:11px;color:var(--text-3)">${item.ngayXL}</span>` : ''}
+        </div>
+      </div>
+    </div>`;
+  }).join('');
+
+  openModal('m-nv-order');
+}
+
+/* ── Quick approve (từ bảng) ── */
+function quickApproveWish(id) {
+  const w = wishes.find(x => x.id === id);
+  showConfirm(
+    `Duyệt nguyện vọng của ${w.tenSV}?`,
+    () => approveWish(id),
+    'Duyệt', 'btn-primary'
+  );
+}
+
+/* ── Modal: Chi tiết nguyện vọng ── */
+function openNVModal(id, rejectMode) {
+  _nvId = id;
+  _nvRejectMode = !!rejectMode;
+  const w = wishes.find(x => x.id === id);
+
+  document.getElementById('nv-modal-title').textContent = `Nguyện vọng — ${w.tenSV}`;
+  document.getElementById('nv-masv').textContent  = w.maSV;
+  document.getElementById('nv-tensv').textContent = w.tenSV;
+  document.getElementById('nv-lop').textContent   = w.lop;
+  document.getElementById('nv-gpa').textContent   = w.gpa.toFixed(1);
+  document.getElementById('nv-gpa').style.color   = w.gpa >= 3.0 ? 'var(--success)' : w.gpa >= 2.5 ? 'var(--text-1)' : 'var(--error)';
+  document.getElementById('nv-ctdt').textContent  = w.ctdt;
+
+  const loaiBadge = w.loai === 'Có sẵn'
+    ? '<span class="tag tag-default">Chọn đề tài GV có sẵn</span>'
+    : '<span class="tag tag-warning">Đề xuất đề tài mới</span>';
+  const linkedTopic  = w.topicId ? topics.find(x => x.id === w.topicId) : null;
+  const topicDisplay = linkedTopic
+    ? `<strong>${linkedTopic.name}</strong> <span style="font-size:11px;color:var(--text-3)">(${linkedTopic.code})</span>`
+    : `<strong>${w.topicName || '—'}</strong>`;
+
+  const nvNum   = w.thuTuNV || 1;
+  const nvClass = nvNum === 1 ? 'nv1' : nvNum === 2 ? 'nv2' : 'nv3';
+  const nvBadge = `<span class="nv-order-badge ${nvClass}" style="cursor:default">&nbsp;NV&nbsp;${nvNum}&nbsp;</span>
+    &nbsp;<a href="#" style="font-size:12px;color:var(--primary)" onclick="event.preventDefault();closeModal('m-nv');openNVOrder(${w.id})">Xem DS ưu tiên ↗</a>`;
+
+  document.getElementById('nv-vw-body').innerHTML = `
+    <tr><th>Loại nguyện vọng</th><td>${loaiBadge}</td></tr>
+    <tr><th>Đợt thực tập</th><td>${w.dot}</td></tr>
+    <tr><th>Thứ tự nguyện vọng</th><td>${nvBadge}</td></tr>
+    <tr><th>${w.loai === 'Có sẵn' ? 'Đề tài đăng ký' : 'Đề tài đề xuất'}</th><td>${topicDisplay}</td></tr>
+    ${w.moTa ? `<tr><th>Mô tả đề xuất</th><td style="white-space:pre-wrap;line-height:1.6;font-size:13px">${w.moTa}</td></tr>` : ''}
+    <tr><th>Lý do đăng ký</th><td style="font-size:13px;line-height:1.6;font-style:italic;color:var(--text-2)">${w.lydo}</td></tr>
+    <tr><th>Ngày đăng ký</th><td>${w.ngayDK}</td></tr>
+    <tr><th>Trạng thái</th><td><span class="tag ${NV_CLR[w.status]}">${w.status}</span></td></tr>
+    ${w.tuChoiLydo ? `<tr><th>Lý do từ chối</th><td style="color:var(--error);font-size:13px">${w.tuChoiLydo}</td></tr>` : ''}`;
+
+  document.getElementById('nv-history').innerHTML = (w.history || []).length
+    ? [...w.history].reverse().map(h => `
+        <li>
+          <div class="h-dot ${h.dot}"></div>
+          <div>
+            <div style="font-weight:500">${h.action}</div>
+            ${h.result ? `<div class="h-meta">${h.result}</div>` : ''}
+            <div class="h-meta">${h.date}</div>
+          </div>
+        </li>`).join('')
+    : '<li style="color:var(--text-3);font-size:13px">Chưa có lịch sử</li>';
+
+  document.getElementById('nv-reject-fi').style.display = _nvRejectMode ? '' : 'none';
+  document.getElementById('nv-reject-reason').value = '';
+  document.getElementById('nv-reject-err').style.display = 'none';
+
+  _refreshNVFooter(w);
+  openModal('m-nv');
+}
+
+function _refreshNVFooter(w) {
+  let btns = `<button class="btn btn-default" data-close="m-nv">Đóng</button>`;
+  if (w.status === 'Chờ GV duyệt') {
+    if (_nvRejectMode) {
+      btns += `<button class="btn btn-default" onclick="_cancelRejectMode()">← Quay lại</button>
+               <button class="btn btn-danger" onclick="confirmRejectWish(${w.id})">❌ Xác nhận từ chối</button>`;
+    } else {
+      btns += `<button class="btn btn-default" onclick="openNVModal(${w.id},true)">❌ Từ chối</button>
+               <button class="btn btn-primary" onclick="approveWish(${w.id})">✅ Duyệt nguyện vọng</button>`;
+    }
+  }
+  document.getElementById('nv-modal-ft').innerHTML = btns;
+}
+
+function _cancelRejectMode() {
+  _nvRejectMode = false;
+  document.getElementById('nv-reject-fi').style.display = 'none';
+  _refreshNVFooter(wishes.find(x => x.id === _nvId));
+}
+
+/* ── Duyệt nguyện vọng ── */
+function approveWish(id) {
+  const w = wishes.find(x => x.id === id);
+  const newStatus = w.loai === 'Đề xuất mới' ? 'Chờ Khoa duyệt' : 'Đã duyệt';
+  wishes = wishes.map(x => x.id === id ? {
+    ...x, status: newStatus, gvDuyetDate: new Date().toLocaleDateString('vi'),
+    history: [...(x.history || []), {
+      action  : newStatus === 'Chờ Khoa duyệt' ? 'GV đồng ý hướng dẫn' : 'GV đã duyệt',
+      date    : new Date().toLocaleString('vi'),
+      result  : newStatus === 'Chờ Khoa duyệt'
+                  ? 'Xác nhận hướng dẫn đề tài mới — chuyển Khoa xét duyệt'
+                  : 'Sinh viên đáp ứng yêu cầu — phân công đề tài thành công',
+      dot     : 'ok',
+    }],
+  } : x);
+  closeModal('m-nv');
+  showToast(newStatus === 'Chờ Khoa duyệt'
+    ? 'Đã duyệt — đề tài mới chuyển Khoa xét duyệt 🏫'
+    : 'Đã duyệt nguyện vọng — SV được phân công đề tài ✅');
+  render();
+}
+
+/* ── Từ chối nguyện vọng ── */
+function confirmRejectWish(id) {
+  const reason = document.getElementById('nv-reject-reason').value.trim();
+  if (!reason) { document.getElementById('nv-reject-err').style.display = ''; return; }
+  document.getElementById('nv-reject-err').style.display = 'none';
+  wishes = wishes.map(x => x.id === id ? {
+    ...x, status: 'Từ chối', tuChoiLydo: reason,
+    history: [...(x.history || []), {
+      action: 'GV từ chối', date: new Date().toLocaleString('vi'), result: reason, dot: 'err',
+    }],
+  } : x);
+  closeModal('m-nv');
+  showToast('Đã từ chối nguyện vọng', 'warn');
+  render();
+}
+
+/* ── Modal: Thông tin sinh viên ── */
+function openSVDetail(wishId) {
+  const w = wishes.find(x => x.id === wishId);
+  document.getElementById('sv-title').textContent = `Thông tin sinh viên — ${w.tenSV}`;
+
+  const gpaColor = w.gpa >= 3.0 ? 'var(--success)' : w.gpa >= 2.5 ? 'var(--text-1)' : 'var(--error)';
+  const gpaLabel = w.gpa >= 3.6 ? 'Xuất sắc' : w.gpa >= 3.2 ? 'Giỏi' : w.gpa >= 2.5 ? 'Khá' : 'Trung bình';
+
+  document.getElementById('sv-body').innerHTML = `
+    <tr><th style="width:140px">Mã số SV</th>
+        <td><span style="font-family:monospace;font-size:13px;font-weight:700">${w.maSV}</span></td></tr>
+    <tr><th>Họ và tên</th>
+        <td style="font-weight:600">${w.tenSV}</td></tr>
+    <tr><th>Lớp học phần</th>
+        <td>${w.lop}</td></tr>
+    <tr><th>CTĐT</th>
+        <td>${CTDT_MAP[w.ctdt] || w.ctdt}</td></tr>
+    <tr><th>GPA</th>
+        <td><span style="font-size:15px;font-weight:700;color:${gpaColor}">${w.gpa.toFixed(2)}</span>
+            <span style="font-size:12px;color:var(--text-3);margin-left:6px">${gpaLabel}</span></td></tr>
+    <tr><th>Đợt thực tập</th>
+        <td>${w.dot}</td></tr>
+    <tr><th>Ngày đăng ký NV</th>
+        <td>${w.ngayDK}</td></tr>
+    <tr><th>Lý do đăng ký</th>
+        <td style="font-size:13px;line-height:1.6;font-style:italic;color:var(--text-2)">${w.lydo || '—'}</td></tr>
+    <tr><th>Trạng thái NV</th>
+        <td><span class="tag ${NV_CLR[w.status]}">${w.status}</span></td></tr>`;
+
+  openModal('m-sv');
+}
+
+/* ── Modal: Chi tiết đề tài ── */
+function openTopicDetail(wishId) {
+  const w = wishes.find(x => x.id === wishId);
+  const t = w.topicId ? topics.find(x => x.id === w.topicId) : null;
+
+  document.getElementById('mt-title').textContent = t
+    ? `Chi tiết đề tài — ${t.code}`
+    : 'Chi tiết đề tài đề xuất';
+
+  const v = (x) => x || '';
+
+  const fileLink = (filename) => filename
+    ? `<span style="display:inline-flex;align-items:center;gap:6px">
+         <span style="color:#fa8c16;font-size:15px">📎</span>
+         <span style="color:#fa8c16;text-decoration:underline;cursor:pointer;font-size:13px">${filename}</span>
+       </span>`
+    : '';
+
+  const rows = [
+    ['Mã đề tài',     t
+      ? `<span style="font-family:monospace;font-size:13px;color:var(--text-2)">${t.code}</span>`
+      : w.maDeTaiSV
+        ? `<span style="font-family:monospace;font-size:13px;color:var(--text-2)">${w.maDeTaiSV}</span><span class="tag tag-warning" style="margin-left:8px;font-size:11px">Đề xuất SV</span>`
+        : ''],
+    ['Tên đề tài',    `<strong>${t ? t.name : v(w.topicName)}</strong>`],
+    ['Loại đề tài',   t ? (t.types || []).join(', ') : (TYPE_ABBR[w.loaiDeTai] || v(w.loaiDeTai))],
+    ['CTĐT áp dụng',  t ? (t.ctdt || []).join(', ') : (CTDT_MAP[w.ctdt] || v(w.ctdt))],
+    ['Lĩnh vực',      t ? v(t.field) : ''],
+    ['Số SV tối đa',  t ? `${t.qty} sinh viên` : ''],
+    ['Trạng thái',    t
+      ? `<span class="tag ${TOPIC_STATUS_CLR[t.status] || 'tag-default'}">${t.status}</span>`
+      : (() => {
+          const s = w.status === 'Đã duyệt' ? {l:'Đã duyệt',c:'tag-success'}
+                  : w.status === 'Từ chối'  ? {l:'Từ chối',  c:'tag-error'}
+                  :                           {l:'Chờ duyệt',c:'tag-warning'};
+          return `<span class="tag ${s.c}">${s.l}</span>`;
+        })()],
+    ['Hoạt động',     t
+      ? `<span style="display:inline-flex;align-items:center;gap:6px">
+           <span style="width:8px;height:8px;border-radius:50%;background:${t.hoatDong==='Mở'?'var(--success)':'#bfbfbf'}"></span>
+           <span style="font-size:13px">${t.hoatDong || ''}</span>
+         </span>`
+      : `<span style="display:inline-flex;align-items:center;gap:6px">
+           <span style="width:8px;height:8px;border-radius:50%;background:var(--success)"></span>
+           <span style="font-size:13px">Mở</span>
+         </span>`],
+    ['Tóm tắt',       t ? v(t.desc) : v(w.moTa)],
+    ['Yêu cầu SV',    t ? v(t.req) : ''],
+    ['Sản phẩm DK',   t ? v(t.output) : v(w.svOutput)],
+    ['Công nghệ',     t ? v(t.tech) : v(w.svTech)],
+    ['Tài liệu đính kèm', t ? fileLink(t.tailieu) : fileLink(w.tailieu && w.tailieu.name)],
+    ['Ngày gửi',      t ? v(t.created) : v(w.ngayDK)],
+    ['Giảng viên',    'TS. Nguyễn Minh Tuấn'],
+    ['Đơn vị',        'BM. Công nghệ phần mềm'],
+    ['Email',         'tuannm@university.edu.vn'],
+  ];
+
+  document.getElementById('mt-body').innerHTML = rows.map(([label, value]) =>
+    `<tr><th style="width:130px;white-space:nowrap">${label}</th><td style="white-space:pre-wrap;line-height:1.6">${value}</td></tr>`
+  ).join('');
+
+  openModal('m-topic');
+}
+
+/* ── Init ── */
+render();
+</script>
+</body>
+</html>

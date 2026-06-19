@@ -1,0 +1,570 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Đề tài tham khảo | Sinh viên | HTQT Đại học</title>
+  <link rel="stylesheet" href="_styles.css">
+  <style>
+    /* ── Stat row ── */
+    .stat-row{display:flex;gap:12px;margin-bottom:16px}
+    .stat-box{flex:1;background:#fff;border:1px solid var(--border);border-radius:8px;padding:14px 18px;display:flex;align-items:center;gap:14px}
+    .stat-ico{font-size:26px;line-height:1}
+    .stat-num{font-size:22px;font-weight:700;line-height:1}
+    .stat-lbl{font-size:12px;color:var(--text-3);margin-top:2px}
+    .stat-box.primary .stat-num{color:var(--primary)}
+    .stat-box.ok      .stat-num{color:var(--success)}
+    .stat-box.warn    .stat-num{color:var(--warning)}
+    .stat-box.err     .stat-num{color:var(--error)}
+
+    /* ── Topic code ── */
+    .topic-code{font-size:11px;color:var(--text-3);font-family:monospace;margin-bottom:2px}
+
+    /* ── Slot bar ── */
+    .slot-bar-wrap{display:flex;align-items:center;gap:6px}
+    .slot-bar{width:56px;height:5px;background:var(--border);border-radius:3px;overflow:hidden;flex-shrink:0}
+    .slot-bar-fill{height:100%;border-radius:3px;background:var(--primary)}
+    .slot-bar-fill.warn{background:var(--warning)}
+    .slot-bar-fill.full{background:var(--error)}
+
+    /* ── Status tags ── */
+    .tag-open{background:#e6fffb;color:#08979c;border-color:#87e8de}
+    .tag-full{background:#fff2f0;color:#cf1322;border-color:#ffa39e}
+
+    /* ── Card-style square tabs ── */
+    .sq-nav{display:flex;gap:2px;margin-bottom:0}
+    .sq-btn{padding:9px 22px;font-size:13px;font-weight:500;color:var(--text-2);background:#fafafa;
+            border:1px solid var(--border);border-bottom:none;cursor:pointer;font-family:inherit;
+            transition:all .15s;display:inline-flex;align-items:center;gap:7px;
+            border-radius:6px 6px 0 0;position:relative;bottom:-1px;white-space:nowrap}
+    .sq-btn:hover:not([disabled]){color:var(--primary);background:#fff7e6}
+    .sq-btn.active{background:#fff;color:var(--primary);font-weight:600;z-index:1;border-color:var(--border)}
+    .sq-btn[disabled]{cursor:default;opacity:.55}
+    .sq-content{background:#fff;border:1px solid var(--border);border-radius:0 6px 6px 6px;padding:20px}
+
+    /* ── Tab badges ── */
+    .tab-cnt{background:var(--primary);color:#fff;border-radius:10px;font-size:11px;padding:1px 7px;font-weight:700;line-height:1.6}
+    .tab-soon{background:#e8e8e8;color:#8c8c8c;border-radius:10px;font-size:11px;padding:1px 7px;font-weight:600;line-height:1.6}
+
+    /* ── Row hover cursor ── */
+    table.tbl tbody tr:hover td{background:#fff7e6;cursor:pointer}
+
+    /* ── desc-tbl th width override ── */
+    .desc-tbl th{width:30%}
+
+    /* ── Coming soon ── */
+    .coming-soon{text-align:center;padding:80px 20px}
+    .cs-ico{font-size:64px;margin-bottom:16px}
+    .coming-soon h3{font-size:18px;font-weight:600;color:var(--text-2);margin:0 0 8px}
+    .coming-soon p{font-size:14px;color:var(--text-3);margin:0;line-height:1.7}
+
+    /* ── Empty search state ── */
+    .topic-empty{text-align:center;padding:48px 20px;color:var(--text-3)}
+    .topic-empty .te-ico{font-size:42px;margin-bottom:10px}
+    .topic-empty p{font-size:13px;margin:0}
+  </style>
+</head>
+<body>
+<div class="app">
+
+  <!-- ═══ SIDEBAR ═══ -->
+  <nav class="sidebar">
+    <div class="sb-logo">
+      <div class="sb-logo-icon">🎓</div>
+      <div>
+        <div class="sb-logo-text">HTQT Đại học</div>
+        <div class="text-muted text-sm">Sinh viên</div>
+      </div>
+    </div>
+    <div class="sb-user">
+      <div class="av">SV</div>
+      <div>
+        <div style="font-size:13px;font-weight:600">Lê Thị Mai Anh</div>
+        <div style="font-size:11px;color:var(--text-3)">20110001 · CNTT &amp; QTKD K20</div>
+      </div>
+    </div>
+    <ul class="sb-menu">
+      <li><a href="#">🏠&nbsp; Trang chủ</a></li>
+      <li class="active">
+        <a href="#">🎓&nbsp; Đồ án &amp; Thực tập</a>
+        <ul class="sb-sub open">
+          <li><a href="MH-SV-01_MyInternships.html">📚 Đợt học tập</a></li>
+          <li><a href="MH-SV-01_MyInternships.html#thuc-tap">🏢 Thực tập</a></li>
+          <li><a href="#">📖 Đồ án / Khoá luận</a></li>
+          <li class="active"><a href="MH-SV-03_TopicReference.html">🔍 Đề tài tham khảo</a></li>
+          <li><a href="MH-SV-02_TopicBrowse.html">📝 Quản lý nguyện vọng</a></li>
+        </ul>
+      </li>
+      <li><a href="#">👤&nbsp; Hồ sơ cá nhân</a></li>
+      <li><a href="#">📰&nbsp; Thông báo</a></li>
+    </ul>
+  </nav>
+
+  <!-- ═══ MAIN ═══ -->
+  <div class="main">
+
+    <!-- HEADER -->
+    <header class="app-header" style="justify-content:flex-end">
+      <div class="h-right">
+        <div class="bw"><button class="btn btn-link" style="font-size:18px">🔔</button></div>
+        <div class="av">SV</div>
+      </div>
+    </header>
+
+    <main class="content">
+
+      <!-- ── Square card tabs ── -->
+      <div class="sq-nav">
+        <button class="sq-btn active" id="tb-gv" onclick="switchTab('gv')">
+          🏫 Đề tài giảng viên
+          <span class="tab-cnt" id="cnt-gv">0</span>
+        </button>
+        <button class="sq-btn" id="tb-csv" disabled>
+          🎓 Đề tài cựu sinh viên
+          <span class="tab-soon">Sắp ra mắt</span>
+        </button>
+      </div>
+
+      <!-- ══════════════════════════════════
+           TAB 1 — Đề tài giảng viên
+      ══════════════════════════════════ -->
+      <div class="sq-content" id="pane-gv">
+
+        <!-- DVQL notice -->
+        <div style="display:flex;align-items:center;gap:8px;margin-bottom:12px;padding:9px 14px;background:#e6f7ff;border:1px solid #91d5ff;border-radius:6px;font-size:13px;color:#0050b3">
+          <span style="font-size:15px">🏫</span>
+          <span>Hiển thị đề tài thuộc đơn vị quản lý của bạn:
+            <strong id="dvql-label"></strong>
+          </span>
+        </div>
+
+        <!-- Filter bar -->
+        <div class="filter-bar" style="margin-bottom:14px">
+          <div class="input-search" style="flex:1;min-width:200px">
+            <input type="text" class="fc" id="f-q" placeholder="Tìm tên đề tài, giảng viên, mã...">
+          </div>
+          <select class="fc" style="width:190px" id="f-ctdt">
+            <option value="">Tất cả CTĐT</option>
+          </select>
+          <select class="fc" style="width:150px" id="f-type">
+            <option value="">Tất cả loại</option>
+          </select>
+          <select class="fc" style="width:155px" id="f-status">
+            <option value="">Tất cả tình trạng</option>
+            <option value="open">Còn chỗ đăng ký</option>
+            <option value="full">Đã đủ chỗ</option>
+          </select>
+        </div>
+
+        <!-- Topic table -->
+        <div style="border:1px solid var(--border);border-radius:6px;overflow:hidden">
+          <div class="tbl-wrap">
+            <table class="tbl" style="width:100%">
+              <thead>
+                <tr>
+                  <th style="width:128px">Mã đề tài</th>
+                  <th>Tên đề tài</th>
+                  <th style="width:170px">Giảng viên HD</th>
+                  <th style="width:75px;text-align:center">Loại</th>
+                  <th style="width:120px">CTĐT</th>
+                  <th style="width:170px">Đơn vị quản lý</th>
+                  <th style="width:100px">Số lượng SV</th>
+                  <th style="width:64px;text-align:center">Chi tiết</th>
+                </tr>
+              </thead>
+              <tbody id="topic-tbody"><!-- JS --></tbody>
+            </table>
+          </div>
+        </div>
+
+      </div><!-- /pane-gv -->
+
+      <!-- ══════════════════════════════════
+           TAB 2 — Đề tài cựu sinh viên (coming soon)
+      ══════════════════════════════════ -->
+      <div class="sq-content" id="pane-csv" style="display:none;border-radius:0 6px 6px 6px">
+        <div class="coming-soon">
+          <div class="cs-ico">🚧</div>
+          <h3>Đề tài cựu sinh viên</h3>
+          <p>Tính năng này đang trong quá trình phát triển.<br>
+          Sắp tới, bạn có thể xem và tham khảo các đề tài do cựu sinh viên<br>
+          đã thực hiện, giúp định hướng và lấy ý tưởng cho đề tài của mình.</p>
+        </div>
+      </div>
+
+    </main>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════
+     MODAL: CHI TIẾT ĐỀ TÀI
+════════════════════════════════════════════════════ -->
+<div class="overlay hidden" id="m-detail">
+  <div class="modal-box" style="width:620px;max-width:96vw;max-height:92vh">
+    <div class="modal-hd">
+      <h4 class="modal-title">Chi tiết đề tài</h4>
+      <button class="modal-close" data-close="m-detail">✕</button>
+    </div>
+
+    <div class="modal-bd" id="md-body" style="padding:20px 24px;overflow-y:auto">
+      <!-- populated by openDetail() -->
+    </div>
+
+    <div class="modal-ft">
+      <button class="btn btn-default" data-close="m-detail">Đóng</button>
+      <a href="MH-SV-02_TopicBrowse.html" class="btn btn-primary">
+        📝 Đến trang Đăng ký nguyện vọng
+      </a>
+    </div>
+  </div>
+</div>
+
+<script src="_utils.js"></script>
+<script>
+/* ════════════════════════════════════════
+   DATA
+════════════════════════════════════════ */
+const TOPIC_TYPES = ['TTTN', 'ĐATN', 'KLTN', 'ĐACS', 'ĐALN'];
+const CTDT_MAP    = { CT001:'Công nghệ thông tin', CT002:'Quản trị kinh doanh' };
+const TYPE_LABEL  = { TTTN:'Thực tập tốt nghiệp', ĐATN:'Đồ án tốt nghiệp', KLTN:'Khóa luận tốt nghiệp', ĐACS:'Đồ án chuyên sâu', ĐALN:'Đồ án liên ngành' };
+const DVQL_MAP    = { KHCNTT:'Khoa Công nghệ thông tin', KHQTKD:'Khoa Quản trị kinh doanh' };
+
+/* Đơn vị quản lý của sinh viên đang đăng nhập — lấy từ profile, dùng để lọc đề tài */
+const STUDENT_DVQL = 'KHCNTT';
+
+const TOPICS = [
+  /* ── CT001: Công nghệ thông tin ── */
+  { id:101, code:'DT-2026-0001',
+    name:'Xây dựng hệ thống gợi ý học phần thông minh bằng Machine Learning',
+    gv:'TS. Nguyễn Minh Tuấn', type:'ĐATN', ctdt:'CT001', dvql:'KHCNTT', maxQty:2, taken:1,
+    domain:'Trí tuệ nhân tạo & Dữ liệu', submittedDate:'05/05/2026',
+    summary:'Nghiên cứu và xây dựng hệ thống gợi ý học phần tự động cho sinh viên dựa trên lịch sử học tập và mục tiêu nghề nghiệp, sử dụng Collaborative Filtering và Content-Based Filtering.',
+    tech:'Python, Scikit-learn, FastAPI, React',
+    products:'Hệ thống web gợi ý học phần, báo cáo nghiên cứu, bộ dữ liệu huấn luyện',
+    requirements:'GPA ≥ 3.0, có kiến thức Python, ML cơ bản, xử lý dữ liệu',
+  },
+  { id:102, code:'DT-2026-0002',
+    name:'Nghiên cứu và triển khai giải pháp bảo mật Zero Trust cho doanh nghiệp',
+    gv:'PGS. Lê Thị Hoa', type:'KLTN', ctdt:'CT001', dvql:'KHCNTT', maxQty:1, taken:1,
+    domain:'An toàn thông tin', submittedDate:'03/05/2026',
+    summary:'Nghiên cứu kiến trúc bảo mật Zero Trust và triển khai demo giải pháp bảo mật toàn diện cho doanh nghiệp vừa và nhỏ, bao gồm xác thực đa yếu tố, kiểm soát truy cập động và giám sát liên tục.',
+    tech:'Azure AD, Cloudflare Access, Keycloak, Python, Docker',
+    products:'Tài liệu kiến trúc Zero Trust, PoC demo, báo cáo đánh giá bảo mật',
+    requirements:'Kiến thức mạng, bảo mật thông tin, Linux',
+  },
+  { id:103, code:'DT-2026-0003',
+    name:'Ứng dụng Blockchain trong quản lý chuỗi cung ứng thực phẩm',
+    gv:'ThS. Nguyễn Thu Hà', type:'ĐACS', ctdt:'CT001', dvql:'KHCNTT', maxQty:2, taken:0,
+    domain:'Blockchain & Web3', submittedDate:'04/05/2026',
+    summary:'Xây dựng hệ thống truy xuất nguồn gốc thực phẩm minh bạch ứng dụng công nghệ Blockchain, cho phép người tiêu dùng và doanh nghiệp theo dõi toàn bộ hành trình sản phẩm từ nông trại đến bàn ăn.',
+    tech:'Ethereum/Solidity, Truffle, Web3.js, React, IPFS',
+    products:'Smart contract, ứng dụng web truy xuất nguồn gốc, tài liệu kỹ thuật',
+    requirements:'JavaScript, kiến thức cơ bản về Blockchain',
+  },
+  { id:104, code:'DT-2026-0004',
+    name:'Xây dựng hệ thống phân tích log và phát hiện xâm nhập mạng bằng AI',
+    gv:'TS. Nguyễn Minh Tuấn', type:'ĐATN', ctdt:'CT001', dvql:'KHCNTT', maxQty:1, taken:0,
+    domain:'An toàn thông tin', submittedDate:'05/05/2026',
+    summary:'Nghiên cứu và triển khai hệ thống SIEM (Security Information and Event Management) tích hợp AI để phân tích log thời gian thực và phát hiện các hành vi xâm nhập bất thường trong mạng doanh nghiệp.',
+    tech:'ELK Stack, Python, TensorFlow, Kafka, Docker, Grafana',
+    products:'Hệ thống SIEM demo, mô hình AI phát hiện xâm nhập, dashboard giám sát',
+    requirements:'Mạng máy tính, Python, cơ bản về bảo mật',
+  },
+  { id:105, code:'DT-2026-0005',
+    name:'Nghiên cứu tối ưu hóa hiệu năng truy vấn cơ sở dữ liệu phân tán',
+    gv:'TS. Trần Văn Bình', type:'KLTN', ctdt:'CT001', dvql:'KHCNTT', maxQty:2, taken:2,
+    domain:'Hệ thống & Hạ tầng', submittedDate:'02/05/2026',
+    summary:'Nghiên cứu các kỹ thuật tối ưu hóa truy vấn trong môi trường cơ sở dữ liệu phân tán, bao gồm phân mảnh dữ liệu, replication và thuật toán lập lịch truy vấn để cải thiện hiệu năng hệ thống.',
+    tech:'PostgreSQL, Citus, Apache Cassandra, Python, Java',
+    products:'Bộ benchmark, báo cáo so sánh kỹ thuật, đề xuất giải pháp tối ưu',
+    requirements:'CSDL nâng cao, kiến trúc phân tán',
+  },
+  { id:106, code:'DT-2026-0006',
+    name:'Xây dựng hệ thống giám sát IoT trong nông nghiệp thông minh',
+    gv:'ThS. Lê Minh Đức', type:'TTTN', ctdt:'CT001', dvql:'KHCNTT', maxQty:3, taken:1,
+    domain:'Hệ thống nhúng & IoT', submittedDate:'01/05/2026',
+    summary:'Thiết kế và triển khai hệ thống IoT giám sát các thông số môi trường nông nghiệp (nhiệt độ, độ ẩm, ánh sáng, pH đất) theo thời gian thực, tích hợp cảnh báo thông minh và điều khiển tự động.',
+    tech:'Arduino/ESP32, MQTT, Node-RED, InfluxDB, Grafana, React Native',
+    products:'Thiết bị IoT prototype, ứng dụng di động, dashboard giám sát',
+    requirements:'Điện tử cơ bản, lập trình nhúng, IoT',
+  },
+  { id:107, code:'DT-2026-0007',
+    name:'Phát triển ứng dụng di động hỗ trợ người khiếm thị nhận diện môi trường',
+    gv:'TS. Phạm Quốc Hùng', type:'ĐALN', ctdt:'CT001', dvql:'KHCNTT', maxQty:2, taken:2,
+    domain:'Công nghệ di động & AI', submittedDate:'06/05/2026',
+    summary:'Xây dựng ứng dụng di động sử dụng thị giác máy tính và NLP để hỗ trợ người khiếm thị nhận diện và mô tả đồ vật, văn bản, khuôn mặt trong môi trường xung quanh theo thời gian thực.',
+    tech:'React Native, TensorFlow Lite, OpenCV, Google ML Kit, Firebase',
+    products:'Ứng dụng iOS/Android, mô hình nhận diện tùy chỉnh, tài liệu hướng dẫn',
+    requirements:'React Native, Computer Vision cơ bản, UX cho người dùng đặc biệt',
+  },
+
+  /* ── CT002: Quản trị kinh doanh ── */
+  { id:201, code:'DT-2026-Q01',
+    name:'Phân tích chiến lược marketing số cho doanh nghiệp SME',
+    gv:'TS. Lê Văn Nam', type:'TTTN', ctdt:'CT002', dvql:'KHQTKD', maxQty:3, taken:1,
+    domain:'Marketing & Truyền thông số', submittedDate:'07/05/2026',
+    summary:'Nghiên cứu và phân tích các chiến lược marketing số hiệu quả cho doanh nghiệp vừa và nhỏ (SME) trong bối cảnh chuyển đổi số, bao gồm SEO, SEM, social media marketing và đo lường ROI.',
+    tech:'Google Analytics, Meta Ads, SEMrush, Power BI, Excel',
+    products:'Báo cáo phân tích, bộ KPI marketing, khung chiến lược cho SME',
+    requirements:'Cơ bản marketing, phân tích dữ liệu',
+  },
+  { id:202, code:'DT-2026-Q02',
+    name:'Mô hình kinh doanh B2B2C: cơ sở lý thuyết và ứng dụng thực tiễn',
+    gv:'PGS. Nguyễn Thị Hồng', type:'KLTN', ctdt:'CT002', dvql:'KHQTKD', maxQty:2, taken:2,
+    domain:'Quản trị & Chiến lược', submittedDate:'03/05/2026',
+    summary:'Nghiên cứu lý thuyết về mô hình B2B2C, phân tích các case study thành công và xây dựng khung ứng dụng cho doanh nghiệp Việt Nam trong bối cảnh thương mại điện tử phát triển nhanh.',
+    tech:'Nghiên cứu định tính/định lượng, SPSS, Power BI',
+    products:'Luận văn khoa học, khung mô hình B2B2C Việt Nam, đề xuất chính sách',
+    requirements:'Quản trị kinh doanh, phương pháp nghiên cứu khoa học',
+  },
+  { id:203, code:'DT-2026-Q03',
+    name:'Tối ưu hóa chuỗi cung ứng cho doanh nghiệp bán lẻ hiện đại',
+    gv:'TS. Trần Minh Khoa', type:'TTTN', ctdt:'CT002', dvql:'KHQTKD', maxQty:2, taken:0,
+    domain:'Logistics & Chuỗi cung ứng', submittedDate:'04/05/2026',
+    summary:'Phân tích và tối ưu hóa chuỗi cung ứng cho doanh nghiệp bán lẻ đa kênh, bao gồm quản lý tồn kho, logistics, dự báo nhu cầu và ứng dụng công nghệ RFID/IoT trong quản lý hàng hóa.',
+    tech:'SAP, Excel Advanced, Power BI, Python (dự báo)',
+    products:'Báo cáo phân tích chuỗi cung ứng, mô hình tối ưu hóa, đề xuất cải tiến',
+    requirements:'Logistics, quản lý tồn kho, cơ bản phân tích dữ liệu',
+  },
+  { id:204, code:'DT-2026-Q04',
+    name:'Ứng dụng Power BI trong phân tích dữ liệu kinh doanh',
+    gv:'ThS. Phạm Thị Linh', type:'ĐACS', ctdt:'CT002', dvql:'KHQTKD', maxQty:3, taken:1,
+    domain:'Phân tích dữ liệu kinh doanh', submittedDate:'02/05/2026',
+    summary:'Xây dựng bộ dashboard phân tích dữ liệu kinh doanh toàn diện bằng Power BI, bao gồm phân tích doanh số, khách hàng, tài chính và dự báo xu hướng cho doanh nghiệp bán lẻ điển hình.',
+    tech:'Power BI, Power Query, DAX, SQL, Excel',
+    products:'Bộ dashboard Power BI, tài liệu hướng dẫn, báo cáo phân tích mẫu',
+    requirements:'SQL cơ bản, Excel, tư duy phân tích kinh doanh',
+  },
+  { id:205, code:'DT-2026-Q05',
+    name:'Thiết kế hệ thống CRM cho doanh nghiệp vừa và nhỏ',
+    gv:'TS. Lê Văn Nam', type:'ĐATN', ctdt:'CT002', dvql:'KHQTKD', maxQty:3, taken:0,
+    domain:'CRM & Kinh doanh số', submittedDate:'08/05/2026',
+    summary:'Phân tích yêu cầu và thiết kế hệ thống CRM phù hợp với quy mô và đặc thù của doanh nghiệp vừa và nhỏ tại Việt Nam, tích hợp với các nền tảng social media và thương mại điện tử phổ biến.',
+    tech:'React, Node.js, PostgreSQL, Redis, Zapier, Webhook',
+    products:'Hệ thống CRM hoạt động, tài liệu thiết kế, hướng dẫn triển khai',
+    requirements:'Lập trình web, CSDL, nghiệp vụ CRM',
+  },
+  { id:206, code:'DT-2026-Q06',
+    name:'Quản lý dự án Agile trong môi trường startup công nghệ',
+    gv:'TS. Trần Minh Khoa', type:'ĐATN', ctdt:'CT002', dvql:'KHQTKD', maxQty:2, taken:1,
+    domain:'Quản trị dự án', submittedDate:'06/05/2026',
+    summary:'Nghiên cứu ứng dụng phương pháp Agile/Scrum trong quản lý dự án tại startup công nghệ Việt Nam, phân tích yếu tố thành công và thất bại, đề xuất mô hình Agile phù hợp văn hóa địa phương.',
+    tech:'Jira, Confluence, Miro, khảo sát, phỏng vấn sâu',
+    products:'Báo cáo nghiên cứu, playbook Agile cho startup Việt Nam, bộ template quản lý dự án',
+    requirements:'Quản trị dự án cơ bản, phương pháp nghiên cứu',
+  },
+  { id:207, code:'DT-2026-Q07',
+    name:'Ứng dụng AI trong phân tích hành vi mua sắm khách hàng trực tuyến',
+    gv:'PGS. Nguyễn Thị Hồng', type:'ĐALN', ctdt:'CT002', dvql:'KHQTKD', maxQty:2, taken:0,
+    domain:'Thương mại điện tử & AI', submittedDate:'07/05/2026',
+    summary:'Nghiên cứu và xây dựng mô hình phân tích hành vi mua sắm khách hàng trực tuyến sử dụng AI/ML, đề xuất các chiến lược cá nhân hóa và tăng tỉ lệ chuyển đổi cho sàn thương mại điện tử.',
+    tech:'Python, Pandas, Scikit-learn, Tableau, Google Analytics API',
+    products:'Mô hình phân tích hành vi, dashboard trực quan, báo cáo đề xuất chiến lược',
+    requirements:'Python/R, thống kê cơ bản, marketing cơ bản',
+  },
+];
+
+/* ════════════════════════════════════════
+   HELPERS
+════════════════════════════════════════ */
+function isFull(t) { return t.taken >= t.maxQty; }
+
+function slotHtml(t) {
+  const pct    = Math.round((t.taken / t.maxQty) * 100);
+  const fillCl = pct >= 100 ? 'full' : pct >= 80 ? 'warn' : '';
+  const txtCl  = pct >= 100 ? 'color:var(--error)' : pct >= 80 ? 'color:var(--warning)' : 'color:var(--text-2)';
+  return `
+    <div class="slot-bar-wrap">
+      <span style="font-size:12px;font-weight:600;${txtCl}">${t.taken}/${t.maxQty}</span>
+      <div class="slot-bar"><div class="slot-bar-fill ${fillCl}" style="width:${pct}%"></div></div>
+    </div>`;
+}
+
+/* ════════════════════════════════════════
+   FILTER & RENDER TABLE
+════════════════════════════════════════ */
+function filtered() {
+  const q    = (document.getElementById('f-q')?.value     || '').toLowerCase();
+  const ctdt = document.getElementById('f-ctdt')?.value   || '';
+  const type = document.getElementById('f-type')?.value   || '';
+  const stat = document.getElementById('f-status')?.value || '';
+  return TOPICS.filter(t =>
+    t.dvql === STUDENT_DVQL &&
+    (stat !== 'open' || !isFull(t)) &&
+    (stat !== 'full' ||  isFull(t)) &&
+    (!q    || t.name.toLowerCase().includes(q) || t.gv.toLowerCase().includes(q) || t.code.toLowerCase().includes(q)) &&
+    (!ctdt || t.ctdt === ctdt) &&
+    (!type || t.type === type)
+  );
+}
+
+function renderTable(list) {
+  document.getElementById('cnt-gv').textContent = list.length;
+  const tbody = document.getElementById('topic-tbody');
+  if (!list.length) {
+    tbody.innerHTML = `
+      <tr><td colspan="8">
+        <div class="topic-empty">
+          <div class="te-ico">🔍</div>
+          <p>Không tìm thấy đề tài phù hợp với bộ lọc hiện tại.</p>
+        </div>
+      </td></tr>`;
+    return;
+  }
+  tbody.innerHTML = list.map(t => {
+    const full = isFull(t);
+    return `
+      <tr onclick="openDetail(${t.id})" ${full?'style="opacity:.72"':''}>
+        <td><div class="topic-code">${t.code}</div></td>
+        <td><span style="font-size:13px;font-weight:500">${t.name}</span></td>
+        <td style="font-size:13px;color:var(--text-2)">${t.gv}</td>
+        <td style="text-align:center"><span class="tag tag-default" style="font-size:11px">${t.type}</span></td>
+        <td>
+          <div style="font-size:12px;font-weight:600;color:var(--text-1)">${t.ctdt}</div>
+          <div style="font-size:11px;color:var(--text-3)">${CTDT_MAP[t.ctdt]||t.ctdt}</div>
+        </td>
+        <td>
+          <div style="font-size:12px;font-weight:600;color:var(--text-1)">${t.dvql}</div>
+          <div style="font-size:11px;color:var(--text-3)">${DVQL_MAP[t.dvql]||t.dvql}</div>
+        </td>
+        <td style="font-size:13px">${t.taken}/${t.maxQty}</td>
+        <td style="text-align:center">
+          <button class="btn btn-default btn-sm"
+            onclick="event.stopPropagation();openDetail(${t.id})">Xem</button>
+        </td>
+      </tr>`;
+  }).join('');
+}
+
+function applyFilter() {
+  renderTable(filtered());
+}
+
+/* ════════════════════════════════════════
+   DETAIL MODAL
+════════════════════════════════════════ */
+function openDetail(topicId) {
+  const t = TOPICS.find(x => x.id === topicId);
+  if (!t) return;
+
+  const statusTag  = `<span class="tag tag-success">Đã duyệt</span>`;
+  const activeTag  = isFull(t)
+    ? `<span class="tag tag-error">🔴 Đóng</span>`
+    : `<span class="tag tag-open">🟢 Mở</span>`;
+  const techTags = (t.tech || '').split(',')
+    .map(s => `<span class="tag tag-blue" style="font-size:12px">${s.trim()}</span>`)
+    .join(' ');
+
+  document.getElementById('md-body').innerHTML = `
+    <table class="desc-tbl">
+      <tr>
+        <th>Mã đề tài</th>
+        <td style="font-family:monospace;font-size:13px">${t.code}</td>
+      </tr>
+      <tr>
+        <th>Tên đề tài</th>
+        <td style="font-weight:600;font-size:14px;line-height:1.5">${t.name}</td>
+      </tr>
+      <tr>
+        <th>Giảng viên HD</th>
+        <td>${t.gv}</td>
+      </tr>
+      <tr>
+        <th>Loại đề tài</th>
+        <td>${TYPE_LABEL[t.type] || t.type}</td>
+      </tr>
+      <tr>
+        <th>Lĩnh vực</th>
+        <td>${t.domain || '—'}</td>
+      </tr>
+      <tr>
+        <th>CTĐT</th>
+        <td>${t.ctdt} – ${CTDT_MAP[t.ctdt] || t.ctdt}</td>
+      </tr>
+      <tr>
+        <th>Đơn vị quản lý</th>
+        <td>${t.dvql} – ${DVQL_MAP[t.dvql] || t.dvql}</td>
+      </tr>
+      <tr>
+        <th>Số SV tối đa</th>
+        <td>${t.maxQty} sinh viên &nbsp;<span style="color:var(--text-3);font-size:12px">(đã đăng ký: ${t.taken})</span></td>
+      </tr>
+      <tr>
+        <th>Trạng thái</th>
+        <td>${statusTag}</td>
+      </tr>
+      <tr>
+        <th>Hoạt động</th>
+        <td>${activeTag}</td>
+      </tr>
+      <tr>
+        <th>Tóm tắt</th>
+        <td style="line-height:1.65">${t.summary}</td>
+      </tr>
+      <tr>
+        <th>Yêu cầu SV</th>
+        <td>${t.requirements || '—'}</td>
+      </tr>
+      <tr>
+        <th>Sản phẩm DK</th>
+        <td>${t.products}</td>
+      </tr>
+      <tr>
+        <th>Công nghệ</th>
+        <td style="line-height:2">${techTags}</td>
+      </tr>
+      <tr>
+        <th>Ngày gửi</th>
+        <td>${t.submittedDate || '—'}</td>
+      </tr>
+    </table>
+  `;
+
+  openModal('m-detail');
+}
+
+/* ════════════════════════════════════════
+   TAB SWITCH
+════════════════════════════════════════ */
+function switchTab(key) {
+  ['gv', 'csv'].forEach(k => {
+    const pane = document.getElementById('pane-' + k);
+    const btn  = document.getElementById('tb-'   + k);
+    const isActive = k === key;
+    pane.style.display = isActive ? '' : 'none';
+    if (!btn.disabled) btn.classList.toggle('active', isActive);
+  });
+}
+
+/* ════════════════════════════════════════
+   INIT
+════════════════════════════════════════ */
+(function init() {
+  /* Hiển thị tên đơn vị quản lý trong banner */
+  const dvqlLabel = document.getElementById('dvql-label');
+  if (dvqlLabel) dvqlLabel.textContent = DVQL_MAP[STUDENT_DVQL] || STUDENT_DVQL;
+
+  /* Populate CTĐT filter — chỉ hiển thị CTĐT thuộc đơn vị của sinh viên */
+  const ctdtSel = document.getElementById('f-ctdt');
+  const visibleCtdt = [...new Set(TOPICS.filter(t => t.dvql === STUDENT_DVQL).map(t => t.ctdt))];
+  visibleCtdt.forEach(code => {
+    ctdtSel.insertAdjacentHTML('beforeend', `<option value="${code}">${CTDT_MAP[code]||code}</option>`);
+  });
+
+  /* Populate type filter */
+  const typeSel = document.getElementById('f-type');
+  TOPIC_TYPES.forEach(t => {
+    typeSel.insertAdjacentHTML('beforeend', `<option value="${t}">${t}</option>`);
+  });
+
+  /* Bind filter events */
+  ['f-q', 'f-ctdt', 'f-type', 'f-status'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.addEventListener(el.tagName === 'INPUT' ? 'input' : 'change', applyFilter);
+  });
+
+  applyFilter();
+})();
+</script>
+</body>
+</html>

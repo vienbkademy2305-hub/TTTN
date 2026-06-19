@@ -267,19 +267,19 @@
                   </tr>
                   <tr data-id="cpa">
                     <td>CPA</td>
-                    <td><select class="fc"><option>--</option><option>=</option><option>&lt;</option><option>&lt;=</option><option>&gt;</option><option>&gt;=</option><option>!=</option></select></td>
-                    <td><input class="fc" type="number" step="0.1" min="0" max="4" placeholder="VD: 2.0"></td>
+                    <td><select class="fc"><option>--</option><option>=</option><option>&lt;</option><option>&lt;=</option><option>&gt;</option><option selected>&gt;=</option><option>!=</option></select></td>
+                    <td><input class="fc" type="number" step="0.1" min="0" max="10" placeholder="VD: 6.0"></td>
                     <td style="text-align:center"><button class="btn btn-link btn-sm" style="color:var(--danger)" onclick="removeCond32(this)" title="Xóa">✕</button></td>
                   </tr>
                   <tr data-id="tinchi">
                     <td>Số tín chỉ tích lũy</td>
-                    <td><select class="fc"><option>--</option><option>=</option><option>&lt;</option><option>&lt;=</option><option>&gt;</option><option>&gt;=</option><option>!=</option></select></td>
+                    <td><select class="fc"><option>--</option><option>=</option><option>&lt;</option><option>&lt;=</option><option>&gt;</option><option selected>&gt;=</option><option>!=</option></select></td>
                     <td><input class="fc" type="number" min="0" placeholder="VD: 90"></td>
                     <td style="text-align:center"><button class="btn btn-link btn-sm" style="color:var(--danger)" onclick="removeCond32(this)" title="Xóa">✕</button></td>
                   </tr>
-                  <tr data-id="nohp">
-                    <td>Số học phần nợ</td>
-                    <td><select class="fc"><option>--</option><option>=</option><option>&lt;</option><option>&lt;=</option><option>&gt;</option><option>&gt;=</option><option>!=</option></select></td>
+                  <tr data-id="tinchi-no">
+                    <td>Số tín chỉ nợ</td>
+                    <td><select class="fc"><option>--</option><option>=</option><option>&lt;</option><option selected>&lt;=</option><option>&gt;</option><option>&gt;=</option><option>!=</option></select></td>
                     <td><input class="fc" type="number" min="0" placeholder="VD: 0"></td>
                     <td style="text-align:center"><button class="btn btn-link btn-sm" style="color:var(--danger)" onclick="removeCond32(this)" title="Xóa">✕</button></td>
                   </tr>
@@ -295,12 +295,32 @@
             </div>
             <div id="cond33-list" style="display:flex;flex-direction:column;gap:6px;margin-bottom:6px">
               <!-- default 2 items -->
-              <div class="sys-cond-row" data-id="canh-bao" style="display:flex;align-items:center;justify-content:space-between;padding:9px 12px;border:1px solid var(--border);border-radius:6px;font-size:13px;background:#fff">
-                <span>🔒 Không thuộc diện cảnh báo học vụ</span>
+              <div class="sys-cond-row" data-id="tinchi-pct" style="display:flex;align-items:center;justify-content:space-between;padding:9px 12px;border:1px solid var(--border);border-radius:6px;font-size:13px;background:#fff">
+                <span>🔒 Số tín chỉ tích lũy &ge; 80% số tín chỉ CTĐT</span>
                 <button class="btn btn-link btn-sm" style="color:var(--danger)" onclick="removeCond33(this)">✕</button>
               </div>
-              <div class="sys-cond-row" data-id="tam-dung" style="display:flex;align-items:center;justify-content:space-between;padding:9px 12px;border:1px solid var(--border);border-radius:6px;font-size:13px;background:#fff">
-                <span>🔒 Không thuộc diện tạm dừng học tập</span>
+              <div class="sys-cond-row" data-id="hpbb-cn" style="display:flex;align-items:center;justify-content:space-between;padding:9px 12px;border:1px solid var(--border);border-radius:6px;font-size:13px;background:#fff">
+                <span>🔒 Hoàn thành các học phần bắt buộc khối kiến thức giáo dục chuyên nghiệp</span>
+                <button class="btn btn-link btn-sm" style="color:var(--danger)" onclick="removeCond33(this)">✕</button>
+              </div>
+              <div class="sys-cond-row" data-id="dang-hoc" style="display:flex;align-items:center;justify-content:space-between;padding:9px 12px;border:1px solid var(--border);border-radius:6px;font-size:13px;background:#fff">
+                <span>🔒 Trạng thái đang học</span>
+                <button class="btn btn-link btn-sm" style="color:var(--danger)" onclick="removeCond33(this)">✕</button>
+              </div>
+              <div class="sys-cond-row" data-id="ky-luat-hs" style="display:flex;align-items:center;justify-content:space-between;padding:9px 12px;border:1px solid var(--border);border-radius:6px;font-size:13px;background:#fff">
+                <span>🔒 Không bị kỷ luật hình sự</span>
+                <button class="btn btn-link btn-sm" style="color:var(--danger)" onclick="removeCond33(this)">✕</button>
+              </div>
+              <div class="sys-cond-row" data-id="hoc-phi" style="display:flex;align-items:center;justify-content:space-between;padding:9px 12px;border:1px solid var(--border);border-radius:6px;font-size:13px;background:#fff">
+                <span>🔒 Không nợ học phí trong kỳ</span>
+                <button class="btn btn-link btn-sm" style="color:var(--danger)" onclick="removeCond33(this)">✕</button>
+              </div>
+              <div class="sys-cond-row" data-id="tttn-hp" style="display:flex;align-items:center;justify-content:space-between;padding:9px 12px;border:1px solid var(--border);border-radius:6px;font-size:13px;background:#fff">
+                <span>🔒 Hoàn thành học phần thực tập tốt nghiệp</span>
+                <button class="btn btn-link btn-sm" style="color:var(--danger)" onclick="removeCond33(this)">✕</button>
+              </div>
+              <div class="sys-cond-row" data-id="khong-huy-dk" style="display:flex;align-items:center;justify-content:space-between;padding:9px 12px;border:1px solid var(--border);border-radius:6px;font-size:13px;background:#fff">
+                <span>🔒 Chưa từng hủy đăng ký ĐAKLTN</span>
                 <button class="btn btn-link btn-sm" style="color:var(--danger)" onclick="removeCond33(this)">✕</button>
               </div>
             </div>
@@ -419,13 +439,10 @@ function closeModal(id){ document.getElementById(id).classList.add('hidden'); }
 
 // ───── 3.2 Tiêu chí tham số ─────
 const POOL32 = [
-  { id:'gpa',      label:'GPA',                     type:'decimal', placeholder:'VD: 2.5', min:0, max:4, step:0.1 },
-  { id:'cpa',      label:'CPA',                     type:'decimal', placeholder:'VD: 2.0', min:0, max:4, step:0.1 },
-  { id:'tinchi',   label:'Số tín chỉ tích lũy',     type:'int',     placeholder:'VD: 90',  min:0 },
-  { id:'nohp',     label:'Số học phần nợ',           type:'int',     placeholder:'VD: 0',   min:0 },
-  { id:'renluyen', label:'Điểm rèn luyện',           type:'int',     placeholder:'VD: 65',  min:0, max:100 },
-  { id:'caiThien', label:'Số HP cần cải thiện',      type:'int',     placeholder:'VD: 3',   min:0 },
-  { id:'chinhSach',label:'Thuộc đối tượng chính sách',type:'bool',   placeholder:'' },
+  { id:'gpa',       label:'GPA',                  type:'decimal', placeholder:'VD: 2.5', min:0, max:4,  step:0.1 },
+  { id:'cpa',       label:'CPA',                  type:'decimal', placeholder:'VD: 6.0', min:0, max:10, step:0.1 },
+  { id:'tinchi',    label:'Số tín chỉ tích lũy',  type:'int',     placeholder:'VD: 90',  min:0 },
+  { id:'tinchi-no', label:'Số tín chỉ nợ',        type:'int',     placeholder:'VD: 0',   min:0 },
 ];
 
 function getAdded32(){ return [...document.querySelectorAll('#cond32-body tr')].map(r=>r.dataset.id); }
@@ -467,16 +484,13 @@ function removeCond32(btn){
 
 // ───── 3.3 Điều kiện hệ thống ─────
 const POOL33 = [
-  { id:'kthcs',     label:'Hoàn thành khối KT cơ sở ngành' },
-  { id:'ktcn',      label:'Hoàn thành khối KT chuyên ngành' },
-  { id:'ttcs',      label:'Hoàn thành thực tập cơ sở' },
-  { id:'ngoaingu',  label:'Đạt chuẩn đầu ra ngoại ngữ' },
-  { id:'tinhhoc',   label:'Đạt chuẩn đầu ra tin học' },
-  { id:'canh-bao',  label:'Không thuộc diện cảnh báo học vụ' },
-  { id:'tam-dung',  label:'Không thuộc diện tạm dừng học tập' },
-  { id:'ky-luat',   label:'Không có quyết định kỷ luật còn hiệu lực' },
-  { id:'tai-chinh', label:'Không nợ học phí (đã hoàn thành nghĩa vụ tài chính)' },
-  { id:'dang-ky-hp',label:'Đã đăng ký học phần học kỳ hiện tại' },
+  { id:'tinchi-pct',  label:'Số tín chỉ tích lũy ≥ 80% số tín chỉ CTĐT' },
+  { id:'hpbb-cn',     label:'Hoàn thành các học phần bắt buộc khối kiến thức giáo dục chuyên nghiệp' },
+  { id:'dang-hoc',    label:'Trạng thái đang học' },
+  { id:'ky-luat-hs',  label:'Không bị kỷ luật hình sự' },
+  { id:'hoc-phi',     label:'Không nợ học phí trong kỳ' },
+  { id:'tttn-hp',     label:'Hoàn thành học phần thực tập tốt nghiệp' },
+  { id:'khong-huy-dk',label:'Chưa từng hủy đăng ký ĐAKLTN' },
 ];
 
 function getAdded33(){ return [...document.querySelectorAll('#cond33-list .sys-cond-row')].map(r=>r.dataset.id); }

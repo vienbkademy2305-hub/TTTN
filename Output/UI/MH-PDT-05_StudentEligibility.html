@@ -158,40 +158,6 @@
         </div>
       </div>
 
-      <!-- Sync Status Bar -->
-      <div class="sync-bar" id="sync-bar">
-        <div class="sync-sources">
-          <!-- Nguồn 1: Hệ thống Học vụ -->
-          <div class="sync-source">
-            <span class="sync-dot ok" id="dot-hv"></span>
-            <span class="sync-source-name">Học vụ</span>
-            <span class="sync-badge ok" id="badge-hv">Đã đồng bộ</span>
-            <span class="sync-time" id="time-hv">08:30, 12/06/2026</span>
-          </div>
-          <div class="sync-divider"></div>
-          <!-- Nguồn 2: Phân hệ Tài chính -->
-          <div class="sync-source">
-            <span class="sync-dot stale" id="dot-tc"></span>
-            <span class="sync-source-name">Tài chính</span>
-            <span class="sync-badge stale" id="badge-tc">Cần cập nhật</span>
-            <span class="sync-time" id="time-tc">07:00, 12/06/2026</span>
-          </div>
-          <div class="sync-divider"></div>
-          <!-- Nguồn 3: Phân hệ Điểm / CTĐT -->
-          <div class="sync-source">
-            <span class="sync-dot ok" id="dot-diem"></span>
-            <span class="sync-source-name">Điểm &amp; CTĐT</span>
-            <span class="sync-badge ok" id="badge-diem">Đã đồng bộ</span>
-            <span class="sync-time" id="time-diem">08:30, 12/06/2026</span>
-          </div>
-        </div>
-        <!-- Actions -->
-        <div style="display:flex;gap:8px;flex-shrink:0">
-          <button class="btn btn-default btn-sm" onclick="syncSource('tc')" id="btn-sync-tc">🔄 Đồng bộ Tài chính</button>
-          <button class="btn btn-primary btn-sm" onclick="syncAll()" id="btn-sync-all">🔄 Đồng bộ tất cả</button>
-        </div>
-      </div>
-
       <!-- Filter -->
       <div class="filter-bar">
         <div class="input-search" style="width:220px">
@@ -244,6 +210,10 @@
       </div>
 
       <!-- Table -->
+      <div style="display:flex;justify-content:flex-end;gap:8px;margin-bottom:8px">
+        <button class="btn btn-default btn-sm" onclick="syncTuition()">🔄 Đồng bộ Tài chính</button>
+        <button class="btn btn-primary btn-sm" onclick="syncAll()">🔄 Đồng bộ tất cả</button>
+      </div>
       <div class="card" style="padding:0">
         <div class="tbl-wrap">
           <table class="tbl">
@@ -415,10 +385,16 @@
           </thead>
           <tbody>
             <tr><td>GPA</td><td>&gt;= 2.50</td><td id="d-gpa">2.10</td><td style="text-align:center"><span class="tag tag-error">Không đạt</span></td></tr>
-            <tr><td>Số tín chỉ tích lũy</td><td>&gt;= 80</td><td>95</td><td style="text-align:center"><span class="tag tag-success">Đạt</span></td></tr>
-            <tr><td>Số học phần nợ</td><td>&lt;= 2</td><td>1</td><td style="text-align:center"><span class="tag tag-success">Đạt</span></td></tr>
-            <tr><td>Không thuộc diện cảnh báo HV</td><td>= Không</td><td>Không</td><td style="text-align:center"><span class="tag tag-success">Đạt</span></td></tr>
-            <tr><td>Đạt chuẩn đầu ra ngoại ngữ</td><td>= Đạt</td><td>Đạt</td><td style="text-align:center"><span class="tag tag-success">Đạt</span></td></tr>
+            <tr><td>CPA</td><td>&gt;= 6.00</td><td>5.40</td><td style="text-align:center"><span class="tag tag-error">Không đạt</span></td></tr>
+            <tr><td>Số tín chỉ tích lũy</td><td>&gt;= 90</td><td>95</td><td style="text-align:center"><span class="tag tag-success">Đạt</span></td></tr>
+            <tr><td>Số tín chỉ nợ</td><td>&lt;= 0</td><td>1</td><td style="text-align:center"><span class="tag tag-error">Không đạt</span></td></tr>
+            <tr><td>TC tích lũy &ge; 80% TC CTĐT</td><td>= Đạt</td><td>79% (95/120)</td><td style="text-align:center"><span class="tag tag-error">Không đạt</span></td></tr>
+            <tr><td>Hoàn thành HP bắt buộc khối KTGD chuyên nghiệp</td><td>= Đạt</td><td>Đạt</td><td style="text-align:center"><span class="tag tag-success">Đạt</span></td></tr>
+            <tr><td>Trạng thái đang học</td><td>= Đang học</td><td>Đang học</td><td style="text-align:center"><span class="tag tag-success">Đạt</span></td></tr>
+            <tr><td>Không bị kỷ luật hình sự</td><td>= Không</td><td>Không</td><td style="text-align:center"><span class="tag tag-success">Đạt</span></td></tr>
+            <tr><td>Không nợ học phí trong kỳ</td><td>= Không nợ</td><td>Không nợ</td><td style="text-align:center"><span class="tag tag-success">Đạt</span></td></tr>
+            <tr><td>Hoàn thành HP thực tập tốt nghiệp</td><td>= Đạt</td><td>Đạt</td><td style="text-align:center"><span class="tag tag-success">Đạt</span></td></tr>
+            <tr><td>Chưa từng hủy đăng ký ĐAKLTN</td><td>= Chưa từng</td><td>Chưa từng</td><td style="text-align:center"><span class="tag tag-success">Đạt</span></td></tr>
           </tbody>
         </table>
       </div>
@@ -689,6 +665,11 @@ function confirmPublish(){
 function syncTuition(){
   toast('Đang đồng bộ trạng thái học phí từ phân hệ Tài chính...','warning');
   setTimeout(()=>toast('Đồng bộ học phí hoàn tất — 142 sinh viên đã được cập nhật'),2000);
+}
+
+function syncAll(){
+  toast('Đang đồng bộ tất cả dữ liệu (Học vụ, Tài chính, Điểm & CTĐT)...','warning');
+  setTimeout(()=>toast('Đồng bộ tất cả hoàn tất — dữ liệu đã được cập nhật'),2500);
 }
 
 function toast(msg, type='success'){

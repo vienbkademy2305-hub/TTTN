@@ -35,11 +35,9 @@
     .chk-cell{width:36px;text-align:center;padding-left:12px!important}
     .row-chk{width:15px;height:15px;cursor:pointer;accent-color:var(--primary)}
 
-    /* type list in table */
     .type-list{margin:0;padding:0;list-style:none}
     .type-list li{font-size:12px;color:var(--text-2);line-height:1.7}
 
-    /* multi-select dropdown */
     .ms-wrap{position:relative}
     .ms-trigger{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:6px 10px;border:1px solid var(--border);border-radius:6px;cursor:pointer;background:#fff;min-height:34px;user-select:none;transition:border-color .2s}
     .ms-trigger:hover,.ms-wrap.open .ms-trigger{border-color:var(--primary)}
@@ -54,7 +52,6 @@
     .ms-opt+.ms-opt{border-top:1px solid var(--border)}
     .ms-opt input[type=checkbox]{width:15px;height:15px;accent-color:var(--primary);cursor:pointer;flex-shrink:0}
 
-    /* inline active dropdown */
     .active-sel{font-size:12px;padding:3px 6px;border-radius:4px;cursor:pointer;outline:none;border:1px solid}
     .active-sel.is-open {color:#389e0d;border-color:#b7eb8f;background:#f6ffed}
     .active-sel.is-closed{color:#8c8c8c;border-color:#d9d9d9;background:#fafafa}
@@ -82,8 +79,7 @@
         <span class="mn-group">📋&nbsp; Đề tài &nbsp;▾</span>
         <ul class="sb-sub open">
           <li class="active"><a href="MH-GV-04_MyTopics.html">DS đề tài của tôi</a></li>
-          <li><a href="#">DS nguyện vọng đề tài</a></li>
-          <li><a href="MH-GV-03_AdvisorWishApproval.html">SV đề nghị tôi hướng dẫn</a></li>
+          <li><a href="MH-GV-05_TopicWishes.html">DS nguyện vọng đề tài</a></li>
         </ul>
       </li>
       <li>
@@ -172,6 +168,7 @@
         </div>
         <div class="pagination"><span class="pg-info" id="pg-info"></span></div>
       </div>
+
     </main>
   </div>
 </div>
@@ -231,6 +228,25 @@
         </div>
       </div>
       <div class="fi">
+        <label>Chương trình đào tạo áp dụng <span class="req">*</span></label>
+        <div class="ms-wrap" id="mf-ctdt">
+          <div class="ms-trigger" onclick="toggleMsDrop(this)">
+            <span class="ms-display ph">-- Chọn chương trình đào tạo --</span>
+            <span class="ms-arrow">▼</span>
+          </div>
+          <div class="ms-drop">
+            <label class="ms-opt"><input type="checkbox" value="Kỹ thuật phần mềm"            onchange="updateCtdtDisplay(this)"><span><b>KTPM</b> — Kỹ thuật phần mềm</span></label>
+            <label class="ms-opt"><input type="checkbox" value="Khoa học máy tính"            onchange="updateCtdtDisplay(this)"><span><b>KHMT</b> — Khoa học máy tính</span></label>
+            <label class="ms-opt"><input type="checkbox" value="Công nghệ thông tin"           onchange="updateCtdtDisplay(this)"><span><b>CNTT</b> — Công nghệ thông tin</span></label>
+            <label class="ms-opt"><input type="checkbox" value="Hệ thống thông tin"            onchange="updateCtdtDisplay(this)"><span><b>HTTT</b> — Hệ thống thông tin</span></label>
+            <label class="ms-opt"><input type="checkbox" value="Mạng máy tính & Truyền thông" onchange="updateCtdtDisplay(this)"><span><b>MMT</b> — Mạng máy tính & Truyền thông</span></label>
+            <label class="ms-opt"><input type="checkbox" value="An toàn thông tin"             onchange="updateCtdtDisplay(this)"><span><b>ATTT</b> — An toàn thông tin</span></label>
+            <label class="ms-opt"><input type="checkbox" value="Trí tuệ nhân tạo"             onchange="updateCtdtDisplay(this)"><span><b>TTNT</b> — Trí tuệ nhân tạo</span></label>
+          </div>
+        </div>
+        <div class="f-hint">Đề tài có thể áp dụng cho nhiều chương trình đào tạo</div>
+      </div>
+      <div class="fi">
         <label>Số lượng sinh viên tối đa <span class="req">*</span></label>
         <input type="number" class="fc" id="mf-qty" min="1" max="10" value="1" style="width:120px">
         <div class="f-hint">Từ 1 đến 10 sinh viên</div>
@@ -280,18 +296,13 @@
       <h4 class="modal-title">Chi tiết đề tài</h4>
       <button class="modal-close" data-close="m-view">✕</button>
     </div>
-    <div class="modal-bd">
-
-      <div class="reject-alert" id="vw-reject-alert">
-        <strong>❌ Đề tài bị từ chối</strong>
-        <p id="vw-reject-text"></p>
-      </div>
-
-      <table class="desc-tbl"><tbody id="vw-body"></tbody></table>
-
-      <div style="margin-top:18px">
-        <div style="font-weight:600;font-size:13px;margin-bottom:10px;color:var(--text-2)">📜 Lịch sử xét duyệt</div>
-        <ul class="history-list" id="vw-history"></ul>
+    <div class="modal-bd" style="padding-top:0">
+      <div style="padding-top:16px">
+        <table class="desc-tbl"><tbody id="vw-body"></tbody></table>
+        <div style="margin-top:18px">
+          <div style="font-weight:600;font-size:13px;margin-bottom:10px;color:var(--text-2)">📜 Lịch sử xét duyệt</div>
+          <ul class="history-list" id="vw-history"></ul>
+        </div>
       </div>
     </div>
     <div class="modal-ft" id="vw-actions"></div>
@@ -305,11 +316,12 @@ let topics = [
   {
     id:1, code:'DT-2026-0001',
     name:'Xây dựng hệ thống gợi ý học phần thông minh bằng Machine Learning',
-    types:['Đồ án tốt nghiệp'], field:'Trí tuệ nhân tạo & Dữ liệu', qty:2,
+    types:['Đồ án tốt nghiệp'], ctdt:['Kỹ thuật phần mềm','Trí tuệ nhân tạo'], field:'Trí tuệ nhân tạo & Dữ liệu', qty:2,
     desc:'Nghiên cứu và xây dựng hệ thống gợi ý học phần dựa trên lịch sử học tập và nguyện vọng của sinh viên sử dụng các thuật toán Machine Learning hiện đại.',
     req:'GPA ≥ 3.0, có kiến thức Python, ML cơ bản, xử lý dữ liệu.',
     output:'Ứng dụng web + báo cáo nghiên cứu + mô hình ML đã huấn luyện.',
     tech:'Python, scikit-learn, FastAPI, React',
+    file:'Mo_ta_de_tai_DT2026_0001.pdf',
     status:'Đã duyệt', active:'Mở', created:'05/05/2026',
     history:[
       {action:'Gửi xét duyệt', date:'05/05/2026 09:00', result:'', dot:'warn'},
@@ -319,11 +331,12 @@ let topics = [
   {
     id:2, code:'DT-2026-0002',
     name:'Phân tích cảm xúc người dùng từ đánh giá sản phẩm trực tuyến',
-    types:['Khoá luận tốt nghiệp'], field:'Trí tuệ nhân tạo & Dữ liệu', qty:1,
+    types:['Khoá luận tốt nghiệp'], ctdt:['Khoa học máy tính','Kỹ thuật phần mềm','Trí tuệ nhân tạo'], field:'Trí tuệ nhân tạo & Dữ liệu', qty:1,
     desc:'Xây dựng mô hình NLP phân tích cảm xúc (tích cực/tiêu cực/trung lập) từ các bình luận người dùng trên sàn thương mại điện tử tiếng Việt.',
     req:'GPA ≥ 3.2, Python, NLP cơ bản, đã học môn Xử lý ngôn ngữ tự nhiên.',
     output:'Mô hình phân loại cảm xúc + API + báo cáo so sánh các phương pháp.',
     tech:'Python, Transformers (BERT), Flask',
+    file:'De_cuong_NLP_cam_xuc_DT2026_0002.pdf',
     status:'Chờ duyệt', created:'10/06/2026',
     history:[
       {action:'Gửi xét duyệt', date:'10/06/2026 08:45', result:'', dot:'warn'},
@@ -332,7 +345,7 @@ let topics = [
   {
     id:3, code:'DT-2026-0003',
     name:'Ứng dụng nhận diện khuôn mặt cho hệ thống điểm danh sinh viên',
-    types:['Đồ án tốt nghiệp'], field:'Trí tuệ nhân tạo & Dữ liệu', qty:2,
+    types:['Đồ án tốt nghiệp'], ctdt:['Kỹ thuật phần mềm','Công nghệ thông tin'], field:'Trí tuệ nhân tạo & Dữ liệu', qty:2,
     desc:'Thiết kế và triển khai hệ thống điểm danh tự động sử dụng nhận diện khuôn mặt thời gian thực, tích hợp với hệ thống quản lý đào tạo hiện có.',
     req:'GPA ≥ 2.8, Python, OpenCV hoặc TensorFlow, kiến thức cơ bản về xử lý ảnh.',
     output:'Ứng dụng desktop/web + CSDL + báo cáo đánh giá độ chính xác.',
@@ -340,14 +353,14 @@ let topics = [
     status:'Từ chối', created:'01/04/2026',
     rejectReason:'Đề tài có nội dung trùng lặp với đề tài DT-2025-0087 của năm học trước. Đề nghị giảng viên điều chỉnh phạm vi nghiên cứu, tập trung vào khía cạnh bảo mật hoặc tích hợp đa phương thức để tạo sự khác biệt.',
     history:[
-      {action:'Gửi xét duyệt lần 1', date:'01/04/2026 10:00', result:'', dot:'warn'},
+      {action:'Gửi xét duyệt', date:'01/04/2026 10:00', result:'', dot:'warn'},
       {action:'Từ chối', date:'03/04/2026 11:00', result:'Trùng lặp nội dung với đề tài cũ', dot:'err'},
     ]
   },
   {
     id:4, code:'DT-2026-0004',
     name:'Thiết kế kiến trúc microservices cho hệ thống thương mại điện tử quy mô lớn',
-    types:['Khoá luận tốt nghiệp'], field:'Công nghệ phần mềm', qty:1,
+    types:['Khoá luận tốt nghiệp'], ctdt:['Kỹ thuật phần mềm'], field:'Công nghệ phần mềm', qty:1,
     desc:'Nghiên cứu, thiết kế và triển khai kiến trúc microservices cho một hệ thống thương mại điện tử có khả năng mở rộng cao, bao gồm service discovery, API gateway và message broker.',
     req:'GPA ≥ 3.0, Java/Go/Node.js, Docker, kiến trúc phần mềm cơ bản.',
     output:'Hệ thống demo + tài liệu thiết kế kiến trúc + báo cáo đánh giá hiệu năng.',
@@ -372,6 +385,7 @@ const STATUS_CLR = {
 };
 
 let editId = null;
+let _currentTopicId = null;
 
 /* ── Checkbox helpers ── */
 function toggleAll(tbodyId, checked) {
@@ -386,7 +400,7 @@ function syncSelectAll(tbodyId, chkAllId) {
   el.indeterminate = done.length > 0 && done.length < all.length;
 }
 
-/* ── Toggle active status (from table row) ── */
+/* ── Toggle active status ── */
 function toggleActive(id, sel) {
   const val = sel.value;
   topics = topics.map(t => t.id === id ? {...t, active: val} : t);
@@ -394,7 +408,6 @@ function toggleActive(id, sel) {
   showToast(val === 'Mở' ? 'Đã mở nhận đăng ký đề tài' : 'Đã đóng nhận đăng ký đề tài');
 }
 
-/* ── Toggle active status (from view detail modal) ── */
 function updateActiveFromView(id, sel) {
   const val = sel.value;
   topics = topics.map(t => t.id === id ? {...t, active: val} : t);
@@ -417,7 +430,6 @@ function render() {
 
   document.getElementById('tbody').innerHTML = rows.length ? rows.map(t => {
     const typeList = (t.types||[]).map(tp => `<li title="${tp}">${TYPE_ABBR[tp]||tp}</li>`).join('');
-
     const activeCell = t.status === 'Đã duyệt'
       ? `<select class="active-sel ${t.active==='Mở'?'is-open':'is-closed'}" onchange="toggleActive(${t.id},this)">
            <option value="Mở"  ${t.active==='Mở' ?'selected':''}>🟢 Mở</option>
@@ -467,10 +479,7 @@ function render() {
 }
 
 function resetFilter() {
-  ['q','f-type','f-status'].forEach(id => {
-    const el = document.getElementById(id);
-    if (el.tagName==='INPUT') el.value=''; else el.value='';
-  });
+  ['q','f-type','f-status'].forEach(id => { document.getElementById(id).value = ''; });
   render();
 }
 
@@ -498,7 +507,6 @@ document.addEventListener('click', e => {
     document.querySelectorAll('.ms-wrap.open').forEach(w => w.classList.remove('open'));
   }
 });
-
 function getSelectedTypes() {
   return Array.from(document.querySelectorAll('#mf-types input[type=checkbox]:checked')).map(c => c.value);
 }
@@ -509,6 +517,37 @@ function setSelectedTypes(arr) {
   });
 }
 
+const CTDT_ABBR = {
+  'Kỹ thuật phần mềm'            : 'KTPM',
+  'Khoa học máy tính'            : 'KHMT',
+  'Công nghệ thông tin'           : 'CNTT',
+  'Hệ thống thông tin'            : 'HTTT',
+  'Mạng máy tính & Truyền thông' : 'MMT',
+  'An toàn thông tin'             : 'ATTT',
+  'Trí tuệ nhân tạo'             : 'TTNT',
+};
+function updateCtdtDisplay(chk) {
+  const wrap    = chk.closest('.ms-wrap');
+  const checked = Array.from(wrap.querySelectorAll('input[type=checkbox]:checked'));
+  const display = wrap.querySelector('.ms-display');
+  if (checked.length === 0) {
+    display.textContent = '-- Chọn chương trình đào tạo --';
+    display.classList.add('ph');
+  } else {
+    display.textContent = checked.map(c => CTDT_ABBR[c.value] || c.value).join(', ');
+    display.classList.remove('ph');
+  }
+}
+function getSelectedCtdt() {
+  return Array.from(document.querySelectorAll('#mf-ctdt input[type=checkbox]:checked')).map(c => c.value);
+}
+function setSelectedCtdt(arr) {
+  document.querySelectorAll('#mf-ctdt input[type=checkbox]').forEach(c => {
+    c.checked = (arr||[]).includes(c.value);
+    updateCtdtDisplay(c);
+  });
+}
+
 /* ── Create / Edit ── */
 function openCreate() {
   editId = null;
@@ -516,6 +555,7 @@ function openCreate() {
   ['mf-name','mf-desc','mf-req','mf-output','mf-tech'].forEach(id => document.getElementById(id).value='');
   document.getElementById('mf-code').value  = `DT-2026-${String(topics.length+1).padStart(4,'0')}`;
   setSelectedTypes([]);
+  setSelectedCtdt([]);
   document.getElementById('mf-field').value = '';
   document.getElementById('mf-qty').value   = 1;
   document.getElementById('mf-reject-alert').classList.remove('show');
@@ -530,13 +570,13 @@ function openEdit(id) {
   document.getElementById('mf-code').value   = t.code;
   document.getElementById('mf-name').value   = t.name;
   setSelectedTypes(t.types||[]);
+  setSelectedCtdt(t.ctdt||[]);
   document.getElementById('mf-field').value  = t.field;
   document.getElementById('mf-qty').value    = t.qty;
   document.getElementById('mf-desc').value   = t.desc;
   document.getElementById('mf-req').value    = t.req;
   document.getElementById('mf-output').value = t.output || '';
   document.getElementById('mf-tech').value   = t.tech || '';
-
   const alert = document.getElementById('mf-reject-alert');
   if (t.status==='Từ chối' && t.rejectReason) {
     document.getElementById('mf-reject-text').textContent = t.rejectReason;
@@ -552,13 +592,14 @@ function saveForm(action) {
   const code   = document.getElementById('mf-code').value.trim();
   const name   = document.getElementById('mf-name').value.trim();
   const types  = getSelectedTypes();
+  const ctdt   = getSelectedCtdt();
   const field  = document.getElementById('mf-field').value;
   const qty    = parseInt(document.getElementById('mf-qty').value)||0;
   const desc   = document.getElementById('mf-desc').value.trim();
   const req    = document.getElementById('mf-req').value.trim();
   const output = document.getElementById('mf-output').value.trim();
 
-  if (!code || !name || !types.length || !field || qty < 1 || !desc || !req || !output) {
+  if (!code || !name || !types.length || !ctdt.length || !field || qty < 1 || !desc || !req || !output) {
     showToast('Vui lòng điền đầy đủ thông tin bắt buộc (*)', 'err'); return;
   }
   if (topics.some(t => t.code.trim().toLowerCase() === code.toLowerCase() && t.id !== editId)) {
@@ -567,20 +608,23 @@ function saveForm(action) {
   if (name.length < 10) { showToast('Tên đề tài phải có ít nhất 10 ký tự','err'); return; }
   if (desc.length < 50) { showToast('Tóm tắt đề tài phải có ít nhất 50 ký tự','err'); return; }
 
-  const status = action==='submit' ? 'Chờ duyệt' : 'Nháp';
-  const tech   = document.getElementById('mf-tech').value.trim();
+  const status   = action==='submit' ? 'Chờ duyệt' : 'Nháp';
+  const tech     = document.getElementById('mf-tech').value.trim();
+  const fileInput = document.getElementById('mf-file');
+  const fileName  = fileInput.files[0] ? fileInput.files[0].name
+                  : (editId ? (topics.find(t=>t.id===editId)||{}).file || '' : '');
 
   if (editId) {
     topics = topics.map(t => t.id===editId ? {
-      ...t, code, name, types, field, qty, desc, req, output, tech, status,
+      ...t, code, name, types, ctdt, field, qty, desc, req, output, tech, file: fileName, status,
       history: action==='submit' ? [...(t.history||[]), {
-        action: t.status==='Từ chối' ? `Gửi lại lần ${(t.history||[]).filter(h=>h.dot==='warn').length+1}` : 'Gửi xét duyệt',
+        action: 'Gửi xét duyệt',
         date: new Date().toLocaleString('vi'), result:'', dot:'warn'
       }] : (t.history||[])
     } : t);
   } else {
     topics.push({
-      id: Date.now(), code, name, types, field, qty, desc, req, output, tech, status,
+      id: Date.now(), code, name, types, ctdt, field, qty, desc, req, output, tech, file: fileName, status,
       created: new Date().toLocaleDateString('vi'),
       history: action==='submit' ? [{action:'Gửi xét duyệt', date:new Date().toLocaleString('vi'), result:'', dot:'warn'}] : []
     });
@@ -590,7 +634,7 @@ function saveForm(action) {
   render();
 }
 
-/* ── Quick submit (from table) ── */
+/* ── Quick submit ── */
 function quickSubmit(id) {
   showConfirm(
     'Gửi đề tài lên Khoa xét duyệt?',
@@ -605,7 +649,7 @@ function quickSubmit(id) {
   );
 }
 
-/* ── Delete (Draft only) ── */
+/* ── Delete ── */
 function deleteTopic(id) {
   showConfirm(
     'Xóa đề tài này? Hành động không thể hoàn tác.',
@@ -614,11 +658,10 @@ function deleteTopic(id) {
   );
 }
 
-/* ── View Detail ── */
+/* ── View detail ── */
 function viewTopic(id) {
   const t = topics.find(x=>x.id===id);
-
-  document.getElementById('vw-reject-alert').classList.remove('show');
+  _currentTopicId = id;
 
   const activeRow = t.status==='Đã duyệt'
     ? `<tr><th>Hoạt động</th><td>
@@ -633,6 +676,7 @@ function viewTopic(id) {
     <tr><th>Mã đề tài</th>  <td><span class="topic-code" style="font-size:13px">${t.code}</span></td></tr>
     <tr><th>Tên đề tài</th>  <td><strong>${t.name}</strong></td></tr>
     <tr><th>Loại đề tài</th> <td>${(t.types||[]).join(', ')}</td></tr>
+    <tr><th>CTĐT áp dụng</th><td>${(t.ctdt||[]).join(', ')}</td></tr>
     <tr><th>Lĩnh vực</th>    <td>${t.field}</td></tr>
     <tr><th>Số SV tối đa</th><td>${t.qty} sinh viên</td></tr>
     <tr><th>Trạng thái</th>  <td><span class="tag ${STATUS_CLR[t.status]}">${t.status}</span></td></tr>
@@ -641,6 +685,11 @@ function viewTopic(id) {
     <tr><th>Yêu cầu SV</th>  <td style="white-space:pre-wrap;line-height:1.6">${t.req}</td></tr>
     <tr><th>Sản phẩm DK</th> <td>${t.output}</td></tr>
     ${t.tech ? `<tr><th>Công nghệ</th><td>${t.tech}</td></tr>` : ''}
+    <tr><th>Tài liệu đính kèm</th><td>${
+      t.file
+        ? `<a href="#" style="color:var(--primary);text-decoration:none" title="Tải xuống ${t.file}">📎 ${t.file}</a>`
+        : ''
+    }</td></tr>
     <tr><th>Ngày gửi</th>    <td>${t.status==='Nháp' ? '<span style="color:var(--text-3)">—</span>' : t.created}</td></tr>`;
 
   document.getElementById('vw-history').innerHTML = (t.history||[]).length
@@ -660,11 +709,6 @@ function viewTopic(id) {
     <button class="btn btn-primary" onclick="closeModal('m-view');quickSubmit(${t.id})">📨 Gửi duyệt</button>`;
   if (t.status==='Từ chối') btns += `<button class="btn btn-primary" onclick="closeModal('m-view');openEdit(${t.id})">✏️ Chỉnh sửa & Gửi lại</button>`;
   document.getElementById('vw-actions').innerHTML = btns;
-
-  if (t.status==='Từ chối' && t.rejectReason) {
-    document.getElementById('vw-reject-text').textContent = t.rejectReason;
-    document.getElementById('vw-reject-alert').classList.add('show');
-  }
 
   openModal('m-view');
 }

@@ -29,15 +29,22 @@
     .cell-gv{cursor:pointer;position:relative;min-width:130px}
     .cell-gv:hover{background:#f0f7ff}
     .gv-unassigned{color:var(--text-3);font-style:italic;font-size:12px}
-    .gv-single{font-size:12px;color:var(--text-2)}
-    .gv-multi{color:#fa8c16;font-size:12px;cursor:pointer;font-weight:500}
+    .gv-single{font-size:12px;color:var(--text-2);font-weight:700}
+    .gv-single-ext{font-size:12px;color:#d46b08;font-weight:700}
+    .gv-multi{color:var(--text-2);font-size:12px;cursor:pointer;font-weight:400;display:inline-block;line-height:1.7}
+    .gv-multi strong{font-weight:700;color:var(--text-1)}
     .warn-icon{color:#f5222d;animation:wblink 1.5s ease-in-out infinite}
     @keyframes wblink{0%,100%{opacity:1}50%{opacity:0.3}}
 
-    .gv-picker{position:fixed;z-index:999;background:#fff;border:1px solid var(--border);border-radius:8px;box-shadow:0 6px 16px rgba(0,0,0,.14);padding:12px;width:280px;display:none}
-    .gv-picker.open{display:block}
-    .gv-opt{padding:7px 10px;cursor:pointer;border-radius:4px;font-size:12px;color:var(--text-2)}
-    .gv-opt:hover{background:#f0f7ff}
+    .mgv-card{display:flex;align-items:center;gap:12px;padding:12px 14px;border-bottom:1px solid var(--border);background:#fff;transition:background .15s}
+    .mgv-card:last-child{border-bottom:none}
+    .mgv-card.mgv-hl{border-left:3px solid var(--primary);padding-left:11px;background:#f0f7ff}
+    .mgv-card-info{flex:1;min-width:0}
+    .mgv-card-name{font-size:13px;font-weight:600;color:var(--text-1)}
+    .mgv-card-dept{font-size:12px;color:var(--text-3);margin-top:2px}
+    .tag-inhouse{background:#f6ffed;color:#389e0d;border:1px solid #b7eb8f;padding:2px 10px;border-radius:10px;font-size:12px;white-space:nowrap;flex-shrink:0}
+    .tag-external{background:#fff7e6;color:#d46b08;border:1px solid #ffd591;padding:2px 10px;border-radius:10px;font-size:12px;white-space:nowrap;flex-shrink:0}
+    .mgv-w-inp{width:56px;text-align:center;color:#fa8c16;font-weight:600;padding:3px 6px;font-size:13px}
 
     /* Badge trạng thái — 8 bước quy trình */
     [class^="tpd-"]{padding:2px 10px;border-radius:10px;font-size:12px;white-space:nowrap;border:1px solid}
@@ -300,11 +307,11 @@
                 <th style="min-width:130px">Mã SV</th>
                 <th style="min-width:140px">Họ và tên</th>
                 <th style="min-width:80px">CTĐT</th>
-                <th style="min-width:140px">Mã đợt TT</th>
+                <th style="min-width:140px">Đợt</th>
                 <th style="min-width:130px">Lớp học phần</th>
                 <th style="min-width:155px">Cơ sở TT</th>
                 <th style="min-width:165px;display:none">Địa điểm TT</th>
-                <th style="min-width:170px">Giảng viên HD</th>
+                <th style="min-width:170px">Giảng viên hướng dẫn</th>
                 <th style="text-align:center;min-width:85px">Đề cương</th>
                 <th style="text-align:center;min-width:80px">File BC</th>
                 <th style="text-align:center;min-width:80px">Điểm QT</th>
@@ -360,8 +367,8 @@
                   <span>Ngõ 11 Duy Tân, Cầu Giấy, HN</span>
                   <input class="cell-edit-input" value="Ngõ 11 Duy Tân, Cầu Giấy, HN" onblur="endEdit(this)" onkeydown="if(event.key==='Enter')endEdit(this)">
                 </td>
-                <td>
-                  <span class="gv-multi" onclick="openMultiGV('B22DCCN015','Lê Thị Bích',this.closest('tr'))" title="Click để cấu hình trọng số">TS. Trần Triệu Long, ThS. Nguyễn Đình Hùng</span>
+                <td class="cell-gv">
+                  <span class="gv-multi" onclick="openMultiGV('B22DCCN015','Lê Thị Bích',this.closest('tr'))" title="Click để xem & cấu hình GVHD"><strong>TS. Trần Triệu Long</strong><br>ThS. Nguyễn Đình Hùng</span>
                 </td>
                 <td style="text-align:center"><span class="cell-link" onclick="openDeCanvas('B22DCCN015','Lê Thị Bích')">Chi tiết</span></td>
                 <td style="text-align:center"><span class="cell-na">N/A</span></td>
@@ -471,88 +478,139 @@
   </div>
 </div>
 
-<!-- GV Picker (floating) -->
-<div class="gv-picker" id="gv-picker">
-  <div style="font-size:12px;font-weight:600;margin-bottom:8px;color:var(--text-2)">Chọn Giảng viên HD</div>
-  <input class="fc" id="gv-search" type="text" placeholder="🔍 Tìm nhanh tên GV..." style="margin-bottom:8px;font-size:12px" oninput="filterGV(this.value)">
-  <div id="gv-list" style="max-height:180px;overflow-y:auto;display:flex;flex-direction:column;gap:2px">
-    <div class="gv-opt" onclick="selectGV('TS. Trần Triệu Long')">TS. Trần Triệu Long <span style="color:var(--text-3);font-size:11px">(7/10)</span></div>
-    <div class="gv-opt" onclick="selectGV('ThS. Nguyễn Đình Hùng')">ThS. Nguyễn Đình Hùng <span style="color:var(--text-3);font-size:11px">(5/8)</span></div>
-    <div class="gv-opt" onclick="selectGV('TS. Lê Quốc Hùng')">TS. Lê Quốc Hùng <span style="color:var(--text-3);font-size:11px">(5/10)</span></div>
-    <div class="gv-opt" onclick="selectGV('ThS. Hoàng Minh Tuấn')">ThS. Hoàng Minh Tuấn <span style="color:var(--text-3);font-size:11px">(3/8)</span></div>
-    <div class="gv-opt" style="color:var(--text-3)" onclick="selectGV('TS. Phạm Văn Đức')">TS. Phạm Văn Đức <span style="font-size:11px">(12/12 — đủ chỉ tiêu)</span></div>
-  </div>
-  <button class="btn btn-default btn-sm" style="width:100%;margin-top:8px;font-size:12px" onclick="closeGVPicker()">Đóng</button>
-</div>
-
-<!-- Modal: Phân công hàng loạt -->
-<div class="overlay hidden" id="modal-bulk">
-  <div class="modal-box" style="width:480px">
-    <div class="modal-hd">
-      <span class="modal-title">👨‍🏫 Phân công GVHD — <span id="bulk-count">0</span> sinh viên</span>
-      <button class="modal-close" onclick="closeModal('modal-bulk')">✕</button>
-    </div>
-    <div class="modal-bd">
-      <div class="fi">
-        <label>Giảng viên Hướng dẫn <span class="req">*</span></label>
-        <select class="fc" id="bulk-gv">
-          <option value="">-- Chọn GVHD --</option>
-          <option>TS. Trần Triệu Long (còn 3/10 chỉ tiêu)</option>
-          <option>ThS. Nguyễn Đình Hùng (còn 3/8 chỉ tiêu)</option>
-          <option>TS. Lê Quốc Hùng (còn 5/10 chỉ tiêu)</option>
-          <option>ThS. Hoàng Minh Tuấn (còn 5/8 chỉ tiêu)</option>
-        </select>
-        <div class="f-hint">Nếu số SV vượt chỉ tiêu hệ thống sẽ cảnh báo — Giáo vụ có thể xác nhận tiếp tục (bypass).</div>
-      </div>
-    </div>
-    <div class="modal-ft">
-      <button class="btn btn-default" onclick="closeModal('modal-bulk')">Hủy</button>
-      <button class="btn btn-primary" onclick="saveBulk()">💾 Xác nhận phân công</button>
-    </div>
-  </div>
-</div>
-
-<!-- Modal: Đa GVHD & Trọng số -->
+<!-- Modal: GV Hướng dẫn (card-based + ngoài trường) — dùng chung cho 1 SV và hàng loạt -->
 <div class="overlay hidden" id="modal-multi-gv">
-  <div class="modal-box" style="width:560px">
+  <div class="modal-box" style="width:580px;max-height:90vh">
     <div class="modal-hd">
-      <span class="modal-title">⚠️ Quản lý GVHD &amp; Trọng số — <span id="mgv-sv"></span></span>
+      <span class="modal-title">👨‍🏫 GV Hướng dẫn — <span id="mgv-sv"></span></span>
       <button class="modal-close" onclick="closeModal('modal-multi-gv')">✕</button>
     </div>
-    <div class="modal-bd">
-      <div class="alert alert-warning" style="margin-bottom:14px">
-        <span class="alert-ico">⚠️</span>
-        <div class="alert-body"><span class="alert-desc">Sinh viên được phân công từ 2 GVHD trở lên. Tổng trọng số phải đạt <strong>chính xác 100%</strong>.</span></div>
+    <div class="modal-bd" style="overflow-y:auto">
+
+      <!-- Danh sách GV dạng card -->
+      <div style="display:flex;align-items:center;gap:12px;padding:8px 14px;background:#fafafa;border:1px solid var(--border);border-bottom:none;border-radius:8px 8px 0 0;font-size:12px;font-weight:600;color:var(--text-3)">
+        <div style="flex:1">Giảng viên hướng dẫn</div>
+        <div style="width:90px;flex-shrink:0;text-align:center">Phân loại</div>
+        <div style="width:76px;flex-shrink:0;text-align:center">Trọng số</div>
+        <div style="width:28px;flex-shrink:0;text-align:center">Xóa</div>
       </div>
-      <table class="tbl" id="mgv-table">
-        <thead>
-          <tr>
-            <th>Giảng viên Hướng dẫn</th>
-            <th style="text-align:center;width:130px">Trọng số (%)</th>
-            <th style="text-align:center;width:50px">Xóa</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr>
-            <td>TS. Trần Triệu Long</td>
-            <td><input class="fc" type="number" min="0" max="100" value="60" style="text-align:center" oninput="recalcWeight()"></td>
-            <td style="text-align:center"><button class="btn btn-link btn-sm" style="color:var(--danger)" onclick="removeGVRow(this)">✕</button></td>
-          </tr>
-          <tr>
-            <td>ThS. Nguyễn Đình Hùng</td>
-            <td><input class="fc" type="number" min="0" max="100" value="40" style="text-align:center" oninput="recalcWeight()"></td>
-            <td style="text-align:center"><button class="btn btn-link btn-sm" style="color:var(--danger)" onclick="removeGVRow(this)">✕</button></td>
-          </tr>
-        </tbody>
-      </table>
-      <div style="display:flex;justify-content:space-between;align-items:center;margin-top:10px">
-        <button class="btn btn-default btn-sm" onclick="addGVRow()">+ Thêm GVHD</button>
-        <span style="font-size:13px">Tổng: <strong id="total-weight" style="color:var(--success)">100%</strong></span>
+      <div id="mgv-card-list" style="border:1px solid var(--border);border-top:none;border-radius:0 0 8px 8px;overflow:hidden;margin-bottom:10px"></div>
+
+      <!-- Tổng trọng số -->
+      <div style="display:flex;justify-content:flex-end;align-items:center;gap:8px;margin-bottom:12px">
+        <span style="font-size:13px;color:var(--text-2)">Tổng trọng số:</span>
+        <strong id="total-weight" style="font-size:14px;color:var(--success)">100%</strong>
+        <span id="weight-valid-icon" style="font-size:13px;color:var(--success)">✓ Hợp lệ</span>
       </div>
-      <div class="fe" id="weight-err" style="display:none;margin-top:8px">Tổng trọng số hướng dẫn phải đạt chính xác 100%!</div>
+      <div class="fe" id="weight-err" style="display:none;margin-bottom:10px">Tổng trọng số hướng dẫn phải đạt chính xác 100%!</div>
+      <button class="btn btn-default btn-sm" id="mgv-add-btn" onclick="openAddGVPanel()" style="margin-bottom:16px">+ Thêm GVHD</button>
+
+      <!-- Panel chọn GV mới: Trong trường (dropdown) / Ngoài trường (nhập tay) -->
+      <div id="mgv-add-panel" style="display:none;border:1px dashed var(--primary);border-radius:8px;padding:12px 14px;margin-bottom:16px;background:#f0f7ff">
+        <div style="display:flex;gap:8px;margin-bottom:10px">
+          <button type="button" class="btn btn-sm btn-primary" id="mgv-type-internal" onclick="setAddGVType('internal')">🏫 Trong Trường</button>
+          <button type="button" class="btn btn-sm btn-default" id="mgv-type-external" onclick="setAddGVType('external')">🏛️ Ngoài Trường</button>
+        </div>
+        <div id="mgv-add-internal">
+          <select class="fc" id="mgv-add-select" style="font-size:13px"></select>
+          <div class="f-hint">Chọn từ danh sách GV của Khoa · số trong ngoặc là chỉ tiêu còn lại/tổng chỉ tiêu.</div>
+        </div>
+        <div id="mgv-add-external" style="display:none">
+          <div class="f-row col-2">
+            <div class="fi">
+              <label>Họ và tên GV <span class="req">*</span></label>
+              <input class="fc" id="mgv-add-ext-name" type="text" placeholder="VD: Lê Văn Bình">
+            </div>
+            <div class="fi">
+              <label>Nơi công tác <span class="req">*</span></label>
+              <input class="fc" id="mgv-add-ext-dept" type="text" placeholder="VD: Đại học Quốc gia TP.HCM">
+            </div>
+            <div class="fi">
+              <label>Học hàm</label>
+              <input class="fc" id="mgv-add-ext-rank" type="text" placeholder="GS / PGS">
+            </div>
+            <div class="fi">
+              <label>Học vị</label>
+              <input class="fc" id="mgv-add-ext-degree" type="text" placeholder="TS / ThS">
+            </div>
+            <div class="fi" style="grid-column:1/-1">
+              <label>Chuyên ngành</label>
+              <input class="fc" id="mgv-add-ext-major" type="text" placeholder="Chuyên ngành nghiên cứu...">
+            </div>
+            <div class="fi">
+              <label>Điện thoại <span class="req">*</span></label>
+              <input class="fc" id="mgv-add-ext-phone" type="text" placeholder="0xxx xxx xxx">
+            </div>
+            <div class="fi">
+              <label>Email <span class="req">*</span></label>
+              <input class="fc" id="mgv-add-ext-email" type="text" placeholder="email@...">
+            </div>
+            <div class="fi">
+              <label>CCCD <span class="req">*</span></label>
+              <input class="fc" id="mgv-add-ext-cccd" type="text" placeholder="12 chữ số">
+            </div>
+          </div>
+        </div>
+        <div style="display:flex;justify-content:flex-end;gap:8px;margin-top:10px">
+          <button class="btn btn-default btn-sm" onclick="cancelAddGV()">Hủy</button>
+          <button class="btn btn-primary btn-sm" onclick="confirmAddGV()">+ Thêm</button>
+        </div>
+      </div>
+
+      <!-- Thông tin GV ngoài trường -->
+      <div id="mgv-external-section" style="display:none">
+        <div style="border-top:1px solid var(--border);padding-top:14px;margin-top:4px">
+          <div style="display:flex;align-items:center;gap:6px;margin-bottom:10px">
+            <span>🏛️</span>
+            <span style="font-size:13px;font-weight:600;color:var(--text-2)">Thông tin GV ngoài trường</span>
+          </div>
+          <div style="border:1px solid var(--border);border-radius:8px;padding:14px 16px;background:#fff">
+            <div id="mgv-ext-gv-name" style="font-size:14px;font-weight:700;color:var(--text-1);margin-bottom:14px"></div>
+            <div class="f-row col-2" style="margin-bottom:16px">
+              <div class="fi" style="margin-bottom:0">
+                <label>Họ và tên <span class="req">*</span></label>
+                <input class="fc" id="ext-name" type="text" placeholder="Nhập họ tên...">
+              </div>
+              <div class="fi" style="margin-bottom:0">
+                <label>Nơi công tác <span class="req">*</span></label>
+                <input class="fc" id="ext-workplace" type="text" placeholder="Tên trường / tổ chức...">
+              </div>
+            </div>
+            <div class="f-row col-3" style="margin-bottom:16px">
+              <div class="fi" style="margin-bottom:0">
+                <label>Học hàm</label>
+                <input class="fc" id="ext-rank" type="text" placeholder="GS / PGS">
+              </div>
+              <div class="fi" style="margin-bottom:0">
+                <label>Học vị</label>
+                <input class="fc" id="ext-degree" type="text" placeholder="TS / ThS">
+              </div>
+              <div class="fi" style="margin-bottom:0">
+                <label>Chuyên ngành</label>
+                <input class="fc" id="ext-major" type="text" placeholder="Chuyên ngành nghiên cứu...">
+              </div>
+            </div>
+            <div class="f-row col-3" style="margin-bottom:0">
+              <div class="fi" style="margin-bottom:0">
+                <label>Điện thoại <span class="req">*</span></label>
+                <input class="fc" id="ext-phone" type="text" placeholder="0xxx xxx xxx">
+              </div>
+              <div class="fi" style="margin-bottom:0">
+                <label>Email <span class="req">*</span></label>
+                <input class="fc" id="ext-email" type="text" placeholder="email@...">
+              </div>
+              <div class="fi" style="margin-bottom:0">
+                <label>CCCD <span class="req">*</span></label>
+                <input class="fc" id="ext-cccd" type="text" placeholder="12 chữ số">
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
     </div>
     <div class="modal-ft">
-      <button class="btn btn-default" onclick="closeModal('modal-multi-gv')">Hủy</button>
+      <button class="btn btn-default" onclick="closeModal('modal-multi-gv')">Đóng</button>
       <button class="btn btn-primary" onclick="saveMultiGV()">💾 Lưu cấu hình</button>
     </div>
   </div>
@@ -1224,8 +1282,6 @@ function switchSubNav(tabIdx,subIdx,total) {
   }
 }
 
-let currentGVCell = null;
-
 function closeModal(id){ document.getElementById(id).classList.add('hidden'); }
 
 // Inline edit
@@ -1248,77 +1304,259 @@ function endEdit(inp) {
   }
 }
 
-// GV Picker
+// --- Phân công GVHD: dùng chung modal đa-GVHD (card + trọng số) cho cả 1 sinh viên và hàng loạt ---
+function getRowMeta(row) {
+  const idEl = row.querySelector('td:nth-child(2) strong');
+  const nameEl = row.querySelector('.sv-name-link');
+  return { id: idEl ? idEl.textContent.trim() : '', name: nameEl ? nameEl.textContent.trim() : '' };
+}
+// Click vào ô GVHD của 1 sinh viên → mở thẳng danh sách GVHD (có sẵn nút "+ Thêm GVHD"),
+// hỗ trợ phân 1 hoặc nhiều GV (trong/ngoài trường) kèm chia trọng số ngay từ đầu.
 function openGVPicker(cell) {
-  currentGVCell = cell;
-  const p = document.getElementById('gv-picker');
-  const r = cell.getBoundingClientRect();
-  p.style.top = (r.bottom + window.scrollY + 4) + 'px';
-  p.style.left = r.left + 'px';
-  p.classList.add('open');
-  document.getElementById('gv-search').value = '';
-  filterGV('');
-  document.getElementById('gv-search').focus();
-}
-function closeGVPicker() {
-  document.getElementById('gv-picker').classList.remove('open');
-  currentGVCell = null;
-}
-function filterGV(q) {
-  document.querySelectorAll('.gv-opt').forEach(o => {
-    o.style.display = o.textContent.toLowerCase().includes(q.toLowerCase()) ? '' : 'none';
-  });
-}
-function selectGV(name) {
-  if(currentGVCell) {
-    const sp = currentGVCell.querySelector('span');
-    sp.className = 'gv-single';
-    sp.textContent = name;
+  const row = cell.closest('tr');
+  const { id, name } = getRowMeta(row);
+  const sp = cell.querySelector('span');
+  let seed = studentMGVData[id] ? studentMGVData[id].map(c => Object.assign({}, c)) : [];
+  if (!seed.length && sp) {
+    if (sp.classList.contains('gv-single')) {
+      seed = [{ name: sp.textContent.trim(), dept:'Khoa CNTT', type:'internal', weight:100, extInfo:null }];
+    } else if (sp.classList.contains('gv-single-ext')) {
+      const nm = sp.textContent.replace('🏛️','').trim();
+      seed = [{ name: nm, dept:'', type:'external', weight:100,
+        extInfo:{ name:nm, workplace:'', rank:'', degree:'', major:'', phone:'', email:'', cccd:'' } }];
+    }
   }
-  closeGVPicker();
-  toast('Đã phân công: ' + name);
-}
-document.addEventListener('click', e => {
-  if(!e.target.closest('#gv-picker') && !e.target.closest('.cell-gv'))
-    closeGVPicker();
-});
-
-// Multi-GV
-let currentMultiGVRow = null;
-function openMultiGV(id, name, row) {
-  currentMultiGVRow = row || null;
+  currentMultiGVRows = [row];
   document.getElementById('mgv-sv').textContent = name + ' (' + id + ')';
+  mgvCards = seed;
   document.getElementById('weight-err').style.display = 'none';
-  recalcWeight();
+  renderMGVCards();
   document.getElementById('modal-multi-gv').classList.remove('hidden');
 }
-function recalcWeight() {
-  let total = 0;
-  document.querySelectorAll('#mgv-table input[type=number]').forEach(i => total += parseFloat(i.value)||0);
-  const el = document.getElementById('total-weight');
-  el.textContent = total + '%';
-  el.style.color = total === 100 ? 'var(--success)' : 'var(--danger)';
+// Phân công GVHD hàng loạt: chọn nhiều SV (checkbox) → mở cùng modal card, áp dụng cấu hình
+// GVHD (1 hoặc nhiều GV, chia trọng số) giống nhau cho tất cả SV đã chọn.
+function openBulkAssign() {
+  const rows = Array.from(document.querySelectorAll('.row-chk:checked')).map(chk => chk.closest('tr'));
+  if (!rows.length) return;
+  currentMultiGVRows = rows;
+  document.getElementById('mgv-sv').textContent = rows.length + ' sinh viên đã chọn';
+  mgvCards = [];
+  document.getElementById('weight-err').style.display = 'none';
+  renderMGVCards();
+  document.getElementById('modal-multi-gv').classList.remove('hidden');
 }
-function removeGVRow(btn) { btn.closest('tr').remove(); recalcWeight(); }
-function addGVRow() {
-  const tr = document.createElement('tr');
-  tr.innerHTML = '<td><select class="fc" style="font-size:12px"><option value="">-- Chọn GV --</option><option>TS. Lê Quốc Hùng</option><option>ThS. Hoàng Minh Tuấn</option></select></td><td><input class="fc" type="number" min="0" max="100" value="0" style="text-align:center" oninput="recalcWeight()"></td><td style="text-align:center"><button class="btn btn-link btn-sm" style="color:var(--danger)" onclick="removeGVRow(this)">✕</button></td>';
-  document.querySelector('#mgv-table tbody').appendChild(tr);
+
+// --- Multi-GV modal ---
+const studentMGVData = {
+  'B22DCCN015': [
+    { name:'TS. Trần Triệu Long', dept:'Khoa CNTT', type:'internal', weight:60, extInfo:null },
+    { name:'ThS. Nguyễn Đình Hùng', dept:'Khoa CNTT', type:'internal', weight:40, extInfo:null },
+  ],
+};
+let mgvCards = [];
+let currentMultiGVRows = [];
+
+function renderMGVCards() {
+  const list = document.getElementById('mgv-card-list');
+  if (!mgvCards.length) {
+    list.innerHTML = '<div style="padding:24px;text-align:center;color:var(--text-3);font-size:13px">Chưa có giảng viên hướng dẫn — nhấn "+ Thêm GVHD"</div>';
+    updateExtSection();
+    recalcWeight();
+    return;
+  }
+  list.innerHTML = mgvCards.map((c, i) => `
+    <div class="mgv-card${i===0?' mgv-hl':''}">
+      <div class="mgv-card-info">
+        <div class="mgv-card-name">${c.name}</div>
+        <div class="mgv-card-dept">🏛️ ${c.dept}</div>
+      </div>
+      <span class="${c.type==='internal'?'tag-inhouse':'tag-external'}">${c.type==='internal'?'Trong Trường':'Ngoài Trường'}</span>
+      <div style="display:flex;align-items:center;gap:4px;flex-shrink:0">
+        <input class="fc mgv-w-inp" type="number" min="0" max="100" value="${c.weight}"
+          oninput="mgvCards[${i}].weight=parseInt(this.value)||0;recalcWeight()">
+        <span style="color:var(--text-3);font-size:12px">%</span>
+      </div>
+      <button class="btn btn-link btn-sm" style="color:var(--danger);flex-shrink:0" onclick="removeGVCard(${i})">✕</button>
+    </div>`).join('');
+  updateExtSection();
   recalcWeight();
 }
-function saveMultiGV() {
-  let total = 0;
-  document.querySelectorAll('#mgv-table input[type=number]').forEach(i => total += parseFloat(i.value)||0);
-  if(total !== 100) { document.getElementById('weight-err').style.display = 'block'; return; }
+
+function updateExtSection() {
+  const extGV = mgvCards.find(c => c.type === 'external');
+  const sec = document.getElementById('mgv-external-section');
+  if (!extGV) { sec.style.display = 'none'; return; }
+  sec.style.display = '';
+  document.getElementById('mgv-ext-gv-name').textContent = extGV.name;
+  const ei = extGV.extInfo || {};
+  document.getElementById('ext-name').value      = ei.name      || '';
+  document.getElementById('ext-workplace').value = ei.workplace || '';
+  document.getElementById('ext-rank').value      = ei.rank      || '';
+  document.getElementById('ext-degree').value    = ei.degree    || '';
+  document.getElementById('ext-major').value     = ei.major     || '';
+  document.getElementById('ext-phone').value     = ei.phone     || '';
+  document.getElementById('ext-email').value     = ei.email     || '';
+  document.getElementById('ext-cccd').value      = ei.cccd      || '';
+}
+
+function openMultiGV(id, name, row) {
+  currentMultiGVRows = row ? [row] : [];
+  document.getElementById('mgv-sv').textContent = name + ' (' + id + ')';
+  mgvCards = (studentMGVData[id] || []).map(c => Object.assign({}, c));
   document.getElementById('weight-err').style.display = 'none';
-  // Xóa ⚠️ vì trọng số đã được cấu hình đúng
-  if(currentMultiGVRow) {
-    const icon = currentMultiGVRow.querySelector('.warn-icon');
-    if(icon) icon.remove();
-    currentMultiGVRow = null;
+  renderMGVCards();
+  document.getElementById('modal-multi-gv').classList.remove('hidden');
+}
+
+function recalcWeight() {
+  const total = mgvCards.reduce((s, c) => s + (c.weight || 0), 0);
+  const el = document.getElementById('total-weight');
+  const vi = document.getElementById('weight-valid-icon');
+  el.textContent = total + '%';
+  el.style.color = total === 100 ? 'var(--success)' : 'var(--danger)';
+  vi.textContent = total === 100 ? '✓ Hợp lệ' : '✗ Chưa hợp lệ';
+  vi.style.color  = total === 100 ? 'var(--success)' : 'var(--danger)';
+}
+
+function removeGVCard(idx) {
+  mgvCards.splice(idx, 1);
+  renderMGVCards();
+}
+
+// --- Thêm GVHD: chọn Trong trường (dropdown theo chỉ tiêu) hoặc Ngoài trường (nhập tay) ---
+const internalGVList = [
+  { name:'TS. Trần Triệu Long',   dept:'Khoa CNTT', cap:'3/10' },
+  { name:'ThS. Nguyễn Đình Hùng', dept:'Khoa CNTT', cap:'3/8'  },
+  { name:'TS. Lê Quốc Hùng',      dept:'Khoa CNTT', cap:'5/10' },
+  { name:'ThS. Hoàng Minh Tuấn',  dept:'Khoa CNTT', cap:'5/8'  },
+  { name:'TS. Phạm Văn Đức',      dept:'Khoa CNTT', cap:'12/12 — đủ chỉ tiêu', full:true },
+];
+let addGVType = 'internal';
+
+function openAddGVPanel() {
+  document.getElementById('mgv-add-panel').style.display = 'block';
+  document.getElementById('mgv-add-btn').style.display = 'none';
+  populateInternalSelect();
+  setAddGVType('internal');
+}
+function populateInternalSelect() {
+  const sel = document.getElementById('mgv-add-select');
+  const usedNames = mgvCards.map(c => c.name);
+  const opts = internalGVList.filter(g => !usedNames.includes(g.name));
+  sel.innerHTML = '<option value="">-- Chọn giảng viên trong trường --</option>' +
+    opts.map(g => `<option value="${g.name}" data-dept="${g.dept}" ${g.full ? 'disabled' : ''}>${g.name} (${g.cap})</option>`).join('');
+}
+function setAddGVType(type) {
+  addGVType = type;
+  document.getElementById('mgv-type-internal').className = 'btn btn-sm' + (type === 'internal' ? ' btn-primary' : ' btn-default');
+  document.getElementById('mgv-type-external').className = 'btn btn-sm' + (type === 'external' ? ' btn-primary' : ' btn-default');
+  document.getElementById('mgv-add-internal').style.display = type === 'internal' ? '' : 'none';
+  document.getElementById('mgv-add-external').style.display = type === 'external' ? '' : 'none';
+}
+const MGV_ADD_EXT_FIELDS = ['mgv-add-ext-name','mgv-add-ext-dept','mgv-add-ext-rank','mgv-add-ext-degree','mgv-add-ext-major','mgv-add-ext-phone','mgv-add-ext-email','mgv-add-ext-cccd'];
+function cancelAddGV() {
+  document.getElementById('mgv-add-panel').style.display = 'none';
+  document.getElementById('mgv-add-btn').style.display = '';
+  MGV_ADD_EXT_FIELDS.forEach(id => document.getElementById(id).value = '');
+}
+function confirmAddGV() {
+  if (addGVType === 'internal') {
+    const sel = document.getElementById('mgv-add-select');
+    if (!sel.value) { toast('Vui lòng chọn giảng viên trong trường', 'error'); return; }
+    const dept = sel.selectedOptions[0].dataset.dept || 'Khoa CNTT';
+    mgvCards.push({ name: sel.value, dept, type:'internal', weight:0, extInfo:null });
+  } else {
+    const name   = document.getElementById('mgv-add-ext-name').value.trim();
+    const dept   = document.getElementById('mgv-add-ext-dept').value.trim();
+    const rank   = document.getElementById('mgv-add-ext-rank').value.trim();
+    const degree = document.getElementById('mgv-add-ext-degree').value.trim();
+    const major  = document.getElementById('mgv-add-ext-major').value.trim();
+    const phone  = document.getElementById('mgv-add-ext-phone').value.trim();
+    const email  = document.getElementById('mgv-add-ext-email').value.trim();
+    const cccd   = document.getElementById('mgv-add-ext-cccd').value.trim();
+    if (!name || !dept || !phone || !email || !cccd) {
+      toast('Vui lòng điền đầy đủ thông tin bắt buộc (*) của GV ngoài trường', 'error'); return;
+    }
+    const titleParts = [rank, degree].filter(Boolean);
+    const displayName = titleParts.length ? titleParts.join('.') + '. ' + name : name;
+    mgvCards.push({ name: displayName, dept, type:'external', weight:0,
+      extInfo:{ name, workplace:dept, rank, degree, major, phone, email, cccd } });
   }
+  cancelAddGV();
+  renderMGVCards();
+  toast('Đã thêm GVHD — cập nhật trọng số');
+}
+
+// GV trọng số cao hơn được in đậm, mỗi GV xuống 1 dòng riêng
+function gvMultiHTML(cards) {
+  const weights = cards.map(c => c.weight || 0);
+  const maxW = Math.max(...weights);
+  const hasDiff = weights.some(w => w !== maxW);
+  return cards.map(c => {
+    const label = (c.type === 'external' ? '🏛️ ' : '') + c.name;
+    return (hasDiff && (c.weight || 0) === maxW) ? '<strong>' + label + '</strong>' : label;
+  }).join('<br>');
+}
+
+// Đồng bộ kết quả cấu hình GVHD (1 hoặc nhiều GV) ngược lại ô "Giảng viên hướng dẫn" trên bảng
+function updateGVCellFromCards(row) {
+  const cell = row.querySelector('.cell-gv');
+  if (!cell) return;
+  const { id, name } = getRowMeta(row);
+  const sp = cell.querySelector('span');
+  if (mgvCards.length >= 2) {
+    studentMGVData[id] = mgvCards.map(c => Object.assign({}, c));
+    sp.className = 'gv-multi';
+    sp.innerHTML = gvMultiHTML(mgvCards);
+    cell.setAttribute('title', 'Click để xem & cấu hình GVHD');
+    cell.onclick = () => openMultiGV(id, name, row);
+  } else if (mgvCards.length === 1) {
+    delete studentMGVData[id];
+    const c = mgvCards[0];
+    if (c.type === 'external') {
+      sp.className = 'gv-single-ext';
+      sp.innerHTML = '🏛️ ' + c.name;
+    } else {
+      sp.className = 'gv-single';
+      sp.textContent = c.name;
+    }
+    cell.removeAttribute('title');
+    cell.onclick = () => openGVPicker(cell);
+  } else {
+    delete studentMGVData[id];
+    sp.className = 'gv-unassigned';
+    sp.textContent = '— Click để phân công GV';
+    cell.removeAttribute('title');
+    cell.onclick = () => openGVPicker(cell);
+  }
+}
+
+function saveMultiGV() {
+  const total = mgvCards.reduce((s, c) => s + (c.weight || 0), 0);
+  if (total !== 100) { document.getElementById('weight-err').style.display = 'block'; return; }
+  document.getElementById('weight-err').style.display = 'none';
+  const hasExt = mgvCards.some(c => c.type === 'external');
+  if (hasExt) {
+    const n = document.getElementById('ext-name').value.trim();
+    const p = document.getElementById('ext-phone').value.trim();
+    const e = document.getElementById('ext-email').value.trim();
+    const cc = document.getElementById('ext-cccd').value.trim();
+    if (!n || !p || !e || !cc) {
+      toast('Vui lòng điền đầy đủ thông tin bắt buộc (*) của GV ngoài trường', 'error'); return;
+    }
+  }
+  const rows = currentMultiGVRows;
+  rows.forEach(row => {
+    const icon = row.querySelector('.warn-icon');
+    if (icon) icon.remove();
+    updateGVCellFromCards(row);
+  });
+  currentMultiGVRows = [];
+  if (rows.length > 1) clearSelection();
   closeModal('modal-multi-gv');
-  toast('Đã lưu cấu hình trọng số GVHD');
+  toast(rows.length > 1
+    ? 'Đã áp dụng cấu hình GVHD cho ' + rows.length + ' sinh viên'
+    : 'Đã lưu cấu hình GVHD');
 }
 
 // Đề cương / Kế hoạch
@@ -1631,18 +1869,10 @@ function onRowCheck() {
   const n = document.querySelectorAll('.row-chk:checked').length;
   document.getElementById('bulk-bar').classList.toggle('show', n > 0);
   document.getElementById('selected-count').textContent = n;
-  document.getElementById('bulk-count').textContent = n;
 }
 function clearSelection() {
   document.querySelectorAll('.row-chk, #chk-all').forEach(c => c.checked = false);
   onRowCheck();
-}
-function openBulkAssign() { document.getElementById('modal-bulk').classList.remove('hidden'); }
-function saveBulk() {
-  if(!document.getElementById('bulk-gv').value) { toast('Vui lòng chọn GVHD', 'error'); return; }
-  clearSelection();
-  closeModal('modal-bulk');
-  toast('Đã phân công GVHD hàng loạt thành công');
 }
 
 function syncData() {

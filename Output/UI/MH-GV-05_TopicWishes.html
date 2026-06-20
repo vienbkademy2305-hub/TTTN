@@ -135,6 +135,11 @@
             <option value="Đã duyệt">Đã duyệt</option>
             <option value="Từ chối">Từ chối</option>
           </select>
+          <select class="fc" style="width:170px" id="f-dot" onchange="render()">
+            <option value="">Tất cả đợt</option>
+            <option value="HK1 2025-2026">HK1 2025-2026</option>
+            <option value="HK2 2024-2025">HK2 2024-2025</option>
+          </select>
           <button class="btn btn-default" onclick="resetFilter()">🔄 Reset</button>
         </div>
 
@@ -143,15 +148,18 @@
           <table class="tbl">
             <thead>
               <tr>
-                <th style="width:44px;text-align:center">STT</th>
+                <th style="width:44px;text-align:center"><input type="checkbox" id="chk-all" onchange="toggleAllRows(this.checked)" style="width:15px;height:15px;cursor:pointer;accent-color:var(--primary)"></th>
                 <th style="width:110px">Mã số SV</th>
                 <th style="width:150px">Họ và tên</th>
                 <th style="width:110px">Lớp học phần</th>
                 <th style="width:70px">CTĐT</th>
+                <th style="width:110px">Đợt</th>
                 <th>Đề tài đăng ký</th>
+                <th style="min-width:175px">Giảng viên hướng dẫn</th>
                 <th style="width:110px;text-align:center">Thứ tự NV</th>
                 <th style="width:100px">Ngày đăng ký</th>
                 <th style="width:130px">Trạng thái</th>
+                <th style="min-width:170px">Lý do từ chối</th>
                 <th style="width:110px;text-align:center">Hành động</th>
               </tr>
             </thead>
@@ -275,6 +283,22 @@
   </div>
 </div>
 
+<!-- ═══════════════════════════════════════════
+     MODAL: GVHD & TRỌNG SỐ
+════════════════════════════════════════════ -->
+<div class="overlay hidden" id="m-gvhd">
+  <div class="modal-box w650">
+    <div class="modal-hd">
+      <h4 class="modal-title" id="gvhd-title">Giảng viên hướng dẫn &amp; Trọng số</h4>
+      <button class="modal-close" data-close="m-gvhd">✕</button>
+    </div>
+    <div class="modal-bd" id="gvhd-body"></div>
+    <div class="modal-ft">
+      <button class="btn btn-default" data-close="m-gvhd">Đóng</button>
+    </div>
+  </div>
+</div>
+
 <script src="_utils.js"></script>
 <script>
 /* ── Topics data ── */
@@ -326,11 +350,10 @@ const NV_CLR = {
 };
 
 const NVO_STATUS_CLR = {
-  'Chờ GV duyệt'  : 'tag-warning',
-  'Chờ Khoa duyệt': 'tag-default',
-  'Đã duyệt'      : 'tag-success',
-  'Từ chối'       : 'tag-error',
-  'Chưa đến lượt' : 'tag-default',
+  'Chờ duyệt': 'tag-warning',
+  'Đã duyệt' : 'tag-success',
+  'Từ chối'  : 'tag-error',
+  'Không xét': 'tag-default',
 };
 
 const TOPIC_STATUS_CLR = {
@@ -355,11 +378,26 @@ const CTDT_MAP = {
   'KHDL': 'Khoa học dữ liệu',
 };
 
+/* ── Capacity per batch ── */
+const dotCapacity = {
+  'HK1 2025-2026': 5,
+  'HK2 2024-2025': 3,
+};
+
+function getUsed(dot) {
+  return wishes.filter(w =>
+    w.dot === dot && ['Đã duyệt', 'Chờ Khoa duyệt'].includes(w.status)
+  ).length;
+}
+
 let wishes = [
   {
     id:1, maSV:'B22DCCN001', tenSV:'Nguyễn Văn An', lop:'INT3110_1', gpa:3.2, ctdt:'KTPM',
     topicId:1, loai:'Có sẵn', dot:'HK1 2025-2026',
     status:'Chờ GV duyệt', ngayDK:'05/06/2026',
+    gvChinh:'TS. Nguyễn Minh Tuấn', gvChinhTrongSo:60, gvChinhDonVi:'Khoa CNTT',
+    gvDong:[{ten:'ThS. Trần Thị Hoa', trongSo:40, donVi:'Khoa CNTT'}],
+    gvNgoaiTruong:[],
     thuTuNV: 2,
     dsNguyenVong: [
       { thuTu:1, tenGV:'TS. Lê Thị Mai', topicName:'Ứng dụng ML trong dự báo tài chính', status:'Từ chối', ngayXL:'08/06/2026' },
@@ -376,6 +414,8 @@ let wishes = [
     id:2, maSV:'B22DCCN022', tenSV:'Phạm Minh Khoa', lop:'INT3110_2', gpa:3.4, ctdt:'KTPM',
     topicId:1, loai:'Có sẵn', dot:'HK1 2025-2026',
     status:'Chờ GV duyệt', ngayDK:'11/06/2026',
+    gvChinh:'TS. Nguyễn Minh Tuấn', gvChinhTrongSo:100, gvChinhDonVi:'Khoa CNTT',
+    gvDong:[], gvNgoaiTruong:[],
     thuTuNV: 1,
     dsNguyenVong: [
       { thuTu:1, tenGV:'TS. Nguyễn Minh Tuấn', topicName:'Hệ thống gợi ý học phần thông minh bằng Machine Learning', status:'Chờ GV duyệt', ngayXL:null, isCurrent:true },
@@ -395,6 +435,9 @@ let wishes = [
     svTech:'Python, LangChain, OpenAI API, FastAPI, React',
     tailieu:{ name:'De_xuat_de_tai_ChatbotLLM_B22DCCN015.pdf', size:'1.2 MB' },
     status:'Chờ Khoa duyệt', ngayDK:'08/06/2026', gvDuyetDate:'11/06/2026',
+    gvChinh:'TS. Nguyễn Minh Tuấn', gvChinhTrongSo:70, gvChinhDonVi:'Khoa CNTT',
+    gvDong:[],
+    gvNgoaiTruong:[{ten:'PGS.TS. Lê Văn Bình', hoTen:'Lê Văn Bình', trongSo:30, hocHam:'PGS', hocVi:'TS', chuyenNganh:'Trí tuệ nhân tạo, Xử lý ngôn ngữ tự nhiên', noiCongTac:'Đại học Quốc gia TP.HCM', khoa:'Khoa Công nghệ thông tin', email:'lvbinh@hcmus.edu.vn', dienThoai:'0903 456 789', cccd:'079198765432'}],
     thuTuNV: 1,
     dsNguyenVong: [
       { thuTu:1, tenGV:'TS. Nguyễn Minh Tuấn', topicName:'Xây dựng chatbot hỗ trợ sinh viên bằng LLM (đề xuất mới)', status:'Chờ Khoa duyệt', ngayXL:'11/06/2026', isCurrent:true },
@@ -409,6 +452,9 @@ let wishes = [
     id:4, maSV:'B22DCCN033', tenSV:'Lê Quốc Cường', lop:'INT3110_2', gpa:2.8, ctdt:'KHMT',
     topicId:2, loai:'Có sẵn', dot:'HK1 2025-2026',
     status:'Đã duyệt', ngayDK:'05/06/2026', gvDuyetDate:'09/06/2026',
+    gvChinh:'TS. Nguyễn Minh Tuấn', gvChinhTrongSo:60, gvChinhDonVi:'Khoa CNTT',
+    gvDong:[{ten:'ThS. Nguyễn Thị Lan', trongSo:40, donVi:'Khoa CNTT'}],
+    gvNgoaiTruong:[],
     thuTuNV: 1,
     dsNguyenVong: [
       { thuTu:1, tenGV:'TS. Nguyễn Minh Tuấn', topicName:'Phân tích cảm xúc người dùng từ đánh giá sản phẩm trực tuyến', status:'Đã duyệt', ngayXL:'09/06/2026', isCurrent:true },
@@ -424,6 +470,9 @@ let wishes = [
     id:5, maSV:'B22DCCN058', tenSV:'Hoàng Minh Đức', lop:'INT3110_1', gpa:3.1, ctdt:'HTTT',
     topicId:4, loai:'Có sẵn', dot:'HK2 2024-2025',
     status:'Đã duyệt', ngayDK:'10/02/2025', gvDuyetDate:'13/02/2025',
+    gvChinh:'TS. Nguyễn Minh Tuấn', gvChinhTrongSo:60, gvChinhDonVi:'Khoa CNTT',
+    gvDong:[],
+    gvNgoaiTruong:[{ten:'ThS. Võ Minh Trí', hoTen:'Võ Minh Trí', trongSo:40, hocHam:'', hocVi:'ThS', chuyenNganh:'Big Data, Hệ thống phân tán', noiCongTac:'Viện Nghiên cứu Dữ liệu Quốc gia', khoa:'Bộ phận AI & Big Data', email:'vmtri@ndri.gov.vn', dienThoai:'0907 123 456', cccd:'001302134567'}],
     thuTuNV: 2,
     dsNguyenVong: [
       { thuTu:1, tenGV:'TS. Phạm Quang Hưng', topicName:'Thiết kế hệ thống phân tán với Kafka', status:'Từ chối', ngayXL:'12/02/2025' },
@@ -440,6 +489,8 @@ let wishes = [
     id:6, maSV:'B22DCCN047', tenSV:'Ngô Thị Hà', lop:'INT3110_2', gpa:3.0, ctdt:'KHMT',
     topicId:1, loai:'Có sẵn', dot:'HK1 2025-2026',
     status:'Chờ GV duyệt', ngayDK:'04/06/2026',
+    gvChinh:'TS. Nguyễn Minh Tuấn', gvChinhTrongSo:100, gvChinhDonVi:'Khoa CNTT',
+    gvDong:[], gvNgoaiTruong:[],
     thuTuNV: 3,
     dsNguyenVong: [
       { thuTu:1, tenGV:'TS. Lê Thị Mai', topicName:'Deep Learning trong nhận diện cảm xúc khuôn mặt', status:'Từ chối', ngayXL:'06/06/2026' },
@@ -457,6 +508,8 @@ let wishes = [
     id:7, maSV:'B22DCCN071', tenSV:'Vũ Thanh Long', lop:'INT3110_1', gpa:2.6, ctdt:'KHMT',
     topicId:2, loai:'Có sẵn', dot:'HK1 2025-2026',
     status:'Từ chối', ngayDK:'04/06/2026',
+    gvChinh:'TS. Nguyễn Minh Tuấn', gvChinhTrongSo:100, gvChinhDonVi:'Khoa CNTT',
+    gvDong:[], gvNgoaiTruong:[],
     tuChoiLydo:'GPA 2.6 chưa đáp ứng yêu cầu tối thiểu GPA ≥ 3.2 của đề tài. Sinh viên nên đăng ký các đề tài có yêu cầu thấp hơn hoặc cải thiện kết quả học tập.',
     thuTuNV: 1,
     dsNguyenVong: [
@@ -479,12 +532,14 @@ function render() {
   const q   = document.getElementById('q').value.toLowerCase();
   const ft  = document.getElementById('f-topic').value;
   const fs  = document.getElementById('f-status').value;
+  const fd  = document.getElementById('f-dot').value;
 
   const filtered = wishes.filter(w => {
     const matchQ  = !q || w.tenSV.toLowerCase().includes(q) || w.maSV.toLowerCase().includes(q);
     const matchT  = !ft || (ft === '0' ? w.loai === 'Đề xuất mới' : w.topicId === parseInt(ft));
     const matchS  = !fs || w.status === fs;
-    return matchQ && matchT && matchS;
+    const matchD  = !fd || w.dot === fd;
+    return matchQ && matchT && matchS && matchD;
   });
 
   document.getElementById('s-total').textContent   = wishes.length;
@@ -514,9 +569,30 @@ function render() {
          <button class="icon-btn" title="Từ chối" onclick="openNVModal(${w.id},true)" style="color:var(--error)">❌</button>`
       : ``;
 
+    const gvDongList = (w.gvDong||[]).map(g=>typeof g==='string'?{ten:g,trongSo:0}:g);
+    const gvNgoaiList = w.gvNgoaiTruong||[];
+    const allGVsCell = [
+      { ten:w.gvChinh, trongSo:w.gvChinhTrongSo??100, isNgoai:false },
+      ...gvDongList.map(g=>({ ten:g.ten, trongSo:g.trongSo, isNgoai:false })),
+      ...gvNgoaiList.map(g=>({ ten:g.ten, trongSo:g.trongSo, isNgoai:true })),
+    ];
+    const maxTSCell = Math.max(...allGVsCell.map(g=>g.trongSo||0));
+    const gvMainCell = allGVsCell.find(g=>g.trongSo===maxTSCell) || allGVsCell[0];
+    const gvRestCell = allGVsCell.filter(g=>g!==gvMainCell);
+    const allNames = [
+      `<span style="color:var(--primary)">${gvMainCell.ten||'—'}</span>`,
+      ...gvRestCell.map(g=>`<span style="color:var(--text-2)">${g.ten}</span>`)
+    ];
+    const gvHD = `<div style="cursor:pointer;padding:4px 6px;border-radius:6px;transition:background .15s" onmouseenter="this.style.background='#f0f7ff'" onmouseleave="this.style.background=''" onclick="openGVDetail(${w.id})" title="Xem GVHD & trọng số">
+      <div style="font-size:13px;line-height:1.7">${allNames.join('<span style="color:var(--border);margin:0 2px">,</span> ')}</div>
+    </div>`;
+    const lyDoTC = w.status==='Từ chối'&&w.tuChoiLydo
+      ? `<span style="color:var(--error);font-size:12px;line-height:1.5" title="${w.tuChoiLydo}">${w.tuChoiLydo.length>65?w.tuChoiLydo.slice(0,65)+'…':w.tuChoiLydo}</span>`
+      : `<span style="color:var(--text-3);font-size:12px">—</span>`;
+
     return `
     <tr>
-      <td style="text-align:center;color:var(--text-3);font-size:13px">${i + 1}</td>
+      <td style="text-align:center"><input type="checkbox" class="row-chk" data-id="${w.id}" onchange="onRowChk()" style="width:15px;height:15px;cursor:pointer;accent-color:var(--primary)"></td>
       <td style="font-family:monospace;font-size:12px;color:var(--text-2);white-space:nowrap">${w.maSV}</td>
       <td>
         <span style="font-size:13px;font-weight:600;color:var(--primary);cursor:pointer;text-decoration:underline;text-underline-offset:3px"
@@ -524,22 +600,58 @@ function render() {
       </td>
       <td style="font-size:12px;color:var(--text-2)">${w.lop}</td>
       <td style="font-size:12px;color:var(--text-2)">${w.ctdt}</td>
+      <td style="white-space:nowrap">${(() => {
+        const max  = dotCapacity[w.dot];
+        if (max === undefined) return `<span style="font-size:12px;color:var(--text-2)">${w.dot}</span>`;
+        const used = getUsed(w.dot);
+        const full = used >= max;
+        const ratio = used / max;
+        const capColor = full ? 'var(--error)' : ratio >= 0.8 ? 'var(--warning)' : 'var(--success)';
+        return `<span style="font-size:12px;color:var(--text-2)">${w.dot}</span>
+          <div style="margin-top:3px;display:flex;align-items:center;gap:4px">
+            <span style="font-size:11px;font-weight:600;color:${capColor}">${used}/${max} SV</span>
+            ${full ? `<span class="tag tag-error" style="font-size:10px;padding:1px 5px">Đã đủ</span>` : ''}
+          </div>`;
+      })()}</td>
       <td>${topicDisplay}</td>
+      <td>${gvHD}</td>
       <td style="text-align:center">${nvBadge}</td>
       <td style="font-size:12px;color:var(--text-3);white-space:nowrap">${w.ngayDK}</td>
       <td><span class="tag ${NV_CLR[w.status]}">${w.status}</span></td>
+      <td style="max-width:180px">${lyDoTC}</td>
       <td class="tbl-actions">${actions}</td>
     </tr>`;
   }).join('')
-  : `<tr><td colspan="10" class="tbl-empty">Không có nguyện vọng nào phù hợp</td></tr>`;
+  : `<tr><td colspan="13" class="tbl-empty">Không có nguyện vọng nào phù hợp</td></tr>`;
 
   document.getElementById('pg-info').textContent = `Hiển thị ${filtered.length} / ${wishes.length} nguyện vọng`;
 }
 
+function toggleAllRows(checked) {
+  document.querySelectorAll('.row-chk').forEach(chk => {
+    chk.checked = checked;
+    chk.closest('tr').style.background = checked ? '#f0f7ff' : '';
+  });
+}
+
+function onRowChk() {
+  const all  = document.querySelectorAll('.row-chk');
+  const checked = document.querySelectorAll('.row-chk:checked');
+  const chkAll = document.getElementById('chk-all');
+  if (chkAll) {
+    chkAll.indeterminate = checked.length > 0 && checked.length < all.length;
+    chkAll.checked = checked.length === all.length && all.length > 0;
+  }
+  document.querySelectorAll('.row-chk').forEach(chk => {
+    chk.closest('tr').style.background = chk.checked ? '#f0f7ff' : '';
+  });
+}
+
 function resetFilter() {
-  ['q','f-topic','f-status'].forEach(id => { document.getElementById(id).value = ''; });
+  ['q','f-topic','f-status','f-dot'].forEach(id => { document.getElementById(id).value = ''; });
   render();
 }
+
 
 /* ── Modal: Thứ tự nguyện vọng ── */
 function openNVOrder(wishId) {
@@ -552,8 +664,18 @@ function openNVOrder(wishId) {
   document.getElementById('nvo-gpa').textContent   = w.gpa.toFixed(1);
   document.getElementById('nvo-gpa').style.color   = w.gpa >= 3.0 ? 'var(--success)' : w.gpa >= 2.5 ? 'var(--text-1)' : 'var(--error)';
 
-  document.getElementById('nvo-list').innerHTML = (w.dsNguyenVong || []).map(item => {
-    const numClass = item.thuTu === 1 ? 'nv1' : item.thuTu === 2 ? 'nv2' : item.thuTu === 3 ? 'nv3' : 'nv4';
+  const dsNV = w.dsNguyenVong || [];
+  const hasApproved = dsNV.some(x => x.status === 'Đã duyệt');
+  const mapStatus = s => {
+    if (s === 'Từ chối') return 'Từ chối';
+    if (s === 'Đã duyệt') return 'Đã duyệt';
+    if (s === 'Chờ GV duyệt' || s === 'Chờ Khoa duyệt') return 'Chờ duyệt';
+    return hasApproved ? 'Không xét' : 'Chờ duyệt';
+  };
+
+  document.getElementById('nvo-list').innerHTML = dsNV.map(item => {
+    const numClass    = item.thuTu === 1 ? 'nv1' : item.thuTu === 2 ? 'nv2' : item.thuTu === 3 ? 'nv3' : 'nv4';
+    const displayStatus = mapStatus(item.status);
     return `
     <div class="nv-order-item ${item.isCurrent ? 'current' : ''}">
       <div class="nv-order-num ${numClass}">${item.thuTu}</div>
@@ -564,7 +686,7 @@ function openNVOrder(wishId) {
         </div>
         <div class="nv-order-topic">📋 ${item.topicName}</div>
         <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap">
-          <span class="tag ${NVO_STATUS_CLR[item.status] || 'tag-default'}">${item.status}</span>
+          <span class="tag ${NVO_STATUS_CLR[displayStatus]}">${displayStatus}</span>
           ${item.ngayXL ? `<span style="font-size:11px;color:var(--text-3)">${item.ngayXL}</span>` : ''}
         </div>
       </div>
@@ -576,12 +698,30 @@ function openNVOrder(wishId) {
 
 /* ── Quick approve (từ bảng) ── */
 function quickApproveWish(id) {
-  const w = wishes.find(x => x.id === id);
-  showConfirm(
-    `Duyệt nguyện vọng của ${w.tenSV}?`,
-    () => approveWish(id),
-    'Duyệt', 'btn-primary'
-  );
+  const w    = wishes.find(x => x.id === id);
+  const max  = dotCapacity[w.dot];
+  const used = getUsed(w.dot);
+  const full = max !== undefined && used >= max;
+  const msg  = full
+    ? `⚠️ Đợt ${w.dot} đã đủ hạn mức (${used}/${max} SV).\nVẫn muốn duyệt nguyện vọng của ${w.tenSV}?`
+    : `Duyệt nguyện vọng của ${w.tenSV}?`;
+  showConfirm(msg, () => approveWish(id), full ? 'Vẫn duyệt' : 'Duyệt', 'btn-primary');
+}
+
+/* ── Approve từ modal (có kiểm tra capacity) ── */
+function approveFromModal(id) {
+  const w    = wishes.find(x => x.id === id);
+  const max  = dotCapacity[w.dot];
+  const used = getUsed(w.dot);
+  if (max !== undefined && used >= max) {
+    showConfirm(
+      `⚠️ Đợt ${w.dot} đã đủ hạn mức (${used}/${max} SV).\nVẫn muốn duyệt nguyện vọng của ${w.tenSV}?`,
+      () => approveWish(id),
+      'Vẫn duyệt', 'btn-primary'
+    );
+  } else {
+    approveWish(id);
+  }
 }
 
 /* ── Modal: Chi tiết nguyện vọng ── */
@@ -650,7 +790,7 @@ function _refreshNVFooter(w) {
                <button class="btn btn-danger" onclick="confirmRejectWish(${w.id})">❌ Xác nhận từ chối</button>`;
     } else {
       btns += `<button class="btn btn-default" onclick="openNVModal(${w.id},true)">❌ Từ chối</button>
-               <button class="btn btn-primary" onclick="approveWish(${w.id})">✅ Duyệt nguyện vọng</button>`;
+               <button class="btn btn-primary" onclick="approveFromModal(${w.id})">✅ Duyệt nguyện vọng</button>`;
     }
   }
   document.getElementById('nv-modal-ft').innerHTML = btns;
@@ -794,6 +934,108 @@ function openTopicDetail(wishId) {
   ).join('');
 
   openModal('m-topic');
+}
+
+/* ── Modal: GVHD & Trọng số ── */
+function openGVDetail(wishId) {
+  const w = wishes.find(x => x.id === wishId);
+  document.getElementById('gvhd-title').textContent = `GV Hướng dẫn — ${w.tenSV} (${w.maSV})`;
+
+  const gvDongList = (w.gvDong||[]).map(g => typeof g==='string'?{ten:g,trongSo:0}:g);
+  const gvNgoaiList = w.gvNgoaiTruong||[];
+  const allGVs = [
+    { ten:w.gvChinh, trongSo:w.gvChinhTrongSo??100, thuocTruong:true, donVi:w.gvChinhDonVi||'' },
+    ...gvDongList.map(g=>({ ten:g.ten, trongSo:g.trongSo, thuocTruong:true, donVi:g.donVi||'' })),
+    ...gvNgoaiList.map(g=>({ ...g, thuocTruong:false, donVi:g.noiCongTac||g.truong||'' })),
+  ];
+  const maxTS = Math.max(...allGVs.map(g=>g.trongSo||0));
+  allGVs.forEach(gv => {
+    gv.loai = gv.trongSo === maxTS ? 'chinh' : (gv.thuocTruong ? 'dong' : 'ngoai');
+  });
+  const total = allGVs.reduce((s,g)=>s+(g.trongSo||0), 0);
+  const totalOk = total === 100;
+
+  let html = `
+  <div style="border:1px solid var(--border);border-radius:8px;overflow:hidden;margin-bottom:14px">
+    <div style="background:#fafafa;padding:10px 16px;border-bottom:1px solid var(--border);display:grid;grid-template-columns:1fr 110px 70px 60px;font-size:12px;font-weight:600;color:var(--text-3)">
+      <span>Giảng viên hướng dẫn</span><span>Phân loại</span><span style="text-align:right">Trọng số</span><span style="text-align:center">Xóa</span>
+    </div>
+    ${allGVs.map(gv => {
+      const isChiif = gv.loai === 'chinh';
+      const locationTag = gv.thuocTruong
+        ? `<span style="font-size:11px;background:#f6ffed;color:#389e0d;border:1px solid #b7eb8f;border-radius:4px;padding:2px 8px;font-weight:500">Trong Trường</span>`
+        : `<span style="font-size:11px;background:#fff7e6;color:#d46b08;border:1px solid #ffd591;border-radius:4px;padding:2px 8px;font-weight:500">Ngoài Trường</span>`;
+      return `<div style="display:grid;grid-template-columns:1fr 110px 70px 60px;align-items:center;gap:10px;padding:12px 16px;border-bottom:1px solid var(--border);${isChiif?'background:#f0f7ff;border-left:3px solid #1677ff':''}">
+        <div>
+          <div style="font-size:13px;font-weight:${isChiif?700:500};color:${isChiif?'var(--text-1)':'var(--text-2)'}">${gv.ten}</div>
+          ${gv.donVi?`<div style="font-size:11px;color:var(--text-3);margin-top:2px">🏛️ ${gv.donVi}</div>`:''}
+        </div>
+        <div>${locationTag}</div>
+        <div style="font-size:14px;font-weight:700;color:var(--primary);text-align:right">${gv.trongSo}%</div>
+        <div style="text-align:center"><button disabled title="Không có quyền xóa" style="background:none;border:none;cursor:not-allowed;font-size:15px;color:#d9d9d9;opacity:.5">🗑</button></div>
+      </div>`;
+    }).join('')}
+  </div>
+
+  <div style="display:flex;align-items:center;justify-content:flex-end;gap:10px;margin-bottom:${gvNgoaiList.length?16:4}px">
+    <span style="font-size:13px;color:var(--text-3)">Tổng trọng số:</span>
+    <span style="font-size:16px;font-weight:700;color:${totalOk?'var(--success)':'var(--error)'}">${total}%</span>
+    <span style="font-size:12px;color:${totalOk?'var(--success)':'var(--error)'}">${totalOk?'✓ Hợp lệ':'⚠ Chưa đủ 100%'}</span>
+  </div>`;
+
+  if (gvNgoaiList.length) {
+    html += `<div style="border-top:1px solid var(--border);padding-top:16px">
+      <div style="font-weight:600;font-size:13px;margin-bottom:12px;color:var(--text-2)">🏛️ Thông tin GV ngoài trường <span style="font-weight:400;color:var(--text-3);font-size:12px">(sinh viên kê khai)</span></div>`;
+    gvNgoaiList.forEach(gv => {
+      const hocHamLabel = gv.hocHam || '— Không có —';
+      const hocViLabel  = gv.hocVi  || '— Không có —';
+      html += `<div style="background:#fafafa;border:1px solid var(--border);border-radius:8px;padding:14px 16px;margin-bottom:10px">
+        <div style="font-weight:700;font-size:13px;color:var(--text-1);margin-bottom:12px">${gv.ten}</div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px 20px;font-size:12px;margin-bottom:10px">
+          <div>
+            <div style="color:var(--text-3);font-weight:500;margin-bottom:2px">Họ và tên <span style="color:var(--error)">*</span></div>
+            <div style="background:#fff;border:1px solid var(--border);border-radius:4px;padding:5px 8px">${gv.hoTen||gv.ten}</div>
+          </div>
+          <div>
+            <div style="color:var(--text-3);font-weight:500;margin-bottom:2px">Nơi công tác <span style="color:var(--error)">*</span></div>
+            <div style="background:#fff;border:1px solid var(--border);border-radius:4px;padding:5px 8px">${gv.noiCongTac||gv.truong||'—'}</div>
+          </div>
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px 20px;font-size:12px;margin-bottom:10px">
+          <div>
+            <div style="color:var(--text-3);font-weight:500;margin-bottom:2px">Học hàm</div>
+            <div style="background:#fff;border:1px solid var(--border);border-radius:4px;padding:5px 8px;color:${gv.hocHam?'var(--text-1)':'var(--text-3)'}">${hocHamLabel}</div>
+          </div>
+          <div>
+            <div style="color:var(--text-3);font-weight:500;margin-bottom:2px">Học vị</div>
+            <div style="background:#fff;border:1px solid var(--border);border-radius:4px;padding:5px 8px;color:${gv.hocVi?'var(--text-1)':'var(--text-3)'}">${hocViLabel}</div>
+          </div>
+          <div>
+            <div style="color:var(--text-3);font-weight:500;margin-bottom:2px">Chuyên ngành</div>
+            <div style="background:#fff;border:1px solid var(--border);border-radius:4px;padding:5px 8px">${gv.chuyenNganh||'—'}</div>
+          </div>
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px 20px;font-size:12px">
+          <div>
+            <div style="color:var(--text-3);font-weight:500;margin-bottom:2px">Điện thoại <span style="color:var(--error)">*</span></div>
+            <div style="background:#fff;border:1px solid var(--border);border-radius:4px;padding:5px 8px">${gv.dienThoai||'—'}</div>
+          </div>
+          <div>
+            <div style="color:var(--text-3);font-weight:500;margin-bottom:2px">Email <span style="color:var(--error)">*</span></div>
+            <div style="background:#fff;border:1px solid var(--border);border-radius:4px;padding:5px 8px">${gv.email||'—'}</div>
+          </div>
+          <div>
+            <div style="color:var(--text-3);font-weight:500;margin-bottom:2px">CCCD <span style="color:var(--error)">*</span></div>
+            <div style="background:#fff;border:1px solid var(--border);border-radius:4px;padding:5px 8px;font-family:monospace">${gv.cccd||'—'}</div>
+          </div>
+        </div>
+      </div>`;
+    });
+    html += `</div>`;
+  }
+
+  document.getElementById('gvhd-body').innerHTML = html;
+  openModal('m-gvhd');
 }
 
 /* ── Init ── */

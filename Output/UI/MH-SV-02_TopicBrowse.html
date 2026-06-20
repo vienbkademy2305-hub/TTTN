@@ -903,7 +903,7 @@ function renderSortCards() {
     const totalCo   = coGvList.reduce((s, c) => s + (c.weight || 0), 0);
     const priWeight = 100 - totalCo;
     const panelOpen = openCoP.has(item.id);
-    const totalOk   = priWeight >= 1 && priWeight <= 99;
+    const totalOk   = coGvList.length === 0 || (priWeight >= 1 && priWeight <= 99);
 
     /* ── Collapsed summary ── */
     let coGvDisplay;
@@ -919,22 +919,35 @@ function renderSortCards() {
     }
 
     /* ── Existing co-advisor weight rows ── */
-    const coRows = coGvList.map((cg, ci) => `
-      <div style="display:flex;align-items:center;gap:8px;margin-top:6px;padding:8px 10px;border-radius:6px;background:#f9f0ff;border:1px solid #d3adf7">
+    const coRows = coGvList.map((cg, ci) => {
+      const extDetail = cg.type === 'external' ? `
+        <div style="font-size:11px;color:var(--text-3);margin-top:3px;line-height:1.6">
+          📍 ${cg.extNoiCongTac||'—'} &nbsp;·&nbsp; 📞 ${cg.extPhone||'—'} &nbsp;·&nbsp; ✉️ ${cg.extEmail||'—'}
+          ${cg.extCCCD?`&nbsp;·&nbsp; 🪪 ${cg.extCCCD}`:''}
+        </div>` : '';
+      const editBtn = cg.type === 'external'
+        ? `<button class="btn btn-default btn-sm" style="flex-shrink:0;padding:3px 8px"
+             title="Chỉnh sửa thông tin GV ngoài trường" onclick="editCoGv('${item.id}',${ci})">✎ Sửa</button>`
+        : '';
+      return `
+      <div style="display:flex;align-items:flex-start;gap:8px;margin-top:6px;padding:8px 10px;border-radius:6px;background:#f9f0ff;border:1px solid #d3adf7">
         <div style="flex:1;min-width:0">
           <div style="font-size:12px;font-weight:600;color:#722ed1">ĐHD ${ci+1}: ${cg.name}</div>
           <div style="font-size:11px;color:var(--text-3)">${cg.type==='internal'?'🏫 Trong trường':'🌐 Ngoài trường'}</div>
+          ${extDetail}
         </div>
-        <div style="display:flex;align-items:center;gap:4px;flex-shrink:0">
+        <div style="display:flex;align-items:center;gap:4px;flex-shrink:0;margin-top:2px">
           <input type="number" class="fc" id="co-wt-${item.id}-${ci}"
             value="${cg.weight}" min="1" max="99"
             style="width:64px;text-align:center;font-size:14px;font-weight:700;color:#722ed1;padding:4px 8px"
             oninput="updateCoWeight('${item.id}')">
           <span style="font-size:12px;color:var(--text-3)">%</span>
         </div>
-        <button class="btn btn-default btn-sm" style="flex-shrink:0;padding:3px 8px;color:var(--error);border-color:var(--error)"
+        ${editBtn}
+        <button class="btn btn-default btn-sm" style="flex-shrink:0;padding:3px 8px;color:var(--error);border-color:var(--error);margin-top:2px"
           onclick="removeOneCoGv('${item.id}',${ci})">✕</button>
-      </div>`).join('');
+      </div>`;
+    }).join('');
 
     /* ── "Add new" defaults ── */
     const suggestWt = Math.min(30, Math.max(1, priWeight > 1 ? Math.floor(priWeight / 2) : 1));
@@ -989,13 +1002,14 @@ function renderSortCards() {
             <!-- Hàng từng GV đồng HD -->
             ${coRows}
 
-            <!-- Dòng tổng -->
+            <!-- Dòng tổng — chỉ hiện khi có GV đồng HD -->
+            ${coGvList.length ? `
             <div style="display:flex;justify-content:flex-end;align-items:center;gap:6px;margin-top:6px;padding-top:6px;border-top:1px solid var(--border)">
               <span style="font-size:12px;color:var(--text-2)">Tổng:</span>
               <strong id="co-total-${item.id}" style="font-size:13px;color:${totalOk?'var(--success)':'var(--error)'}">
                 ${totalOk ? '100% ✓' : `GV đồng HD = ${totalCo}% — vượt 99%`}
               </strong>
-            </div>
+            </div>` : `<div id="co-total-${item.id}" style="display:none"></div>`}
           </div>
 
           <!-- Form thêm GV đồng HD mới -->
@@ -1182,6 +1196,36 @@ function removeOneCoGv(itemId, idx) {
   showToast('Đã xóa GV đồng hướng dẫn');
   openCoP.add(itemId);
   renderSortCards();
+}
+
+function editCoGv(itemId, idx) {
+  const item = wSelList.find(s => s.id === itemId);
+  if (!item) return;
+  updateCoWeight(itemId);
+  const cg = item.coGvList[idx];
+  if (!cg || cg.type !== 'external') return;
+
+  /* Lưu lại dữ liệu trước khi xóa */
+  const saved = { ...cg };
+
+  item.coGvList.splice(idx, 1);
+  openCoP.add(itemId);
+  renderSortCards();
+
+  /* Pre-fill form ngoài trường */
+  setCoType(itemId, 'external');
+  const set = (id, v) => { const el = document.getElementById(id); if (el) el.value = v || ''; };
+  set(`co-ext-name-${itemId}`,  saved.extName        || '');
+  set(`co-ext-nct-${itemId}`,   saved.extNoiCongTac  || '');
+  set(`co-ext-hh-${itemId}`,    saved.extHocHam      || '');
+  set(`co-ext-hv-${itemId}`,    saved.extHocVi       || '');
+  set(`co-ext-cn-${itemId}`,    saved.extChuyenNganh || '');
+  set(`co-ext-phone-${itemId}`, saved.extPhone        || '');
+  set(`co-ext-email-${itemId}`, saved.extEmail        || '');
+  set(`co-ext-cccd-${itemId}`,  saved.extCCCD         || '');
+  set(`co-new-wt-${itemId}`,    saved.weight);
+
+  showToast('Đã tải thông tin GV ngoài trường — chỉnh sửa rồi nhấn "Thêm vào danh sách"', 'info');
 }
 
 /* ════════════════════════════════════════

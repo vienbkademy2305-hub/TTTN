@@ -345,7 +345,7 @@
               <div class="alert alert-info" style="padding:8px 12px;margin-bottom:14px;font-size:12px">
                 <span class="alert-ico" style="font-size:14px">ℹ️</span>
                 <div class="alert-body">
-                  Giảng viên hướng dẫn chính <strong>bắt buộc</strong> phải là giảng viên trong trường.
+                  Đề tài <strong>bắt buộc</strong> phải có ít nhất 1 giảng viên hướng dẫn trong trường.
                   Có thể bổ sung GV đồng hướng dẫn (trong hoặc ngoài trường) ở bước tiếp theo.
                 </div>
               </div>
@@ -902,50 +902,37 @@ function renderSortCards() {
     const coGvList  = item.coGvList || [];
     const totalCo   = coGvList.reduce((s, c) => s + (c.weight || 0), 0);
     const priWeight = 100 - totalCo;
+    const maxWeight = Math.max(priWeight, ...coGvList.map(cg => cg.weight || 0));
     const panelOpen = openCoP.has(item.id);
     const totalOk   = coGvList.length === 0 || (priWeight >= 1 && priWeight <= 99);
 
-    /* ── Collapsed summary ── */
-    let coGvDisplay;
-    if (!coGvList.length) {
-      coGvDisplay = `<span style="font-size:12px;color:var(--text-2)">GV hướng dẫn:</span>
-        <span class="tag tag-blue" style="font-size:11px;margin-left:4px">100%</span>
-        <span style="font-size:12px;color:var(--text-3);margin-left:8px">— Chưa có GV đồng hướng dẫn</span>`;
-    } else {
-      const tags  = [`HD ${priWeight}%`, ...coGvList.map((cg,ci)=>`ĐHD${coGvList.length>1?ci+1:''} ${cg.weight}%`)].join(' / ');
-      const names = coGvList.length === 1 ? coGvList[0].name : `${coGvList.length} GV đồng HD`;
-      coGvDisplay = `<span style="color:#722ed1;font-weight:600">GV đồng HD:</span> ${names}
-        <span class="tag" style="color:#722ed1;background:#f9f0ff;border-color:#d3adf7;font-size:11px;margin-left:6px">${tags}</span>`;
-    }
-
-    /* ── Existing co-advisor weight rows ── */
+    /* ── Existing co-advisor rows (table style) ── */
+    const coGridCols = '1fr 100px 86px 64px';
     const coRows = coGvList.map((cg, ci) => {
-      const extDetail = cg.type === 'external' ? `
-        <div style="font-size:11px;color:var(--text-3);margin-top:3px;line-height:1.6">
-          📍 ${cg.extNoiCongTac||'—'} &nbsp;·&nbsp; 📞 ${cg.extPhone||'—'} &nbsp;·&nbsp; ✉️ ${cg.extEmail||'—'}
-          ${cg.extCCCD?`&nbsp;·&nbsp; 🪪 ${cg.extCCCD}`:''}
-        </div>` : '';
+      const locationTag = cg.type === 'internal'
+        ? `<span style="font-size:11px;background:#f6ffed;color:#389e0d;border:1px solid #b7eb8f;border-radius:4px;padding:2px 8px;font-weight:500">Trong Trường</span>`
+        : `<span style="font-size:11px;background:#fff7e6;color:#d46b08;border:1px solid #ffd591;border-radius:4px;padding:2px 8px;font-weight:500">Ngoài Trường</span>`;
       const editBtn = cg.type === 'external'
-        ? `<button class="btn btn-default btn-sm" style="flex-shrink:0;padding:3px 8px"
-             title="Chỉnh sửa thông tin GV ngoài trường" onclick="editCoGv('${item.id}',${ci})">✎ Sửa</button>`
+        ? `<button class="icon-btn" title="Chỉnh sửa thông tin GV ngoài trường" onclick="editCoGv('${item.id}',${ci})">✎</button>`
         : '';
+      const isMax = (cg.weight || 0) === maxWeight;
       return `
-      <div style="display:flex;align-items:flex-start;gap:8px;margin-top:6px;padding:8px 10px;border-radius:6px;background:#f9f0ff;border:1px solid #d3adf7">
-        <div style="flex:1;min-width:0">
-          <div style="font-size:12px;font-weight:600;color:#722ed1">ĐHD ${ci+1}: ${cg.name}</div>
-          <div style="font-size:11px;color:var(--text-3)">${cg.type==='internal'?'🏫 Trong trường':'🌐 Ngoài trường'}</div>
-          ${extDetail}
+      <div style="display:grid;grid-template-columns:${coGridCols};gap:8px;align-items:center;padding:10px 12px;border-bottom:1px solid var(--border)">
+        <div style="min-width:0">
+          <div style="font-size:13px;font-weight:${isMax?700:500};color:${isMax?'var(--text-1)':'var(--text-2)'}">${cg.name}</div>
         </div>
-        <div style="display:flex;align-items:center;gap:4px;flex-shrink:0;margin-top:2px">
+        <div>${locationTag}</div>
+        <div style="display:flex;align-items:center;justify-content:flex-end;gap:2px">
           <input type="number" class="fc" id="co-wt-${item.id}-${ci}"
             value="${cg.weight}" min="1" max="99"
-            style="width:64px;text-align:center;font-size:14px;font-weight:700;color:#722ed1;padding:4px 8px"
+            style="width:54px;text-align:center;font-size:13px;font-weight:700;color:#722ed1;padding:4px 6px"
             oninput="updateCoWeight('${item.id}')">
           <span style="font-size:12px;color:var(--text-3)">%</span>
         </div>
-        ${editBtn}
-        <button class="btn btn-default btn-sm" style="flex-shrink:0;padding:3px 8px;color:var(--error);border-color:var(--error);margin-top:2px"
-          onclick="removeOneCoGv('${item.id}',${ci})">✕</button>
+        <div style="display:flex;align-items:center;justify-content:center;gap:2px">
+          ${editBtn}
+          <button class="icon-btn danger" title="Xóa GV đồng hướng dẫn" onclick="removeOneCoGv('${item.id}',${ci})">✕</button>
+        </div>
       </div>`;
     }).join('');
 
@@ -973,12 +960,9 @@ function renderSortCards() {
       </div>
 
       <div class="co-area">
-        <div style="display:flex;align-items:center;justify-content:space-between">
-          <div style="font-size:12px">${coGvDisplay}</div>
-          <button class="co-toggle-btn" onclick="toggleCoPanel('${item.id}')">
-            ${coGvList.length ? '✎ Sửa GV đồng HD' : '＋ Thêm GV đồng hướng dẫn'}
-          </button>
-        </div>
+        <button class="co-toggle-btn" onclick="toggleCoPanel('${item.id}')">
+          ${panelOpen ? '▴' : '▾'} GV đồng hướng dẫn${coGvList.length ? `<span class="tag tag-default" style="font-size:10px;margin-left:4px">${coGvList.length}</span>` : ''}
+        </button>
 
         <div class="co-panel${panelOpen?' open':''}" id="co-panel-${item.id}"${panelOpen?' style="display:block"':''}>
 
@@ -986,25 +970,32 @@ function renderSortCards() {
           <div style="margin-top:12px">
             <div style="font-size:12px;font-weight:600;color:var(--text-2);margin-bottom:8px">Phân bổ trọng số hướng dẫn</div>
 
-            <!-- GV HD chính (read-only, tự tính) -->
-            <div style="display:flex;align-items:center;gap:8px;padding:8px 10px;border-radius:6px;background:#e6f4ff;border:1px solid #91caff">
-              <div style="flex:1;min-width:0">
-                <div style="font-size:12px;font-weight:600;color:var(--primary)">${item.gvName}</div>
-                <div style="font-size:11px;color:var(--text-3)">GV hướng dẫn chính</div>
+            <div style="border:1px solid var(--border);border-radius:8px;overflow:hidden">
+              <!-- Header -->
+              <div style="display:grid;grid-template-columns:${coGridCols};gap:8px;background:#fafafa;padding:8px 12px;border-bottom:1px solid var(--border);font-size:11px;font-weight:600;color:var(--text-3)">
+                <span>Giảng viên hướng dẫn</span><span>Phân loại</span><span style="text-align:right">Trọng số</span><span style="text-align:center">Xóa</span>
               </div>
-              <div style="display:flex;align-items:center;gap:4px;flex-shrink:0">
-                <span id="co-pri-display-${item.id}"
-                  style="font-size:16px;font-weight:700;min-width:32px;text-align:right;color:${totalOk?'var(--primary)':'var(--error)'}">${priWeight}</span>
-                <span style="font-size:12px;color:var(--text-3)">%</span>
-              </div>
-            </div>
 
-            <!-- Hàng từng GV đồng HD -->
-            ${coRows}
+              <!-- GV HD chính (read-only, tự tính) -->
+              <div style="display:grid;grid-template-columns:${coGridCols};gap:8px;align-items:center;padding:10px 12px;border-bottom:1px solid var(--border);background:#e6f4ff;border-left:3px solid var(--primary)">
+                <div style="min-width:0">
+                  <div style="font-size:13px;font-weight:${priWeight===maxWeight?700:500};color:${priWeight===maxWeight?'var(--text-1)':'var(--text-2)'}">${item.gvName}</div>
+                </div>
+                <div><span style="font-size:11px;background:#f6ffed;color:#389e0d;border:1px solid #b7eb8f;border-radius:4px;padding:2px 8px;font-weight:500">Trong Trường</span></div>
+                <div style="text-align:right">
+                  <span id="co-pri-display-${item.id}"
+                    style="font-size:14px;font-weight:700;color:${totalOk?'var(--primary)':'var(--error)'}">${priWeight}%</span>
+                </div>
+                <div style="text-align:center;color:var(--text-3);font-size:13px">—</div>
+              </div>
+
+              <!-- Hàng từng GV đồng HD -->
+              ${coRows}
+            </div>
 
             <!-- Dòng tổng — chỉ hiện khi có GV đồng HD -->
             ${coGvList.length ? `
-            <div style="display:flex;justify-content:flex-end;align-items:center;gap:6px;margin-top:6px;padding-top:6px;border-top:1px solid var(--border)">
+            <div style="display:flex;justify-content:flex-end;align-items:center;gap:6px;margin-top:8px">
               <span style="font-size:12px;color:var(--text-2)">Tổng:</span>
               <strong id="co-total-${item.id}" style="font-size:13px;color:${totalOk?'var(--success)':'var(--error)'}">
                 ${totalOk ? '100% ✓' : `GV đồng HD = ${totalCo}% — vượt 99%`}
@@ -1014,11 +1005,9 @@ function renderSortCards() {
 
           <!-- Form thêm GV đồng HD mới -->
           <div style="border-top:1px dashed var(--border);padding-top:12px;margin-top:12px">
-            <div style="font-size:12px;font-weight:600;color:var(--text-2);margin-bottom:8px">＋ Thêm GV đồng hướng dẫn</div>
 
             <!-- Loại GV -->
             <div style="margin-bottom:10px">
-              <label style="font-size:12px;font-weight:600;color:var(--text-2);display:block;margin-bottom:6px">Loại GV đồng hướng dẫn</label>
               <div class="seg-group">
                 <button class="seg-btn active" id="co-seg-in-${item.id}"  onclick="setCoType('${item.id}','internal')">🏫 Trong trường</button>
                 <button class="seg-btn"        id="co-seg-out-${item.id}" onclick="setCoType('${item.id}','external')">🌐 Ngoài trường</button>

@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>DS Nguyện vọng Đề tài | Khoa CNTT</title>
+  <title>DS Nguyện vọng Đề tài | Phòng Đào tạo</title>
   <link rel="stylesheet" href="_styles.css">
   <style>
     .stat-row{display:flex;gap:12px;margin-bottom:20px}
@@ -66,42 +66,37 @@
   <nav class="sidebar">
     <div class="sb-logo">
       <div class="sb-logo-icon">🎓</div>
-      <div><div class="sb-logo-text">HTQT Đại học</div><div class="text-muted text-sm">Khoa CNTT</div></div>
+      <div><div class="sb-logo-text">HTQT Đại học</div><div class="text-muted text-sm">Phòng Đào tạo</div></div>
     </div>
     <div class="sb-user">
-      <div class="av">KC</div>
-      <div>
-        <div style="font-size:13px;font-weight:600">TS. Trần Văn Bình</div>
-        <div style="font-size:11px;color:var(--text-3)">Giáo vụ Khoa</div>
-      </div>
+      <div class="av" style="background:#1677ff">PĐT</div>
+      <div><div style="font-size:13px;font-weight:600">Nguyễn Thị Lan</div><span class="tag tag-blue" style="font-size:11px">Phòng Đào tạo</span></div>
     </div>
     <ul class="sb-menu">
-      <li><a href="#">🏠&nbsp; Trang chủ</a></li>
+      <li><a href="MH-PDT-00_Dashboard.html">🏠&nbsp; Trang chủ</a></li>
       <li>
         <span class="mn-group">📅&nbsp; Quản lý đợt &nbsp;▾</span>
         <ul class="sb-sub open">
-          <li><a href="#">Danh sách đợt</a></li>
-          <li><a href="MH-KCM-04_StudentEligibility.html">DS Xét điều kiện</a></li>
+          <li><a href="MH-PDT-01_InternshipRound.html">Danh sách đợt</a></li>
+          <li><a href="MH-PDT-05_StudentEligibility.html">DS Xét điều kiện</a></li>
         </ul>
       </li>
       <li class="active">
         <span class="mn-group">📋&nbsp; Đề tài &nbsp;▾</span>
         <ul class="sb-sub open">
-          <li style="display:none"><a href="#">DS đề tài</a></li>
-          <li class="active"><a href="MH-KCM-06_StudentTopicApproval.html">DS nguyện vọng đề tài</a></li>
-          <li><a href="MH-KCM-03_TopicApproval.html">Xét duyệt đề tài GV</a></li>
-        </ul>
-      </li>
-      <li>
-        <span class="mn-group">🎓&nbsp; Đồ án / Khóa luận &nbsp;▾</span>
-        <ul class="sb-sub open">
-          <li><a href="MH-KCM-07_GraduationProjectManagement.html">Quản lý ĐATN &amp; KLTN</a></li>
+          <li><a href="MH-GV-04_MyTopics.html">DS đề tài của tôi</a></li>
+          <li class="active"><a href="MH-PDT-08_StudentTopicApproval.html">DS nguyện vọng đề tài</a></li>
+          <li style="display:none"><a href="MH-KCM-05_AdvisorWishApproval.html">Phê duyệt phân công GVHD</a></li>
+          <li><a href="MH-KCM-03_TopicApproval.html">Xét duyệt đề tài</a></li>
         </ul>
       </li>
       <li>
         <span class="mn-group">👨‍🏫&nbsp; Hướng dẫn &nbsp;▾</span>
         <ul class="sb-sub open">
-          <li><a href="MH-GV-01_InternshipTracking.html">QL DS thực tập</a></li>
+          <li><a href="MH-PDT-06_InternshipStudents.html">QL DS thực tập</a></li>
+          <li><a href="#">QL DS đồ án tốt nghiệp</a></li>
+          <li><a href="#">QL DS khoá luận tốt nghiệp</a></li>
+          <li><a href="MH-GV-02_ChangeRequestApproval.html">Quản lý yêu cầu thay đổi</a></li>
         </ul>
       </li>
     </ul>
@@ -113,7 +108,7 @@
       <span class="h-breadcrumb">Đề tài &gt; DS nguyện vọng đề tài</span>
       <div class="h-right">
         <div class="bw"><button class="btn btn-link" style="font-size:18px">🔔</button><span class="bc">2</span></div>
-        <div class="av">KC</div>
+        <div class="av" style="background:#1677ff">PĐT</div>
       </div>
     </header>
 
@@ -131,7 +126,7 @@
       <!-- Card -->
       <div class="card">
         <div class="card-hd">
-          <h3 class="card-title">Danh sách nguyện vọng đề tài sinh viên</h3>
+          <h3 class="card-title">Danh sách nguyện vọng đề tài sinh viên — Toàn trường</h3>
         </div>
 
         <!-- Filter -->
@@ -149,12 +144,14 @@
             <option value="TS. Nguyễn Minh Tuấn">TS. Nguyễn Minh Tuấn</option>
             <option value="TS. Lê Thị Mai">TS. Lê Thị Mai</option>
             <option value="ThS. Trần Văn Hùng">ThS. Trần Văn Hùng</option>
+            <option value="TS. Đỗ Anh Quân">TS. Đỗ Anh Quân</option>
           </select>
-          <select class="fc" style="width:190px" id="f-donvi" onchange="render()">
+          <select class="fc" style="width:200px" id="f-donvi" onchange="render()">
             <option value="">Tất cả đơn vị</option>
             <option value="BM. Công nghệ phần mềm">BM. Công nghệ phần mềm</option>
             <option value="BM. Hệ thống thông tin">BM. Hệ thống thông tin</option>
             <option value="BM. Trí tuệ nhân tạo">BM. Trí tuệ nhân tạo</option>
+            <option value="Khoa Điện - Điện tử">Khoa Điện - Điện tử</option>
           </select>
           <select class="fc" style="width:155px" id="f-dot" onchange="render()">
             <option value="">Tất cả đợt</option>
@@ -363,6 +360,7 @@
 const CTDT_MAP = {
   'KTPM':'Kỹ thuật phần mềm','KHMT':'Khoa học máy tính',
   'HTTT':'Hệ thống thông tin','CNTT':'Công nghệ thông tin','KHDL':'Khoa học dữ liệu',
+  'DTVT':'Điện tử Viễn thông',
 };
 const TYPE_ABBR = {
   'Đồ án tốt nghiệp':'ĐATN','Khoá luận tốt nghiệp':'KLTN',
@@ -413,6 +411,14 @@ const topics = [
     output:'Ứng dụng mobile Android/iOS + tài liệu kỹ thuật + báo cáo đánh giá.',
     tech:'Unity, AR Foundation, C#, Firebase', tailieu:'',
     gvHD:'ThS. Trần Văn Hùng', donViGV:'BM. Công nghệ phần mềm', emailGV:'hungtv@university.edu.vn' },
+  { id:5, code:'DT-2026-0030', name:'Thiết kế hệ thống IoT giám sát chất lượng không khí',
+    types:['Đồ án tốt nghiệp'], ctdt:['Điện tử Viễn thông'],
+    field:'Điện tử & IoT', qty:2, hoatDong:'Mở', status:'Đã duyệt', created:'20/05/2026',
+    desc:'Thiết kế và triển khai hệ thống cảm biến IoT thu thập, giám sát và cảnh báo chất lượng không khí theo thời gian thực.',
+    req:'GPA ≥ 2.8, kiến thức vi điều khiển, mạng cảm biến không dây.',
+    output:'Thiết bị IoT thực tế + dashboard giám sát + báo cáo đánh giá độ chính xác.',
+    tech:'ESP32, MQTT, InfluxDB, Grafana', tailieu:'Mo_ta_de_tai_DT2026_0030.pdf',
+    gvHD:'TS. Đỗ Anh Quân', donViGV:'Khoa Điện - Điện tử', emailGV:'quanda@university.edu.vn' },
 ];
 
 /* ── GV slot capacity per đợt ── */
@@ -423,6 +429,8 @@ const gvSlots = [
   { gv:'TS. Lê Thị Mai',       dot:'HK1-2025-2026', max:3 },
   { gv:'ThS. Trần Văn Hùng',   dot:'HK2-2025-2026', max:2 },
   { gv:'ThS. Trần Văn Hùng',   dot:'HK1-2025-2026', max:2 },
+  { gv:'TS. Đỗ Anh Quân',      dot:'HK2-2025-2026', max:4 },
+  { gv:'TS. Đỗ Anh Quân',      dot:'HK1-2025-2026', max:4 },
 ];
 
 /* ── Wishes data ── */
@@ -525,6 +533,33 @@ let wishes = [
       { thuTu:1, tenGV:'TS. Nguyễn Minh Tuấn', topicName:'Phân tích cảm xúc người dùng từ đánh giá sản phẩm trực tuyến', status:'Từ chối', ngayXL:'08/06/2026', isCurrent:true },
     ],
     lydo:'Em rất quan tâm đến NLP và phân tích dữ liệu người dùng.' },
+  { id:9, dot:'HK2-2025-2026', maSV:'B22DCDT012', tenSV:'Trịnh Văn Nam', lop:'ELE3201_1', ctdt:'DTVT', gpa:3.0,
+    topicId:5, loai:'Có sẵn',
+    gvChinh:'TS. Đỗ Anh Quân', gvChinhTrongSo:100, gvChinhDonVi:'Khoa Điện - Điện tử',
+    gvDong:[], gvNgoaiTruong:[],
+    status:'Chờ GV duyệt', ngayDK:'06/06/2026',
+    thuTuNV:1,
+    dsNguyenVong:[
+      { thuTu:1, tenGV:'TS. Đỗ Anh Quân', topicName:'Thiết kế hệ thống IoT giám sát chất lượng không khí', status:'Chờ GV duyệt', ngayXL:null, isCurrent:true },
+    ],
+    lydo:'Em có kinh nghiệm với ESP32 và muốn ứng dụng IoT vào giám sát môi trường.' },
+  { id:10, dot:'HK2-2025-2026', maSV:'B22DCDT025', tenSV:'Lý Thị Mỹ Linh', lop:'ELE3201_2', ctdt:'DTVT', gpa:3.4,
+    topicId:null, loai:'Đề xuất mới', maDeTaiSV:'SV-ĐT-2026-003',
+    topicName:'Hệ thống giám sát năng lượng mặt trời thông minh sử dụng IoT', loaiDeTai:'Đồ án tốt nghiệp',
+    moTa:'Thiết kế hệ thống thu thập và giám sát hiệu suất tấm pin năng lượng mặt trời theo thời gian thực, cảnh báo sớm sự cố qua ứng dụng di động.',
+    svOutput:'Thiết bị giám sát IoT + ứng dụng di động + báo cáo đánh giá hiệu suất.',
+    svTech:'ESP32, LoRa, Node-RED, React Native',
+    tailieu:{ name:'De_xuat_IoT_NangLuongMatTroi_B22DCDT025.pdf' },
+    gvChinh:'TS. Đỗ Anh Quân', gvChinhTrongSo:100, gvChinhDonVi:'Khoa Điện - Điện tử',
+    gvDong:[], gvNgoaiTruong:[],
+    nhanXetGV:'Đề tài thiết thực, phù hợp xu hướng năng lượng tái tạo. Sinh viên có nền tảng tốt về vi điều khiển.',
+    ngayGVDuyet:'09/06/2026',
+    status:'Chờ Khoa duyệt', ngayDK:'07/06/2026',
+    thuTuNV:1,
+    dsNguyenVong:[
+      { thuTu:1, tenGV:'TS. Đỗ Anh Quân', topicName:'Hệ thống giám sát năng lượng mặt trời thông minh sử dụng IoT (đề xuất mới)', status:'Chờ Khoa duyệt', ngayXL:'09/06/2026', isCurrent:true },
+    ],
+    lydo:'Em muốn ứng dụng IoT vào lĩnh vực năng lượng tái tạo đang phát triển mạnh.' },
 ];
 
 let _rvId = null;

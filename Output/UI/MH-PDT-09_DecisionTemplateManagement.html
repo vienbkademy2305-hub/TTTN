@@ -1,0 +1,399 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Danh mục mẫu Quyết định | Phòng Đào tạo</title>
+  <link rel="stylesheet" href="_styles.css">
+  <style>
+    .tpl-var{background:#fff7e6;color:#d46b08;border:1px solid #ffd591;border-radius:4px;padding:0 5px;font-family:monospace;font-size:12px;white-space:nowrap}
+    .var-group{margin-bottom:10px}
+    .var-group-lbl{font-size:11px;color:var(--text-3);margin-bottom:5px;text-transform:uppercase;letter-spacing:.04em}
+    .var-btn{font-size:11px;border:1px solid var(--border);background:#fff;border-radius:4px;padding:3px 9px;cursor:pointer;color:var(--text-2);margin:0 4px 4px 0}
+    .var-btn:hover{border-color:var(--primary);color:var(--primary);background:var(--primary-light)}
+    .editor-wrap{display:grid;grid-template-columns:1fr 230px;gap:16px}
+    .preview-pane{background:#fafafa;border:1px solid var(--border);border-radius:8px;padding:16px;font-size:13px;line-height:1.7;max-height:360px;overflow-y:auto}
+    .preview-pane .tpl-var{background:transparent;border:none;color:var(--text-1);font-family:inherit;padding:0;font-weight:600}
+    .doc-paper{background:#fff;border:1px solid var(--border);min-height:300px}
+  </style>
+</head>
+<body>
+<div class="app">
+
+  <!-- ═══ SIDEBAR ═══ -->
+  <nav class="sidebar">
+    <div class="sb-logo">
+      <div class="sb-logo-icon">🎓</div>
+      <div><div class="sb-logo-text">HTQT Đại học</div><div class="text-muted text-sm">Phòng Đào tạo</div></div>
+    </div>
+    <div class="sb-user">
+      <div class="av" style="background:#1677ff">PĐT</div>
+      <div><div style="font-size:13px;font-weight:600">Nguyễn Thị Lan</div><span class="tag tag-blue" style="font-size:11px">Phòng Đào tạo</span></div>
+    </div>
+    <ul class="sb-menu">
+      <li><a href="MH-PDT-00_Dashboard.html">🏠&nbsp; Trang chủ</a></li>
+      <li>
+        <span class="mn-group">📅&nbsp; Quản lý đợt &nbsp;▾</span>
+        <ul class="sb-sub open">
+          <li><a href="MH-PDT-01_InternshipRound.html">Danh sách đợt</a></li>
+          <li><a href="MH-PDT-05_StudentEligibility.html">DS Xét điều kiện</a></li>
+        </ul>
+      </li>
+      <li>
+        <span class="mn-group">📋&nbsp; Đề tài &nbsp;▾</span>
+        <ul class="sb-sub open">
+          <li><a href="MH-PDT-08_StudentTopicApproval.html">DS nguyện vọng đề tài</a></li>
+        </ul>
+      </li>
+      <li>
+        <span class="mn-group">👨‍🏫&nbsp; Hướng dẫn &nbsp;▾</span>
+        <ul class="sb-sub open">
+          <li><a href="MH-PDT-06_InternshipStudents.html">QL DS thực tập</a></li>
+        </ul>
+      </li>
+      <li class="active">
+        <span class="mn-group">⚙️&nbsp; Cấu hình hệ thống &nbsp;▾</span>
+        <ul class="sb-sub open">
+          <li class="active"><a href="MH-PDT-09_DecisionTemplateManagement.html">Mẫu Quyết định</a></li>
+        </ul>
+      </li>
+    </ul>
+  </nav>
+
+  <!-- ═══ MAIN ═══ -->
+  <div class="main">
+    <header class="app-header">
+      <span class="h-breadcrumb">Cấu hình hệ thống &gt; Danh mục mẫu Quyết định</span>
+      <div class="h-right">
+        <div class="bw"><button class="btn btn-link" style="font-size:18px">🔔</button><span class="bc">1</span></div>
+        <div class="av" style="background:#1677ff">PĐT</div>
+      </div>
+    </header>
+
+    <main class="content">
+      <div class="card">
+        <div class="card-hd">
+          <h3 class="card-title">Danh mục mẫu Quyết định giao đề tài / thay đổi đề tài</h3>
+          <button class="btn btn-primary" onclick="openEdit()">+ Tạo mẫu mới</button>
+        </div>
+
+        <div class="filter-bar">
+          <div class="input-search" style="width:240px">
+            <input type="text" class="fc" id="q" placeholder="Tìm tên mẫu..." oninput="render()">
+          </div>
+          <select class="fc" style="width:170px" id="f-loaiqd" onchange="render()">
+            <option value="">Tất cả loại QĐ</option>
+            <option>Giao đề tài</option>
+            <option>Thay đổi đề tài</option>
+          </select>
+          <select class="fc" style="width:190px" id="f-loaihinh" onchange="render()">
+            <option value="">Tất cả loại hình</option>
+            <option>Đồ án tốt nghiệp</option>
+            <option>Khóa luận tốt nghiệp</option>
+            <option>Cả hai</option>
+          </select>
+          <select class="fc" style="width:160px" id="f-trangthai" onchange="render()">
+            <option value="">Tất cả trạng thái</option>
+            <option>Đang dùng</option>
+            <option>Ngừng dùng</option>
+          </select>
+          <button class="btn btn-default" onclick="resetFilter()">🔄 Reset</button>
+        </div>
+
+        <div class="tbl-wrap">
+          <table class="tbl">
+            <thead>
+              <tr>
+                <th>Tên mẫu</th>
+                <th style="width:140px">Loại QĐ</th>
+                <th style="width:160px">Loại hình áp dụng</th>
+                <th style="width:90px;text-align:center">Số biến</th>
+                <th style="width:110px">Trạng thái</th>
+                <th style="width:100px">Cập nhật</th>
+                <th style="width:160px;text-align:center">Thao tác</th>
+              </tr>
+            </thead>
+            <tbody id="tbody"></tbody>
+          </table>
+        </div>
+        <div class="pagination"><span class="pg-info" id="pg-info"></span></div>
+      </div>
+    </main>
+  </div>
+</div>
+
+<!-- ═══ MODAL: TẠO/SỬA MẪU ═══ -->
+<div class="overlay hidden" id="m-edit">
+  <div class="modal-box w700" style="max-height:92vh;width:900px">
+    <div class="modal-hd">
+      <h4 class="modal-title" id="ed-title">Tạo mẫu Quyết định</h4>
+      <button class="modal-close" data-close="m-edit">✕</button>
+    </div>
+    <div class="modal-bd">
+      <div class="f-row col-2">
+        <div class="fi">
+          <label>Tên mẫu <span class="req">*</span></label>
+          <input class="fc" id="ed-name" placeholder="VD: Mẫu QĐ giao đề tài - ĐATN (mặc định)">
+        </div>
+        <div class="fi">
+          <label>Trạng thái</label>
+          <select class="fc" id="ed-trangthai">
+            <option>Đang dùng</option>
+            <option>Ngừng dùng</option>
+          </select>
+        </div>
+      </div>
+      <div class="f-row col-2">
+        <div class="fi">
+          <label>Loại quyết định <span class="req">*</span></label>
+          <select class="fc" id="ed-loaiqd" onchange="renderVarPanel()">
+            <option>Giao đề tài</option>
+            <option>Thay đổi đề tài</option>
+          </select>
+        </div>
+        <div class="fi">
+          <label>Loại hình đào tạo áp dụng <span class="req">*</span></label>
+          <select class="fc" id="ed-loaihinh">
+            <option>Đồ án tốt nghiệp</option>
+            <option>Khóa luận tốt nghiệp</option>
+            <option>Cả hai</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="fi">
+        <label>Nội dung mẫu <span class="req">*</span></label>
+        <div class="editor-wrap">
+          <div>
+            <div class="rich-toolbar">
+              <button type="button" onclick="fmt('bold')"><b>B</b></button>
+              <button type="button" onclick="fmt('italic')"><i>I</i></button>
+              <button type="button" onclick="fmt('underline')"><u>U</u></button>
+              <button type="button" onclick="fmt('justifyCenter')">≡ Giữa</button>
+              <button type="button" onclick="fmt('justifyLeft')">≡ Trái</button>
+              <button type="button" onclick="fmt('insertUnorderedList')">• List</button>
+            </div>
+            <div class="rich-area doc-paper" id="ed-content" contenteditable="true"></div>
+          </div>
+          <div>
+            <div class="var-group-lbl">Chèn biến dữ liệu</div>
+            <div id="var-panel"></div>
+            <button class="btn btn-default btn-sm btn-block" style="margin-top:10px" onclick="openPreview()">👁️ Xem trước</button>
+          </div>
+        </div>
+        <div class="f-hint">Click vào biến để chèn vào vị trí con trỏ trong vùng soạn nội dung.</div>
+      </div>
+    </div>
+    <div class="modal-ft">
+      <button class="btn btn-default" data-close="m-edit">Hủy</button>
+      <button class="btn btn-primary" onclick="saveTemplate()">💾 Lưu mẫu</button>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ MODAL: XEM TRƯỚC ═══ -->
+<div class="overlay hidden" id="m-preview">
+  <div class="modal-box w640">
+    <div class="modal-hd">
+      <h4 class="modal-title">Xem trước (dữ liệu mẫu)</h4>
+      <button class="modal-close" data-close="m-preview">✕</button>
+    </div>
+    <div class="modal-bd">
+      <div class="alert alert-info" style="margin-bottom:14px">
+        <span class="alert-ico">ℹ️</span>
+        <div class="alert-body"><span class="alert-desc">Bản xem trước dùng dữ liệu mẫu minh họa — số liệu thật sẽ được hệ thống tự động ghép khi xuất quyết định cho từng sinh viên.</span></div>
+      </div>
+      <div class="preview-pane doc-paper" id="preview-content"></div>
+    </div>
+    <div class="modal-ft">
+      <button class="btn btn-default" data-close="m-preview">Đóng</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast-box" id="toast-box"></div>
+
+<script src="_utils.js"></script>
+<script>
+const SAMPLE_DATA = {
+  maSV:'B22DCCN001', hoTen:'Nguyễn Văn An', lop:'INT3110_1', ctdt:'Kỹ thuật phần mềm',
+  tenDeTai:'Xây dựng hệ thống gợi ý học phần thông minh bằng Machine Learning', maDeTai:'DT-2026-0001',
+  gvhd:'TS. Nguyễn Minh Tuấn', donViGV:'BM. Công nghệ phần mềm',
+  soQuyetDinh:'QĐ-2026/TT-145', ngayKy:'20/06/2026', loaiHinh:'Đồ án tốt nghiệp', donVi:'Khoa Công nghệ thông tin',
+  deTaiCu:'Hệ thống phân tích dữ liệu bán hàng (bản gốc)', deTaiMoi:'Hệ thống phân tích dữ liệu bán hàng cho doanh nghiệp vừa và nhỏ',
+  lyDoThayDoi:'Điều chỉnh phạm vi đề tài theo góp ý hội đồng duyệt đề cương.',
+};
+
+const VAR_GROUPS = {
+  'Giao đề tài': [
+    {grp:'Sinh viên', vars:['maSV','hoTen','lop','ctdt']},
+    {grp:'Đề tài & GVHD', vars:['maDeTai','tenDeTai','gvhd','donViGV']},
+    {grp:'Quyết định', vars:['soQuyetDinh','ngayKy','loaiHinh','donVi']},
+  ],
+  'Thay đổi đề tài': [
+    {grp:'Sinh viên', vars:['maSV','hoTen','lop','ctdt']},
+    {grp:'Đề tài & GVHD', vars:['gvhd','donViGV','deTaiCu','deTaiMoi']},
+    {grp:'Quyết định', vars:['soQuyetDinh','ngayKy','loaiHinh','donVi','lyDoThayDoi']},
+  ],
+};
+
+let templates = [
+  {id:1, name:'Mẫu QĐ giao đề tài - ĐATN (mặc định)', loaiQD:'Giao đề tài', loaiHinh:'Đồ án tốt nghiệp', trangThai:'Đang dùng', updated:'01/03/2026', usedCount:18,
+    content:`<p style="text-align:center"><strong>QUYẾT ĐỊNH GIAO ĐỀ TÀI ĐỒ ÁN TỐT NGHIỆP</strong></p>
+<p style="text-align:center">Số: <span class="tpl-var" contenteditable="false">{{soQuyetDinh}}</span></p>
+<p>Căn cứ kết quả xét duyệt nguyện vọng hướng dẫn đồ án tốt nghiệp, <span class="tpl-var" contenteditable="false">{{donVi}}</span> quyết định giao đề tài cho sinh viên:</p>
+<p>Họ và tên: <span class="tpl-var" contenteditable="false">{{hoTen}}</span> &nbsp; Mã số SV: <span class="tpl-var" contenteditable="false">{{maSV}}</span> &nbsp; Lớp: <span class="tpl-var" contenteditable="false">{{lop}}</span></p>
+<p>Tên đề tài: <span class="tpl-var" contenteditable="false">{{tenDeTai}}</span> (Mã: <span class="tpl-var" contenteditable="false">{{maDeTai}}</span>)</p>
+<p>Giảng viên hướng dẫn: <span class="tpl-var" contenteditable="false">{{gvhd}}</span> — <span class="tpl-var" contenteditable="false">{{donViGV}}</span></p>
+<p style="text-align:right">Ngày ký: <span class="tpl-var" contenteditable="false">{{ngayKy}}</span></p>`},
+
+  {id:2, name:'Mẫu QĐ giao đề tài - KLTN (mặc định)', loaiQD:'Giao đề tài', loaiHinh:'Khóa luận tốt nghiệp', trangThai:'Đang dùng', updated:'01/03/2026', usedCount:9,
+    content:`<p style="text-align:center"><strong>QUYẾT ĐỊNH GIAO ĐỀ TÀI KHÓA LUẬN TỐT NGHIỆP</strong></p>
+<p style="text-align:center">Số: <span class="tpl-var" contenteditable="false">{{soQuyetDinh}}</span></p>
+<p><span class="tpl-var" contenteditable="false">{{donVi}}</span> quyết định giao đề tài khóa luận tốt nghiệp cho sinh viên <span class="tpl-var" contenteditable="false">{{hoTen}}</span> (<span class="tpl-var" contenteditable="false">{{maSV}}</span>), lớp <span class="tpl-var" contenteditable="false">{{lop}}</span>.</p>
+<p>Tên đề tài: <span class="tpl-var" contenteditable="false">{{tenDeTai}}</span></p>
+<p>Giảng viên hướng dẫn: <span class="tpl-var" contenteditable="false">{{gvhd}}</span> — <span class="tpl-var" contenteditable="false">{{donViGV}}</span></p>
+<p style="text-align:right">Ngày ký: <span class="tpl-var" contenteditable="false">{{ngayKy}}</span></p>`},
+
+  {id:3, name:'Mẫu QĐ thay đổi đề tài (chung)', loaiQD:'Thay đổi đề tài', loaiHinh:'Cả hai', trangThai:'Đang dùng', updated:'15/03/2026', usedCount:3,
+    content:`<p style="text-align:center"><strong>QUYẾT ĐỊNH THAY ĐỔI ĐỀ TÀI <span class="tpl-var" contenteditable="false">{{loaiHinh}}</span></strong></p>
+<p style="text-align:center">Số: <span class="tpl-var" contenteditable="false">{{soQuyetDinh}}</span></p>
+<p>Xét đề nghị thay đổi đề tài của sinh viên <span class="tpl-var" contenteditable="false">{{hoTen}}</span> (<span class="tpl-var" contenteditable="false">{{maSV}}</span>), <span class="tpl-var" contenteditable="false">{{donVi}}</span> quyết định:</p>
+<p>Đề tài cũ: <span class="tpl-var" contenteditable="false">{{deTaiCu}}</span></p>
+<p>Đề tài mới: <span class="tpl-var" contenteditable="false">{{deTaiMoi}}</span></p>
+<p>Lý do thay đổi: <span class="tpl-var" contenteditable="false">{{lyDoThayDoi}}</span></p>
+<p>Giảng viên hướng dẫn: <span class="tpl-var" contenteditable="false">{{gvhd}}</span> — <span class="tpl-var" contenteditable="false">{{donViGV}}</span></p>
+<p style="text-align:right">Ngày ký: <span class="tpl-var" contenteditable="false">{{ngayKy}}</span></p>`},
+
+  {id:4, name:'Mẫu QĐ giao đề tài - ĐATN (bản cũ 2024)', loaiQD:'Giao đề tài', loaiHinh:'Đồ án tốt nghiệp', trangThai:'Ngừng dùng', updated:'10/01/2025', usedCount:42,
+    content:`<p style="text-align:center"><strong>QUYẾT ĐỊNH GIAO ĐỀ TÀI ĐỒ ÁN TỐT NGHIỆP (mẫu 2024)</strong></p>
+<p>Số: <span class="tpl-var" contenteditable="false">{{soQuyetDinh}}</span> — Sinh viên: <span class="tpl-var" contenteditable="false">{{hoTen}}</span> (<span class="tpl-var" contenteditable="false">{{maSV}}</span>)</p>
+<p>Đề tài: <span class="tpl-var" contenteditable="false">{{tenDeTai}}</span> — GVHD: <span class="tpl-var" contenteditable="false">{{gvhd}}</span></p>`},
+];
+
+let editId = null;
+
+function countVars(html){
+  const set = new Set((html.match(/\{\{(\w+)\}\}/g)||[]));
+  return set.size;
+}
+
+function render(){
+  const q = document.getElementById('q').value.toLowerCase();
+  const floaiqd = document.getElementById('f-loaiqd').value;
+  const floaihinh = document.getElementById('f-loaihinh').value;
+  const ftrangthai = document.getElementById('f-trangthai').value;
+
+  const filtered = templates.filter(t => {
+    const matchQ = !q || t.name.toLowerCase().includes(q);
+    const matchLoaiQD = !floaiqd || t.loaiQD === floaiqd;
+    const matchLoaiHinh = !floaihinh || t.loaiHinh === floaihinh;
+    const matchTrangThai = !ftrangthai || t.trangThai === ftrangthai;
+    return matchQ && matchLoaiQD && matchLoaiHinh && matchTrangThai;
+  });
+
+  document.getElementById('tbody').innerHTML = filtered.length ? filtered.map(t => `
+    <tr>
+      <td><strong>${t.name}</strong>${t.usedCount?`<div style="font-size:11px;color:var(--text-3)">Đã dùng cho ${t.usedCount} quyết định</div>`:''}</td>
+      <td><span class="tag ${t.loaiQD==='Giao đề tài'?'tag-success':'tag-error'}">${t.loaiQD}</span></td>
+      <td>${t.loaiHinh === 'Cả hai' ? '<span class="tag tag-blue">Cả hai</span>' : t.loaiHinh === 'Đồ án tốt nghiệp' ? '<span class="tag tag-blue">ĐATN</span>' : '<span class="tag tag-warning">KLTN</span>'}</td>
+      <td style="text-align:center">${countVars(t.content)}</td>
+      <td><span class="tag ${t.trangThai==='Đang dùng'?'tag-success':'tag-default'}">${t.trangThai}</span></td>
+      <td style="font-size:12px;color:var(--text-3)">${t.updated}</td>
+      <td class="tbl-actions" style="justify-content:center">
+        <button class="icon-btn" title="Sửa" onclick="openEdit(${t.id})">✏️</button>
+        <button class="icon-btn" title="Sao chép" onclick="duplicateTemplate(${t.id})">📑</button>
+        <button class="icon-btn ${t.trangThai==='Đang dùng'?'warn-btn':'success-btn'}" title="${t.trangThai==='Đang dùng'?'Ngừng dùng':'Kích hoạt'}" onclick="toggleStatus(${t.id})">${t.trangThai==='Đang dùng'?'⏸️':'▶️'}</button>
+        <button class="icon-btn danger" title="${t.usedCount?'Không thể xóa — đang được sử dụng':'Xóa'}" ${t.usedCount?'disabled':''} onclick="deleteTemplate(${t.id})">🗑️</button>
+      </td>
+    </tr>`).join('') : `<tr><td colspan="7" class="tbl-empty">Không có mẫu phù hợp</td></tr>`;
+
+  document.getElementById('pg-info').textContent = `Hiển thị ${filtered.length} / ${templates.length} mẫu`;
+}
+
+function resetFilter(){
+  ['q','f-loaiqd','f-loaihinh','f-trangthai'].forEach(id => document.getElementById(id).value = '');
+  render();
+}
+
+function toggleStatus(id){
+  templates = templates.map(t => t.id === id ? {...t, trangThai: t.trangThai === 'Đang dùng' ? 'Ngừng dùng' : 'Đang dùng'} : t);
+  showToast('Đã cập nhật trạng thái mẫu');
+  render();
+}
+function duplicateTemplate(id){
+  const t = templates.find(x => x.id === id);
+  const newId = Math.max(...templates.map(x=>x.id)) + 1;
+  templates.push({...t, id:newId, name:t.name + ' (bản sao)', trangThai:'Ngừng dùng', usedCount:0, updated:new Date().toLocaleDateString('vi')});
+  showToast('Đã sao chép mẫu — vui lòng kiểm tra lại trước khi kích hoạt');
+  render();
+}
+function deleteTemplate(id){
+  const t = templates.find(x => x.id === id);
+  if (t.usedCount) { showToast('Không thể xóa mẫu đang được sử dụng', 'err'); return; }
+  showConfirm(`Xóa mẫu "${t.name}"?`, () => { templates = templates.filter(x => x.id !== id); showToast('Đã xóa mẫu'); render(); }, 'Xóa', 'btn-danger');
+}
+
+/* ════════ EDITOR ════════ */
+function fmt(cmd){ document.execCommand(cmd, false, null); }
+
+function renderVarPanel(){
+  const loaiQD = document.getElementById('ed-loaiqd').value;
+  const groups = VAR_GROUPS[loaiQD] || [];
+  document.getElementById('var-panel').innerHTML = groups.map(g => `
+    <div class="var-group">
+      <div class="var-group-lbl">${g.grp}</div>
+      ${g.vars.map(v => `<button type="button" class="var-btn" onclick="insertVar('${v}')">{{${v}}}</button>`).join('')}
+    </div>`).join('');
+}
+
+function insertVar(name){
+  const editor = document.getElementById('ed-content');
+  editor.focus();
+  document.execCommand('insertHTML', false, `<span class="tpl-var" contenteditable="false">{{${name}}}</span>&nbsp;`);
+}
+
+function openEdit(id){
+  editId = id || null;
+  const t = id ? templates.find(x => x.id === id) : null;
+  document.getElementById('ed-title').textContent = t ? `Sửa mẫu — ${t.name}` : 'Tạo mẫu Quyết định';
+  document.getElementById('ed-name').value = t ? t.name : '';
+  document.getElementById('ed-loaiqd').value = t ? t.loaiQD : 'Giao đề tài';
+  document.getElementById('ed-loaihinh').value = t ? t.loaiHinh : 'Đồ án tốt nghiệp';
+  document.getElementById('ed-trangthai').value = t ? t.trangThai : 'Đang dùng';
+  document.getElementById('ed-content').innerHTML = t ? t.content : '<p>Nhập nội dung quyết định tại đây...</p>';
+  renderVarPanel();
+  openModal('m-edit');
+}
+
+function saveTemplate(){
+  const name = document.getElementById('ed-name').value.trim();
+  const content = document.getElementById('ed-content').innerHTML.trim();
+  if (!name) { showToast('Vui lòng nhập tên mẫu', 'warn'); return; }
+  const loaiQD = document.getElementById('ed-loaiqd').value;
+  const loaiHinh = document.getElementById('ed-loaihinh').value;
+  const trangThai = document.getElementById('ed-trangthai').value;
+  const today = new Date().toLocaleDateString('vi');
+
+  if (editId) {
+    templates = templates.map(t => t.id === editId ? {...t, name, loaiQD, loaiHinh, trangThai, content, updated:today} : t);
+  } else {
+    const newId = Math.max(...templates.map(x=>x.id), 0) + 1;
+    templates.push({id:newId, name, loaiQD, loaiHinh, trangThai, content, updated:today, usedCount:0});
+  }
+  closeModal('m-edit');
+  showToast('Đã lưu mẫu quyết định');
+  render();
+}
+
+function openPreview(){
+  const html = document.getElementById('ed-content').innerHTML;
+  const merged = html.replace(/\{\{(\w+)\}\}/g, (m,p1) => SAMPLE_DATA[p1] !== undefined ? SAMPLE_DATA[p1] : m);
+  document.getElementById('preview-content').innerHTML = merged;
+  openModal('m-preview');
+}
+
+render();
+</script>
+</body>
+</html>

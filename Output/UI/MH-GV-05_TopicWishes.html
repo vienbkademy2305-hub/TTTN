@@ -15,6 +15,7 @@
     .stat-box.warn    .stat-num{color:var(--warning)}
     .stat-box.ok      .stat-num{color:var(--success)}
     .stat-box.err     .stat-num{color:var(--error)}
+    .stat-box.purple  .stat-num{color:#722ed1}
 
     .history-list{list-style:none;padding:0;margin:0}
     .history-list li{display:flex;gap:10px;padding:8px 0;border-bottom:1px solid var(--border);font-size:13px}
@@ -101,7 +102,8 @@
       <div class="stat-row">
         <div class="stat-box primary"><div class="stat-ico">📋</div><div><div class="stat-num" id="s-total">0</div><div class="stat-lbl">Tổng nguyện vọng</div></div></div>
         <div class="stat-box warn">  <div class="stat-ico">⏳</div><div><div class="stat-num" id="s-pending">0</div><div class="stat-lbl">Chờ GV duyệt</div></div></div>
-        <div class="stat-box ok">   <div class="stat-ico">✅</div><div><div class="stat-num" id="s-approved">0</div><div class="stat-lbl">Đã duyệt / Chờ Khoa</div></div></div>
+        <div class="stat-box purple"><div class="stat-ico">🏫</div><div><div class="stat-num" id="s-school">0</div><div class="stat-lbl">Chờ Khoa duyệt</div></div></div>
+        <div class="stat-box ok">   <div class="stat-ico">✅</div><div><div class="stat-num" id="s-approved">0</div><div class="stat-lbl">Đã duyệt</div></div></div>
         <div class="stat-box err">  <div class="stat-ico">❌</div><div><div class="stat-num" id="s-rejected">0</div><div class="stat-lbl">Từ chối</div></div></div>
       </div>
 
@@ -121,6 +123,10 @@
           <div class="input-search" style="width:260px">
             <input type="text" class="fc" id="q" placeholder="Tìm sinh viên, mã SV..." oninput="render()">
           </div>
+          <select class="fc" style="width:160px" id="f-donvi" onchange="render()">
+            <option value="">Tất cả đơn vị</option>
+            <option value="Khoa CNTT">Khoa CNTT</option>
+          </select>
           <select class="fc" style="width:180px" id="f-topic" onchange="render()">
             <option value="">Tất cả đề tài</option>
             <option value="1">DT-2026-0001</option>
@@ -153,9 +159,10 @@
                 <th style="width:150px">Họ và tên</th>
                 <th style="width:110px">Lớp học phần</th>
                 <th style="width:70px">CTĐT</th>
+                <th style="width:100px">Đơn vị</th>
                 <th style="width:110px">Đợt</th>
                 <th>Đề tài đăng ký</th>
-                <th style="min-width:175px">Giảng viên hướng dẫn</th>
+                <th style="min-width:130px">Giảng viên hướng dẫn</th>
                 <th style="width:110px;text-align:center">Thứ tự NV</th>
                 <th style="width:100px">Ngày đăng ký</th>
                 <th style="width:130px">Trạng thái</th>
@@ -392,7 +399,7 @@ function getUsed(dot) {
 
 let wishes = [
   {
-    id:1, maSV:'B22DCCN001', tenSV:'Nguyễn Văn An', lop:'INT3110_1', gpa:3.2, ctdt:'KTPM',
+    id:1, maSV:'B22DCCN001', tenSV:'Nguyễn Văn An', lop:'INT3110_1', gpa:3.2, ctdt:'KTPM', donVi:'Khoa CNTT',
     topicId:1, loai:'Có sẵn', dot:'HK1 2025-2026',
     status:'Chờ GV duyệt', ngayDK:'05/06/2026',
     gvChinh:'TS. Nguyễn Minh Tuấn', gvChinhTrongSo:60, gvChinhDonVi:'Khoa CNTT',
@@ -411,7 +418,7 @@ let wishes = [
     ]
   },
   {
-    id:2, maSV:'B22DCCN022', tenSV:'Phạm Minh Khoa', lop:'INT3110_2', gpa:3.4, ctdt:'KTPM',
+    id:2, maSV:'B22DCCN022', tenSV:'Phạm Minh Khoa', lop:'INT3110_2', gpa:3.4, ctdt:'KTPM', donVi:'Khoa CNTT',
     topicId:1, loai:'Có sẵn', dot:'HK1 2025-2026',
     status:'Chờ GV duyệt', ngayDK:'11/06/2026',
     gvChinh:'TS. Nguyễn Minh Tuấn', gvChinhTrongSo:100, gvChinhDonVi:'Khoa CNTT',
@@ -425,7 +432,7 @@ let wishes = [
     history:[{action:'Đăng ký nguyện vọng', date:'11/06/2026 14:00', dot:'warn'}]
   },
   {
-    id:3, maSV:'B22DCCN015', tenSV:'Trần Thị Bích', lop:'INT3110_1', gpa:3.5, ctdt:'KTPM',
+    id:3, maSV:'B22DCCN015', tenSV:'Trần Thị Bích', lop:'INT3110_1', gpa:3.5, ctdt:'KTPM', donVi:'Khoa CNTT',
     topicId:null, loai:'Đề xuất mới', dot:'HK1 2025-2026',
     maDeTaiSV:'SV-ĐT-2026-001',
     topicName:'Xây dựng chatbot hỗ trợ sinh viên bằng LLM',
@@ -449,7 +456,7 @@ let wishes = [
     ]
   },
   {
-    id:4, maSV:'B22DCCN033', tenSV:'Lê Quốc Cường', lop:'INT3110_2', gpa:2.8, ctdt:'KHMT',
+    id:4, maSV:'B22DCCN033', tenSV:'Lê Quốc Cường', lop:'INT3110_2', gpa:2.8, ctdt:'KHMT', donVi:'Khoa CNTT',
     topicId:2, loai:'Có sẵn', dot:'HK1 2025-2026',
     status:'Đã duyệt', ngayDK:'05/06/2026', gvDuyetDate:'09/06/2026',
     gvChinh:'TS. Nguyễn Minh Tuấn', gvChinhTrongSo:60, gvChinhDonVi:'Khoa CNTT',
@@ -467,7 +474,7 @@ let wishes = [
     ]
   },
   {
-    id:5, maSV:'B22DCCN058', tenSV:'Hoàng Minh Đức', lop:'INT3110_1', gpa:3.1, ctdt:'HTTT',
+    id:5, maSV:'B22DCCN058', tenSV:'Hoàng Minh Đức', lop:'INT3110_1', gpa:3.1, ctdt:'HTTT', donVi:'Khoa CNTT',
     topicId:4, loai:'Có sẵn', dot:'HK2 2024-2025',
     status:'Đã duyệt', ngayDK:'10/02/2025', gvDuyetDate:'13/02/2025',
     gvChinh:'TS. Nguyễn Minh Tuấn', gvChinhTrongSo:60, gvChinhDonVi:'Khoa CNTT',
@@ -486,7 +493,7 @@ let wishes = [
     ]
   },
   {
-    id:6, maSV:'B22DCCN047', tenSV:'Ngô Thị Hà', lop:'INT3110_2', gpa:3.0, ctdt:'KHMT',
+    id:6, maSV:'B22DCCN047', tenSV:'Ngô Thị Hà', lop:'INT3110_2', gpa:3.0, ctdt:'KHMT', donVi:'Khoa CNTT',
     topicId:1, loai:'Có sẵn', dot:'HK1 2025-2026',
     status:'Chờ GV duyệt', ngayDK:'04/06/2026',
     gvChinh:'TS. Nguyễn Minh Tuấn', gvChinhTrongSo:100, gvChinhDonVi:'Khoa CNTT',
@@ -505,7 +512,7 @@ let wishes = [
     ]
   },
   {
-    id:7, maSV:'B22DCCN071', tenSV:'Vũ Thanh Long', lop:'INT3110_1', gpa:2.6, ctdt:'KHMT',
+    id:7, maSV:'B22DCCN071', tenSV:'Vũ Thanh Long', lop:'INT3110_1', gpa:2.6, ctdt:'KHMT', donVi:'Khoa CNTT',
     topicId:2, loai:'Có sẵn', dot:'HK1 2025-2026',
     status:'Từ chối', ngayDK:'04/06/2026',
     gvChinh:'TS. Nguyễn Minh Tuấn', gvChinhTrongSo:100, gvChinhDonVi:'Khoa CNTT',
@@ -530,21 +537,24 @@ let _nvRejectMode = false;
 /* ── Render table ── */
 function render() {
   const q   = document.getElementById('q').value.toLowerCase();
+  const fu  = document.getElementById('f-donvi').value;
   const ft  = document.getElementById('f-topic').value;
   const fs  = document.getElementById('f-status').value;
   const fd  = document.getElementById('f-dot').value;
 
   const filtered = wishes.filter(w => {
     const matchQ  = !q || w.tenSV.toLowerCase().includes(q) || w.maSV.toLowerCase().includes(q);
+    const matchU  = !fu || w.donVi === fu;
     const matchT  = !ft || (ft === '0' ? w.loai === 'Đề xuất mới' : w.topicId === parseInt(ft));
     const matchS  = !fs || w.status === fs;
     const matchD  = !fd || w.dot === fd;
-    return matchQ && matchT && matchS && matchD;
+    return matchQ && matchU && matchT && matchS && matchD;
   });
 
   document.getElementById('s-total').textContent   = wishes.length;
   document.getElementById('s-pending').textContent  = wishes.filter(w => w.status === 'Chờ GV duyệt').length;
-  document.getElementById('s-approved').textContent = wishes.filter(w => w.status === 'Đã duyệt' || w.status === 'Chờ Khoa duyệt').length;
+  document.getElementById('s-school').textContent   = wishes.filter(w => w.status === 'Chờ Khoa duyệt').length;
+  document.getElementById('s-approved').textContent = wishes.filter(w => w.status === 'Đã duyệt').length;
   document.getElementById('s-rejected').textContent = wishes.filter(w => w.status === 'Từ chối').length;
 
   document.getElementById('tbody').innerHTML = filtered.length ? filtered.map((w, i) => {
@@ -553,10 +563,10 @@ function render() {
     const topicDisplay = linkedTopic
       ? `<span style="font-family:monospace;font-size:13px;font-weight:700;color:var(--primary);cursor:pointer;text-decoration:underline;text-underline-offset:3px"
             onclick="openTopicDetail(${w.id})" title="Xem chi tiết đề tài">${linkedTopic.code}</span>
-         <div style="font-size:12px;color:var(--text-2);margin-top:3px;line-height:1.4">${linkedTopic.name}</div>`
+         <div style="font-size:12px;color:var(--text-2);margin-top:3px;line-height:1.4;max-width:280px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis" title="${linkedTopic.name}">${linkedTopic.name}</div>`
       : `<span style="font-family:monospace;font-size:13px;font-weight:700;color:var(--primary);cursor:pointer;text-decoration:underline;text-underline-offset:3px"
             onclick="openTopicDetail(${w.id})" title="Xem chi tiết đề tài (đề xuất)">${w.maDeTaiSV || 'Đề xuất mới'}</span>
-         <div style="font-size:12px;color:var(--text-2);margin-top:3px;line-height:1.4">${w.topicName || ''}</div>`;
+         <div style="font-size:12px;color:var(--text-2);margin-top:3px;line-height:1.4;max-width:280px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis" title="${w.topicName || ''}">${w.topicName || ''}</div>`;
 
     const nvNum   = w.thuTuNV || 1;
     const nvClass = nvNum === 1 ? 'nv1' : nvNum === 2 ? 'nv2' : 'nv3';
@@ -600,6 +610,7 @@ function render() {
       </td>
       <td style="font-size:12px;color:var(--text-2)">${w.lop}</td>
       <td style="font-size:12px;color:var(--text-2)">${w.ctdt}</td>
+      <td style="font-size:12px;color:var(--text-2)">${w.donVi}</td>
       <td style="white-space:nowrap">${(() => {
         const max  = dotCapacity[w.dot];
         if (max === undefined) return `<span style="font-size:12px;color:var(--text-2)">${w.dot}</span>`;
@@ -622,7 +633,7 @@ function render() {
       <td class="tbl-actions">${actions}</td>
     </tr>`;
   }).join('')
-  : `<tr><td colspan="13" class="tbl-empty">Không có nguyện vọng nào phù hợp</td></tr>`;
+  : `<tr><td colspan="14" class="tbl-empty">Không có nguyện vọng nào phù hợp</td></tr>`;
 
   document.getElementById('pg-info').textContent = `Hiển thị ${filtered.length} / ${wishes.length} nguyện vọng`;
 }
@@ -648,7 +659,7 @@ function onRowChk() {
 }
 
 function resetFilter() {
-  ['q','f-topic','f-status','f-dot'].forEach(id => { document.getElementById(id).value = ''; });
+  ['q','f-donvi','f-topic','f-status','f-dot'].forEach(id => { document.getElementById(id).value = ''; });
   render();
 }
 
@@ -857,6 +868,8 @@ function openSVDetail(wishId) {
         <td>${w.lop}</td></tr>
     <tr><th>CTĐT</th>
         <td>${CTDT_MAP[w.ctdt] || w.ctdt}</td></tr>
+    <tr><th>Đơn vị</th>
+        <td>${w.donVi}</td></tr>
     <tr><th>GPA</th>
         <td><span style="font-size:15px;font-weight:700;color:${gpaColor}">${w.gpa.toFixed(2)}</span>
             <span style="font-size:12px;color:var(--text-3);margin-left:6px">${gpaLabel}</span></td></tr>

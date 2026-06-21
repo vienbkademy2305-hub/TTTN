@@ -94,14 +94,9 @@
         </ul>
       </li>
       <li class="active">
-        <span class="mn-group">🎓&nbsp; Đồ án / Khóa luận &nbsp;▾</span>
-        <ul class="sb-sub open">
-          <li class="active"><a href="MH-KCM-07_GraduationProjectManagement.html">Quản lý ĐATN &amp; KLTN</a></li>
-        </ul>
-      </li>
-      <li>
         <span class="mn-group">👨‍🏫&nbsp; Hướng dẫn &nbsp;▾</span>
         <ul class="sb-sub open">
+          <li class="active"><a href="MH-KCM-07_GraduationProjectManagement.html">Quản lý ĐATN &amp; KLTN</a></li>
           <li><a href="MH-GV-01_InternshipTracking.html">QL DS thực tập</a></li>
         </ul>
       </li>
@@ -111,7 +106,7 @@
   <!-- ═══ MAIN ═══ -->
   <div class="main">
     <header class="app-header">
-      <span class="h-breadcrumb">Đồ án / Khóa luận &gt; Quản lý ĐATN &amp; KLTN</span>
+      <span class="h-breadcrumb">Hướng dẫn &gt; Quản lý ĐATN &amp; KLTN</span>
       <div class="h-right">
         <div class="bw"><button class="btn btn-link" style="font-size:18px">🔔</button><span class="bc">3</span></div>
         <div class="av">KC</div>
@@ -185,6 +180,7 @@
                 <th style="min-width:180px">Đề tài</th>
                 <th style="min-width:130px">GVHD</th>
                 <th style="min-width:130px">GV phản biện</th>
+                <th style="width:90px;text-align:center">Báo cáo</th>
                 <th style="width:140px">Trạng thái</th>
                 <th style="width:110px">Quyết định</th>
                 <th style="width:96px;text-align:center">Hành động</th>
@@ -473,6 +469,38 @@
   </div>
 </div>
 
+<!-- ═══ MODAL: BÁO CÁO CUỐI KỲ ═══ -->
+<div class="overlay hidden" id="m-report">
+  <div class="modal-box" style="width:520px">
+    <div class="modal-hd">
+      <span class="modal-title">📋 Báo cáo cuối kỳ — <span id="bc-sv"></span></span>
+      <button class="modal-close" data-close="m-report">✕</button>
+    </div>
+    <div class="modal-bd">
+      <div class="fi">
+        <label>File báo cáo chính thức</label>
+        <div style="display:flex;gap:8px;align-items:center">
+          <span style="font-size:13px;color:var(--primary)" id="bc-file"></span>
+          <button class="btn btn-default btn-sm" onclick="showToast('Đang xem báo cáo (mô phỏng)')">👁️ Xem</button>
+          <button class="btn btn-default btn-sm" onclick="showToast('Đang tải báo cáo (mô phỏng)')">⬇️ Tải</button>
+        </div>
+        <div class="f-hint" id="bc-submitinfo"></div>
+      </div>
+      <div class="fi" id="bc-sanpham-wrap" style="display:none">
+        <label>Mã nguồn / Sản phẩm</label>
+        <div style="display:flex;gap:8px;align-items:center">
+          <a href="#" id="bc-sanpham-link" onclick="showToast('Đang mở liên kết sản phẩm (mô phỏng)');return false" style="font-size:13px;color:var(--primary);text-decoration:underline"></a>
+          <button class="btn btn-default btn-sm" onclick="showToast('Đang mở liên kết sản phẩm (mô phỏng)')">🔗 Mở</button>
+        </div>
+      </div>
+    </div>
+    <div class="modal-ft">
+      <button class="btn btn-default" data-close="m-report">Đóng</button>
+      <button class="btn btn-default" style="color:var(--warning)" onclick="allowResubmitReport()">🔄 Cho phép nộp lại</button>
+    </div>
+  </div>
+</div>
+
 <div class="toast-box" id="toast-box"></div>
 
 <script src="_utils.js"></script>
@@ -514,13 +542,13 @@ const STEP_LABELS = ['Đủ ĐK','Chờ ĐK NV','Chờ duyệt NV','Đã phân c
 let students = [
   {id:1, maSV:'B22DCCN001', tenSV:'Nguyễn Văn An', lop:'INT3110_1', ctdt:'KTPM', gpa:3.2,
     dotId:'DA-HK2-2025-2026', loaiHinh:'Đồ án tốt nghiệp',
-    topic:null, gvhd:null, donViGV:null, nguon:null, gvpb:null, canManual:false,
+    topic:null, gvhd:null, donViGV:null, nguon:null, gvpb:null, baoCao:null, canManual:false,
     status:'Đủ điều kiện',
     history:[{time:'01/06/2026', actor:'Hệ thống', action:'Công bố đợt — SV đủ điều kiện', result:'', dot:'ok'}]},
 
   {id:2, maSV:'B22DCCN022', tenSV:'Phạm Minh Khoa', lop:'INT3110_2', ctdt:'KTPM', gpa:3.4,
     dotId:'DA-HK2-2025-2026', loaiHinh:'Đồ án tốt nghiệp',
-    topic:null, gvhd:null, donViGV:null, nguon:null, gvpb:null, canManual:true,
+    topic:null, gvhd:null, donViGV:null, nguon:null, gvpb:null, baoCao:null, canManual:true,
     status:'Chờ đăng ký nguyện vọng',
     history:[
       {time:'01/06/2026', actor:'Hệ thống', action:'Công bố đợt — SV đủ điều kiện', result:'', dot:'ok'},
@@ -529,7 +557,7 @@ let students = [
 
   {id:3, maSV:'B22DCCN015', tenSV:'Trần Thị Bích', lop:'INT3110_1', ctdt:'KTPM', gpa:3.5,
     dotId:'DA-HK2-2025-2026', loaiHinh:'Đồ án tốt nghiệp',
-    topic:null, gvhd:null, donViGV:null, nguon:null, gvpb:null, canManual:false,
+    topic:null, gvhd:null, donViGV:null, nguon:null, gvpb:null, baoCao:null, canManual:false,
     status:'Chờ duyệt nguyện vọng',
     history:[
       {time:'01/06/2026', actor:'Hệ thống', action:'Công bố đợt — SV đủ điều kiện', result:'', dot:'ok'},
@@ -538,7 +566,7 @@ let students = [
 
   {id:4, maSV:'B22DCCN033', tenSV:'Lê Quốc Cường', lop:'INT3110_2', ctdt:'KHMT', gpa:2.8,
     dotId:'DA-HK2-2025-2026', loaiHinh:'Đồ án tốt nghiệp',
-    topic:null, gvhd:null, donViGV:null, nguon:null, gvpb:null, canManual:true,
+    topic:null, gvhd:null, donViGV:null, nguon:null, gvpb:null, baoCao:null, canManual:true,
     status:'Chờ duyệt nguyện vọng',
     history:[
       {time:'01/06/2026', actor:'Hệ thống', action:'Công bố đợt — SV đủ điều kiện', result:'', dot:'ok'},
@@ -549,7 +577,7 @@ let students = [
 
   {id:5, maSV:'B22DCCN047', tenSV:'Ngô Thị Hà', lop:'INT3110_2', ctdt:'KHMT', gpa:3.0,
     dotId:'DA-HK2-2025-2026', loaiHinh:'Đồ án tốt nghiệp',
-    topic:TOPIC_CATALOG[3], gvhd:'ThS. Trần Văn Hùng', donViGV:'BM. Công nghệ phần mềm', nguon:'Tự động', gvpb:null, canManual:false,
+    topic:TOPIC_CATALOG[3], gvhd:'ThS. Trần Văn Hùng', donViGV:'BM. Công nghệ phần mềm', nguon:'Tự động', gvpb:null, baoCao:null, canManual:false,
     status:'Đã phân công',
     history:[
       {time:'01/06/2026', actor:'Hệ thống', action:'Công bố đợt — SV đủ điều kiện', result:'', dot:'ok'},
@@ -560,7 +588,7 @@ let students = [
 
   {id:6, maSV:'B22DCCN058', tenSV:'Hoàng Minh Đức', lop:'INT3110_1', ctdt:'HTTT', gpa:3.1,
     dotId:'DA-HK2-2025-2026', loaiHinh:'Đồ án tốt nghiệp',
-    topic:TOPIC_CATALOG[2], gvhd:'TS. Lê Thị Mai', donViGV:'BM. Hệ thống thông tin', nguon:'Tự động', gvpb:null, canManual:false,
+    topic:TOPIC_CATALOG[2], gvhd:'TS. Lê Thị Mai', donViGV:'BM. Hệ thống thông tin', nguon:'Tự động', gvpb:null, baoCao:null, canManual:false,
     status:'Chờ quyết định giao đề tài',
     history:[
       {time:'01/06/2026', actor:'Hệ thống', action:'Công bố đợt — SV đủ điều kiện', result:'', dot:'ok'},
@@ -571,7 +599,7 @@ let students = [
 
   {id:7, maSV:'B22DCCN089', tenSV:'Nguyễn Hoàng Nam', lop:'INT3110_2', ctdt:'KHMT', gpa:3.3,
     dotId:'DA-HK1-2025-2026', loaiHinh:'Đồ án tốt nghiệp',
-    topic:TOPIC_CATALOG[1], gvhd:'TS. Nguyễn Minh Tuấn', donViGV:'BM. Công nghệ phần mềm', nguon:'Thủ công', gvpb:null, canManual:false,
+    topic:TOPIC_CATALOG[1], gvhd:'TS. Nguyễn Minh Tuấn', donViGV:'BM. Công nghệ phần mềm', nguon:'Thủ công', gvpb:null, baoCao:null, canManual:false,
     status:'Chờ quyết định giao đề tài',
     history:[
       {time:'01/05/2026', actor:'Hệ thống', action:'Công bố đợt — SV đủ điều kiện', result:'', dot:'ok'},
@@ -581,7 +609,7 @@ let students = [
 
   {id:8, maSV:'B22DCCN071', tenSV:'Vũ Thanh Long', lop:'INT3110_1', ctdt:'KHMT', gpa:2.9,
     dotId:'DA-HK1-2025-2026', loaiHinh:'Đồ án tốt nghiệp',
-    topic:TOPIC_CATALOG[0], gvhd:'TS. Nguyễn Minh Tuấn', donViGV:'BM. Công nghệ phần mềm', nguon:'Tự động', gvpb:'TS. Lê Thị Mai', canManual:false,
+    topic:TOPIC_CATALOG[0], gvhd:'TS. Nguyễn Minh Tuấn', donViGV:'BM. Công nghệ phần mềm', nguon:'Tự động', gvpb:'TS. Lê Thị Mai', baoCao:'BC_DATN_B22DCCN071.pdf', baoCaoNgay:'15/06/2026 16:40', sanPham:'github.com/vuthanhlong/datn-2026', canManual:false,
     status:'Đã ban hành quyết định',
     qdGiao:{so:'145/QĐ-PĐT', ngay:'01/06/2026', donViBanHanh:'Phòng Đào tạo', nguoiKy:'Nguyễn Thị Lan — Trưởng phòng Đào tạo', file:'QD-145-PDT-2026.pdf'},
     history:[
@@ -594,7 +622,7 @@ let students = [
 
   {id:9, maSV:'B21DCCN102', tenSV:'Đặng Thị Quỳnh', lop:'INT3110_3', ctdt:'KTPM', gpa:3.6,
     dotId:'DA-HK1-2025-2026', loaiHinh:'Đồ án tốt nghiệp',
-    topic:TOPIC_CATALOG[3], gvhd:'TS. Lê Thị Mai', donViGV:'BM. Hệ thống thông tin', nguon:'Tự động', gvpb:'ThS. Trần Văn Hùng', canManual:false,
+    topic:TOPIC_CATALOG[3], gvhd:'TS. Lê Thị Mai', donViGV:'BM. Hệ thống thông tin', nguon:'Tự động', gvpb:'ThS. Trần Văn Hùng', baoCao:null, canManual:false,
     status:'Thay đổi đề tài',
     qdGiao:{so:'098/QĐ-PĐT', ngay:'10/05/2026', donViBanHanh:'Phòng Đào tạo', nguoiKy:'Nguyễn Thị Lan — Trưởng phòng Đào tạo', file:'QD-098-PDT-2026.pdf'},
     changeRequest:{topicCu:TOPIC_CATALOG[3].name, topicMoi:'Ứng dụng AR kết hợp ML cá nhân hoá nội dung học tiếng Anh', gvhdCu:'TS. Lê Thị Mai', gvhdMoi:'TS. Lê Thị Mai', lyDo:'Sinh viên đề xuất mở rộng phạm vi đề tài sang tích hợp Machine Learning, được GVHD đồng ý.'},
@@ -609,7 +637,7 @@ let students = [
 
   {id:10, maSV:'B21DCCN076', tenSV:'Bùi Văn Khải', lop:'INT3110_2', ctdt:'HTTT', gpa:3.0,
     dotId:'KL-HK2-2025-2026', loaiHinh:'Khóa luận tốt nghiệp',
-    topic:TOPIC_CATALOG[2], gvhd:'TS. Lê Thị Mai', donViGV:'BM. Hệ thống thông tin', nguon:'Tự động', gvpb:'TS. Nguyễn Minh Tuấn', canManual:false,
+    topic:TOPIC_CATALOG[2], gvhd:'TS. Lê Thị Mai', donViGV:'BM. Hệ thống thông tin', nguon:'Tự động', gvpb:'TS. Nguyễn Minh Tuấn', baoCao:'BC_KLTN_B21DCCN076.pdf', baoCaoNgay:'20/06/2026 09:30', canManual:false,
     status:'Đã cập nhật quyết định thay đổi',
     qdGiao:{so:'077/QĐ-PĐT', ngay:'02/04/2026', donViBanHanh:'Phòng Đào tạo', nguoiKy:'Nguyễn Thị Lan — Trưởng phòng Đào tạo', file:'QD-077-PDT-2026.pdf'},
     qdDoiList:[{so:'112/QĐ-PĐT', ngay:'14/05/2026', donViBanHanh:'Phòng Đào tạo', nguoiKy:'Nguyễn Thị Lan — Trưởng phòng Đào tạo', file:'QD-112-PDT-2026.pdf', deTaiCu:'Hệ thống phân tích dữ liệu bán hàng (bản gốc)', deTaiMoi:'Hệ thống phân tích dữ liệu bán hàng cho doanh nghiệp vừa và nhỏ', gvhdCu:'TS. Lê Thị Mai', gvhdMoi:'TS. Lê Thị Mai', lyDo:'Điều chỉnh phạm vi đề tài theo góp ý hội đồng duyệt đề cương.'}],
@@ -625,13 +653,13 @@ let students = [
 
   {id:11, maSV:'B21DCCN055', tenSV:'Phan Thị Yến', lop:'INT3110_1', ctdt:'KHMT', gpa:3.7,
     dotId:'KL-HK2-2025-2026', loaiHinh:'Khóa luận tốt nghiệp',
-    topic:null, gvhd:null, donViGV:null, nguon:null, gvpb:null, canManual:false,
+    topic:null, gvhd:null, donViGV:null, nguon:null, gvpb:null, baoCao:null, canManual:false,
     status:'Đủ điều kiện',
     history:[{time:'15/03/2026', actor:'Hệ thống', action:'Công bố đợt — SV đủ điều kiện', result:'', dot:'ok'}]},
 
   {id:12, maSV:'B21DCCN061', tenSV:'Đỗ Văn Tài', lop:'INT3110_3', ctdt:'KTPM', gpa:2.7,
     dotId:'KL-HK2-2025-2026', loaiHinh:'Khóa luận tốt nghiệp',
-    topic:null, gvhd:null, donViGV:null, nguon:null, gvpb:null, canManual:true,
+    topic:null, gvhd:null, donViGV:null, nguon:null, gvpb:null, baoCao:null, canManual:true,
     status:'Chờ đăng ký nguyện vọng',
     history:[
       {time:'15/03/2026', actor:'Hệ thống', action:'Công bố đợt — SV đủ điều kiện', result:'', dot:'ok'},
@@ -711,6 +739,11 @@ function render(){
     const gvpbCell = s.gvpb
       ? `<div style="font-size:13px">${s.gvpb}</div>`
       : `<span style="color:var(--text-3);font-size:12px">— Chưa có</span>`;
+    const baoCaoCell = !s.qdGiao
+      ? `<span style="color:var(--text-3);font-size:12px">—</span>`
+      : s.baoCao
+        ? `<a href="#" onclick="viewReport(${s.id});return false" title="Xem báo cáo">📄 Xem</a>`
+        : `<span style="color:var(--text-3);font-size:12px">Chưa nộp</span>`;
     const statusCell = `<span class="tag ${meta.cls}">${meta.ico} ${s.status}</span>` + (s.canManual ? `<span class="warn-pill">⚠ Cần phân công</span>` : '');
     const qdCell = s.qdGiao ? `<span style="font-family:monospace;font-size:12px;color:var(--text-2)">${s.qdGiao.so}</span>` : `<span style="color:var(--text-3);font-size:12px">—</span>`;
     const canAssign = s.canManual;
@@ -735,11 +768,12 @@ function render(){
       <td>${topicCell}</td>
       <td>${gvCell}</td>
       <td>${gvpbCell}</td>
+      <td style="text-align:center">${baoCaoCell}</td>
       <td>${statusCell}</td>
       <td>${qdCell}</td>
       <td class="tbl-actions">${actions}</td>
     </tr>`;
-  }).join('') : `<tr><td colspan="13" class="tbl-empty">Không có sinh viên phù hợp</td></tr>`;
+  }).join('') : `<tr><td colspan="14" class="tbl-empty">Không có sinh viên phù hợp</td></tr>`;
 
   document.getElementById('pg-info').textContent = `Hiển thị ${filtered.length} / ${students.length} sinh viên`;
   refreshBulkBar();
@@ -804,6 +838,7 @@ function openDetail(id){
     ['Đề tài hiện tại', s.topic ? `<strong>${s.topic.code}</strong> — ${s.topic.name}` : '<span style="color:var(--text-3)">Chưa có</span>'],
     ['GVHD hiện tại', s.gvhd ? (s.gvList && s.gvList.length > 1 ? gvMultiHTML(s.gvList) : s.gvhd) : '<span style="color:var(--text-3)">Chưa có</span>'],
     ['GV phản biện', s.gvpb ? s.gvpb : '<span style="color:var(--text-3)">Chưa có</span>'],
+    ['Báo cáo', !s.qdGiao ? '<span style="color:var(--text-3)">—</span>' : (s.baoCao ? `<a href="#" onclick="viewReport(${s.id});return false">📄 ${s.baoCao}</a>` : '<span style="color:var(--text-3)">Chưa nộp</span>')],
     ['Trạng thái', `<span class="tag ${meta.cls}">${meta.ico} ${s.status}</span>`],
   ];
   if (s.qdGiao) rows.push(['QĐ giao đề tài', `<span style="font-family:monospace;font-weight:700;color:var(--primary)">${s.qdGiao.so}</span> — ${s.qdGiao.ngay}`]);
@@ -1152,6 +1187,30 @@ function exportDecision(id){
   const s = students.find(x => x.id === id);
   closeModal('m-decision');
   showToast(`Đang xuất file quyết định cho ${s.tenSV} (${s.maSV})...`);
+}
+let _reportTargetId = null;
+function viewReport(id){
+  const s = students.find(x => x.id === id);
+  if (!s.baoCao) return;
+  _reportTargetId = id;
+  document.getElementById('bc-sv').textContent = `${s.tenSV} (${s.maSV})`;
+  document.getElementById('bc-file').textContent = `📎 ${s.baoCao}`;
+  document.getElementById('bc-submitinfo').innerHTML = s.baoCaoNgay ? `Nộp lúc: ${s.baoCaoNgay} — <span style="color:var(--success)">đúng hạn</span>` : '';
+  const sanPhamWrap = document.getElementById('bc-sanpham-wrap');
+  if (s.sanPham) { sanPhamWrap.style.display = ''; document.getElementById('bc-sanpham-link').textContent = `🔗 ${s.sanPham}`; }
+  else sanPhamWrap.style.display = 'none';
+  openModal('m-report');
+}
+function allowResubmitReport(){
+  const today = new Date().toLocaleDateString('vi');
+  students = students.map(s => {
+    if (s.id !== _reportTargetId) return s;
+    return { ...s, baoCao:null, baoCaoNgay:null, sanPham:null,
+      history:[...s.history, {time:today, actor:'TS. Trần Văn Bình (Khoa)', action:'Mở lại cổng nộp báo cáo', result:'Yêu cầu sinh viên nộp lại báo cáo cuối kỳ', dot:'warn'}] };
+  });
+  closeModal('m-report');
+  showToast('Đã mở lại cổng nộp báo cáo cho sinh viên', 'warn');
+  render();
 }
 function exportBulk(){
   if (!selectedIds.length) { showToast('Vui lòng chọn ít nhất 1 sinh viên', 'warn'); return; }

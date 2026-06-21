@@ -88,7 +88,7 @@
         <span class="mn-group">📋&nbsp; Đề tài &nbsp;▾</span>
         <ul class="sb-sub open">
           <li><a href="MH-KCM-06_StudentTopicApproval.html">DS nguyện vọng đề tài</a></li>
-          <li><a href="MH-KCM-03_TopicApproval.html">Xét duyệt đề tài GV</a></li>
+          <li><a href="MH-KCM-03_TopicApproval.html">Xét duyệt đề tài</a></li>
         </ul>
       </li>
       <li class="active">
@@ -460,6 +460,8 @@
         <tr><td class="itl">Người ký</td><td id="dt-qdsignedby"></td></tr>
         <tr><td class="itl">File đính kèm</td><td id="dt-qdfile"></td></tr>
         <tr id="dt-note-row" style="display:none"><td class="itl">Ghi chú</td><td id="dt-note" style="color:var(--text-2)"></td></tr>
+        <tr id="dt-bienban-row" style="display:none"><td class="itl">Biên bản họp</td><td id="dt-bienban"></td></tr>
+        <tr id="dt-completenote-row" style="display:none"><td class="itl">Ghi chú kết quả họp</td><td id="dt-completenote" style="color:var(--text-2)"></td></tr>
       </table>
 
       <div class="section-hd">Danh sách Thành viên (<span id="dt-mem-count">0</span> người)</div>
@@ -537,6 +539,19 @@
       <div class="fi">
         <label>Ghi chú kết quả họp</label>
         <textarea class="fc" id="cp-note" rows="3" placeholder="Ví dụ: Hội đồng đã họp và hoàn tất chấm điểm cho 5 sinh viên."></textarea>
+      </div>
+      <div class="fi">
+        <label>Biên bản họp (PDF)</label>
+        <div id="cp-dropzone" style="display:flex;align-items:center;gap:10px;padding:10px 12px;border:2px dashed var(--border);border-radius:8px;background:#fafafa;cursor:pointer;transition:border-color .15s"
+             ondragover="event.preventDefault();this.style.borderColor='var(--primary)'"
+             ondragleave="this.style.borderColor='var(--border)'"
+             ondrop="onCpFileDrop(event)">
+          <span style="font-size:22px">📄</span>
+          <div style="flex:1;font-size:12px;font-weight:500;color:var(--text-2)" id="cp-file-name">Chưa có file — kéo thả hoặc nhấn chọn file</div>
+          <input type="file" id="cp-file-input" accept=".pdf" style="display:none" onchange="onCpFileSelect(this)">
+          <button class="btn btn-default btn-sm" onclick="document.getElementById('cp-file-input').click()">Chọn file</button>
+          <button class="btn btn-default btn-sm" id="cp-file-clear" style="display:none;color:var(--danger)" onclick="clearCpFile()">✕</button>
+        </div>
       </div>
       <div style="background:#e6f4ff;border:1px solid #91caff;border-radius:6px;padding:10px 12px;font-size:13px">
         🏁 Sau khi xác nhận, hội đồng chuyển sang <strong>Hoàn thành</strong> và không thể chỉnh sửa thêm.
@@ -642,7 +657,7 @@ const COUNCILS = [
       {role:'pb',name:'TS. Lê Đức Thọ',         gvType:'noi', unit:'Khoa CNTT', email:'leductho@khoacntt.edu.vn'}
     ],
     status:'completed', qdNum:'312/QĐ-CNTT', qdDate:'19/06/2026', qdSignedBy:'Nguyễn Thị Lan — Trưởng phòng Đào tạo', qdFile:'QD_312-QD-CNTT.pdf',
-    completedAt:'23/06/2026', completeNote:'Hội đồng đã họp và hoàn tất chấm điểm cho 5 sinh viên.',
+    completedAt:'23/06/2026', completeNote:'Hội đồng đã họp và hoàn tất chấm điểm cho 5 sinh viên.', bienBanFile:'BienBan_HD-2026-013.pdf',
     createdBy:'TS. Trần Văn Bình', createdAt:'10/06/2026', note:''
   },
   {
@@ -1068,13 +1083,43 @@ function openCompleteModal(id) {
   document.getElementById('cp-name').textContent = c.name;
   document.getElementById('cp-date').value = '2026-06-20';
   document.getElementById('cp-note').value = '';
+  clearCpFile();
   openModal('modal-complete');
+}
+function onCpFileSelect(input) {
+  if (input.files && input.files[0]) {
+    document.getElementById('cp-file-name').textContent = '📎 ' + input.files[0].name;
+    document.getElementById('cp-file-name').style.color = 'var(--primary)';
+    document.getElementById('cp-file-clear').style.display = '';
+    document.getElementById('cp-dropzone').style.borderColor = 'var(--primary)';
+  }
+}
+function onCpFileDrop(e) {
+  e.preventDefault();
+  document.getElementById('cp-dropzone').style.borderColor = 'var(--border)';
+  const f = e.dataTransfer.files[0];
+  if (f && f.type === 'application/pdf') {
+    document.getElementById('cp-file-name').textContent = '📎 ' + f.name;
+    document.getElementById('cp-file-name').style.color = 'var(--primary)';
+    document.getElementById('cp-file-clear').style.display = '';
+  } else {
+    showToast('Chỉ chấp nhận file PDF', 'err');
+  }
+}
+function clearCpFile() {
+  document.getElementById('cp-file-input').value = '';
+  document.getElementById('cp-file-name').textContent = 'Chưa có file — kéo thả hoặc nhấn chọn file';
+  document.getElementById('cp-file-name').style.color = 'var(--text-2)';
+  document.getElementById('cp-file-clear').style.display = 'none';
+  document.getElementById('cp-dropzone').style.borderColor = 'var(--border)';
 }
 function submitComplete() {
   const c = COUNCILS.find(x => x.id === currentId);
   c.status = 'completed';
   c.completedAt   = fmtDMY(document.getElementById('cp-date').value);
   c.completeNote  = document.getElementById('cp-note').value.trim();
+  const fileInput = document.getElementById('cp-file-input');
+  if (fileInput.files && fileInput.files[0]) c.bienBanFile = fileInput.files[0].name;
   closeModal('modal-complete');
   render();
   showToast('🏁 Đã đánh dấu hội đồng hoàn thành.', 'ok');
@@ -1084,6 +1129,10 @@ function submitComplete() {
 function downloadDecision(id) {
   const c = COUNCILS.find(x => x.id === id);
   showToast(`📄 Đã tải xuống file Quyết định ${c.qdNum} (mô phỏng).`, 'ok');
+}
+function downloadBienBan(id) {
+  const c = COUNCILS.find(x => x.id === id);
+  showToast(`📄 Đã tải xuống Biên bản họp ${c.bienBanFile} (mô phỏng).`, 'ok');
 }
 
 /* ── Detail modal ─────────────────────────────────────────── */
@@ -1112,6 +1161,16 @@ function openDetail(id) {
   const noteRow = document.getElementById('dt-note-row');
   if (c.note) { document.getElementById('dt-note').textContent = c.note; noteRow.style.display = ''; }
   else { noteRow.style.display = 'none'; }
+
+  const bienBanRow = document.getElementById('dt-bienban-row');
+  if (c.bienBanFile) {
+    document.getElementById('dt-bienban').innerHTML = `<a href="#" onclick="downloadBienBan(${c.id});return false">📄 ${c.bienBanFile} — Tải xuống</a>`;
+    bienBanRow.style.display = '';
+  } else { bienBanRow.style.display = 'none'; }
+
+  const completeNoteRow = document.getElementById('dt-completenote-row');
+  if (c.completeNote) { document.getElementById('dt-completenote').textContent = c.completeNote; completeNoteRow.style.display = ''; }
+  else { completeNoteRow.style.display = 'none'; }
 
   document.getElementById('dt-mem-count').textContent = c.members.length;
   document.getElementById('dt-mem-tbody').innerHTML = c.members.length

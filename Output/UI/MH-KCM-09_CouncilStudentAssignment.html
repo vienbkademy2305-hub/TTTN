@@ -73,7 +73,7 @@
         <span class="mn-group">📋&nbsp; Đề tài &nbsp;▾</span>
         <ul class="sb-sub open">
           <li><a href="MH-KCM-06_StudentTopicApproval.html">DS nguyện vọng đề tài</a></li>
-          <li><a href="MH-KCM-03_TopicApproval.html">Xét duyệt đề tài GV</a></li>
+          <li><a href="MH-KCM-03_TopicApproval.html">Xét duyệt đề tài</a></li>
         </ul>
       </li>
       <li class="active">
@@ -114,7 +114,10 @@
 
       <!-- Section A: Thông tin hội đồng -->
       <div class="card" style="margin-bottom:16px">
-        <div class="section-hd" style="margin-top:0">Thông tin Hội đồng</div>
+        <div style="display:flex;align-items:center;justify-content:space-between">
+          <div class="section-hd" style="margin-top:0">Thông tin Hội đồng</div>
+          <div id="hd-actions" style="margin-bottom:8px"></div>
+        </div>
         <table class="info-tbl">
           <tr><td class="itl">Mã hội đồng</td><td><strong id="hd-code" class="qd-num" style="font-size:13px"></strong></td></tr>
           <tr><td class="itl">Tên hội đồng</td><td><strong id="hd-name"></strong></td></tr>
@@ -131,12 +134,15 @@
           <tr><td class="itl">Người ký</td><td id="hd-qdsigned"></td></tr>
           <tr><td class="itl">File đính kèm</td><td id="hd-qdfile"></td></tr>
           <tr id="hd-note-row" style="display:none"><td class="itl">Ghi chú</td><td id="hd-note" style="color:var(--text-2)"></td></tr>
+          <tr id="hd-bienban-row" style="display:none"><td class="itl">Biên bản họp</td><td id="hd-bienban"></td></tr>
+          <tr id="hd-completenote-row" style="display:none"><td class="itl">Ghi chú kết quả họp</td><td id="hd-completenote" style="color:var(--text-2)"></td></tr>
         </table>
       </div>
 
       <!-- Section B: Thành viên -->
       <div class="card" style="margin-bottom:16px">
         <div class="section-hd" style="margin-top:0">Danh sách Thành viên (<span id="mem-count">0</span> người)</div>
+        <div id="mem-bienban-note"></div>
         <div class="bulk-bar" id="mem-bulk-bar" style="display:none">
           <span>Đã chọn <strong id="mem-bulk-count">0</strong> thành viên</span>
           <button class="btn btn-primary btn-sm" onclick="sendBulkEmail()">📧 Gửi email</button>
@@ -168,19 +174,27 @@
         <div class="card-hd" style="padding:20px 24px 0">
           <h3 class="card-title">Danh sách Sinh viên &amp; Chấm điểm</h3>
         </div>
+        <div class="bulk-bar" id="sv-bulk-bar" style="display:none;margin:0 24px 12px">
+          <span>Đã chọn <strong id="sv-bulk-count">0</strong> sinh viên</span>
+          <button class="btn btn-default btn-sm" id="sv-bulk-score-btn" onclick="openBulkScoreModal()">✎ Chấm điểm hàng loạt</button>
+          <button class="btn btn-primary btn-sm" onclick="sendBulkEmailStudents()">📧 Gửi email</button>
+        </div>
         <div class="tbl-wrap" style="padding:0 0 16px">
           <table class="sv-tbl">
             <thead>
               <tr>
+                <th style="width:36px;text-align:center"><input type="checkbox" id="sv-chk-all" onchange="toggleAllStudents(this.checked)" style="width:15px;height:15px;cursor:pointer;accent-color:var(--primary)"></th>
                 <th style="width:100px">Mã SV</th>
                 <th style="min-width:130px">Họ và tên</th>
-                <th style="width:90px">Lớp</th>
+                <th style="width:110px">Lớp học phần</th>
                 <th style="width:65px">CTĐT</th>
                 <th style="width:90px">Loại hình</th>
                 <th>Đề tài</th>
                 <th style="min-width:130px">GVHD</th>
                 <th style="min-width:130px">GV phản biện</th>
                 <th style="width:90px;text-align:center">Báo cáo</th>
+                <th style="width:90px;text-align:center">Điểm hướng dẫn</th>
+                <th style="width:90px;text-align:center">Điểm phản biện</th>
                 <th style="width:90px;text-align:center">Điểm TB</th>
                 <th style="width:130px">Trạng thái chấm</th>
                 <th style="width:90px;text-align:center">Thao tác</th>
@@ -212,18 +226,22 @@
         <tr><td class="itl">GVHD</td><td id="sc-gvhd"></td></tr>
       </table>
 
-      <div class="section-hd" style="margin-top:0">Điểm theo từng thành viên hội đồng</div>
-      <table class="mem-tbl" style="margin-bottom:14px">
-        <thead>
-          <tr>
-            <th style="width:110px">Vai trò</th>
-            <th>Họ và tên</th>
-            <th style="width:80px;text-align:center">Điểm</th>
-            <th>Nhận xét</th>
-          </tr>
-        </thead>
-        <tbody id="sc-mem-tbody"></tbody>
-      </table>
+      <div id="sc-lock-note" class="gate-note" style="display:none">🔒 Hội đồng chấm điểm theo hình thức bỏ phiếu kín — bạn chỉ xem được điểm của chính mình, không xem được điểm của các thành viên khác.</div>
+
+      <div id="sc-mem-section">
+        <div class="section-hd" style="margin-top:0">Điểm theo từng thành viên hội đồng</div>
+        <table class="mem-tbl" style="margin-bottom:14px">
+          <thead>
+            <tr>
+              <th style="width:110px">Vai trò</th>
+              <th>Họ và tên</th>
+              <th style="width:80px;text-align:center">Điểm</th>
+              <th>Nhận xét</th>
+            </tr>
+          </thead>
+          <tbody id="sc-mem-tbody"></tbody>
+        </table>
+      </div>
 
       <div id="sc-self-form"></div>
 
@@ -234,6 +252,32 @@
     <div class="modal-ft">
       <button class="btn btn-default" data-close="modal-score">Đóng</button>
       <button class="btn btn-primary" id="sc-save-btn" onclick="saveScore()">💾 Lưu điểm của tôi</button>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════════
+     MODAL: CHẤM ĐIỂM HÀNG LOẠT
+════════════════════════════════════════ -->
+<div class="overlay hidden" id="modal-bulkscore">
+  <div class="modal-box w520">
+    <div class="modal-hd">
+      <span class="modal-title">✎ Chấm điểm hàng loạt</span>
+      <button class="modal-close" data-close="modal-bulkscore">✕</button>
+    </div>
+    <div class="modal-bd">
+      <div class="fi">
+        <label>Điểm (0–10) <span class="req">*</span></label>
+        <input type="number" class="fc" id="bs-score" min="0" max="10" step="0.1">
+      </div>
+      <div class="fi">
+        <label>Nhận xét</label>
+        <input type="text" class="fc" id="bs-comment" placeholder="Áp dụng chung cho tất cả sinh viên được chọn...">
+      </div>
+    </div>
+    <div class="modal-ft">
+      <button class="btn btn-default" data-close="modal-bulkscore">Hủy</button>
+      <button class="btn btn-primary" onclick="confirmBulkScore()">💾 Lưu điểm</button>
     </div>
   </div>
 </div>
@@ -302,6 +346,29 @@
 </div>
 
 <!-- ════════════════════════════════════════
+     MODAL: GV HƯỚNG DẪN & TRỌNG SỐ
+════════════════════════════════════════ -->
+<div class="overlay hidden" id="modal-gvhd">
+  <div class="modal-box w520">
+    <div class="modal-hd">
+      <span class="modal-title" id="gvd-title">GV Hướng dẫn</span>
+      <button class="modal-close" data-close="modal-gvhd">✕</button>
+    </div>
+    <div class="modal-bd">
+      <div style="border:1px solid var(--border);border-radius:8px;overflow:hidden">
+        <div style="background:#fafafa;padding:10px 16px;border-bottom:1px solid var(--border);display:grid;grid-template-columns:1fr 110px 70px;font-size:12px;font-weight:600;color:var(--text-3)">
+          <span>Giảng viên hướng dẫn</span><span>Phân loại</span><span style="text-align:right">Trọng số</span>
+        </div>
+        <div id="gvd-body"></div>
+      </div>
+    </div>
+    <div class="modal-ft">
+      <button class="btn btn-default" data-close="modal-gvhd">Đóng</button>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════════
      MODAL: SOẠN EMAIL
 ════════════════════════════════════════ -->
 <div class="overlay hidden" id="modal-email">
@@ -328,6 +395,51 @@
     <div class="modal-ft">
       <button class="btn btn-default" data-close="modal-email">Hủy</button>
       <button class="btn btn-primary" onclick="confirmSendEmail()">📧 Gửi email</button>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════════
+     MODAL: ĐÁNH DẤU HOÀN THÀNH
+════════════════════════════════════════ -->
+<div class="overlay hidden" id="modal-complete">
+  <div class="modal-box w480">
+    <div class="modal-hd">
+      <span class="modal-title">Đánh dấu Hoàn thành</span>
+      <button class="modal-close" data-close="modal-complete">✕</button>
+    </div>
+    <div class="modal-bd">
+      <div style="font-size:13px;color:var(--text-2);margin-bottom:14px">
+        Hội đồng: <strong id="cp-name"></strong>
+      </div>
+      <div class="fi">
+        <label>Ngày hoàn tất</label>
+        <input type="date" class="fc" id="cp-date">
+      </div>
+      <div class="fi">
+        <label>Ghi chú kết quả họp</label>
+        <textarea class="fc" id="cp-note" rows="3" placeholder="Ví dụ: Hội đồng đã họp và hoàn tất chấm điểm cho 5 sinh viên."></textarea>
+      </div>
+      <div class="fi">
+        <label>Biên bản họp (PDF)</label>
+        <div id="cp-dropzone" style="display:flex;align-items:center;gap:10px;padding:10px 12px;border:2px dashed var(--border);border-radius:8px;background:#fafafa;cursor:pointer;transition:border-color .15s"
+             ondragover="event.preventDefault();this.style.borderColor='var(--primary)'"
+             ondragleave="this.style.borderColor='var(--border)'"
+             ondrop="onCpFileDrop(event)">
+          <span style="font-size:22px">📄</span>
+          <div style="flex:1;font-size:12px;font-weight:500;color:var(--text-2)" id="cp-file-name">Chưa có file — kéo thả hoặc nhấn chọn file</div>
+          <input type="file" id="cp-file-input" accept=".pdf" style="display:none" onchange="onCpFileSelect(this)">
+          <button class="btn btn-default btn-sm" onclick="document.getElementById('cp-file-input').click()">Chọn file</button>
+          <button class="btn btn-default btn-sm" id="cp-file-clear" style="display:none;color:var(--danger)" onclick="clearCpFile()">✕</button>
+        </div>
+      </div>
+      <div style="background:#e6f4ff;border:1px solid #91caff;border-radius:6px;padding:10px 12px;font-size:13px">
+        🏁 Sau khi xác nhận, hội đồng chuyển sang <strong>Hoàn thành</strong> và không thể chỉnh sửa thêm.
+      </div>
+    </div>
+    <div class="modal-ft">
+      <button class="btn btn-default" data-close="modal-complete">Hủy</button>
+      <button class="btn btn-primary" onclick="submitComplete()">✓ Xác nhận hoàn thành</button>
     </div>
   </div>
 </div>
@@ -365,7 +477,7 @@ const COUNCILS = [
       { role:'pb', name:'TS. Phạm Quốc Hùng',    gvType:'noi', unit:'Khoa CNTT', email:'phamquochung@khoacntt.edu.vn' }
     ],
     students:[
-      { maSV:'B22DCCN001', tenSV:'Nguyễn Văn An', svEmail:'b22dccn001@student.edu.vn', lop:'INT3110_1', ctdt:'KTPM', loaiHinh:'TTTN', maDeTai:'DT-2026-001', tenDeTai:'Xây dựng hệ thống quản lý thực tập sinh viên', linhVuc:'CNPM', maxSv:1, tomTat:'Xây dựng hệ thống web hỗ trợ Khoa quản lý đợt thực tập, đăng ký nguyện vọng và theo dõi tiến độ sinh viên.', yeuCau:'Có kiến thức cơ bản về lập trình web và cơ sở dữ liệu quan hệ.', sanPham:'Ứng dụng web hoàn chỉnh, báo cáo thống kê và tài liệu hướng dẫn sử dụng.', congNghe:'ReactJS, Node.js, MySQL', gvhd:'PGS.TS. Lê Văn Minh', baoCao:null, scores:{} },
+      { maSV:'B22DCCN001', tenSV:'Nguyễn Văn An', svEmail:'b22dccn001@student.edu.vn', lop:'INT3110_1', ctdt:'KTPM', loaiHinh:'TTTN', maDeTai:'DT-2026-001', tenDeTai:'Xây dựng hệ thống quản lý thực tập sinh viên', linhVuc:'CNPM', maxSv:1, tomTat:'Xây dựng hệ thống web hỗ trợ Khoa quản lý đợt thực tập, đăng ký nguyện vọng và theo dõi tiến độ sinh viên.', yeuCau:'Có kiến thức cơ bản về lập trình web và cơ sở dữ liệu quan hệ.', sanPham:'Ứng dụng web hoàn chỉnh, báo cáo thống kê và tài liệu hướng dẫn sử dụng.', congNghe:'ReactJS, Node.js, MySQL', gvhd:'PGS.TS. Lê Văn Minh', gvDong:[{ten:'TS. Trần Văn Bình', trongSo:30}], baoCao:null, scores:{} },
       { maSV:'B22DCCN022', tenSV:'Phạm Minh Khoa', svEmail:'b22dccn022@student.edu.vn', lop:'INT3110_2', ctdt:'KTPM', loaiHinh:'TTTN', maDeTai:'DT-2026-002', tenDeTai:'Ứng dụng AI trong chấm điểm tự động',        linhVuc:'AI', maxSv:1, tomTat:'Nghiên cứu ứng dụng mô hình học máy để hỗ trợ chấm điểm tự động báo cáo thực tập.', yeuCau:'Có kiến thức cơ bản về Machine Learning và Python.', sanPham:'Mô hình chấm điểm thử nghiệm và báo cáo đánh giá độ chính xác.', congNghe:'Python, scikit-learn, Flask', gvhd:'TS. Trần Văn Bình',    baoCao:null, scores:{} }
     ]
   },
@@ -391,6 +503,7 @@ const COUNCILS = [
     donvi:'Bộ môn Hệ thống thông tin', nganh:'Hệ thống thông tin', type:'chamdiem', dot:'HK2 2025-2026',
     meetForm:'offline', date:'22/06/2026', time:'08:00', room:'Phòng họp A1-103', link:'', status:'completed',
     qdNum:'312/QĐ-CNTT', qdDate:'19/06/2026', qdSignedBy:'Nguyễn Thị Lan — Trưởng phòng Đào tạo', qdFile:'QD_312-QD-CNTT.pdf',
+    completeNote:'Hội đồng đã họp và hoàn tất chấm điểm cho 5 sinh viên.', bienBanFile:'BienBan_HD-2026-013.pdf',
     createdBy:'TS. Trần Văn Bình', createdAt:'10/06/2026', note:'',
     members:[
       { role:'ct', name:'TS. Nguyễn Minh Tuấn', gvType:'noi', unit:'Khoa CNTT', email:'nguyenminhtuan@khoacntt.edu.vn' },
@@ -400,7 +513,7 @@ const COUNCILS = [
       { role:'pb', name:'TS. Lê Đức Thọ',         gvType:'noi', unit:'Khoa CNTT', email:'leductho@khoacntt.edu.vn' }
     ],
     students:[
-      { maSV:'B22DCCN058', tenSV:'Hoàng Minh Đức', svEmail:'b22dccn058@student.edu.vn', lop:'INT3110_1', ctdt:'HTTT', loaiHinh:'TTTN', maDeTai:'DT-2026-005', tenDeTai:'Hệ thống quản trị quan hệ khách hàng', linhVuc:'CNPM', maxSv:1, tomTat:'Xây dựng hệ thống CRM giúp doanh nghiệp quản lý thông tin và chăm sóc khách hàng.', yeuCau:'Có kiến thức cơ bản về lập trình web và CSDL.', sanPham:'Ứng dụng CRM hoàn chỉnh và tài liệu hướng dẫn sử dụng.', congNghe:'Java Spring Boot, MySQL, ReactJS', gvhd:'TS. Nguyễn Minh Tuấn', baoCao:'BC_TTTN_B22DCCN058.pdf',
+      { maSV:'B22DCCN058', tenSV:'Hoàng Minh Đức', svEmail:'b22dccn058@student.edu.vn', lop:'INT3110_1', ctdt:'HTTT', loaiHinh:'TTTN', maDeTai:'DT-2026-005', tenDeTai:'Hệ thống quản trị quan hệ khách hàng', linhVuc:'CNPM', maxSv:1, tomTat:'Xây dựng hệ thống CRM giúp doanh nghiệp quản lý thông tin và chăm sóc khách hàng.', yeuCau:'Có kiến thức cơ bản về lập trình web và CSDL.', sanPham:'Ứng dụng CRM hoàn chỉnh và tài liệu hướng dẫn sử dụng.', congNghe:'Java Spring Boot, MySQL, ReactJS', gvhd:'TS. Nguyễn Minh Tuấn', gvDong:[{ten:'TS. Phạm Thu Hà', trongSo:25}], baoCao:'BC_TTTN_B22DCCN058.pdf',
         scores:{ 'TS. Nguyễn Minh Tuấn':{score:8.0,comment:'Đạt yêu cầu.'}, 'TS. Phạm Thu Hà':{score:8.5,comment:'Tốt.'}, 'ThS. Nguyễn Thu Hoa':{score:8.2,comment:'Khá tốt.'}, 'TS. Lê Đức Thọ':{score:7.8,comment:'Cần bổ sung kiểm thử.'} } },
       { maSV:'B22DCCN047', tenSV:'Ngô Thị Hà',     svEmail:'b22dccn047@student.edu.vn', lop:'INT3110_2', ctdt:'HTTT', loaiHinh:'TTTN', maDeTai:'DT-2026-006', tenDeTai:'Hệ thống cảnh báo gian lận giao dịch', linhVuc:'ATTT', maxSv:1, tomTat:'Xây dựng module phát hiện và cảnh báo các giao dịch bất thường, nghi ngờ gian lận theo thời gian thực.', yeuCau:'Có kiến thức về an toàn thông tin và lập trình backend.', sanPham:'Module phát hiện gian lận và báo cáo đánh giá hiệu quả.', congNghe:'Python, Kafka, PostgreSQL', gvhd:'TS. Nguyễn Minh Tuấn', baoCao:'BC_TTTN_B22DCCN047.pdf',
         scores:{ 'TS. Nguyễn Minh Tuấn':{score:9.0,comment:'Xuất sắc.'}, 'TS. Phạm Thu Hà':{score:8.8,comment:'Rất tốt.'}, 'ThS. Nguyễn Thu Hoa':{score:9.0,comment:'Xuất sắc.'}, 'TS. Lê Đức Thọ':{score:8.5,comment:'Tốt.'} } }
@@ -442,8 +555,24 @@ function avgScore(sv) {
   const vals = Object.values(sv.scores).map(s => s.score).filter(v => typeof v === 'number');
   return vals.length ? (vals.reduce((a,b)=>a+b,0) / vals.length) : null;
 }
+function avgOf(names, sv) {
+  const vals = names.map(n => sv.scores[n] && sv.scores[n].score).filter(v => typeof v === 'number');
+  return vals.length ? (vals.reduce((a,b)=>a+b,0) / vals.length) : null;
+}
+function gvhdScore(sv) { return avgOf([sv.gvhd, ...(sv.gvDong||[]).map(g=>g.ten)], sv); }
+function pbScore(sv, c) { return avgOf(c.members.filter(m => m.role === 'pb').map(m => m.name), sv); }
+/* Bỏ phiếu kín: chỉ cho xem điểm của 1 nhóm thành viên cụ thể nếu xem-được-tất-cả, hoặc chính người trong nhóm đó */
+function canSeeScoreOf(names, c) {
+  return canViewAllScores(c) || names.includes(currentPersona);
+}
 /* Chỉ hội đồng "Đã duyệt" mới được chấm; "Hoàn thành" chỉ xem lại điểm, không sửa được */
 function canScoreNow(c) { return c.status === 'approved' && !!currentPersona; }
+/* Bỏ phiếu kín: không persona (xem ở vai trò Đào tạo/Admin) hoặc persona là Chủ tịch/Thư ký mới xem được điểm của tất cả thành viên */
+function canViewAllScores(c) {
+  if (!currentPersona) return true;
+  const m = c.members.find(x => x.name === currentPersona);
+  return !m || m.role === 'ct' || m.role === 'tk';
+}
 
 /* ── Gửi email thành viên ─────────────────────────────────── */
 let selectedMembers = new Set();
@@ -561,6 +690,25 @@ function renderCouncilInfo(c) {
   if (c.note) { document.getElementById('hd-note').textContent = c.note; noteRow.style.display = ''; }
   else { noteRow.style.display = 'none'; }
 
+  const bienBanRow = document.getElementById('hd-bienban-row');
+  if (c.bienBanFile) { document.getElementById('hd-bienban').innerHTML = `<a href="#" onclick="return false">📄 ${c.bienBanFile} — Tải xuống</a>`; bienBanRow.style.display = ''; }
+  else { bienBanRow.style.display = 'none'; }
+
+  const completeNoteRow = document.getElementById('hd-completenote-row');
+  if (c.completeNote) { document.getElementById('hd-completenote').textContent = c.completeNote; completeNoteRow.style.display = ''; }
+  else { completeNoteRow.style.display = 'none'; }
+
+  document.getElementById('hd-actions').innerHTML = c.status === 'approved'
+    ? `<button class="btn btn-primary btn-sm" onclick="openCompleteModal()">🏁 Đánh dấu hoàn thành</button>`
+    : '';
+
+  document.getElementById('mem-bienban-note').innerHTML = c.status === 'completed'
+    ? `<div style="background:#e6f4ff;border:1px solid #91caff;border-radius:6px;padding:8px 12px;margin-bottom:12px;font-size:12px;color:var(--text-2)">
+        🏁 Hội đồng đã <strong>Hoàn thành</strong> (${c.completedAt || '—'})${c.completeNote ? ' — ' + c.completeNote : ''}
+        ${c.bienBanFile ? ` — <a href="#" onclick="return false">📄 ${c.bienBanFile}</a>` : ''}
+      </div>`
+    : '';
+
   document.getElementById('mem-count').textContent = c.members.length;
   document.getElementById('mem-tbody').innerHTML = c.members.length
     ? c.members.map((m,i) => `<tr>
@@ -591,11 +739,12 @@ function renderStudents() {
   const tbody = document.getElementById('sv-tbody');
 
   if (!c.students.length) {
-    tbody.innerHTML = '<tr><td colspan="12" class="tbl-empty">Hội đồng chưa có sinh viên được phân công.</td></tr>';
+    tbody.innerHTML = '<tr><td colspan="15" class="tbl-empty">Hội đồng chưa có sinh viên được phân công.</td></tr>';
+    clearStudentSelection();
     return;
   }
 
-  tbody.innerHTML = c.students.map(sv => {
+  tbody.innerHTML = c.students.map((sv, i) => {
     const sm  = scoringMembers(c);
     const cnt = sm.filter(m => sv.scores[m.name] != null).length;
     const avg = avgScore(sv);
@@ -610,28 +759,108 @@ function renderStudents() {
           ? `<span class="tag tag-warning">Đang chấm (${cnt}/${sm.length})</span>`
           : `<span class="tag tag-default">Chưa chấm (0/${sm.length})</span>`;
     const action = canScore
-      ? `<button class="btn btn-default btn-sm" onclick="openScoreModal('${sv.maSV}')">${sv.scores[currentPersona] ? '✎ Sửa điểm' : '✎ Chấm điểm'}</button>`
-      : `<button class="btn btn-default btn-sm" onclick="openScoreModal('${sv.maSV}')" title="Chỉ xem">👁 Xem</button>`;
-    const phanBien = c.members.filter(m => m.role === 'pb').map(m => m.name).join(', ') || '—';
+      ? `<button class="icon-btn" onclick="openScoreModal('${sv.maSV}')" title="${sv.scores[currentPersona] ? 'Sửa điểm' : 'Chấm điểm'}">✎</button>`
+      : `<button class="icon-btn" onclick="openScoreModal('${sv.maSV}')" title="Chỉ xem">👁</button>`;
+    const phanBienList = c.members.filter(m => m.role === 'pb');
+    const phanBienCell = phanBienList.length
+      ? phanBienList.map(m => `<div style="font-size:12px">${m.name}</div>`).join('')
+      : '<span style="color:var(--text-3);font-size:12px">—</span>';
     const baoCaoCell = sv.baoCao
       ? `<a href="#" onclick="viewReport('${sv.maSV}');return false" title="Xem báo cáo">📄 Xem</a>`
       : `<span style="color:var(--text-3);font-size:12px">Chưa nộp</span>`;
+    const gvDongList = sv.gvDong || [];
+    const primaryTS  = gvDongList.length ? 100 - gvDongList.reduce((s,g) => s + g.trongSo, 0) : 100;
+    const allGV      = [{ ten: sv.gvhd, trongSo: primaryTS }, ...gvDongList];
+    const gvCell = `<div style="cursor:pointer" onclick="openGVDetail('${sv.maSV}')" title="Xem GVHD &amp; trọng số">
+      ${allGV.map((g,gi) => `<div style="font-size:12px;${gi===0?'color:var(--text-1);font-weight:600':'color:var(--text-2)'}">${g.ten}</div>`).join('')}
+    </div>`;
+    const pbNames   = phanBienList.map(m => m.name);
+    const ghVal = gvhdScore(sv);
+    const ghCell = ghVal !== null ? `<span class="score-avg ok">${ghVal.toFixed(1)}</span>` : `<span class="score-avg pending">—</span>`;
+    const pbVal = pbScore(sv, c);
+    const pbCell = !canSeeScoreOf(pbNames, c)
+      ? `<span title="Bỏ phiếu kín — không xem được" style="color:var(--text-3)">🔒</span>`
+      : pbVal !== null ? `<span class="score-avg ok">${pbVal.toFixed(1)}</span>` : `<span class="score-avg pending">—</span>`;
 
     return `<tr>
+      <td style="text-align:center"><input type="checkbox" class="sv-chk" data-masv="${sv.maSV}" onchange="onStudentCheck(this)" style="width:15px;height:15px;cursor:pointer;accent-color:var(--primary)"></td>
       <td style="font-family:monospace;font-size:12px;color:var(--text-2);white-space:nowrap">${sv.maSV}</td>
       <td><a class="name-cell" href="#" onclick="openStudentInfo('${sv.maSV}');return false">${sv.tenSV}</a></td>
       <td style="font-size:12px;color:var(--text-2)">${sv.lop}</td>
       <td style="font-size:12px;color:var(--text-2)">${sv.ctdt}</td>
       <td style="font-size:12px;color:var(--text-2)">${LOAIHINH_LABEL[sv.loaiHinh] || sv.loaiHinh}</td>
       <td style="font-size:12px;color:var(--text-2);max-width:0"><a class="name-cell" href="#" style="max-width:260px;display:block" title="${sv.tenDeTai}" onclick="openTopicInfo('${sv.maSV}');return false">${sv.tenDeTai}</a></td>
-      <td style="font-size:12px;color:var(--text-2)">${sv.gvhd}</td>
-      <td style="font-size:12px;color:var(--text-2)">${phanBien}</td>
+      <td>${gvCell}</td>
+      <td>${phanBienCell}</td>
       <td style="text-align:center">${baoCaoCell}</td>
+      <td style="text-align:center">${ghCell}</td>
+      <td style="text-align:center">${pbCell}</td>
       <td style="text-align:center">${avgCell}</td>
       <td>${statusCell}</td>
       <td style="text-align:center">${action}</td>
     </tr>`;
   }).join('');
+  clearStudentSelection();
+}
+
+/* ── Gửi email sinh viên ──────────────────────────────────── */
+let selectedStudents = new Set();
+
+function toggleAllStudents(checked) {
+  document.querySelectorAll('.sv-chk').forEach(chk => {
+    chk.checked = checked;
+    if (checked) selectedStudents.add(chk.dataset.masv); else selectedStudents.delete(chk.dataset.masv);
+  });
+  updateStudentBulkBar();
+}
+function onStudentCheck(chk) {
+  if (chk.checked) selectedStudents.add(chk.dataset.masv); else selectedStudents.delete(chk.dataset.masv);
+  updateStudentBulkBar();
+}
+function clearStudentSelection() {
+  selectedStudents.clear();
+  document.querySelectorAll('.sv-chk').forEach(chk => chk.checked = false);
+  const all = document.getElementById('sv-chk-all');
+  if (all) all.checked = false;
+  updateStudentBulkBar();
+}
+function updateStudentBulkBar() {
+  document.getElementById('sv-bulk-count').textContent = selectedStudents.size;
+  document.getElementById('sv-bulk-bar').style.display = selectedStudents.size ? 'flex' : 'none';
+  document.getElementById('sv-bulk-score-btn').style.display = canScoreNow(council()) ? '' : 'none';
+}
+function sendBulkEmailStudents() {
+  const c  = council();
+  const svs = c.students.filter(sv => selectedStudents.has(sv.maSV) && sv.svEmail)
+    .map(sv => ({ name: sv.tenSV, email: sv.svEmail }));
+  if (!svs.length) { showToast('Vui lòng chọn ít nhất 1 sinh viên có email.', 'err'); return; }
+  openEmailModal(svs);
+}
+
+/* ── GV Hướng dẫn & Trọng số ──────────────────────────────── */
+function openGVDetail(maSV) {
+  const c  = council();
+  const sv = c.students.find(s => s.maSV === maSV);
+  const gvDongList = sv.gvDong || [];
+  const primaryTS  = gvDongList.length ? 100 - gvDongList.reduce((s,g) => s + g.trongSo, 0) : 100;
+  const allGV      = [{ ten: sv.gvhd, trongSo: primaryTS }, ...gvDongList];
+
+  document.getElementById('gvd-title').textContent = `GV Hướng dẫn — ${sv.tenSV} (${sv.maSV})`;
+  document.getElementById('gvd-body').innerHTML = allGV.map((g,i) => {
+    const mem = c.members.find(m => m.name === g.ten);
+    const loaiBadge = mem && mem.gvType === 'ngoai'
+      ? '<span class="gv-ext-badge">Ngoài trường</span>'
+      : '<span class="gv-int-badge">Trong trường</span>';
+    return `<div style="display:grid;grid-template-columns:1fr 110px 70px;align-items:center;gap:10px;padding:12px 16px;${i<allGV.length-1?'border-bottom:1px solid var(--border)':''}${i===0?';background:#f0f7ff':''}">
+      <div>
+        <div style="font-size:13px;font-weight:${i===0?700:500};color:${i===0?'var(--text-1)':'var(--text-2)'}">${g.ten}</div>
+        ${mem ? `<div style="font-size:11px;color:var(--text-3);margin-top:2px">🏛️ ${mem.unit}</div>` : ''}
+      </div>
+      <div>${loaiBadge}</div>
+      <div style="font-size:14px;font-weight:700;color:var(--primary);text-align:right">${g.trongSo}%</div>
+    </div>`;
+  }).join('');
+  openModal('modal-gvhd');
 }
 
 /* ── Chi tiết đề tài ──────────────────────────────────────── */
@@ -698,18 +927,23 @@ function openScoreModal(maSV) {
   document.getElementById('sc-gvhd').textContent  = sv.gvhd;
 
   const sm = scoringMembers(c);
-  document.getElementById('sc-mem-tbody').innerHTML = sm.length
-    ? sm.map(m => {
-        const s = sv.scores[m.name];
-        const isSelf = m.name === currentPersona;
-        return `<tr class="${isSelf ? 'score-row-self' : ''}">
-          <td><span class="role-tag ${ROLE_CLS[m.role]}">${ROLE_LABEL[m.role]}</span></td>
-          <td style="font-size:13px;font-weight:600">${m.name}${isSelf ? ' <span style="color:var(--primary);font-size:11px">(bạn)</span>' : ''}</td>
-          <td style="text-align:center;font-weight:700">${s ? s.score.toFixed(1) : '<span style="color:var(--text-3);font-weight:400">—</span>'}</td>
-          <td style="font-size:12px;color:var(--text-2)">${s ? s.comment || '' : '<span style="color:var(--text-3)">Chưa chấm</span>'}</td>
-        </tr>`;
-      }).join('')
-    : '<tr><td colspan="4" class="tbl-empty">Hội đồng chưa có thành viên chấm điểm.</td></tr>';
+  const viewAll = canViewAllScores(c);
+  document.getElementById('sc-lock-note').style.display = viewAll ? 'none' : '';
+  document.getElementById('sc-mem-section').style.display = viewAll ? '' : 'none';
+  if (viewAll) {
+    document.getElementById('sc-mem-tbody').innerHTML = sm.length
+      ? sm.map(m => {
+          const s = sv.scores[m.name];
+          const isSelf = m.name === currentPersona;
+          return `<tr class="${isSelf ? 'score-row-self' : ''}">
+            <td><span class="role-tag ${ROLE_CLS[m.role]}">${ROLE_LABEL[m.role]}</span></td>
+            <td style="font-size:13px;font-weight:600">${m.name}${isSelf ? ' <span style="color:var(--primary);font-size:11px">(bạn)</span>' : ''}</td>
+            <td style="text-align:center;font-weight:700">${s ? s.score.toFixed(1) : '<span style="color:var(--text-3);font-weight:400">—</span>'}</td>
+            <td style="font-size:12px;color:var(--text-2)">${s ? s.comment || '' : '<span style="color:var(--text-3)">Chưa chấm</span>'}</td>
+          </tr>`;
+        }).join('')
+      : '<tr><td colspan="4" class="tbl-empty">Hội đồng chưa có thành viên chấm điểm.</td></tr>';
+  }
 
   const selfForm = document.getElementById('sc-self-form');
   if (canScore) {
@@ -753,6 +987,77 @@ function saveScore() {
   closeModal('modal-score');
   renderStudents();
   showToast(`💾 Đã lưu điểm (${score.toFixed(1)}) cho ${sv.tenSV}.`, 'ok');
+}
+
+/* ── Chấm điểm hàng loạt ───────────────────────────────────── */
+function openBulkScoreModal() {
+  const c = council();
+  if (!canScoreNow(c)) { showToast('Hội đồng hiện không cho chấm điểm.', 'err'); return; }
+  const svs = c.students.filter(sv => selectedStudents.has(sv.maSV));
+  if (!svs.length) { showToast('Vui lòng chọn ít nhất 1 sinh viên.', 'err'); return; }
+  document.getElementById('bs-score').value = '';
+  document.getElementById('bs-comment').value = '';
+  openModal('modal-bulkscore');
+}
+function confirmBulkScore() {
+  const c = council();
+  const score = parseFloat(document.getElementById('bs-score').value);
+  if (isNaN(score) || score < 0 || score > 10) { showToast('Vui lòng nhập điểm hợp lệ trong khoảng 0–10.', 'err'); return; }
+  const comment = document.getElementById('bs-comment').value.trim();
+  const svs = c.students.filter(sv => selectedStudents.has(sv.maSV));
+  svs.forEach(sv => { sv.scores[currentPersona] = { score, comment }; });
+  closeModal('modal-bulkscore');
+  renderStudents();
+  showToast(`💾 Đã lưu điểm (${score.toFixed(1)}) cho ${svs.length} sinh viên.`, 'ok');
+}
+
+/* ── Đánh dấu hoàn thành (ghi chú + biên bản họp) ─────────── */
+function fmtDMY(iso) { const [y,m,d] = iso.split('-'); return `${d}/${m}/${y}`; }
+function openCompleteModal() {
+  const c = council();
+  document.getElementById('cp-name').textContent = c.name;
+  document.getElementById('cp-date').value = new Date().toISOString().slice(0,10);
+  document.getElementById('cp-note').value = '';
+  clearCpFile();
+  openModal('modal-complete');
+}
+function onCpFileSelect(input) {
+  if (input.files && input.files[0]) {
+    document.getElementById('cp-file-name').textContent = '📎 ' + input.files[0].name;
+    document.getElementById('cp-file-name').style.color = 'var(--primary)';
+    document.getElementById('cp-file-clear').style.display = '';
+    document.getElementById('cp-dropzone').style.borderColor = 'var(--primary)';
+  }
+}
+function onCpFileDrop(e) {
+  e.preventDefault();
+  document.getElementById('cp-dropzone').style.borderColor = 'var(--border)';
+  const f = e.dataTransfer.files[0];
+  if (f && f.type === 'application/pdf') {
+    document.getElementById('cp-file-name').textContent = '📎 ' + f.name;
+    document.getElementById('cp-file-name').style.color = 'var(--primary)';
+    document.getElementById('cp-file-clear').style.display = '';
+  } else {
+    showToast('Chỉ chấp nhận file PDF', 'err');
+  }
+}
+function clearCpFile() {
+  document.getElementById('cp-file-input').value = '';
+  document.getElementById('cp-file-name').textContent = 'Chưa có file — kéo thả hoặc nhấn chọn file';
+  document.getElementById('cp-file-name').style.color = 'var(--text-2)';
+  document.getElementById('cp-file-clear').style.display = 'none';
+  document.getElementById('cp-dropzone').style.borderColor = 'var(--border)';
+}
+function submitComplete() {
+  const c = council();
+  c.status = 'completed';
+  c.completedAt  = fmtDMY(document.getElementById('cp-date').value);
+  c.completeNote = document.getElementById('cp-note').value.trim();
+  const fileInput = document.getElementById('cp-file-input');
+  if (fileInput.files && fileInput.files[0]) c.bienBanFile = fileInput.files[0].name;
+  closeModal('modal-complete');
+  renderAll();
+  showToast('🏁 Đã đánh dấu hội đồng hoàn thành.', 'ok');
 }
 
 /* ── Render all ───────────────────────────────────────────── */

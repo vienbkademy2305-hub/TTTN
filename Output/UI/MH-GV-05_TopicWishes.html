@@ -302,6 +302,7 @@
     <div class="modal-bd" id="gvhd-body"></div>
     <div class="modal-ft">
       <button class="btn btn-default" data-close="m-gvhd">Đóng</button>
+      <button class="btn btn-primary" onclick="saveGVHD()">💾 Lưu cấu hình</button>
     </div>
   </div>
 </div>
@@ -593,7 +594,7 @@ function render() {
       `<span style="color:var(--primary)">${gvMainCell.ten||'—'}</span>`,
       ...gvRestCell.map(g=>`<span style="color:var(--text-2)">${g.ten}</span>`)
     ];
-    const gvHD = `<div style="cursor:pointer;padding:4px 6px;border-radius:6px;transition:background .15s" onmouseenter="this.style.background='#f0f7ff'" onmouseleave="this.style.background=''" onclick="openGVDetail(${w.id})" title="Xem GVHD & trọng số">
+    const gvHD = `<div style="cursor:pointer;padding:4px 6px;border-radius:6px;transition:background .15s" onmouseenter="this.style.background='#f0f7ff'" onmouseleave="this.style.background=''" onclick="openGVDetail(${w.id})" title="Xem / chỉnh sửa GVHD & trọng số">
       <div style="font-size:13px;line-height:1.7">${allNames.join('<span style="color:var(--border);margin:0 2px">,</span> ')}</div>
     </div>`;
     const lyDoTC = w.status==='Từ chối'&&w.tuChoiLydo
@@ -949,97 +950,166 @@ function openTopicDetail(wishId) {
   openModal('m-topic');
 }
 
-/* ── Modal: GVHD & Trọng số ── */
+/* ── Modal: GVHD & Trọng số (xem & chỉnh sửa) ── */
+let gvhdCards = [];
+let gvhdWishId = null;
+let gvhdAddType = 'internal';
+const KHOA_GV_LIST = ['ThS. Trần Thị Hoa','ThS. Nguyễn Thị Lan','ThS. Nguyễn Đình Hùng','TS. Trần Triệu Long','TS. Lê Quốc Hùng','ThS. Hoàng Minh Tuấn','TS. Phạm Văn Đức'];
+
 function openGVDetail(wishId) {
   const w = wishes.find(x => x.id === wishId);
+  gvhdWishId = wishId;
   document.getElementById('gvhd-title').textContent = `GV Hướng dẫn — ${w.tenSV} (${w.maSV})`;
 
-  const gvDongList = (w.gvDong||[]).map(g => typeof g==='string'?{ten:g,trongSo:0}:g);
+  const gvDongList = (w.gvDong||[]).map(g => typeof g==='string'?{ten:g,trongSo:0,donVi:''}:g);
   const gvNgoaiList = w.gvNgoaiTruong||[];
-  const allGVs = [
-    { ten:w.gvChinh, trongSo:w.gvChinhTrongSo??100, thuocTruong:true, donVi:w.gvChinhDonVi||'' },
-    ...gvDongList.map(g=>({ ten:g.ten, trongSo:g.trongSo, thuocTruong:true, donVi:g.donVi||'' })),
-    ...gvNgoaiList.map(g=>({ ...g, thuocTruong:false, donVi:g.noiCongTac||g.truong||'' })),
+  gvhdCards = [
+    { isPrimary:true, type:'internal', name:w.gvChinh, donVi:w.gvChinhDonVi||'', weight:w.gvChinhTrongSo??100, extInfo:null },
+    ...gvDongList.map(g => ({ isPrimary:false, type:'internal', name:g.ten, donVi:g.donVi||'', weight:g.trongSo||0, extInfo:null })),
+    ...gvNgoaiList.map(g => ({ isPrimary:false, type:'external', name:g.ten, donVi:g.noiCongTac||g.truong||'', weight:g.trongSo||0,
+      extInfo:{ hoTen:g.hoTen||g.ten, noiCongTac:g.noiCongTac||g.truong||'', hocHam:g.hocHam||'', hocVi:g.hocVi||'', chuyenNganh:g.chuyenNganh||'', dienThoai:g.dienThoai||'', email:g.email||'', cccd:g.cccd||'' } })),
   ];
-  const maxTS = Math.max(...allGVs.map(g=>g.trongSo||0));
-  allGVs.forEach(gv => {
-    gv.loai = gv.trongSo === maxTS ? 'chinh' : (gv.thuocTruong ? 'dong' : 'ngoai');
-  });
-  const total = allGVs.reduce((s,g)=>s+(g.trongSo||0), 0);
+
+  renderGVHDBody();
+  openModal('m-gvhd');
+}
+
+function renderGVHDBody() {
+  const total = gvhdCards.reduce((s,c)=>s+(c.weight||0), 0);
   const totalOk = total === 100;
 
   let html = `
   <div style="border:1px solid var(--border);border-radius:8px;overflow:hidden;margin-bottom:14px">
-    <div style="background:#fafafa;padding:10px 16px;border-bottom:1px solid var(--border);display:grid;grid-template-columns:1fr 110px 70px 60px;font-size:12px;font-weight:600;color:var(--text-3)">
+    <div style="background:#fafafa;padding:10px 16px;border-bottom:1px solid var(--border);display:grid;grid-template-columns:1fr 110px 86px 50px;font-size:12px;font-weight:600;color:var(--text-3)">
       <span>Giảng viên hướng dẫn</span><span>Phân loại</span><span style="text-align:right">Trọng số</span><span style="text-align:center">Xóa</span>
     </div>
-    ${allGVs.map(gv => {
-      const isChiif = gv.loai === 'chinh';
-      const locationTag = gv.thuocTruong
+    ${gvhdCards.map((gv,i) => {
+      const locationTag = gv.type==='internal'
         ? `<span style="font-size:11px;background:#f6ffed;color:#389e0d;border:1px solid #b7eb8f;border-radius:4px;padding:2px 8px;font-weight:500">Trong Trường</span>`
         : `<span style="font-size:11px;background:#fff7e6;color:#d46b08;border:1px solid #ffd591;border-radius:4px;padding:2px 8px;font-weight:500">Ngoài Trường</span>`;
-      return `<div style="display:grid;grid-template-columns:1fr 110px 70px 60px;align-items:center;gap:10px;padding:12px 16px;border-bottom:1px solid var(--border);${isChiif?'background:#f0f7ff;border-left:3px solid #1677ff':''}">
+      const delBtn = gv.isPrimary
+        ? `<button disabled title="Không thể xóa GV hướng dẫn chính" style="background:none;border:none;cursor:not-allowed;font-size:15px;color:#d9d9d9;opacity:.5">🗑</button>`
+        : `<button class="icon-btn danger" title="Xóa GV đồng hướng dẫn" onclick="removeGVHDCard(${i})">🗑</button>`;
+      return `<div style="display:grid;grid-template-columns:1fr 110px 86px 50px;align-items:center;gap:10px;padding:12px 16px;border-bottom:1px solid var(--border);${gv.isPrimary?'background:#f0f7ff;border-left:3px solid #1677ff':''}">
         <div>
-          <div style="font-size:13px;font-weight:${isChiif?700:500};color:${isChiif?'var(--text-1)':'var(--text-2)'}">${gv.ten}</div>
+          <div style="font-size:13px;font-weight:${gv.isPrimary?700:500};color:${gv.isPrimary?'var(--text-1)':'var(--text-2)'}">${gv.name}${gv.isPrimary?' <span class="you-label">Bạn</span>':''}</div>
           ${gv.donVi?`<div style="font-size:11px;color:var(--text-3);margin-top:2px">🏛️ ${gv.donVi}</div>`:''}
         </div>
         <div>${locationTag}</div>
-        <div style="font-size:14px;font-weight:700;color:var(--primary);text-align:right">${gv.trongSo}%</div>
-        <div style="text-align:center"><button disabled title="Không có quyền xóa" style="background:none;border:none;cursor:not-allowed;font-size:15px;color:#d9d9d9;opacity:.5">🗑</button></div>
+        <div style="display:flex;align-items:center;justify-content:flex-end;gap:2px">
+          <input type="number" class="fc" min="0" max="100" value="${gv.weight}"
+            style="width:54px;text-align:center;font-size:13px;font-weight:700;color:var(--primary);padding:3px 6px"
+            oninput="gvhdCards[${i}].weight=Math.min(100,Math.max(0,parseInt(this.value)||0));recalcGVHDWeight()">
+          <span style="font-size:12px;color:var(--text-3)">%</span>
+        </div>
+        <div style="text-align:center">${delBtn}</div>
       </div>`;
     }).join('')}
   </div>
 
-  <div style="display:flex;align-items:center;justify-content:flex-end;gap:10px;margin-bottom:${gvNgoaiList.length?16:4}px">
+  <div style="display:flex;align-items:center;justify-content:flex-end;gap:10px;margin-bottom:14px">
     <span style="font-size:13px;color:var(--text-3)">Tổng trọng số:</span>
-    <span style="font-size:16px;font-weight:700;color:${totalOk?'var(--success)':'var(--error)'}">${total}%</span>
-    <span style="font-size:12px;color:${totalOk?'var(--success)':'var(--error)'}">${totalOk?'✓ Hợp lệ':'⚠ Chưa đủ 100%'}</span>
+    <span id="gvhd-total" style="font-size:16px;font-weight:700;color:${totalOk?'var(--success)':'var(--error)'}">${total}%</span>
+    <span id="gvhd-total-icon" style="font-size:12px;color:${totalOk?'var(--success)':'var(--error)'}">${totalOk?'✓ Hợp lệ':'⚠ Chưa đủ 100%'}</span>
+  </div>
+
+  <button class="btn btn-default btn-sm" id="gvhd-add-btn" onclick="openAddGVHDPanel()" style="margin-bottom:16px">+ Thêm GV đồng hướng dẫn</button>
+
+  <div id="gvhd-add-panel" style="display:none;border:1px dashed var(--primary);border-radius:8px;padding:12px 14px;margin-bottom:16px;background:#f0f7ff">
+    <div style="display:flex;gap:8px;margin-bottom:10px">
+      <button type="button" class="btn btn-sm btn-primary" id="gvhd-type-internal" onclick="setAddGVHDType('internal')">🏫 Trong Trường</button>
+      <button type="button" class="btn btn-sm btn-default" id="gvhd-type-external" onclick="setAddGVHDType('external')">🏛️ Ngoài Trường</button>
+    </div>
+    <div id="gvhd-add-internal">
+      <select class="fc" id="gvhd-add-select" style="font-size:13px"></select>
+    </div>
+    <div id="gvhd-add-external" style="display:none">
+      <div class="f-row col-2">
+        <div class="fi" style="margin-bottom:10px">
+          <label>Họ và tên GV <span class="req">*</span></label>
+          <input class="fc" id="gvhd-add-ext-name" type="text" placeholder="VD: Lê Văn Bình">
+        </div>
+        <div class="fi" style="margin-bottom:10px">
+          <label>Nơi công tác <span class="req">*</span></label>
+          <input class="fc" id="gvhd-add-ext-dept" type="text" placeholder="VD: Đại học Quốc gia TP.HCM">
+        </div>
+        <div class="fi" style="margin-bottom:10px">
+          <label>Học hàm</label>
+          <input class="fc" id="gvhd-add-ext-rank" type="text" placeholder="GS / PGS">
+        </div>
+        <div class="fi" style="margin-bottom:10px">
+          <label>Học vị</label>
+          <input class="fc" id="gvhd-add-ext-degree" type="text" placeholder="TS / ThS">
+        </div>
+        <div class="fi" style="grid-column:1/-1;margin-bottom:10px">
+          <label>Chuyên ngành</label>
+          <input class="fc" id="gvhd-add-ext-major" type="text" placeholder="Chuyên ngành nghiên cứu...">
+        </div>
+        <div class="fi" style="margin-bottom:10px">
+          <label>Điện thoại <span class="req">*</span></label>
+          <input class="fc" id="gvhd-add-ext-phone" type="text" placeholder="0xxx xxx xxx">
+        </div>
+        <div class="fi" style="margin-bottom:10px">
+          <label>Email <span class="req">*</span></label>
+          <input class="fc" id="gvhd-add-ext-email" type="text" placeholder="email@...">
+        </div>
+        <div class="fi" style="margin-bottom:0">
+          <label>CCCD <span class="req">*</span></label>
+          <input class="fc" id="gvhd-add-ext-cccd" type="text" placeholder="12 chữ số">
+        </div>
+      </div>
+    </div>
+    <div style="display:flex;justify-content:flex-end;gap:8px;margin-top:10px">
+      <button class="btn btn-default btn-sm" onclick="cancelAddGVHD()">Hủy</button>
+      <button class="btn btn-primary btn-sm" onclick="confirmAddGVHD()">+ Thêm</button>
+    </div>
   </div>`;
 
-  if (gvNgoaiList.length) {
+  const extCards = gvhdCards.filter(c => c.type === 'external');
+  if (extCards.length) {
     html += `<div style="border-top:1px solid var(--border);padding-top:16px">
-      <div style="font-weight:600;font-size:13px;margin-bottom:12px;color:var(--text-2)">🏛️ Thông tin GV ngoài trường <span style="font-weight:400;color:var(--text-3);font-size:12px">(sinh viên kê khai)</span></div>`;
-    gvNgoaiList.forEach(gv => {
-      const hocHamLabel = gv.hocHam || '— Không có —';
-      const hocViLabel  = gv.hocVi  || '— Không có —';
+      <div style="font-weight:600;font-size:13px;margin-bottom:12px;color:var(--text-2)">🏛️ Thông tin GV ngoài trường</div>`;
+    extCards.forEach(gv => {
+      const idx = gvhdCards.indexOf(gv);
+      const ei = gv.extInfo;
       html += `<div style="background:#fafafa;border:1px solid var(--border);border-radius:8px;padding:14px 16px;margin-bottom:10px">
-        <div style="font-weight:700;font-size:13px;color:var(--text-1);margin-bottom:12px">${gv.ten}</div>
-        <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px 20px;font-size:12px;margin-bottom:10px">
-          <div>
-            <div style="color:var(--text-3);font-weight:500;margin-bottom:2px">Họ và tên <span style="color:var(--error)">*</span></div>
-            <div style="background:#fff;border:1px solid var(--border);border-radius:4px;padding:5px 8px">${gv.hoTen||gv.ten}</div>
+        <div style="font-weight:700;font-size:13px;color:var(--text-1);margin-bottom:12px">${gv.name}</div>
+        <div class="f-row col-2" style="margin-bottom:10px">
+          <div class="fi" style="margin-bottom:0">
+            <label>Họ và tên <span class="req">*</span></label>
+            <input class="fc" value="${ei.hoTen}" oninput="gvhdCards[${idx}].extInfo.hoTen=this.value">
           </div>
-          <div>
-            <div style="color:var(--text-3);font-weight:500;margin-bottom:2px">Nơi công tác <span style="color:var(--error)">*</span></div>
-            <div style="background:#fff;border:1px solid var(--border);border-radius:4px;padding:5px 8px">${gv.noiCongTac||gv.truong||'—'}</div>
-          </div>
-        </div>
-        <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px 20px;font-size:12px;margin-bottom:10px">
-          <div>
-            <div style="color:var(--text-3);font-weight:500;margin-bottom:2px">Học hàm</div>
-            <div style="background:#fff;border:1px solid var(--border);border-radius:4px;padding:5px 8px;color:${gv.hocHam?'var(--text-1)':'var(--text-3)'}">${hocHamLabel}</div>
-          </div>
-          <div>
-            <div style="color:var(--text-3);font-weight:500;margin-bottom:2px">Học vị</div>
-            <div style="background:#fff;border:1px solid var(--border);border-radius:4px;padding:5px 8px;color:${gv.hocVi?'var(--text-1)':'var(--text-3)'}">${hocViLabel}</div>
-          </div>
-          <div>
-            <div style="color:var(--text-3);font-weight:500;margin-bottom:2px">Chuyên ngành</div>
-            <div style="background:#fff;border:1px solid var(--border);border-radius:4px;padding:5px 8px">${gv.chuyenNganh||'—'}</div>
+          <div class="fi" style="margin-bottom:0">
+            <label>Nơi công tác <span class="req">*</span></label>
+            <input class="fc" value="${ei.noiCongTac}" oninput="gvhdCards[${idx}].extInfo.noiCongTac=this.value">
           </div>
         </div>
-        <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px 20px;font-size:12px">
-          <div>
-            <div style="color:var(--text-3);font-weight:500;margin-bottom:2px">Điện thoại <span style="color:var(--error)">*</span></div>
-            <div style="background:#fff;border:1px solid var(--border);border-radius:4px;padding:5px 8px">${gv.dienThoai||'—'}</div>
+        <div class="f-row col-3" style="margin-bottom:10px">
+          <div class="fi" style="margin-bottom:0">
+            <label>Học hàm</label>
+            <input class="fc" value="${ei.hocHam}" oninput="gvhdCards[${idx}].extInfo.hocHam=this.value">
           </div>
-          <div>
-            <div style="color:var(--text-3);font-weight:500;margin-bottom:2px">Email <span style="color:var(--error)">*</span></div>
-            <div style="background:#fff;border:1px solid var(--border);border-radius:4px;padding:5px 8px">${gv.email||'—'}</div>
+          <div class="fi" style="margin-bottom:0">
+            <label>Học vị</label>
+            <input class="fc" value="${ei.hocVi}" oninput="gvhdCards[${idx}].extInfo.hocVi=this.value">
           </div>
-          <div>
-            <div style="color:var(--text-3);font-weight:500;margin-bottom:2px">CCCD <span style="color:var(--error)">*</span></div>
-            <div style="background:#fff;border:1px solid var(--border);border-radius:4px;padding:5px 8px;font-family:monospace">${gv.cccd||'—'}</div>
+          <div class="fi" style="margin-bottom:0">
+            <label>Chuyên ngành</label>
+            <input class="fc" value="${ei.chuyenNganh}" oninput="gvhdCards[${idx}].extInfo.chuyenNganh=this.value">
+          </div>
+        </div>
+        <div class="f-row col-3" style="margin-bottom:0">
+          <div class="fi" style="margin-bottom:0">
+            <label>Điện thoại <span class="req">*</span></label>
+            <input class="fc" value="${ei.dienThoai}" oninput="gvhdCards[${idx}].extInfo.dienThoai=this.value">
+          </div>
+          <div class="fi" style="margin-bottom:0">
+            <label>Email <span class="req">*</span></label>
+            <input class="fc" value="${ei.email}" oninput="gvhdCards[${idx}].extInfo.email=this.value">
+          </div>
+          <div class="fi" style="margin-bottom:0">
+            <label>CCCD <span class="req">*</span></label>
+            <input class="fc" style="font-family:monospace" value="${ei.cccd}" oninput="gvhdCards[${idx}].extInfo.cccd=this.value">
           </div>
         </div>
       </div>`;
@@ -1048,7 +1118,102 @@ function openGVDetail(wishId) {
   }
 
   document.getElementById('gvhd-body').innerHTML = html;
-  openModal('m-gvhd');
+}
+
+function recalcGVHDWeight() {
+  const total = gvhdCards.reduce((s,c)=>s+(c.weight||0), 0);
+  const totalOk = total === 100;
+  const totalEl = document.getElementById('gvhd-total');
+  const iconEl  = document.getElementById('gvhd-total-icon');
+  totalEl.textContent = total + '%';
+  totalEl.style.color = totalOk ? 'var(--success)' : 'var(--error)';
+  iconEl.textContent  = totalOk ? '✓ Hợp lệ' : '⚠ Chưa đủ 100%';
+  iconEl.style.color  = totalOk ? 'var(--success)' : 'var(--error)';
+}
+
+function removeGVHDCard(idx) {
+  gvhdCards.splice(idx, 1);
+  renderGVHDBody();
+}
+
+function openAddGVHDPanel() {
+  document.getElementById('gvhd-add-panel').style.display = 'block';
+  document.getElementById('gvhd-add-btn').style.display = 'none';
+  populateGVHDInternalSelect();
+  setAddGVHDType('internal');
+}
+function populateGVHDInternalSelect() {
+  const sel = document.getElementById('gvhd-add-select');
+  const used = gvhdCards.map(c => c.name);
+  const opts = KHOA_GV_LIST.filter(n => !used.includes(n));
+  sel.innerHTML = '<option value="">-- Chọn giảng viên trong trường --</option>' +
+    opts.map(n => `<option value="${n}">${n}</option>`).join('');
+}
+function setAddGVHDType(type) {
+  gvhdAddType = type;
+  document.getElementById('gvhd-type-internal').className = 'btn btn-sm' + (type === 'internal' ? ' btn-primary' : ' btn-default');
+  document.getElementById('gvhd-type-external').className = 'btn btn-sm' + (type === 'external' ? ' btn-primary' : ' btn-default');
+  document.getElementById('gvhd-add-internal').style.display = type === 'internal' ? '' : 'none';
+  document.getElementById('gvhd-add-external').style.display = type === 'external' ? '' : 'none';
+}
+const GVHD_ADD_EXT_FIELDS = ['gvhd-add-ext-name','gvhd-add-ext-dept','gvhd-add-ext-rank','gvhd-add-ext-degree','gvhd-add-ext-major','gvhd-add-ext-phone','gvhd-add-ext-email','gvhd-add-ext-cccd'];
+function cancelAddGVHD() {
+  document.getElementById('gvhd-add-panel').style.display = 'none';
+  document.getElementById('gvhd-add-btn').style.display = '';
+  GVHD_ADD_EXT_FIELDS.forEach(id => document.getElementById(id).value = '');
+}
+function confirmAddGVHD() {
+  if (gvhdAddType === 'internal') {
+    const sel = document.getElementById('gvhd-add-select');
+    if (!sel.value) { showToast('Vui lòng chọn giảng viên đồng hướng dẫn', 'warn'); return; }
+    gvhdCards.push({ isPrimary:false, type:'internal', name:sel.value, donVi:'Khoa CNTT', weight:0, extInfo:null });
+  } else {
+    const name   = document.getElementById('gvhd-add-ext-name').value.trim();
+    const dept   = document.getElementById('gvhd-add-ext-dept').value.trim();
+    const rank   = document.getElementById('gvhd-add-ext-rank').value.trim();
+    const degree = document.getElementById('gvhd-add-ext-degree').value.trim();
+    const major  = document.getElementById('gvhd-add-ext-major').value.trim();
+    const phone  = document.getElementById('gvhd-add-ext-phone').value.trim();
+    const email  = document.getElementById('gvhd-add-ext-email').value.trim();
+    const cccd   = document.getElementById('gvhd-add-ext-cccd').value.trim();
+    if (!name || !dept || !phone || !email || !cccd) {
+      showToast('Vui lòng điền đầy đủ thông tin bắt buộc (*) của GV ngoài trường', 'warn'); return;
+    }
+    const titleParts = [rank, degree].filter(Boolean);
+    const displayName = titleParts.length ? titleParts.join('.') + '. ' + name : name;
+    gvhdCards.push({ isPrimary:false, type:'external', name:displayName, donVi:dept, weight:0,
+      extInfo:{ hoTen:name, noiCongTac:dept, hocHam:rank, hocVi:degree, chuyenNganh:major, dienThoai:phone, email, cccd } });
+  }
+  cancelAddGVHD();
+  renderGVHDBody();
+  showToast('Đã thêm GV đồng hướng dẫn — cập nhật trọng số');
+}
+
+function saveGVHD() {
+  const total = gvhdCards.reduce((s,c)=>s+(c.weight||0), 0);
+  if (total !== 100) { showToast('Tổng trọng số hướng dẫn phải đạt chính xác 100%', 'err'); return; }
+  for (const c of gvhdCards) {
+    if (c.type === 'external') {
+      const ei = c.extInfo;
+      if (!ei.hoTen || !ei.noiCongTac || !ei.dienThoai || !ei.email || !ei.cccd) {
+        showToast('Vui lòng điền đầy đủ thông tin bắt buộc (*) của GV ngoài trường', 'err'); return;
+      }
+    }
+  }
+  const w = wishes.find(x => x.id === gvhdWishId);
+  const primary = gvhdCards.find(c => c.isPrimary);
+  w.gvChinh = primary.name;
+  w.gvChinhTrongSo = primary.weight;
+  w.gvChinhDonVi = primary.donVi;
+  w.gvDong = gvhdCards.filter(c => !c.isPrimary && c.type === 'internal')
+    .map(c => ({ ten:c.name, trongSo:c.weight, donVi:c.donVi }));
+  w.gvNgoaiTruong = gvhdCards.filter(c => c.type === 'external')
+    .map(c => ({ ten:c.name, hoTen:c.extInfo.hoTen, trongSo:c.weight, hocHam:c.extInfo.hocHam, hocVi:c.extInfo.hocVi,
+      chuyenNganh:c.extInfo.chuyenNganh, noiCongTac:c.extInfo.noiCongTac, email:c.extInfo.email,
+      dienThoai:c.extInfo.dienThoai, cccd:c.extInfo.cccd }));
+  closeModal('m-gvhd');
+  render();
+  showToast('Đã lưu cấu hình GV hướng dẫn');
 }
 
 /* ── Init ── */

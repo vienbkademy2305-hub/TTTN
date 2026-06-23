@@ -30,6 +30,9 @@
     .picker-item.added{background:#f6ffed;border-color:#b7eb8f;cursor:default}
     .picker-item input[type=checkbox]{width:15px;height:15px;flex-shrink:0}
     .cond-empty{text-align:center;padding:18px;color:var(--text-3);font-size:13px;font-style:italic}
+    .creator-chip{display:inline-flex;align-items:center;gap:6px;background:#e6f4ff;border:1px solid #91caff;border-radius:14px;padding:4px 6px 4px 10px;font-size:12px;color:#0958d9;margin:0 6px 6px 0}
+    .creator-chip button{border:none;background:none;cursor:pointer;color:#0958d9;font-size:12px;line-height:1;padding:2px}
+    .creator-chip button:hover{color:var(--error)}
   </style>
 </head>
 <body>
@@ -168,6 +171,12 @@
                 <input class="fc" type="datetime-local" id="f-end" value="2025-09-30T17:00">
               </div>
               <div class="fi" style="grid-column:1/-1">
+                <label>Người tạo <span class="req">*</span></label>
+                <div id="creator-chips" style="display:flex;flex-wrap:wrap;align-items:center"></div>
+                <button type="button" class="btn btn-default btn-sm" onclick="openPickerCreator()">➕ Chọn người tạo</button>
+                <div class="f-hint">Có thể chọn nhiều cán bộ cùng tạo/quản lý đợt này</div>
+              </div>
+              <div class="fi" style="grid-column:1/-1">
                 <label>Mô tả</label>
                 <textarea class="fc" rows="3" placeholder="Thông tin bổ sung về đợt đăng ký..." maxlength="1000"></textarea>
                 <div class="f-hint">Tối đa 1000 ký tự</div>
@@ -237,10 +246,37 @@
                 <input class="fc" type="number" min="1" placeholder="VD: 3">
                 <div class="f-hint">Chỉ áp dụng cho Đồ án / Khóa luận</div>
               </div>
-              <div class="fi">
+              <div class="fi" id="fi-svgvhd-simple">
                 <label>Số SV tối đa / GVHD <span class="req">*</span></label>
                 <input class="fc" type="number" min="1" value="10">
+                <div class="f-hint">Áp dụng chung cho mọi GVHD trong đợt Thực tập</div>
               </div>
+            </div>
+
+            <div class="fi" id="fi-svgvhd-detail" style="display:none;margin-bottom:24px">
+              <label>Số SV tối đa / GVHD theo học vị, chức danh <span class="req">*</span></label>
+              <div class="tbl-wrap">
+                <table class="cond-tbl">
+                  <thead>
+                    <tr><th style="text-align:left">Học vị / Chức danh GVHD</th><th style="width:180px">Số SV tối đa</th></tr>
+                  </thead>
+                  <tbody>
+                    <tr data-id="cap-cao-cap">
+                      <td>PGS, GS, TSKH, GVCC</td>
+                      <td><input class="fc" type="number" min="1" max="20" value="20"></td>
+                    </tr>
+                    <tr data-id="cap-chinh">
+                      <td>TS, GV chính</td>
+                      <td><input class="fc" type="number" min="1" max="15" value="15"></td>
+                    </tr>
+                    <tr data-id="cap-thac-si">
+                      <td>Thạc sĩ</td>
+                      <td><input class="fc" type="number" min="1" max="10" value="10"></td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+              <div class="f-hint">Chỉ áp dụng cho Đồ án / Khóa luận tốt nghiệp — số SV tối đa không vượt mức quy định theo học vị, chức danh GVHD</div>
             </div>
 
             <!-- 3.2 -->
@@ -342,6 +378,26 @@
   </div>
 </div>
 
+<!-- ===== PICKER B1: Người tạo ===== -->
+<div class="overlay hidden" id="modal-picker-creator">
+  <div class="modal-box" style="width:480px">
+    <div class="modal-hd">
+      <span class="modal-title">➕ Chọn Người tạo</span>
+      <button class="modal-close" onclick="closeModal('modal-picker-creator')">✕</button>
+    </div>
+    <div class="modal-bd">
+      <div class="input-search" style="margin-bottom:12px">
+        <input class="fc" type="text" id="picker-creator-search" placeholder="🔍 Tìm theo mã hoặc tên cán bộ..." oninput="filterPickerCreator(this.value)">
+      </div>
+      <div class="picker-list" id="picker-creator-list"></div>
+    </div>
+    <div class="modal-ft">
+      <button class="btn btn-default" onclick="closeModal('modal-picker-creator')">Hủy</button>
+      <button class="btn btn-primary" onclick="confirmPickerCreator()">➕ Thêm vào danh sách</button>
+    </div>
+  </div>
+</div>
+
 <!-- ===== PICKER 3.2: Tiêu chí tham số ===== -->
 <div class="overlay hidden" id="modal-picker32">
   <div class="modal-box" style="width:520px">
@@ -410,7 +466,8 @@ function onLoaiHinhChange() {
   const v = document.getElementById('f-loai').value;
   const show = v.includes('Đồ án')||v.includes('Khóa luận');
   document.getElementById('fi-nv').style.display = show?'':'none';
-  // Also sync to panel 3 if already there
+  document.getElementById('fi-svgvhd-simple').style.display = show?'none':'';
+  document.getElementById('fi-svgvhd-detail').style.display = show?'':'none';
 }
 
 function toggleCond(cb) {
@@ -436,6 +493,59 @@ function saveForm(){
 }
 
 function closeModal(id){ document.getElementById(id).classList.add('hidden'); }
+
+// ───── B1: Người tạo ─────
+const POOL_CREATOR = [
+  { id:'cb001', code:'CB001', name:'Nguyễn Thị Lan' },
+  { id:'cb002', code:'CB002', name:'Trần Văn Bình' },
+  { id:'cb003', code:'CB003', name:'Phạm Thị Hoa' },
+  { id:'cb004', code:'CB004', name:'Lê Văn Đức' },
+  { id:'cb005', code:'CB005', name:'Hoàng Thị Mai' },
+];
+let selectedCreators = ['cb001'];
+
+function renderCreatorChips(){
+  document.getElementById('creator-chips').innerHTML = selectedCreators.map(id=>{
+    const c = POOL_CREATOR.find(x=>x.id===id);
+    if(!c) return '';
+    return `<span class="creator-chip">${c.code} - ${c.name}<button type="button" onclick="removeCreator('${id}')" title="Xóa">✕</button></span>`;
+  }).join('');
+}
+
+function removeCreator(id){
+  selectedCreators = selectedCreators.filter(x=>x!==id);
+  renderCreatorChips();
+}
+
+function renderPickerCreator(filter=''){
+  const q = filter.toLowerCase();
+  document.getElementById('picker-creator-list').innerHTML = POOL_CREATOR
+    .filter(c=>!q || c.code.toLowerCase().includes(q) || c.name.toLowerCase().includes(q))
+    .map(c=>`
+      <label class="picker-item${selectedCreators.includes(c.id)?' added':''}" data-id="${c.id}">
+        <input type="checkbox" ${selectedCreators.includes(c.id)?'checked disabled':''}>
+        <span style="flex:1">${c.code} - ${c.name}</span>
+        ${selectedCreators.includes(c.id)?'<span style="font-size:11px;color:var(--success)">Đã chọn</span>':''}
+      </label>`).join('') || '<div class="cond-empty">Không tìm thấy cán bộ phù hợp</div>';
+}
+
+function openPickerCreator(){
+  document.getElementById('picker-creator-search').value='';
+  renderPickerCreator();
+  document.getElementById('modal-picker-creator').classList.remove('hidden');
+}
+function filterPickerCreator(q){ renderPickerCreator(q); }
+
+function confirmPickerCreator(){
+  document.querySelectorAll('#picker-creator-list .picker-item:not(.added) input:checked').forEach(cb=>{
+    const id = cb.closest('.picker-item').dataset.id;
+    if(!selectedCreators.includes(id)) selectedCreators.push(id);
+  });
+  renderCreatorChips();
+  closeModal('modal-picker-creator');
+}
+
+renderCreatorChips();
 
 // ───── 3.2 Tiêu chí tham số ─────
 const POOL32 = [

@@ -133,6 +133,7 @@
                 <th>Họ tên</th>
                 <th>CTĐT</th>
                 <th>Lớp Học phần</th>
+                <th style="min-width:130px">Thời gian học</th>
                 <th>Loại yêu cầu</th>
                 <th>Ngày gửi</th>
                 <th style="min-width:160px">Nội dung tóm tắt</th>
@@ -150,6 +151,7 @@
                 <td style="font-size:13px">Nguyễn Văn An</td>
                 <td style="font-size:13px;color:var(--text-2)">KTPM</td>
                 <td style="font-size:12px;font-weight:500">INT3110_1</td>
+                <td style="font-size:12px;white-space:nowrap">01/09/2025 – 31/12/2025</td>
                 <td><span class="tag tag-blue">🔄 Đổi DN</span></td>
                 <td style="font-size:12px;white-space:nowrap">20/09/2025 14:32</td>
                 <td style="font-size:12px">Doanh nghiệp tạm dừng hoạt động do tái cơ cấu từ 01/10/2025...</td>
@@ -169,6 +171,7 @@
                 <td style="font-size:13px">Trần Thị Bích</td>
                 <td style="font-size:13px;color:var(--text-2)">KHMT</td>
                 <td style="font-size:12px;font-weight:500">INT3110_1</td>
+                <td style="font-size:12px;white-space:nowrap">01/09/2025 – 31/12/2025</td>
                 <td><span class="tag tag-default">📅 Gia hạn</span></td>
                 <td style="font-size:12px;white-space:nowrap">22/09/2025 09:10</td>
                 <td style="font-size:12px">Dự án tại DN kéo dài thêm 4 tuần so với kế hoạch ban đầu...</td>
@@ -188,6 +191,7 @@
                 <td style="font-size:13px">Lê Quốc Cường</td>
                 <td style="font-size:13px;color:var(--text-2)">KTPM</td>
                 <td style="font-size:12px;font-weight:500">INT3110_2</td>
+                <td style="font-size:12px;white-space:nowrap">01/09/2025 – 31/12/2025</td>
                 <td><span class="tag tag-blue">🔄 Đổi DN</span></td>
                 <td style="font-size:12px;white-space:nowrap">15/09/2025 16:45</td>
                 <td style="font-size:12px">Vị trí thực tập không phù hợp với ngành đào tạo...</td>
@@ -205,6 +209,7 @@
                 <td style="font-size:13px">Phạm Thị Dung</td>
                 <td style="font-size:13px;color:var(--text-2)">HTTT</td>
                 <td style="font-size:12px;font-weight:500">INT2110_1</td>
+                <td style="font-size:12px;white-space:nowrap">01/06/2024 – 31/08/2024</td>
                 <td><span class="tag tag-default">📅 Gia hạn</span></td>
                 <td style="font-size:12px;white-space:nowrap">10/07/2024 11:20</td>
                 <td style="font-size:12px">Lý do cá nhân, cần thêm 2 tuần...</td>
@@ -419,6 +424,14 @@ const DOTS = {
   'Kiến tập HK hè 2024': 'Kiến tập',
   'TTTN HK2 2024-2025':  'Thực tập tốt nghiệp',
   'Kiến tập HK1 2024':   'Kiến tập',
+};
+
+/* Thời gian thực tập của từng Lớp Học phần (lấy theo dữ liệu lớp học phần) */
+const LHP_TIME = {
+  'INT3110_1': '01/09/2025 – 31/12/2025',
+  'INT3110_2': '01/09/2025 – 31/12/2025',
+  'INT3110_3': '01/09/2025 – 31/12/2025',
+  'INT2110_1': '01/06/2024 – 31/08/2024',
 };
 
 const REQUESTS = [
@@ -672,12 +685,12 @@ function _getSelectedRows() {
 function _rowToCols(r) {
   const typeLabel  = r.type === 'change' ? 'Đổi doanh nghiệp' : 'Gia hạn';
   const statusMap  = { pending:'Chờ duyệt', approved:'Đã duyệt', rejected:'Từ chối' };
-  return [r.svId, r.name, r.lhp, r.dot, typeLabel, r.date, statusMap[r.status] || r.status];
+  return [r.svId, r.name, r.lhp, LHP_TIME[r.lhp] || '', r.dot, typeLabel, r.date, statusMap[r.status] || r.status];
 }
 
 function exportCSV() {
   const rows = _getSelectedRows();
-  const header = ['Mã SV','Họ tên','Lớp HP','Đợt','Loại yêu cầu','Ngày gửi','Trạng thái'];
+  const header = ['Mã SV','Họ tên','Lớp HP','Thời gian học','Đợt','Loại yêu cầu','Ngày gửi','Trạng thái'];
   const lines  = [header, ...rows.map(_rowToCols)]
     .map(cols => cols.map(c => '"' + String(c).replace(/"/g,'""') + '"').join(','));
   const blob = new Blob(['﻿' + lines.join('\r\n')], { type:'text/csv;charset=utf-8' });
@@ -687,7 +700,7 @@ function exportCSV() {
 
 function exportExcel() {
   const rows = _getSelectedRows();
-  const header = ['Mã SV','Họ tên','Lớp HP','Đợt','Loại yêu cầu','Ngày gửi','Trạng thái'];
+  const header = ['Mã SV','Họ tên','Lớp HP','Thời gian học','Đợt','Loại yêu cầu','Ngày gửi','Trạng thái'];
   const allRows = [header, ...rows.map(_rowToCols)];
   const xml = `<?xml version="1.0" encoding="UTF-8"?>
 <?mso-application progid="Excel.Sheet"?>

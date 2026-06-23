@@ -924,7 +924,7 @@ function renderSortCards() {
         <div>${locationTag}</div>
         <div style="display:flex;align-items:center;justify-content:flex-end;gap:2px">
           <input type="number" class="fc" id="co-wt-${item.id}-${ci}"
-            value="${cg.weight}" min="1" max="99"
+            value="${cg.weight}" min="0" max="99"
             style="width:54px;text-align:center;font-size:13px;font-weight:700;color:#722ed1;padding:4px 6px"
             oninput="updateCoWeight('${item.id}')">
           <span style="font-size:12px;color:var(--text-3)">%</span>
@@ -1018,7 +1018,7 @@ function renderSortCards() {
             <div style="display:flex;align-items:center;gap:8px;margin-bottom:10px">
               <label style="font-size:12px;color:var(--text-2);white-space:nowrap">Trọng số GV mới (%):</label>
               <input type="number" class="fc" id="co-new-wt-${item.id}"
-                value="${suggestWt}" min="1" max="99"
+                value="${suggestWt}" min="0" max="99"
                 style="width:72px;text-align:center">
             </div>
 
@@ -1098,7 +1098,7 @@ function updateCoWeight(itemId) {
   let totalCo = 0;
   coGvList.forEach((cg, ci) => {
     const el = document.getElementById(`co-wt-${itemId}-${ci}`);
-    const w  = Math.min(99, Math.max(1, parseInt(el?.value) || 1));
+    const w  = Math.min(99, Math.max(0, parseInt(el?.value) || 0));
     cg.weight = w;
     totalCo  += w;
   });
@@ -1135,13 +1135,13 @@ function addOneCoGv(itemId) {
   const totalCo   = coGvList.reduce((s, c) => s + c.weight, 0);
   const priWeight = 100 - totalCo;
 
-  if (priWeight < 2) {
+  if (priWeight < 1) {
     showToast('GV hướng dẫn chính phải còn ít nhất 1% trọng số để thêm GV đồng HD', 'warn');
     return;
   }
 
   const newWtEl = document.getElementById(`co-new-wt-${itemId}`);
-  const newWt   = Math.min(priWeight - 1, Math.max(1, parseInt(newWtEl?.value) || 30));
+  const newWt   = Math.min(priWeight - 1, Math.max(0, parseInt(newWtEl?.value) || 0));
 
   const intEl = document.getElementById(`co-int-${itemId}`);
   const isExt = intEl && intEl.style.display === 'none';

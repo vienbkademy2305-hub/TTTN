@@ -546,6 +546,7 @@
               <th style="width:36px;text-align:center">#</th>
               <th style="width:80px">Tuần <span class="req">*</span></th>
               <th style="min-width:220px">Nhiệm vụ / Công việc <span class="req">*</span></th>
+              <th style="min-width:200px">Kết quả đạt được</th>
               <th style="min-width:120px">Ghi chú</th>
               <th style="width:40px"></th>
             </tr>
@@ -555,6 +556,7 @@
               <td style="text-align:center;color:var(--text-3)">1</td>
               <td><input class="fc" type="text" placeholder="Tuần 1"></td>
               <td><textarea class="fc" style="height:52px;resize:none" placeholder="Mô tả nhiệm vụ..."></textarea></td>
+              <td><textarea class="fc" style="height:52px;resize:none" placeholder="Kết quả đạt được..."></textarea></td>
               <td><input class="fc" type="text" placeholder="Ghi chú..."></td>
               <td style="text-align:center"><button class="btn btn-link" style="color:var(--error)" onclick="svsPlanDel(this)" title="Xóa dòng">🗑️</button></td>
             </tr>
@@ -568,7 +570,19 @@
     </div>
     <div class="modal-ft">
       <button class="btn btn-default" onclick="closeModal('modal-sv-submit-dc')">Hủy</button>
-      <button class="btn btn-primary" onclick="submitSvDc()">🚀 Gửi Đề cương</button>
+      <button class="btn btn-primary" onclick="confirmSubmitSvDc()">🚀 Gửi Đề cương</button>
+    </div>
+  </div>
+</div>
+
+<!-- ======================== POPUP: XÁC NHẬN GỬI ĐỀ CƯƠNG (SV) ======================== -->
+<div class="overlay hidden" id="modal-sv-confirm-dc" style="z-index:1100">
+  <div class="confirm-box">
+    <div class="confirm-title">Xác nhận gửi đề cương?</div>
+    <div class="confirm-desc">Sau khi gửi, đề cương sẽ chuyển sang trạng thái "Chờ GVHD duyệt" và bạn không thể tự chỉnh sửa cho đến khi có phản hồi. Bạn chắc chắn muốn gửi?</div>
+    <div class="confirm-actions">
+      <button class="btn btn-default" onclick="closeModal('modal-sv-confirm-dc')">Hủy</button>
+      <button class="btn btn-primary" onclick="submitSvDc()">Xác nhận gửi</button>
     </div>
   </div>
 </div>
@@ -1129,11 +1143,8 @@ function openSvSubmitDc(maDot) {
   document.getElementById('svsdot').textContent = maDot;
 
   // Nếu là nộp lại (reject) → điền sẵn dữ liệu cũ
-  const isResubmit = d && d.status === 'reject';
   const alertTop = document.getElementById('svs-alert-top');
-  alertTop.innerHTML = isResubmit
-    ? `<div class="alert" style="border-color:#ffa39e;background:#fff1f0"><span class="alert-ico">⚠️</span><div class="alert-body"><div class="alert-title" style="color:var(--error)">Nộp lại đề cương</div><span class="alert-desc">GVHD yêu cầu chỉnh sửa: <strong>${d.statusMsg.replace('GVHD yêu cầu chỉnh sửa: ','')}</strong>. Vui lòng chỉnh sửa và nộp lại.</span></div></div>`
-    : '';
+  alertTop.innerHTML = '';
 
   if (d) {
     document.getElementById('svs-dn').value     = d.dn     || '';
@@ -1149,6 +1160,7 @@ function openSvSubmitDc(maDot) {
           <td style="text-align:center;color:var(--text-3)">${i+1}</td>
           <td><input class="fc" type="text" value="${r.tuan}" placeholder="Tuần ${i+1}"></td>
           <td><textarea class="fc" style="height:52px;resize:none">${r.cv}</textarea></td>
+          <td><textarea class="fc" style="height:52px;resize:none" placeholder="Kết quả đạt được...">${r.kq || ''}</textarea></td>
           <td><input class="fc" type="text" value="${r.gc}" placeholder="Ghi chú..."></td>
           <td style="text-align:center"><button class="btn btn-link" style="color:var(--error)" onclick="svsPlanDel(this)">🗑️</button></td>
         </tr>`;
@@ -1165,6 +1177,7 @@ function openSvSubmitDc(maDot) {
       <td style="text-align:center;color:var(--text-3)">1</td>
       <td><input class="fc" type="text" placeholder="Tuần 1"></td>
       <td><textarea class="fc" style="height:52px;resize:none" placeholder="Mô tả nhiệm vụ..."></textarea></td>
+      <td><textarea class="fc" style="height:52px;resize:none" placeholder="Kết quả đạt được..."></textarea></td>
       <td><input class="fc" type="text" placeholder="Ghi chú..."></td>
       <td style="text-align:center"><button class="btn btn-link" style="color:var(--error)" onclick="svsPlanDel(this)">🗑️</button></td>
     </tr>`;
@@ -1181,6 +1194,7 @@ function svsPlanAdd() {
     <td style="text-align:center;color:var(--text-3)">${svsRowCount}</td>
     <td><input class="fc" type="text" placeholder="Tuần ${svsRowCount}"></td>
     <td><textarea class="fc" style="height:52px;resize:none" placeholder="Mô tả nhiệm vụ..."></textarea></td>
+    <td><textarea class="fc" style="height:52px;resize:none" placeholder="Kết quả đạt được..."></textarea></td>
     <td><input class="fc" type="text" placeholder="Ghi chú..."></td>
     <td style="text-align:center"><button class="btn btn-link" style="color:var(--error)" onclick="svsPlanDel(this)">🗑️</button></td>`;
   tbody.appendChild(tr);
@@ -1197,9 +1211,13 @@ function svsReindex() {
     tr.querySelector('td:first-child').textContent = i + 1;
   });
 }
-function submitSvDc() {
+function confirmSubmitSvDc() {
   if (!document.getElementById('svs-dn').value.trim())     { toast('Vui lòng nhập tên Cơ sở TT', 'error'); return; }
   if (!document.getElementById('svs-phuong').value.trim()) { toast('Vui lòng nhập Phường / Xã', 'error'); return; }
+  document.getElementById('modal-sv-confirm-dc').classList.remove('hidden');
+}
+function submitSvDc() {
+  closeModal('modal-sv-confirm-dc');
   closeModal('modal-sv-submit-dc');
   toast('Đã gửi đề cương thành công. Chờ Giảng viên HD phê duyệt.');
 }

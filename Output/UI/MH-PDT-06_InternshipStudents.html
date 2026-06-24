@@ -1027,6 +1027,10 @@
           <input class="fc" type="text" id="bqd-nguoiky" placeholder="VD: PGS.TS. Nguyễn Văn X — Trưởng Khoa">
         </div>
       </div>
+      <div class="fi" style="margin-bottom:20px">
+        <label>Nội dung</label>
+        <textarea class="fc" id="bqd-noidung" rows="3" placeholder="Nhập nội dung tóm tắt của quyết định (không bắt buộc)..."></textarea>
+      </div>
 
       <!-- Section 2: File QĐ -->
       <div class="sec-title"><span class="sec-badge">2</span> File Quyết định (PDF)</div>
@@ -1935,6 +1939,7 @@ function openBulkQD() {
   document.getElementById('bqd-loai').value      = 'cu-di-hoc';
   document.getElementById('bqd-donvi').value     = 'Khoa CNTT';
   document.getElementById('bqd-nguoiky').value   = '';
+  document.getElementById('bqd-noidung').value   = '';
   clearBQDFile();
   renderBQDSVTable();
 

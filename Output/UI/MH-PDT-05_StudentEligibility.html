@@ -61,6 +61,16 @@
     .col-nv{width:110px}
     .col-note{max-width:150px}
     .col-act{width:160px;text-align:center}
+    /* Lý do — danh sách học phần chưa hoàn thành */
+    .col-reason{width:230px}
+    .reason-title{font-size:12px;font-weight:600;color:var(--error);margin-bottom:4px}
+    .reason-group{font-size:12px;line-height:1.5}
+    .reason-group + .reason-group{margin-top:4px}
+    .reason-cat{font-weight:600;color:var(--text-1)}
+    .reason-course{color:var(--text-3);padding-left:14px}
+    .reason-preview{cursor:pointer}
+    .reason-preview .reason-clamp{display:-webkit-box;-webkit-line-clamp:3;line-clamp:3;-webkit-box-orient:vertical;overflow:hidden}
+    .reason-preview:hover .reason-title{text-decoration:underline}
   </style>
 </head>
 <body>
@@ -193,7 +203,6 @@
           <option>Tất cả TT Công bố</option>
           <option>Đã công bố</option>
           <option>Chưa công bố</option>
-          <option>Không áp dụng</option>
         </select>
       </div>
 
@@ -211,6 +220,7 @@
 
       <!-- Table -->
       <div style="display:flex;justify-content:flex-end;gap:8px;margin-bottom:8px">
+        <button class="btn btn-default btn-sm" onclick="syncClassSection()">🔄 Đồng bộ Lớp học phần</button>
         <button class="btn btn-default btn-sm" onclick="syncTuition()">🔄 Đồng bộ Tài chính</button>
         <button class="btn btn-primary btn-sm" onclick="syncAll()">🔄 Đồng bộ tất cả</button>
       </div>
@@ -233,6 +243,7 @@
                 <th class="col-tt">TT Điều kiện</th>
                 <th class="col-hp">TT Học phí</th>
                 <th class="col-nv">TT Nguyện vọng</th>
+                <th class="col-reason" title="Chỉ hiển thị danh sách học phần khi điều kiện hệ thống &quot;Hoàn thành các học phần bắt buộc khối kiến thức giáo dục chuyên nghiệp&quot; không đạt">Lý do</th>
                 <th class="col-note">Ghi chú</th>
                 <th class="col-cb">TT Công bố</th>
                 <th class="col-act">Thao tác</th>
@@ -252,6 +263,7 @@
                 <td><span class="tag tag-success">✓ Đủ điều kiện</span></td>
                 <td><span class="tag tag-success">Đã nộp</span></td>
                 <td><span class="tag tag-success">Đã đăng ký</span></td>
+                <td style="font-style:italic;color:var(--text-3);font-size:12px">—</td>
                 <td style="font-style:italic;color:var(--text-3);font-size:12px">—</td>
                 <td style="text-align:center"><span class="tag tag-default" id="cb-B22DCCN001">Chưa công bố</span></td>
                 <td>
@@ -274,8 +286,9 @@
                 <td><span class="tag tag-error">✗ Không đủ ĐK</span></td>
                 <td><span class="tag tag-success">Đã nộp</span></td>
                 <td><span class="tag tag-default">Chưa đăng ký</span></td>
+                <td style="font-style:italic;color:var(--text-3);font-size:12px">—</td>
                 <td style="font-style:italic;color:var(--text-3);font-size:12px" title="GPA 2.1 < 2.5">GPA 2.1 &lt; 2.5</td>
-                <td style="text-align:center"><span class="tag tag-default" style="color:var(--text-3)" id="cb-B22DCCN015">Không áp dụng</span></td>
+                <td style="text-align:center"><span class="tag tag-default" id="cb-B22DCCN015">Chưa công bố</span></td>
                 <td>
                   <div class="tbl-actions" style="justify-content:center">
                     <button class="btn btn-link btn-sm" onclick="openDetailPopup('B22DCCN015','Trần Thị Bích')">🔍 Chi tiết</button>
@@ -295,8 +308,9 @@
                 <td><span class="tag tag-default">⊘ Đã hủy</span></td>
                 <td><span class="tag tag-warning">Chưa nộp</span></td>
                 <td><span class="tag tag-success">Đã đăng ký</span></td>
+                <td style="font-style:italic;color:var(--text-3);font-size:12px">—</td>
                 <td style="font-style:italic;color:var(--text-3);font-size:12px" title="Đã đăng ký nguyện vọng nhưng chưa hoàn thành học phí quá hạn 15/09">Đã đăng ký NV nhưng chưa nộp HP...</td>
-                <td style="text-align:center"><span class="tag tag-default" style="color:var(--text-3)" id="cb-B22DCCN033">Không áp dụng</span></td>
+                <td style="text-align:center"><span class="tag tag-default" id="cb-B22DCCN033">Chưa công bố</span></td>
                 <td>
                   <div class="tbl-actions" style="justify-content:center">
                     <button class="btn btn-link btn-sm" onclick="openDetailPopup('B22DCCN033','Lê Quốc Cường')">🔍 Chi tiết</button>
@@ -316,6 +330,7 @@
                 <td><span class="tag tag-success">✓ Đủ điều kiện</span></td>
                 <td><span class="tag tag-success">Đã nộp</span></td>
                 <td><span class="tag tag-default">Chưa đăng ký</span></td>
+                <td style="font-style:italic;color:var(--text-3);font-size:12px">—</td>
                 <td style="font-style:italic;color:var(--text-3);font-size:12px">—</td>
                 <td style="text-align:center"><span class="tag tag-success" id="cb-B22DCCN047">Đã công bố</span></td>
                 <td>
@@ -337,8 +352,24 @@
                 <td><span class="tag tag-error">✗ Không đủ ĐK</span></td>
                 <td><span class="tag tag-warning">Chưa nộp</span></td>
                 <td><span class="tag tag-default">Chưa đăng ký</span></td>
+                <td>
+                  <div class="reason-preview" onclick="openReasonPopup('B22DCCN058','Hoàng Minh Đức')" title="Nhấn để xem chi tiết">
+                    <div class="reason-title">DS khối kiến thức chuyên ngành chưa đạt:</div>
+                    <div class="reason-clamp">
+                      <div class="reason-group">
+                        <div class="reason-cat">1. Khối kiến thức cơ sở</div>
+                        <div class="reason-course">PHI1001 - Triết học Mác - Lênin</div>
+                        <div class="reason-course">PHI1002 - Kinh tế chính trị Mác - Lênin</div>
+                      </div>
+                      <div class="reason-group">
+                        <div class="reason-cat">2. Học phần chuyên ngành</div>
+                        <div class="reason-course">INT1154 - Cấu trúc dữ liệu và giải thuật</div>
+                      </div>
+                    </div>
+                  </div>
+                </td>
                 <td style="font-style:italic;color:var(--text-3);font-size:12px" title="Nợ 3 học phần cơ sở ngành">Nợ 3 học phần cơ sở ngành</td>
-                <td style="text-align:center"><span class="tag tag-default" style="color:var(--text-3)" id="cb-B22DCCN058">Không áp dụng</span></td>
+                <td style="text-align:center"><span class="tag tag-default" id="cb-B22DCCN058">Chưa công bố</span></td>
                 <td>
                   <div class="tbl-actions" style="justify-content:center">
                     <button class="btn btn-link btn-sm" onclick="openDetailPopup('B22DCCN058','Hoàng Minh Đức')">🔍 Chi tiết</button>
@@ -358,6 +389,20 @@
         </div>
       </div>
     </main>
+  </div>
+</div>
+
+<!-- Popup Lý do — DS khối kiến thức chuyên ngành chưa đạt -->
+<div class="overlay hidden" id="modal-reason">
+  <div class="modal-box" style="width:440px">
+    <div class="modal-hd">
+      <span class="modal-title">📋 Lý do — <span id="r-sv-name"></span></span>
+      <button class="modal-close" onclick="closeModal('modal-reason')">✕</button>
+    </div>
+    <div class="modal-bd" id="r-content"></div>
+    <div class="modal-ft">
+      <button class="btn btn-default" onclick="closeModal('modal-reason')">Đóng</button>
+    </div>
   </div>
 </div>
 
@@ -389,7 +434,7 @@
             <tr><td>Số tín chỉ tích lũy</td><td>&gt;= 90</td><td>95</td><td style="text-align:center"><span class="tag tag-success">Đạt</span></td></tr>
             <tr><td>Số tín chỉ nợ</td><td>&lt;= 0</td><td>1</td><td style="text-align:center"><span class="tag tag-error">Không đạt</span></td></tr>
             <tr><td>TC tích lũy &ge; 80% TC CTĐT</td><td>= Đạt</td><td>79% (95/120)</td><td style="text-align:center"><span class="tag tag-error">Không đạt</span></td></tr>
-            <tr><td>Hoàn thành HP bắt buộc khối KTGD chuyên nghiệp</td><td>= Đạt</td><td>Đạt</td><td style="text-align:center"><span class="tag tag-success">Đạt</span></td></tr>
+            <tr><td>Hoàn thành các học phần bắt buộc khối kiến thức giáo dục chuyên nghiệp</td><td>= Đạt</td><td id="d-ktgdcn-actual">Đạt</td><td style="text-align:center"><span class="tag tag-success" id="d-ktgdcn-result">Đạt</span></td></tr>
             <tr><td>Trạng thái đang học</td><td>= Đang học</td><td>Đang học</td><td style="text-align:center"><span class="tag tag-success">Đạt</span></td></tr>
             <tr><td>Không bị kỷ luật hình sự</td><td>= Không</td><td>Không</td><td style="text-align:center"><span class="tag tag-success">Đạt</span></td></tr>
             <tr><td>Không nợ học phí trong kỳ</td><td>= Không nợ</td><td>Không nợ</td><td style="text-align:center"><span class="tag tag-success">Đạt</span></td></tr>
@@ -565,9 +610,44 @@ function clearAll(){
 
 function closeModal(id){ document.getElementById(id).classList.add('hidden'); }
 
+/* DS khối kiến thức chuyên ngành chưa đạt — chỉ khai báo cho SV không đạt tiêu chí này */
+const KTGDCN_FAIL = {
+  'B22DCCN058': [
+    { cat: 'Khối kiến thức cơ sở', courses: ['PHI1001 - Triết học Mác - Lênin', 'PHI1002 - Kinh tế chính trị Mác - Lênin'] },
+    { cat: 'Học phần chuyên ngành', courses: ['INT1154 - Cấu trúc dữ liệu và giải thuật'] }
+  ]
+};
+
+function buildReasonHTML(fail){
+  return '<div class="reason-title" style="margin-bottom:8px">DS khối kiến thức chuyên ngành chưa đạt:</div>' +
+    fail.map((g, i) => '<div class="reason-group"><div class="reason-cat">' + (i + 1) + '. ' + g.cat + '</div>' +
+      g.courses.map(c => '<div class="reason-course">' + c + '</div>').join('') + '</div>').join('');
+}
+
+function openReasonPopup(id, name){
+  const fail = KTGDCN_FAIL[id];
+  if(!fail) return;
+  document.getElementById('r-sv-name').textContent = name + ' (' + id + ')';
+  document.getElementById('r-content').innerHTML = buildReasonHTML(fail);
+  document.getElementById('modal-reason').classList.remove('hidden');
+}
+
 function openDetailPopup(id, name) {
   document.getElementById('d-sv-id').textContent = id;
   document.getElementById('d-sv-name').textContent = name;
+
+  const fail = KTGDCN_FAIL[id];
+  const resultEl = document.getElementById('d-ktgdcn-result');
+  if (fail) {
+    document.getElementById('d-ktgdcn-actual').textContent = 'Không đạt';
+    resultEl.textContent = 'Không đạt';
+    resultEl.className = 'tag tag-error';
+  } else {
+    document.getElementById('d-ktgdcn-actual').textContent = 'Đạt';
+    resultEl.textContent = 'Đạt';
+    resultEl.className = 'tag tag-success';
+  }
+
   document.getElementById('modal-detail').classList.remove('hidden');
 }
 
@@ -636,7 +716,7 @@ function publishOne(id){
 function confirmPublish(){
   closeModal('modal-publish');
   if(_publishTarget === 'all'){
-    // Cập nhật tất cả Chưa công bố → Đã công bố (chỉ tag-default non-NA)
+    // Cập nhật tất cả Chưa công bố → Đã công bố
     document.querySelectorAll('[id^="cb-"]').forEach(el => {
       if(el.textContent.trim() === 'Chưa công bố'){
         el.textContent = 'Đã công bố';
@@ -648,7 +728,7 @@ function confirmPublish(){
     const ids = Array.from(getChecked()).map(c => c.closest('tr').dataset.id);
     ids.forEach(id => {
       const el = document.getElementById('cb-' + id);
-      if(el && el.textContent.trim() !== 'Không áp dụng'){
+      if(el && el.textContent.trim() === 'Chưa công bố'){
         el.textContent = 'Đã công bố';
         el.className = 'tag tag-success';
       }
@@ -660,6 +740,11 @@ function confirmPublish(){
     if(el){ el.textContent = 'Đã công bố'; el.className = 'tag tag-success'; }
     toast('Đã công bố kết quả cho sinh viên ' + _publishTarget);
   }
+}
+
+function syncClassSection(){
+  toast('Đang đồng bộ Lớp học phần từ phân hệ Học vụ...','warning');
+  setTimeout(()=>toast('Đồng bộ Lớp học phần hoàn tất — 142 sinh viên đã được cập nhật'),2000);
 }
 
 function syncTuition(){

@@ -229,7 +229,7 @@
 
       <!-- Toolbar -->
       <div style="display:flex;justify-content:flex-end;gap:8px;margin-bottom:10px">
-        <button class="btn btn-default btn-sm">⬇️ Xuất Excel</button>
+        <button class="btn btn-default btn-sm" onclick="toast('Đang xuất danh sách sinh viên ra Excel...','warning')">⬇️ Xuất DS</button>
       </div>
 
       <!-- Grid -->
@@ -250,7 +250,8 @@
                 <th style="text-align:center;min-width:80px">File BC</th>
                 <th style="text-align:center;min-width:110px">Điểm thành phần</th>
                 <th style="text-align:center;min-width:150px">Trạng thái</th>
-                <th style="text-align:center;min-width:90px">Lịch sử</th>
+                <th style="text-align:center;min-width:110px">Quyết định</th>
+                <th style="text-align:center;min-width:110px">Hành động</th>
               </tr>
             </thead>
             <tbody>
@@ -274,7 +275,8 @@
                 <td style="text-align:center"><span class="cell-link" onclick="openFileBc('B22DCCN001','Nguyễn Văn An')">Chi tiết</span></td>
                 <td style="text-align:center"><span class="cell-score-val" onclick="openDiemThanhPhan('B22DCCN001','Nguyễn Văn An')">8.8</span></td>
                 <td style="text-align:center"><span class="tpd-7">● Đã công bố</span></td>
-                <td style="text-align:center"><button class="btn btn-default btn-sm" onclick="openHistory('B22DCCN001','Nguyễn Văn An')">📋 Xem</button></td>
+                <td style="text-align:center"><span class="cell-link" onclick="viewQD('125/QĐ-ĐHDT')">125/QĐ-ĐHDT</span></td>
+                <td style="text-align:center;white-space:nowrap"><button class="icon-btn" onclick="openHistory('B22DCCN001','Nguyễn Văn An')" title="Xem lịch sử thao tác">📋</button><button class="icon-btn" onclick="openRequests('B22DCCN001','Nguyễn Văn An')" title="DS yêu cầu của sinh viên">📩</button></td>
               </tr>
 
               <!-- Row 2 — Đa GVHD -->
@@ -296,7 +298,8 @@
                 <td style="text-align:center"><span class="cell-na">N/A</span></td>
                 <td style="text-align:center"><span class="cell-score-empty" onclick="openDiemThanhPhan('B22DCCN015','Trần Thị Bích')">_._</span></td>
                 <td style="text-align:center"><span class="tpd-3">● Yêu cầu chỉnh sửa</span></td>
-                <td style="text-align:center"><button class="btn btn-default btn-sm" onclick="openHistory('B22DCCN015','Trần Thị Bích')">📋 Xem</button></td>
+                <td style="text-align:center"><span class="cell-na">—</span></td>
+                <td style="text-align:center;white-space:nowrap"><button class="icon-btn" onclick="openHistory('B22DCCN015','Trần Thị Bích')" title="Xem lịch sử thao tác">📋</button><button class="icon-btn" onclick="openRequests('B22DCCN015','Trần Thị Bích')" title="DS yêu cầu của sinh viên">📩</button></td>
               </tr>
 
               <!-- Row 3 — Chờ Khoa duyệt -->
@@ -318,7 +321,8 @@
                 <td style="text-align:center"><span class="cell-link" onclick="openFileBc('B22DCCN033','Lê Quốc Cường')">Chi tiết</span></td>
                 <td style="text-align:center"><span class="cell-score-empty" onclick="openDiemThanhPhan('B22DCCN033','Lê Quốc Cường')">_._</span></td>
                 <td style="text-align:center"><span class="tpd-4">● Chờ Khoa/Trường duyệt</span></td>
-                <td style="text-align:center"><button class="btn btn-default btn-sm" onclick="openHistory('B22DCCN033','Lê Quốc Cường')">📋 Xem</button></td>
+                <td style="text-align:center"><span class="cell-na">—</span></td>
+                <td style="text-align:center;white-space:nowrap"><button class="icon-btn" onclick="openHistory('B22DCCN033','Lê Quốc Cường')" title="Xem lịch sử thao tác">📋</button><button class="icon-btn" onclick="openRequests('B22DCCN033','Lê Quốc Cường')" title="DS yêu cầu của sinh viên">📩</button></td>
               </tr>
 
               <!-- Row 4 — Chưa có GVHD -->
@@ -340,7 +344,8 @@
                 <td style="text-align:center"><span class="cell-na">N/A</span></td>
                 <td style="text-align:center"><span class="cell-na">_._</span></td>
                 <td style="text-align:center"><span class="tpd-0">● Chưa phân công GVHD</span></td>
-                <td style="text-align:center"><button class="btn btn-default btn-sm" onclick="openHistory('B22DCCN047','Phạm Thị Dung')">📋 Xem</button></td>
+                <td style="text-align:center"><span class="cell-na">—</span></td>
+                <td style="text-align:center;white-space:nowrap"><button class="icon-btn" onclick="openHistory('B22DCCN047','Phạm Thị Dung')" title="Xem lịch sử thao tác">📋</button><button class="icon-btn" onclick="openRequests('B22DCCN047','Phạm Thị Dung')" title="DS yêu cầu của sinh viên">📩</button></td>
               </tr>
 
               <!-- Row 5 — Đã chấm điểm QT -->
@@ -362,7 +367,8 @@
                 <td style="text-align:center"><span class="cell-link" onclick="openFileBc('B22DCCN058','Hoàng Minh Đức')">Chi tiết</span></td>
                 <td style="text-align:center"><span class="cell-score-empty" onclick="openDiemThanhPhan('B22DCCN058','Hoàng Minh Đức')">_._</span></td>
                 <td style="text-align:center"><span class="tpd-6">● Đã chấm điểm</span></td>
-                <td style="text-align:center"><button class="btn btn-default btn-sm" onclick="openHistory('B22DCCN058','Hoàng Minh Đức')">📋 Xem</button></td>
+                <td style="text-align:center"><span class="cell-na">—</span></td>
+                <td style="text-align:center;white-space:nowrap"><button class="icon-btn" onclick="openHistory('B22DCCN058','Hoàng Minh Đức')" title="Xem lịch sử thao tác">📋</button><button class="icon-btn" onclick="openRequests('B22DCCN058','Hoàng Minh Đức')" title="DS yêu cầu của sinh viên">📩</button></td>
               </tr>
 
             </tbody>
@@ -716,6 +722,86 @@
     <div class="modal-ft">
       <button class="btn btn-default" onclick="closeModal('modal-diemthanhphan')">Đóng</button>
       <button class="btn btn-primary" onclick="saveDiemThanhPhan()">💾 Lưu điểm</button>
+    </div>
+  </div>
+</div>
+
+<!-- Modal: Xem Quyết định (read-only) -->
+<div class="overlay hidden" id="modal-qd">
+  <div class="modal-box" style="width:560px">
+    <div class="modal-hd">
+      <span class="modal-title">📜 Quyết định — <span id="qd-so"></span></span>
+      <button class="modal-close" onclick="closeModal('modal-qd')">✕</button>
+    </div>
+    <div class="modal-bd">
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;font-size:13px">
+        <div><span style="color:var(--text-3)">Số quyết định</span><br><strong id="qd-detail-so"></strong></div>
+        <div><span style="color:var(--text-3)">Ngày ban hành</span><br><strong id="qd-ngay"></strong></div>
+        <div><span style="color:var(--text-3)">Loại quyết định</span><br><strong id="qd-loai"></strong></div>
+        <div><span style="color:var(--text-3)">Đơn vị ban hành</span><br><strong id="qd-donvi"></strong></div>
+        <div><span style="color:var(--text-3)">Người ký</span><br><strong id="qd-nguoiky"></strong></div>
+        <div><span style="color:var(--text-3)">Trạng thái</span><br><strong id="qd-trangthai"></strong></div>
+      </div>
+      <div style="margin-top:12px">
+        <span style="color:var(--text-3);font-size:13px">Nội dung tóm tắt</span>
+        <p id="qd-noidung" style="font-size:13px;margin-top:4px"></p>
+      </div>
+      <div style="margin-top:10px;display:flex;align-items:center;gap:8px;background:#fafafa;border:1px solid var(--border);border-radius:6px;padding:10px 12px">
+        <span>📄</span>
+        <span id="qd-file" style="font-size:13px;flex:1"></span>
+        <button class="btn btn-default btn-sm">👁️ Xem</button>
+        <button class="btn btn-default btn-sm">⬇️ Tải</button>
+      </div>
+    </div>
+    <div class="modal-ft">
+      <button class="btn btn-default" onclick="closeModal('modal-qd')">Đóng</button>
+    </div>
+  </div>
+</div>
+
+<!-- Modal: DS Yêu cầu của Sinh viên (read-only — GVHD/GVK chỉ xem, xử lý duyệt/từ chối qua MH-GV-02) -->
+<div class="overlay hidden" id="modal-requests">
+  <div class="modal-box" style="width:760px;max-height:90vh">
+    <div class="modal-hd">
+      <span class="modal-title">📩 Danh sách Yêu cầu — <span id="req-sv"></span></span>
+      <button class="modal-close" onclick="closeModal('modal-requests')">✕</button>
+    </div>
+    <div class="modal-bd" style="overflow-y:auto">
+
+      <div style="display:flex;align-items:center;gap:8px;margin-bottom:14px">
+        <select class="fc" id="req-filter-type" style="width:200px" onchange="filterRequests()">
+          <option value="">Tất cả loại yêu cầu</option>
+          <option value="doi-dn">Đổi DN</option>
+          <option value="gia-han">Gia hạn</option>
+        </select>
+        <select class="fc" id="req-filter-status" style="width:170px" onchange="filterRequests()">
+          <option value="">Tất cả trạng thái</option>
+          <option value="pending">Chờ xử lý</option>
+          <option value="approved">Đã duyệt</option>
+          <option value="rejected">Đã từ chối</option>
+        </select>
+        <span id="req-count-badge" style="background:#e6f4ff;color:var(--primary);border:1px solid #91caff;padding:2px 10px;border-radius:10px;font-size:12px;font-weight:600;margin-left:auto"></span>
+      </div>
+
+      <div style="overflow-x:auto">
+        <table class="tbl" style="width:100%;font-size:13px" id="req-table">
+          <thead>
+            <tr>
+              <th style="width:36px;text-align:center">#</th>
+              <th style="min-width:140px;white-space:nowrap">Ngày gửi</th>
+              <th style="min-width:160px">Loại yêu cầu</th>
+              <th style="min-width:260px">Nội dung</th>
+              <th style="text-align:center;min-width:120px">Trạng thái</th>
+            </tr>
+          </thead>
+          <tbody id="req-body"></tbody>
+        </table>
+      </div>
+      <p style="font-size:12px;color:var(--text-3);margin-top:10px">* Chỉ xem — duyệt/từ chối yêu cầu được xử lý tại màn hình "Phê duyệt Yêu cầu" (MH-GV-02).</p>
+
+    </div>
+    <div class="modal-ft">
+      <button class="btn btn-default" onclick="closeModal('modal-requests')">Đóng</button>
     </div>
   </div>
 </div>
@@ -1822,6 +1908,90 @@ function toast(msg, type='success') {
   t.innerHTML = (type==='success'?'✅ ':type==='error'?'❌ ':'⚠️ ') + msg;
   box.appendChild(t);
   setTimeout(() => t.remove(), 3500);
+}
+
+// Xem Quyết định (read-only)
+const qdData = {
+  '125/QĐ-ĐHDT': { ngay:'01/09/2025', loai:'Cử đi học tập / thực tập', donvi:'Khoa CNTT', nguoiky:'PGS.TS. Nguyễn Văn Hòa — Trưởng khoa', trangthai:'Có hiệu lực', noidung:'Cử sinh viên Nguyễn Văn An đi thực tập tốt nghiệp tại FPT Software, thời gian từ 01/09/2025 đến 31/12/2025.', file:'125-QD-DHDT.pdf' },
+};
+function viewQD(so) {
+  const q = qdData[so] || { ngay:'—', loai:'—', donvi:'—', nguoiky:'—', trangthai:'—', noidung:'—', file:'—' };
+  document.getElementById('qd-so').textContent = so;
+  document.getElementById('qd-detail-so').textContent = so;
+  document.getElementById('qd-ngay').textContent = q.ngay;
+  document.getElementById('qd-loai').textContent = q.loai;
+  document.getElementById('qd-donvi').textContent = q.donvi;
+  document.getElementById('qd-nguoiky').textContent = q.nguoiky;
+  document.getElementById('qd-trangthai').textContent = q.trangthai;
+  document.getElementById('qd-noidung').textContent = q.noidung;
+  document.getElementById('qd-file').textContent = q.file;
+  document.getElementById('modal-qd').classList.remove('hidden');
+}
+
+// DS Yêu cầu của sinh viên (read-only trên màn GVHD/GVK)
+const requestsData = {
+  'B22DCCN001': [
+    { date:'10/09/2025 09:00', type:'doi-dn',  typeText:'Đổi DN',  status:'approved', content:'Xin chuyển từ FPT Software (Hà Nội) sang FPT Software (TP.HCM) do hoàn cảnh gia đình.' },
+    { date:'15/10/2025 14:20', type:'gia-han', typeText:'Gia hạn', status:'approved', content:'Xin gia hạn thêm 2 tuần (01-14/01/2026) vì dự án chưa hoàn thành module cuối.' },
+  ],
+  'B22DCCN015': [
+    { date:'07/09/2025 10:45', type:'doi-dn',  typeText:'Đổi DN',  status:'rejected', content:'Đề nghị được đổi GVHD sang ThS. Hoàng Minh Tuấn do lịch làm việc không phù hợp.' },
+    { date:'14/09/2025 08:30', type:'gia-han', typeText:'Gia hạn', status:'pending',  content:'Xin gia hạn thêm 2 tuần (01-14/01/2026) vì dự án tại Viettel chưa hoàn thành module cuối.' },
+  ],
+  'B22DCCN033': [
+    { date:'05/09/2025 11:00', type:'doi-dn',  typeText:'Đổi DN',  status:'approved', content:'Xin chuyển từ VNPT Technology sang Viettel Network do nhận được offer tốt hơn.' },
+  ],
+  'B22DCCN047': [],
+  'B22DCCN058': [
+    { date:'18/10/2025 09:30', type:'doi-dn',  typeText:'Đổi DN',  status:'approved', content:'Xin nghỉ 2 ngày (25-26/10/2025) để tham dự hội thảo sinh viên tại Hà Nội.' },
+    { date:'05/11/2025 14:00', type:'gia-han', typeText:'Gia hạn', status:'pending',  content:'Đề nghị gia hạn 1 tuần để hoàn thiện tài liệu kỹ thuật và bàn giao sản phẩm cho KMS.' },
+  ],
+};
+
+let currentRequestsSV = null;
+
+function reqStatusBadge(s) {
+  return s === 'approved' ? '<span style="background:#f6ffed;color:#389e0d;border:1px solid #b7eb8f;padding:2px 10px;border-radius:10px;font-size:12px">✔ Đã duyệt</span>'
+       : s === 'rejected' ? '<span style="background:#fff1f0;color:#f5222d;border:1px solid #ffa39e;padding:2px 10px;border-radius:10px;font-size:12px">✕ Từ chối</span>'
+       :                    '<span style="background:#fffbe6;color:#d48806;border:1px solid #ffe58f;padding:2px 10px;border-radius:10px;font-size:12px">⏳ Chờ xử lý</span>';
+}
+
+function renderRequestsTable(rows) {
+  const tbody = document.getElementById('req-body');
+  const badge = document.getElementById('req-count-badge');
+  badge.textContent = rows.length + ' yêu cầu';
+  if (!rows.length) {
+    tbody.innerHTML = '<tr><td colspan="5" style="text-align:center;color:var(--text-3);padding:24px;font-style:italic">Không có yêu cầu nào</td></tr>';
+    return;
+  }
+  tbody.innerHTML = rows.map((r, i) => `
+    <tr>
+      <td style="text-align:center;color:var(--text-3)">${i + 1}</td>
+      <td style="color:var(--text-3);white-space:nowrap">${r.date}</td>
+      <td><span style="background:#f0f7ff;color:var(--primary);border:1px solid #91caff;padding:2px 8px;border-radius:6px;font-size:12px">${r.typeText}</span></td>
+      <td style="color:var(--text-1);line-height:1.5">${r.content}</td>
+      <td style="text-align:center">${reqStatusBadge(r.status)}</td>
+    </tr>`).join('');
+}
+
+function filterRequests() {
+  const typeVal   = document.getElementById('req-filter-type').value;
+  const statusVal = document.getElementById('req-filter-status').value;
+  const all = requestsData[currentRequestsSV] || [];
+  const filtered = all.filter(r =>
+    (!typeVal   || r.type   === typeVal) &&
+    (!statusVal || r.status === statusVal)
+  );
+  renderRequestsTable(filtered);
+}
+
+function openRequests(id, name) {
+  currentRequestsSV = id;
+  document.getElementById('req-sv').textContent = name + ' (' + id + ')';
+  document.getElementById('req-filter-type').value   = '';
+  document.getElementById('req-filter-status').value = '';
+  renderRequestsTable(requestsData[id] || []);
+  document.getElementById('modal-requests').classList.remove('hidden');
 }
 </script>
 </body>

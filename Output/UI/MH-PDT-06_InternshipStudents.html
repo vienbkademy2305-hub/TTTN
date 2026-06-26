@@ -69,44 +69,6 @@
     .plan-tbl input.fc,.plan-tbl textarea.fc{padding:4px 8px;font-size:13px}
     .plan-tbl textarea.fc{resize:none;min-height:unset;height:56px}
 
-    /* Score modal — tabs */
-    .score-tabs{display:flex;gap:0;border-bottom:2px solid var(--border);margin-bottom:18px}
-    .score-tab{padding:9px 20px;font-size:13px;background:none;border:none;border-bottom:3px solid transparent;margin-bottom:-2px;cursor:pointer;color:var(--text-3);transition:all .15s;font-family:inherit}
-    .score-tab:hover{color:var(--primary);background:#f0f7ff}
-    .score-tab.active{color:var(--primary);border-bottom-color:var(--primary);font-weight:600}
-
-    /* Criteria table */
-    .crit-tbl{width:100%;border-collapse:collapse;font-size:13px}
-    .crit-tbl th,.crit-tbl td{padding:8px 10px;border:1px solid var(--border);vertical-align:middle}
-    .crit-tbl th{background:#fafafa;font-weight:500;white-space:nowrap;text-align:center}
-    .crit-tbl th:nth-child(2){text-align:left}
-    .crit-tbl tfoot td{background:#fafafa;font-weight:600}
-    .crit-tbl input.fc{text-align:center;padding:4px 6px;font-size:13px}
-
-    /* Upload minh chứng */
-    .upload-zone{border:2px dashed var(--border);border-radius:8px;padding:20px 16px;text-align:center;cursor:pointer;transition:border-color .2s,background .2s;background:#fafafa}
-    .upload-zone:hover,.upload-zone.drag-over{border-color:var(--primary);background:#e6f4ff}
-    .upload-zone .uz-icon{font-size:28px;line-height:1;margin-bottom:6px}
-    .upload-zone .uz-text{font-size:13px;color:var(--text-2);font-weight:500}
-    .upload-zone .uz-hint{font-size:12px;color:var(--text-3);margin-top:2px}
-    .upload-list{margin-top:10px;display:flex;flex-direction:column;gap:6px}
-    .upload-item{display:flex;align-items:center;gap:8px;padding:7px 10px;border:1px solid var(--border);border-radius:6px;background:#fff;font-size:13px}
-    .upload-item .ui-icon{font-size:16px;flex-shrink:0}
-    .upload-item .ui-name{flex:1;color:var(--text-2);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-    .upload-item .ui-size{font-size:11px;color:var(--text-3);flex-shrink:0}
-    .upload-item .ui-del{color:var(--danger);cursor:pointer;flex-shrink:0;font-size:16px;line-height:1;background:none;border:none;padding:0}
-    .upload-item .ui-del:hover{opacity:.7}
-    .upload-item.ui-uploaded .ui-name{color:var(--primary)}
-
-    /* Score summary bar */
-    .score-summary{display:flex;align-items:center;justify-content:center;gap:16px;background:#fafafa;border:1px solid var(--border);border-radius:8px;padding:14px 20px;margin-top:18px}
-    .ss-item{text-align:center;min-width:90px}
-    .ss-label{font-size:11px;color:var(--text-3);margin-bottom:4px}
-    .ss-val{font-size:20px;font-weight:700;color:var(--text-2)}
-    .ss-op{font-size:20px;color:var(--border);font-weight:300;align-self:flex-end;padding-bottom:6px}
-    .ss-item.final .ss-val{font-size:26px;color:var(--primary)}
-    .ss-item.final .ss-label{color:var(--primary);font-weight:600}
-
     /* Tên SV dạng link */
     .sv-name-link{color:var(--primary);cursor:pointer;font-size:13px;text-decoration:underline;text-underline-offset:2px}
     .sv-name-link:hover{opacity:.8}
@@ -346,7 +308,7 @@
                 <td style="text-align:center"><span class="cell-score-val" onclick="openDiemThanhPhan('B22DCCN001','Nguyễn Văn An')">8.8</span></td>
                 <td style="text-align:center"><span class="tpd-7">● Đã công bố</span></td>
                 <td style="text-align:center"><span class="cell-link" onclick="viewQD('125/QĐ-ĐHDT')">125/QĐ-ĐHDT</span></td>
-                <td style="text-align:center;white-space:nowrap"><button class="icon-btn" onclick="openDiemThanhPhan('B22DCCN001','Nguyễn Văn An')" title="Chấm điểm">✎</button><button class="icon-btn" onclick="openHistory('B22DCCN001','Nguyễn Văn An')" title="Xem lịch sử thao tác">📋</button><button class="icon-btn" onclick="openRequests('B22DCCN001','Nguyễn Văn An')" title="DS yêu cầu của sinh viên">📩</button></td>
+                <td style="text-align:center;white-space:nowrap"><button class="icon-btn" disabled title="Đã công bố — chỉ xem điểm">✎</button><button class="icon-btn" onclick="openHistory('B22DCCN001','Nguyễn Văn An')" title="Xem lịch sử thao tác">📋</button><button class="icon-btn" onclick="openRequests('B22DCCN001','Nguyễn Văn An')" title="DS yêu cầu của sinh viên">📩</button></td>
               </tr>
 
               <!-- Row 2 — Đa GVHD ⚠️ -->
@@ -785,187 +747,7 @@
     </div>
     <div class="modal-ft">
       <button class="btn btn-default" onclick="closeModal('modal-diemthanhphan')">Đóng</button>
-      <button class="btn btn-primary" onclick="saveDiemThanhPhan()">💾 Lưu điểm</button>
-    </div>
-  </div>
-</div>
-
-<!-- Modal: Nhập Điểm (deprecated, giữ tạm cho dữ liệu cũ) -->
-<div class="overlay hidden" id="modal-diem">
-  <div class="modal-box" style="width:880px;max-height:92vh">
-    <div class="modal-hd">
-      <span class="modal-title">📊 Nhập Điểm — <span id="d-sv"></span></span>
-      <button class="modal-close" onclick="closeModal('modal-diem')">✕</button>
-    </div>
-    <div class="modal-bd" style="overflow-y:auto">
-
-      <!-- Tabs -->
-      <div class="score-tabs">
-        <button class="score-tab active" id="stab-0" onclick="switchScoreTab(0)">🏢 Điểm Cơ sở TT</button>
-        <button class="score-tab" id="stab-1" onclick="switchScoreTab(1)">👨‍🏫 GV Chấm 1 (GVHD)</button>
-        <button class="score-tab" id="stab-2" onclick="switchScoreTab(2)">👩‍🏫 GV Chấm 2</button>
-      </div>
-
-      <!-- Pane 0 — Điểm Cơ sở TT -->
-      <div id="score-pane-0">
-        <div class="alert alert-info" style="margin-bottom:16px">
-          <span class="alert-ico">ℹ️</span>
-          <div class="alert-body"><span class="alert-desc">Điểm quá trình do <strong>cơ sở TT / đơn vị thực tập</strong> chấm, phản ánh thái độ, chuyên cần và năng lực thực tế của sinh viên trong suốt đợt thực tập.</span></div>
-        </div>
-        <div class="f-row col-2">
-          <div class="fi">
-            <label>Điểm quá trình (DN) <span class="req">*</span></label>
-            <input class="fc" type="number" min="0" max="10" step="0.1" id="d-dn" placeholder="0.0 – 10.0" oninput="recalcFinal()">
-            <div class="f-hint">Thang điểm 10 · tối đa 1 chữ số thập phân</div>
-          </div>
-          <div class="fi">
-            <label>Người đánh giá (Cơ sở TT)</label>
-            <input class="fc" type="text" id="d-dn-nguoi" placeholder="Họ tên / chức vụ người phụ trách">
-          </div>
-        </div>
-        <div class="fi">
-          <label>Nhận xét của Cơ sở TT</label>
-          <textarea class="fc" id="d-dn-nxet" rows="3" placeholder="Nhập nhận xét, đánh giá từ phía cơ sở TT..."></textarea>
-        </div>
-
-        <!-- Upload file minh chứng -->
-        <div class="fi" style="margin-top:4px">
-          <label>File Minh chứng <span style="font-weight:400;color:var(--text-3)">(Phiếu đánh giá / Xác nhận của Cơ sở TT)</span></label>
-          <div class="upload-zone" id="dn-upload-zone"
-               onclick="document.getElementById('dn-file-input').click()"
-               ondragover="event.preventDefault();this.classList.add('drag-over')"
-               ondragleave="this.classList.remove('drag-over')"
-               ondrop="handleDNDrop(event)">
-            <div class="uz-icon">📎</div>
-            <div class="uz-text">Nhấn để chọn file hoặc kéo thả vào đây</div>
-            <div class="uz-hint">Hỗ trợ: PDF, JPG, PNG, DOCX &nbsp;·&nbsp; Tối đa 10 MB / file &nbsp;·&nbsp; Tối đa 3 file</div>
-          </div>
-          <input type="file" id="dn-file-input" accept=".pdf,.jpg,.jpeg,.png,.docx" multiple style="display:none" onchange="handleDNFiles(this.files)">
-          <div class="upload-list" id="dn-upload-list"></div>
-          <div class="fe" id="dn-upload-err" style="display:none">Tối đa 3 file minh chứng mỗi lần nộp điểm</div>
-        </div>
-      </div>
-
-      <!-- Pane 1 — GVHD chấm Báo cáo -->
-      <div id="score-pane-1" style="display:none">
-        <div class="alert alert-info" style="margin-bottom:12px">
-          <span class="alert-ico">ℹ️</span>
-          <div class="alert-body"><span class="alert-desc">Phiếu chấm báo cáo của <strong>GV Chấm 1 (GVHD)</strong> — người đã trực tiếp hướng dẫn sinh viên trong suốt đợt thực tập. Trọng số: <strong>30%</strong> điểm tổng kết.</span></div>
-        </div>
-        <div style="display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:14px;gap:12px">
-          <div>
-            <div style="font-size:13px;font-weight:600;color:var(--text-1)">Phiếu GV Chấm 1 &mdash; CTĐT: <span id="d-ctdt" style="color:var(--primary)">KTPM</span></div>
-            <div class="text-muted text-sm" style="margin-top:2px">Tiêu chí từ đề cương CTĐT · Điểm mỗi tiêu chí từ 0 – điểm tối đa</div>
-          </div>
-          <div style="text-align:right;flex-shrink:0">
-            <div style="font-size:12px;color:var(--text-3)">GV Chấm 1 (GVHD)</div>
-            <div id="d-gv-name" style="font-size:13px;font-weight:500;color:var(--text-2)">TS. Trần Triệu Long</div>
-          </div>
-        </div>
-
-        <table class="crit-tbl">
-          <thead>
-            <tr>
-              <th style="width:36px">#</th>
-              <th style="text-align:left;min-width:240px">Tiêu chí đánh giá</th>
-              <th style="width:120px">Điểm tối đa</th>
-              <th style="width:150px">Điểm nhập</th>
-            </tr>
-          </thead>
-          <tbody id="criteria-body"></tbody>
-          <tfoot>
-            <tr>
-              <td colspan="2" style="text-align:right;color:var(--text-2)">Tổng cộng</td>
-              <td style="text-align:center;color:var(--text-3)" id="crit-total-max">10.0</td>
-              <td style="text-align:center;font-size:16px;color:var(--primary)" id="crit-total-s">—</td>
-            </tr>
-          </tfoot>
-        </table>
-        <div class="fe" id="crit-weight-err" style="display:none;margin-top:6px">Tổng trọng số phải đúng 100%!</div>
-
-        <div class="fi" style="margin-top:16px">
-          <label>Nhận xét của GV Chấm 1 (GVHD)</label>
-          <textarea class="fc" id="d-gv-nxet" rows="3" placeholder="Nhận xét, góp ý của GV Chấm 1 về nội dung báo cáo..."></textarea>
-        </div>
-      </div>
-
-      <!-- Pane 2 — GV Chấm 2 -->
-      <div id="score-pane-2" style="display:none">
-        <div class="alert alert-info" style="margin-bottom:14px">
-          <span class="alert-ico">ℹ️</span>
-          <div class="alert-body"><span class="alert-desc">Phiếu chấm báo cáo của <strong>GV Chấm 2</strong> — do Khoa phân công, có chuyên môn phù hợp, chấm độc lập với GV Chấm 1. Trọng số: <strong>30%</strong> điểm tổng kết.</span></div>
-        </div>
-        <div class="f-row col-2" style="margin-bottom:14px;align-items:flex-end">
-          <div class="fi">
-            <label>GV Chấm 2 <span class="req">*</span></label>
-            <select class="fc" id="d-gv-c2">
-              <option value="">— Khoa chưa phân công —</option>
-              <option>TS. Lê Quốc Hùng</option>
-              <option>ThS. Hoàng Minh Tuấn</option>
-              <option>TS. Nguyễn Văn Minh</option>
-              <option>ThS. Trần Thị Lan Anh</option>
-            </select>
-            <div class="f-hint">GV có chuyên môn phù hợp — Khoa phân công, không được trùng với GV Chấm 1 (GVHD).</div>
-          </div>
-          <div class="fi">
-            <div style="font-size:12px;color:var(--text-3)">CTĐT áp dụng</div>
-            <div id="d-ctdt-c2" style="font-size:14px;font-weight:600;color:var(--primary);margin-top:4px">KTPM</div>
-          </div>
-        </div>
-
-        <table class="crit-tbl">
-          <thead>
-            <tr>
-              <th style="width:36px">#</th>
-              <th style="text-align:left;min-width:240px">Tiêu chí đánh giá</th>
-              <th style="width:120px">Điểm tối đa</th>
-              <th style="width:150px">Điểm nhập</th>
-            </tr>
-          </thead>
-          <tbody id="criteria-body-c2"></tbody>
-          <tfoot>
-            <tr>
-              <td colspan="2" style="text-align:right;color:var(--text-2)">Tổng cộng</td>
-              <td style="text-align:center;color:var(--text-3)" id="crit-total-max-c2">10.0</td>
-              <td style="text-align:center;font-size:16px;color:var(--primary)" id="crit-total-c2">—</td>
-            </tr>
-          </tfoot>
-        </table>
-        <div class="fe" id="crit-err-c2" style="display:none;margin-top:6px">Vui lòng nhập đủ điểm các tiêu chí cho GV Chấm 2!</div>
-
-        <div class="fi" style="margin-top:16px">
-          <label>Nhận xét của GV Chấm 2</label>
-          <textarea class="fc" id="d-c2-nxet" rows="3" placeholder="Nhận xét, đánh giá của GV Chấm 2 về nội dung báo cáo..."></textarea>
-        </div>
-      </div>
-
-      <!-- Summary tổng kết -->
-      <div class="score-summary" style="gap:10px;flex-wrap:wrap">
-        <div class="ss-item" style="min-width:76px">
-          <div class="ss-label">Điểm QT (DN)&nbsp;40%</div>
-          <div class="ss-val" id="ss-dn">—</div>
-        </div>
-        <div class="ss-op" style="font-size:16px">×0.4&nbsp;+</div>
-        <div class="ss-item" style="min-width:76px">
-          <div class="ss-label">GV Chấm 1&nbsp;30%</div>
-          <div class="ss-val" id="ss-gv">—</div>
-        </div>
-        <div class="ss-op" style="font-size:16px">×0.3&nbsp;+</div>
-        <div class="ss-item" style="min-width:76px">
-          <div class="ss-label">GV Chấm 2&nbsp;30%</div>
-          <div class="ss-val" id="ss-c2">—</div>
-        </div>
-        <div class="ss-op" style="font-size:16px">×0.3&nbsp;=</div>
-        <div class="ss-item final" style="min-width:76px">
-          <div class="ss-label">Điểm Tổng kết</div>
-          <div class="ss-val" id="ss-final">—</div>
-        </div>
-      </div>
-
-    </div>
-    <div class="modal-ft">
-      <button class="btn btn-default" onclick="closeModal('modal-diem')">Hủy</button>
-      <button class="btn btn-primary" onclick="saveDiem()">💾 Lưu điểm</button>
+      <button class="btn btn-primary" id="dtp-save-btn" onclick="saveDiemThanhPhan()">💾 Lưu điểm</button>
     </div>
   </div>
 </div>
@@ -1270,11 +1052,8 @@
       <div style="display:flex;align-items:center;gap:8px;margin-bottom:14px">
         <select class="fc" id="req-filter-type" style="width:200px" onchange="filterRequests()">
           <option value="">Tất cả loại yêu cầu</option>
-          <option value="doi-cstt">Đổi cơ sở TT</option>
-          <option value="gia-han">Gia hạn thực tập</option>
-          <option value="doi-gvhd">Đổi GVHD</option>
-          <option value="nghi-phep">Nghỉ phép</option>
-          <option value="khac">Khác</option>
+          <option value="doi-dn">Đổi DN</option>
+          <option value="gia-han">Gia hạn</option>
         </select>
         <select class="fc" id="req-filter-status" style="width:170px" onchange="filterRequests()">
           <option value="">Tất cả trạng thái</option>
@@ -1656,49 +1435,6 @@ function openFileBc(id, name) {
 }
 function allowResubmit() { closeModal('modal-filebc'); toast('Đã mở lại cổng nộp báo cáo cho sinh viên', 'warning'); }
 
-// Điểm số — tiêu chí theo CTĐT
-const criteriaByCtdt = {
-  'KTPM': [
-    { name: 'Thái độ, tác phong & chuyên cần',               maxScore: 1.0 },
-    { name: 'Khả năng nắm bắt & áp dụng kiến thức chuyên môn', maxScore: 2.0 },
-    { name: 'Kỹ năng lập trình & sử dụng công nghệ',          maxScore: 3.0 },
-    { name: 'Chất lượng sản phẩm / tính năng hoàn thành',     maxScore: 2.5 },
-    { name: 'Kỹ năng phân tích, giải quyết vấn đề',           maxScore: 1.0 },
-    { name: 'Kỹ năng giao tiếp & làm việc nhóm',              maxScore: 0.5 },
-  ],
-  'KHMT': [
-    { name: 'Thái độ, tác phong & chuyên cần',                    maxScore: 1.0 },
-    { name: 'Kiến thức thuật toán & cấu trúc dữ liệu áp dụng',   maxScore: 2.5 },
-    { name: 'Kỹ năng phân tích & mô hình hóa vấn đề',            maxScore: 2.5 },
-    { name: 'Kỹ năng lập trình & thực nghiệm',                   maxScore: 2.5 },
-    { name: 'Kết quả nghiên cứu / tài liệu kỹ thuật',            maxScore: 1.0 },
-    { name: 'Kỹ năng trình bày & báo cáo',                       maxScore: 0.5 },
-  ],
-  'HTTT': [
-    { name: 'Thái độ, tác phong & chuyên cần',                   maxScore: 1.0 },
-    { name: 'Kiến thức phân tích & thiết kế hệ thống',           maxScore: 2.0 },
-    { name: 'Kỹ năng lập trình & triển khai',                    maxScore: 2.5 },
-    { name: 'Kỹ năng quản lý & xử lý dữ liệu',                  maxScore: 2.0 },
-    { name: 'Chất lượng tài liệu đặc tả / hồ sơ hệ thống',      maxScore: 1.5 },
-    { name: 'Kỹ năng giao tiếp & phối hợp',                      maxScore: 1.0 },
-  ],
-};
-
-// Map studentId → CTĐT (demo)
-const studentCtdt = {
-  'B22DCCN001': 'KTPM', 'B22DCCN015': 'KHMT',
-  'B22DCCN033': 'HTTT', 'B22DCCN047': 'KTPM', 'B22DCCN058': 'KTPM',
-};
-
-// Map studentId → GV Chấm 2 do Khoa phân công
-const studentGVC2 = {
-  'B22DCCN001': 'TS. Lê Quốc Hùng',
-  'B22DCCN033': 'ThS. Hoàng Minh Tuấn',
-  'B22DCCN058': '',
-  'B22DCCN015': '',
-  'B22DCCN047': '',
-};
-
 // Đầu điểm thành phần theo từng SV — số lượng/cấu trúc tùy lớp học phần, không cố định 3 đầu.
 // { [maSV]: [{ key, ten, trongSo, diem, nguoiCham }, ...] }
 const studentDiemThanhPhan = {
@@ -1748,106 +1484,6 @@ function gvhdNameOfStudent(id) {
   return sp ? sp.textContent.trim() : '—';
 }
 
-function switchScoreTab(idx) {
-  [0, 1, 2].forEach(i => {
-    document.getElementById('score-pane-' + i).style.display = i === idx ? '' : 'none';
-    document.getElementById('stab-' + i).classList.toggle('active', i === idx);
-  });
-}
-
-function loadCriteria(ctdt) {
-  const list = criteriaByCtdt[ctdt] || criteriaByCtdt['KTPM'];
-  document.getElementById('d-ctdt').textContent = ctdt;
-  const totalMax = list.reduce((s, c) => s + c.maxScore, 0);
-  document.getElementById('crit-total-max').textContent = totalMax.toFixed(1);
-  document.getElementById('criteria-body').innerHTML = list.map((c, i) => `
-    <tr>
-      <td style="text-align:center;color:var(--text-3)">${i + 1}</td>
-      <td>${c.name}</td>
-      <td style="text-align:center;color:var(--text-3)">${c.maxScore.toFixed(1)}</td>
-      <td><input class="fc" type="number" min="0" max="${c.maxScore}" step="0.1" placeholder="0 – ${c.maxScore.toFixed(1)}"
-          data-max="${c.maxScore}" oninput="recalcCriteria()" style="text-align:center;width:100%"></td>
-    </tr>`).join('');
-  recalcCriteria();
-}
-
-function loadCriteriaC2(ctdt) {
-  const list = criteriaByCtdt[ctdt] || criteriaByCtdt['KTPM'];
-  document.getElementById('d-ctdt-c2').textContent = ctdt;
-  const totalMax = list.reduce((s, c) => s + c.maxScore, 0);
-  document.getElementById('crit-total-max-c2').textContent = totalMax.toFixed(1);
-  document.getElementById('criteria-body-c2').innerHTML = list.map((c, i) => `
-    <tr>
-      <td style="text-align:center;color:var(--text-3)">${i + 1}</td>
-      <td>${c.name}</td>
-      <td style="text-align:center;color:var(--text-3)">${c.maxScore.toFixed(1)}</td>
-      <td><input class="fc" type="number" min="0" max="${c.maxScore}" step="0.1" placeholder="0 – ${c.maxScore.toFixed(1)}"
-          data-max="${c.maxScore}" oninput="recalcCriteriaC2()" style="text-align:center;width:100%"></td>
-    </tr>`).join('');
-  recalcCriteriaC2();
-}
-
-function recalcCriteria() {
-  let total = 0, allFilled = true;
-  document.querySelectorAll('#criteria-body tr').forEach(tr => {
-    const inp = tr.querySelector('input');
-    const max = parseFloat(inp.dataset.max);
-    const v   = parseFloat(inp.value);
-    if (!isNaN(v) && v >= 0 && v <= max) {
-      inp.style.borderColor = '';
-      total += v;
-    } else if (inp.value !== '') {
-      inp.style.borderColor = 'var(--danger)';
-      allFilled = false;
-    } else {
-      inp.style.borderColor = '';
-      allFilled = false;
-    }
-  });
-  const el = document.getElementById('crit-total-s');
-  el.textContent = allFilled ? total.toFixed(1) : '—';
-  recalcFinal();
-}
-
-function recalcCriteriaC2() {
-  let total = 0, allFilled = true;
-  document.querySelectorAll('#criteria-body-c2 tr').forEach(tr => {
-    const inp = tr.querySelector('input');
-    if (!inp) return;
-    const max = parseFloat(inp.dataset.max);
-    const v   = parseFloat(inp.value);
-    if (!isNaN(v) && v >= 0 && v <= max) {
-      inp.style.borderColor = '';
-      total += v;
-    } else if (inp.value !== '') {
-      inp.style.borderColor = 'var(--danger)';
-      allFilled = false;
-    } else {
-      inp.style.borderColor = '';
-      allFilled = false;
-    }
-  });
-  const el = document.getElementById('crit-total-c2');
-  el.textContent = allFilled ? total.toFixed(1) : '—';
-  recalcFinal();
-}
-
-function recalcFinal() {
-  const dn  = parseFloat(document.getElementById('d-dn').value);
-  const gvT = document.getElementById('crit-total-s').textContent;
-  const pbT = document.getElementById('crit-total-c2').textContent;
-  const gv  = parseFloat(gvT);
-  const pb  = parseFloat(pbT);
-  document.getElementById('ss-dn').textContent  = !isNaN(dn) ? dn.toFixed(1) : '—';
-  document.getElementById('ss-gv').textContent  = !isNaN(gv) ? gv.toFixed(1) : '—';
-  document.getElementById('ss-c2').textContent  = !isNaN(pb) ? pb.toFixed(1) : '—';
-  document.getElementById('ss-final').textContent =
-    (!isNaN(dn) && !isNaN(gv) && !isNaN(pb)) ? (dn * 0.4 + gv * 0.3 + pb * 0.3).toFixed(1) : '—';
-}
-
-// Upload minh chứng cơ sở TT
-let dnUploadFiles = [];
-
 const FILE_ICONS = { pdf:'📄', jpg:'🖼️', jpeg:'🖼️', png:'🖼️', docx:'📝', doc:'📝' };
 function fileIcon(name) {
   const ext = name.split('.').pop().toLowerCase();
@@ -1859,56 +1495,21 @@ function fmtSize(bytes) {
   return (bytes/1048576).toFixed(1) + ' MB';
 }
 
-function renderDNUploadList() {
-  const list = document.getElementById('dn-upload-list');
-  if (!dnUploadFiles.length) { list.innerHTML = ''; return; }
-  list.innerHTML = dnUploadFiles.map((f, i) => `
-    <div class="upload-item ${f.uploaded ? 'ui-uploaded' : ''}">
-      <span class="ui-icon">${fileIcon(f.name)}</span>
-      <span class="ui-name" title="${f.name}">${f.name}</span>
-      <span class="ui-size">${f.size}</span>
-      ${f.uploaded ? '<button class="btn btn-default btn-sm" style="flex-shrink:0;font-size:11px;padding:1px 8px" onclick="event.stopPropagation()">👁️ Xem</button>' : ''}
-      <button class="ui-del" title="Xóa" onclick="removeDNFile(${i})">×</button>
-    </div>`).join('');
+function findRowById(id) {
+  return Array.from(document.querySelectorAll('.row-chk')).map(c => c.closest('tr')).find(r => getRowMeta(r).id === id);
 }
-
-function handleDNFiles(fileList) {
-  document.getElementById('dn-upload-err').style.display = 'none';
-  const newFiles = Array.from(fileList);
-  for (const f of newFiles) {
-    if (dnUploadFiles.length >= 3) {
-      document.getElementById('dn-upload-err').style.display = 'block'; break;
-    }
-    if (f.size > 10 * 1024 * 1024) { toast('File "' + f.name + '" vượt quá 10 MB', 'error'); continue; }
-    dnUploadFiles.push({ name: f.name, size: fmtSize(f.size), uploaded: false });
-  }
-  renderDNUploadList();
-  document.getElementById('dn-file-input').value = '';
+function isPublished(id) {
+  const row = findRowById(id);
+  const statusSpan = row && row.querySelector('[class^="tpd-"]');
+  return !!statusSpan && statusSpan.className === 'tpd-7';
 }
-
-function handleDNDrop(e) {
-  e.preventDefault();
-  document.getElementById('dn-upload-zone').classList.remove('drag-over');
-  handleDNFiles(e.dataTransfer.files);
-}
-
-function removeDNFile(idx) {
-  dnUploadFiles.splice(idx, 1);
-  document.getElementById('dn-upload-err').style.display = 'none';
-  renderDNUploadList();
-}
-
-// Map studentId → file minh chứng đã nộp (demo)
-const existingDNFiles = {
-  'B22DCCN001': [{ name: 'PhieuDanhGia_FPT_B22DCCN001.pdf', size: '1.2 MB', uploaded: true }],
-  'B22DCCN058': [{ name: 'XacNhanTT_KMS_B22DCCN058.pdf', size: '856 KB', uploaded: true }],
-};
 
 let dtpCurrent = { id: '', name: '' };
 function openDiemThanhPhan(id, name) {
   dtpCurrent = { id, name };
   document.getElementById('dtp-sv').textContent = name + ' (' + id + ')';
 
+  const locked = isPublished(id);
   const items = getDiemThanhPhan(id);
   const evidence = studentDTPEvidence[id] || {};
   const notes = studentDTPNote[id] || {};
@@ -1918,24 +1519,26 @@ function openDiemThanhPhan(id, name) {
     <div style="display:grid;grid-template-columns:1fr 60px 70px 130px 130px 1fr;align-items:center;gap:10px;padding:10px 16px;${i<items.length-1?'border-bottom:1px solid var(--border)':''}">
       <div style="font-size:13px">${it.ten}</div>
       <div style="font-size:13px;color:var(--text-2);text-align:right">${it.trongSo}%</div>
-      <input type="number" class="fc" min="0" max="10" step="0.1" value="${it.diem != null ? it.diem : ''}" data-key="${it.key}" id="dtp-inp-${it.key}" style="padding:4px 6px;font-size:13px;text-align:right" oninput="recalcDiemThanhPhan()">
+      <input type="number" class="fc" min="0" max="10" step="0.1" value="${it.diem != null ? it.diem : ''}" data-key="${it.key}" id="dtp-inp-${it.key}" style="padding:4px 6px;font-size:13px;text-align:right" oninput="recalcDiemThanhPhan()" ${locked ? 'disabled' : ''}>
       <div style="font-size:12px;color:var(--text-2)">${it.nguoiCham}</div>
       <div id="dtp-ev-${it.key}" style="font-size:12px">
         ${ev
           ? `<span style="color:var(--primary)" title="${ev.name}">📎 ${ev.name.length > 16 ? ev.name.slice(0,14)+'…' : ev.name}</span>
-             <button class="btn btn-link btn-sm" style="color:var(--danger);padding:0;margin-left:4px" onclick="removeDTPEvidence('${it.key}')">✕</button>`
-          : `<label class="btn btn-default btn-sm" style="cursor:pointer;font-size:11px;padding:2px 8px">📎 Tải lên
+             ${locked ? '' : `<button class="btn btn-link btn-sm" style="color:var(--danger);padding:0;margin-left:4px" onclick="removeDTPEvidence('${it.key}')">✕</button>`}`
+          : (locked ? '<span style="color:var(--text-3)">—</span>' : `<label class="btn btn-default btn-sm" style="cursor:pointer;font-size:11px;padding:2px 8px">📎 Tải lên
                <input type="file" style="display:none" onchange="uploadDTPEvidence('${it.key}', this)">
-             </label>`}
+             </label>`)}
       </div>
-      <input type="text" class="fc" id="dtp-note-${it.key}" value="${(notes[it.key] || '').replace(/"/g,'&quot;')}" placeholder="Ghi chú..." style="padding:4px 8px;font-size:12px">
+      <input type="text" class="fc" id="dtp-note-${it.key}" value="${(notes[it.key] || '').replace(/"/g,'&quot;')}" placeholder="Ghi chú..." style="padding:4px 8px;font-size:12px" ${locked ? 'disabled' : ''}>
     </div>`;
   }).join('');
 
   recalcDiemThanhPhan();
+  document.getElementById('dtp-save-btn').style.display = locked ? 'none' : '';
   document.getElementById('modal-diemthanhphan').classList.remove('hidden');
 }
 function uploadDTPEvidence(key, input) {
+  if (isPublished(dtpCurrent.id)) return;
   const f = input.files && input.files[0];
   if (!f) return;
   if (f.size > 10 * 1024 * 1024) { toast('File "' + f.name + '" vượt quá 10 MB', 'error'); return; }
@@ -1945,6 +1548,7 @@ function uploadDTPEvidence(key, input) {
   toast('Đã tải lên minh chứng: ' + f.name);
 }
 function removeDTPEvidence(key) {
+  if (isPublished(dtpCurrent.id)) return;
   if (studentDTPEvidence[dtpCurrent.id]) delete studentDTPEvidence[dtpCurrent.id][key];
   openDiemThanhPhan(dtpCurrent.id, dtpCurrent.name);
 }
@@ -1959,6 +1563,7 @@ function recalcDiemThanhPhan() {
 }
 function saveDiemThanhPhan() {
   const id = dtpCurrent.id;
+  if (isPublished(id)) { toast('Điểm đã công bố cho sinh viên, không thể sửa.', 'error'); return; }
   const items = getDiemThanhPhan(id);
   const nguoiCham = gvhdNameOfStudent(id);
 
@@ -1975,7 +1580,7 @@ function saveDiemThanhPhan() {
   items.forEach(it => { studentDTPNote[id][it.key] = document.getElementById('dtp-note-' + it.key).value.trim(); });
 
   const final = diemTongKet(id);
-  const row = Array.from(document.querySelectorAll('.row-chk')).map(c => c.closest('tr')).find(r => getRowMeta(r).id === id);
+  const row = findRowById(id);
   if (row && final != null) {
     const span = row.querySelector('.cell-score-val, .cell-score-empty');
     if (span) {
@@ -1991,56 +1596,6 @@ function saveDiemThanhPhan() {
 
   closeModal('modal-diemthanhphan');
   toast('Đã lưu điểm thành phần cho ' + dtpCurrent.name);
-}
-
-function openDiem(id, name, dnScore) {
-  document.getElementById('d-sv').textContent = name + ' (' + id + ')';
-  document.getElementById('d-dn').value = dnScore || '';
-  document.getElementById('d-dn-nguoi').value = '';
-  document.getElementById('d-dn-nxet').value = '';
-  document.getElementById('d-gv-nxet').value = '';
-  document.getElementById('d-c2-nxet').value = '';
-  // GV Chấm 2
-  const pbGV = studentGVC2[id] || '';
-  const pbSel = document.getElementById('d-gv-c2');
-  pbSel.value = pbGV;
-  if (!pbGV) pbSel.selectedIndex = 0;
-  // Reset upload
-  dnUploadFiles = (existingDNFiles[id] || []).map(f => Object.assign({}, f));
-  renderDNUploadList();
-  document.getElementById('dn-upload-err').style.display = 'none';
-  const ctdt = studentCtdt[id] || 'KTPM';
-  loadCriteria(ctdt);
-  loadCriteriaC2(ctdt);
-  switchScoreTab(0);
-  recalcFinal();
-  document.getElementById('modal-diem').classList.remove('hidden');
-}
-
-function saveDiem() {
-  const dn = parseFloat(document.getElementById('d-dn').value);
-  if (isNaN(dn) || dn < 0 || dn > 10) {
-    switchScoreTab(0);
-    toast('Vui lòng nhập Điểm Cơ sở TT hợp lệ (0.0 – 10.0)', 'error'); return;
-  }
-  const gvT = document.getElementById('crit-total-s').textContent;
-  if (gvT === '—') {
-    switchScoreTab(1);
-    toast('Vui lòng nhập đủ điểm tiêu chí cho GV Chấm 1 (tab "GV Chấm 1")', 'error'); return;
-  }
-  const pbGV = document.getElementById('d-gv-c2').value;
-  if (!pbGV) {
-    switchScoreTab(2);
-    toast('Vui lòng chọn GV Chấm 2 do Khoa phân công', 'error'); return;
-  }
-  const pbT = document.getElementById('crit-total-c2').textContent;
-  if (pbT === '—') {
-    switchScoreTab(2);
-    toast('Vui lòng nhập đủ điểm tiêu chí cho GV Chấm 2', 'error'); return;
-  }
-  closeModal('modal-diem');
-  const fileMsg = dnUploadFiles.length ? ` · ${dnUploadFiles.length} file minh chứng đã lưu` : '';
-  toast('Đã lưu điểm — QT×40% + GV Chấm 1×30% + GV Chấm 2×30% → Đã chấm điểm' + fileMsg);
 }
 
 // Checkbox / Bulk
@@ -2078,6 +1633,13 @@ function syncData() {
     if (statusSpan) {
       statusSpan.className = 'tpd-7';
       statusSpan.textContent = '● Đã công bố';
+    }
+    const scoreBtn = row.querySelector('.icon-btn[onclick^="openDiemThanhPhan"]');
+    if (scoreBtn) {
+      scoreBtn.removeAttribute('onclick');
+      scoreBtn.disabled = true;
+      scoreBtn.textContent = '✎';
+      scoreBtn.title = 'Đã công bố — chỉ xem điểm';
     }
   });
 
@@ -2510,21 +2072,21 @@ function openSVInfo(id) {
 // DS Yêu cầu của sinh viên
 const requestsData = {
   'B22DCCN001': [
-    { date:'10/09/2025 09:00', type:'doi-cstt',  typeText:'Đổi cơ sở TT',   status:'approved', content:'Xin chuyển từ FPT Software (Hà Nội) sang FPT Software (TP.HCM) do hoàn cảnh gia đình.' },
-    { date:'15/10/2025 14:20', type:'nghi-phep', typeText:'Nghỉ phép',       status:'approved', content:'Xin nghỉ 3 ngày (20-22/10/2025) để tham dự đám cưới người thân.' },
+    { date:'10/09/2025 09:00', type:'doi-dn',    typeText:'Đổi DN',           status:'approved', content:'Xin chuyển từ FPT Software (Hà Nội) sang FPT Software (TP.HCM) do hoàn cảnh gia đình.' },
+    { date:'15/10/2025 14:20', type:'gia-han',   typeText:'Gia hạn',         status:'approved', content:'Xin gia hạn thêm 2 tuần (01-14/01/2026) vì dự án chưa hoàn thành module cuối.' },
   ],
   'B22DCCN015': [
-    { date:'07/09/2025 10:45', type:'doi-gvhd',  typeText:'Đổi GVHD',        status:'rejected', content:'Đề nghị được đổi GVHD sang ThS. Hoàng Minh Tuấn do lịch làm việc không phù hợp.' },
-    { date:'14/09/2025 08:30', type:'gia-han',   typeText:'Gia hạn thực tập', status:'pending',  content:'Xin gia hạn thêm 2 tuần (01-14/01/2026) vì dự án tại Viettel chưa hoàn thành module cuối.' },
-    { date:'22/10/2025 16:00', type:'khac',      typeText:'Khác',             status:'pending',  content:'Đề nghị được làm việc từ xa (remote) 2 ngày/tuần do điều kiện di chuyển khó khăn.' },
+    { date:'07/09/2025 10:45', type:'doi-dn',    typeText:'Đổi DN',          status:'rejected', content:'Đề nghị được đổi GVHD sang ThS. Hoàng Minh Tuấn do lịch làm việc không phù hợp.' },
+    { date:'14/09/2025 08:30', type:'gia-han',   typeText:'Gia hạn',         status:'pending',  content:'Xin gia hạn thêm 2 tuần (01-14/01/2026) vì dự án tại Viettel chưa hoàn thành module cuối.' },
+    { date:'22/10/2025 16:00', type:'doi-dn',    typeText:'Đổi DN',          status:'pending',  content:'Đề nghị được làm việc từ xa (remote) 2 ngày/tuần do điều kiện di chuyển khó khăn.' },
   ],
   'B22DCCN033': [
-    { date:'05/09/2025 11:00', type:'doi-cstt',  typeText:'Đổi cơ sở TT',   status:'approved', content:'Xin chuyển từ VNPT Technology sang Viettel Network do nhận được offer tốt hơn.' },
+    { date:'05/09/2025 11:00', type:'doi-dn',    typeText:'Đổi DN',          status:'approved', content:'Xin chuyển từ VNPT Technology sang Viettel Network do nhận được offer tốt hơn.' },
   ],
   'B22DCCN047': [],
   'B22DCCN058': [
-    { date:'18/10/2025 09:30', type:'nghi-phep', typeText:'Nghỉ phép',       status:'approved', content:'Xin nghỉ 2 ngày (25-26/10/2025) để tham dự hội thảo sinh viên tại Hà Nội.' },
-    { date:'05/11/2025 14:00', type:'gia-han',   typeText:'Gia hạn thực tập', status:'pending',  content:'Đề nghị gia hạn 1 tuần để hoàn thiện tài liệu kỹ thuật và bàn giao sản phẩm cho KMS.' },
+    { date:'18/10/2025 09:30', type:'doi-dn',    typeText:'Đổi DN',          status:'approved', content:'Xin nghỉ 2 ngày (25-26/10/2025) để tham dự hội thảo sinh viên tại Hà Nội.' },
+    { date:'05/11/2025 14:00', type:'gia-han',   typeText:'Gia hạn',         status:'pending',  content:'Đề nghị gia hạn 1 tuần để hoàn thiện tài liệu kỹ thuật và bàn giao sản phẩm cho KMS.' },
   ],
 };
 

@@ -229,6 +229,7 @@
 
       <!-- Toolbar -->
       <div style="display:flex;justify-content:flex-end;gap:8px;margin-bottom:10px">
+        <button class="btn btn-default btn-sm" onclick="syncData()">🔄 Đồng bộ điểm</button>
         <button class="btn btn-default btn-sm" onclick="toast('Đang xuất danh sách sinh viên ra Excel...','warning')">⬇️ Xuất DS</button>
       </div>
 
@@ -721,7 +722,7 @@
     </div>
     <div class="modal-ft">
       <button class="btn btn-default" onclick="closeModal('modal-diemthanhphan')">Đóng</button>
-      <button class="btn btn-primary" onclick="saveDiemThanhPhan()">💾 Lưu điểm</button>
+      <button class="btn btn-primary" id="dtp-save-btn" onclick="saveDiemThanhPhan()">💾 Lưu điểm</button>
     </div>
   </div>
 </div>
@@ -1412,18 +1413,52 @@ const studentGVC2Info = {
   'B22DCCN047': { name: null,                       score: null  },
 };
 
-// Điểm Cơ sở TT (Điểm QT) — người đánh giá + điểm, dùng cho popup Điểm thành phần
-const studentDNScore = {
-  'B22DCCN001': { score: 8.5, nguoiCham: 'Đại diện FPT Software' },
-  'B22DCCN058': { score: 7.5, nguoiCham: 'Đại diện KMS Technology' },
+// Đầu điểm thành phần ĐỘNG theo từng SV — đồng bộ cơ chế với MH-PDT-06
+const studentDiemThanhPhan = {
+  'B22DCCN001': [
+    { key:'dn',  ten:'Điểm QT (Cơ sở TT)',          trongSo:40, diem:8.5, nguoiCham:'Đại diện FPT Software' },
+    { key:'gv1', ten:'GV Chấm 1 (GVHD)',            trongSo:30, diem:8.5, nguoiCham:'TS. Trần Triệu Long' },
+    { key:'gv2', ten:'GV Chấm 2 (Khoa phân công)',  trongSo:30, diem:9.0, nguoiCham:'TS. Lê Quốc Hùng' },
+  ],
+  'B22DCCN058': [
+    { key:'dn',  ten:'Điểm QT (Cơ sở TT)',          trongSo:40, diem:7.5, nguoiCham:'Đại diện KMS Technology' },
+    { key:'gv1', ten:'GV Chấm 1 (GVHD)',            trongSo:30, diem:null, nguoiCham:'' },
+    { key:'gv2', ten:'GV Chấm 2 (Khoa phân công)',  trongSo:30, diem:null, nguoiCham:'' },
+  ],
 };
-// Điểm GV Chấm 1 (GVHD) — tổng điểm tiêu chí đã chấm
-const studentGV1Score = {
-  'B22DCCN001': 8.5,
-};
-// File minh chứng theo từng đầu điểm thành phần: { [maSV]: { dn: {name,size}, gv1: {...}, gv2: {...} } }
+function defaultDiemThanhPhan(id) {
+  return [
+    { key:'dn',  ten:'Điểm QT (Cơ sở TT)',          trongSo:40, diem:null, nguoiCham:'' },
+    { key:'gv1', ten:'GV Chấm 1 (GVHD)',            trongSo:30, diem:null, nguoiCham:'' },
+    { key:'gv2', ten:'GV Chấm 2 (Khoa phân công)',  trongSo:30, diem:null, nguoiCham:'' },
+  ];
+}
+function getDiemThanhPhan(id) {
+  if (!studentDiemThanhPhan[id]) studentDiemThanhPhan[id] = defaultDiemThanhPhan(id);
+  return studentDiemThanhPhan[id];
+}
+function diemTongKet(id) {
+  const items = studentDiemThanhPhan[id];
+  if (!items || !items.length) return null;
+  if (items.some(it => it.diem == null)) return null;
+  const tongTrongSo = items.reduce((s,it) => s + it.trongSo, 0);
+  if (!tongTrongSo) return null;
+  return items.reduce((s,it) => s + it.diem * it.trongSo, 0) / tongTrongSo;
+}
+function hasFullScore(id) {
+  return diemTongKet(id) != null;
+}
+function findRowById(id) {
+  return Array.from(document.querySelectorAll('.row-chk')).map(c => c.closest('tr')).find(r => getRowMeta(r).id === id);
+}
+function isPublished(id) {
+  const row = findRowById(id);
+  const statusSpan = row && row.querySelector('[class^="tpd-"]');
+  return !!statusSpan && statusSpan.className === 'tpd-7';
+}
+// File minh chứng theo từng đầu điểm thành phần: { [maSV]: { [key]: {name,size} } }
 const studentDTPEvidence = {};
-// Ghi chú của người chấm theo từng đầu điểm thành phần: { [maSV]: { dn: '...', gv1: '...', gv2: '...' } }
+// Ghi chú theo từng đầu điểm thành phần: { [maSV]: { [key]: '...' } }
 const studentDTPNote = {};
 function gvhdNameOfStudent(id) {
   const cards = studentMGVData[id];
@@ -1531,17 +1566,8 @@ function openDiemThanhPhan(id, name) {
   dtpCurrent = { id, name };
   document.getElementById('dtp-sv').textContent = name + ' (' + id + ')';
 
-  const dn  = studentDNScore[id] || null;
-  const gv1 = studentGV1Score[id];
-  const gv1Name = gvhdNameOfStudent(id);
-  const c2  = studentGVC2Info[id] || {};
-
-  const items = [
-    { key:'dn',  ten:'Điểm QT (Cơ sở TT)', trongSo:40, diem: dn ? dn.score : null, nguoiCham: dn ? dn.nguoiCham : '', editable:true },
-    { key:'gv1', ten:'GV Chấm 1 (GVHD)',   trongSo:30, diem: gv1 != null ? gv1 : null, nguoiCham: gv1 != null ? gv1Name : '', editable:true },
-    { key:'gv2', ten:'GV Chấm 2 (Khoa phân công)', trongSo:30, diem: c2.score != null ? parseFloat(c2.score) : null, nguoiCham: c2.score != null ? (c2.name || '') : '', editable:true },
-  ];
-
+  const locked = isPublished(id);
+  const items = getDiemThanhPhan(id);
   const evidence = studentDTPEvidence[id] || {};
   const notes = studentDTPNote[id] || {};
   document.getElementById('dtp-body').innerHTML = items.map((it,i) => {
@@ -1550,26 +1576,26 @@ function openDiemThanhPhan(id, name) {
     <div style="display:grid;grid-template-columns:1fr 60px 70px 130px 130px 1fr;align-items:center;gap:10px;padding:10px 16px;${i<items.length-1?'border-bottom:1px solid var(--border)':''}">
       <div style="font-size:13px">${it.ten}</div>
       <div style="font-size:13px;color:var(--text-2);text-align:right">${it.trongSo}%</div>
-      ${it.editable
-        ? `<input type="number" class="fc" min="0" max="10" step="0.1" value="${it.diem != null ? it.diem : ''}" data-key="${it.key}" id="dtp-inp-${it.key}" style="padding:4px 6px;font-size:13px;text-align:right" oninput="recalcDiemThanhPhan()">`
-        : `<div style="font-size:14px;font-weight:700;color:var(--primary);text-align:right">${it.diem != null ? it.diem.toFixed(1) : '—'}</div>`}
+      <input type="number" class="fc" min="0" max="10" step="0.1" value="${it.diem != null ? it.diem : ''}" data-key="${it.key}" id="dtp-inp-${it.key}" style="padding:4px 6px;font-size:13px;text-align:right" oninput="recalcDiemThanhPhan()" ${locked ? 'disabled' : ''}>
       <div style="font-size:12px;color:var(--text-2)">${it.nguoiCham}</div>
       <div id="dtp-ev-${it.key}" style="font-size:12px">
         ${ev
           ? `<span style="color:var(--primary)" title="${ev.name}">📎 ${ev.name.length > 16 ? ev.name.slice(0,14)+'…' : ev.name}</span>
-             <button class="btn btn-link btn-sm" style="color:var(--danger);padding:0;margin-left:4px" onclick="removeDTPEvidence('${it.key}')">✕</button>`
-          : `<label class="btn btn-default btn-sm" style="cursor:pointer;font-size:11px;padding:2px 8px">📎 Tải lên
+             ${locked ? '' : `<button class="btn btn-link btn-sm" style="color:var(--danger);padding:0;margin-left:4px" onclick="removeDTPEvidence('${it.key}')">✕</button>`}`
+          : (locked ? '<span style="color:var(--text-3)">—</span>' : `<label class="btn btn-default btn-sm" style="cursor:pointer;font-size:11px;padding:2px 8px">📎 Tải lên
                <input type="file" style="display:none" onchange="uploadDTPEvidence('${it.key}', this)">
-             </label>`}
+             </label>`)}
       </div>
-      <input type="text" class="fc" id="dtp-note-${it.key}" value="${(notes[it.key] || '').replace(/"/g,'&quot;')}" placeholder="Ghi chú..." style="padding:4px 8px;font-size:12px">
+      <input type="text" class="fc" id="dtp-note-${it.key}" value="${(notes[it.key] || '').replace(/"/g,'&quot;')}" placeholder="Ghi chú..." style="padding:4px 8px;font-size:12px" ${locked ? 'disabled' : ''}>
     </div>`;
   }).join('');
 
   recalcDiemThanhPhan();
+  document.getElementById('dtp-save-btn').style.display = locked ? 'none' : '';
   document.getElementById('modal-diemthanhphan').classList.remove('hidden');
 }
 function uploadDTPEvidence(key, input) {
+  if (isPublished(dtpCurrent.id)) return;
   const f = input.files && input.files[0];
   if (!f) return;
   if (f.size > 10 * 1024 * 1024) { toast('File "' + f.name + '" vượt quá 10 MB', 'error'); return; }
@@ -1579,47 +1605,80 @@ function uploadDTPEvidence(key, input) {
   toast('Đã tải lên minh chứng: ' + f.name);
 }
 function removeDTPEvidence(key) {
+  if (isPublished(dtpCurrent.id)) return;
   if (studentDTPEvidence[dtpCurrent.id]) delete studentDTPEvidence[dtpCurrent.id][key];
   openDiemThanhPhan(dtpCurrent.id, dtpCurrent.name);
 }
 function recalcDiemThanhPhan() {
-  const dn  = parseFloat(document.getElementById('dtp-inp-dn').value);
-  const gv1 = parseFloat(document.getElementById('dtp-inp-gv1').value);
-  const gv2 = parseFloat(document.getElementById('dtp-inp-gv2').value);
-  const vals = [dn, gv1, gv2];
-  const final = vals.every(v => !isNaN(v)) ? (dn*0.4 + gv1*0.3 + gv2*0.3) : null;
+  const items = getDiemThanhPhan(dtpCurrent.id);
+  const vals = items.map(it => parseFloat(document.getElementById('dtp-inp-' + it.key).value));
+  const tongTrongSo = items.reduce((s,it) => s + it.trongSo, 0);
+  const final = vals.every(v => !isNaN(v)) && tongTrongSo
+    ? items.reduce((s,it,i) => s + vals[i] * it.trongSo, 0) / tongTrongSo
+    : null;
   document.getElementById('dtp-final').textContent = final != null ? final.toFixed(1) : '—';
 }
 function saveDiemThanhPhan() {
   const id = dtpCurrent.id;
-  const dn  = parseFloat(document.getElementById('dtp-inp-dn').value);
-  const gv1 = parseFloat(document.getElementById('dtp-inp-gv1').value);
-  const gv2 = parseFloat(document.getElementById('dtp-inp-gv2').value);
-  if (isNaN(dn) || dn < 0 || dn > 10) { toast('Vui lòng nhập Điểm QT hợp lệ (0.0 – 10.0)', 'error'); return; }
-  if (isNaN(gv1) || gv1 < 0 || gv1 > 10) { toast('Vui lòng nhập Điểm GV Chấm 1 hợp lệ (0.0 – 10.0)', 'error'); return; }
-  if (isNaN(gv2) || gv2 < 0 || gv2 > 10) { toast('Vui lòng nhập Điểm GV Chấm 2 hợp lệ (0.0 – 10.0)', 'error'); return; }
+  if (isPublished(id)) { toast('Điểm đã công bố cho sinh viên, không thể sửa.', 'error'); return; }
+  const items = getDiemThanhPhan(id);
   const nguoiCham = gvhdNameOfStudent(id);
-  studentDNScore[id] = { score: dn, nguoiCham };
-  studentGV1Score[id] = gv1;
-  studentDTPNote[id] = {
-    dn:  document.getElementById('dtp-note-dn').value.trim(),
-    gv1: document.getElementById('dtp-note-gv1').value.trim(),
-    gv2: document.getElementById('dtp-note-gv2').value.trim(),
-  };
-  studentGVC2Info[id] = { name: nguoiCham, score: gv2.toFixed(1) };
 
-  const final = dn*0.4 + gv1*0.3 + gv2*0.3;
-  const row = Array.from(document.querySelectorAll('.row-chk')).map(c => c.closest('tr')).find(r => getRowMeta(r).id === id);
-  if (row) {
+  for (const it of items) {
+    const v = parseFloat(document.getElementById('dtp-inp-' + it.key).value);
+    if (isNaN(v) || v < 0 || v > 10) { toast(`Vui lòng nhập "${it.ten}" hợp lệ (0.0 – 10.0)`, 'error'); return; }
+  }
+
+  items.forEach(it => {
+    it.diem = parseFloat(document.getElementById('dtp-inp-' + it.key).value);
+    if (!it.nguoiCham) it.nguoiCham = nguoiCham;
+  });
+  studentDTPNote[id] = {};
+  items.forEach(it => { studentDTPNote[id][it.key] = document.getElementById('dtp-note-' + it.key).value.trim(); });
+
+  const final = diemTongKet(id);
+  const row = findRowById(id);
+  if (row && final != null) {
     const span = row.querySelector('.cell-score-val, .cell-score-empty');
     if (span) {
       span.textContent = final.toFixed(1);
       span.className = 'cell-score-val';
     }
+    const statusSpan = row.querySelector('[class^="tpd-"]');
+    if (statusSpan && statusSpan.className !== 'tpd-7') {
+      statusSpan.className = 'tpd-6';
+      statusSpan.textContent = '● Đã chấm điểm';
+    }
   }
 
   closeModal('modal-diemthanhphan');
   toast('Đã lưu điểm thành phần cho ' + dtpCurrent.name);
+}
+
+function syncData() {
+  const rows = Array.from(document.querySelectorAll('.row-chk:checked')).map(chk => chk.closest('tr'));
+  if (!rows.length) { toast('Vui lòng chọn ít nhất 1 sinh viên để đồng bộ điểm.', 'error'); return; }
+
+  const notReady = [];
+  rows.forEach(row => {
+    const { id, name } = getRowMeta(row);
+    if (!hasFullScore(id)) notReady.push(name + ' (' + id + ')');
+  });
+
+  if (notReady.length) {
+    toast('Có sinh viên chưa đủ điểm thành phần: ' + notReady.join(', ') + ' — không thể đồng bộ.', 'error');
+    return;
+  }
+
+  rows.forEach(row => {
+    const statusSpan = row.querySelector('[class^="tpd-"]');
+    if (statusSpan) {
+      statusSpan.className = 'tpd-7';
+      statusSpan.textContent = '● Đã công bố';
+    }
+  });
+
+  toast('Đồng bộ thành công — ' + rows.length + ' sinh viên đã được công bố điểm, sinh viên có thể xem điểm.');
 }
 
 function openDiem(id, name, dnScore) {

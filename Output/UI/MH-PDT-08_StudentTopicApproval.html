@@ -372,9 +372,17 @@ const NV_CLR = {
   'Đã duyệt':'tag-success','Từ chối':'tag-error',
 };
 const NVO_STATUS_CLR = {
-  'Chờ GV duyệt':'tag-warning','Chờ Khoa duyệt':'tag-default',
-  'Đã duyệt':'tag-success','Từ chối':'tag-error','Chưa đến lượt':'tag-default',
+  'Chờ duyệt':'tag-warning','Đã duyệt':'tag-success','Từ chối':'tag-error','Không xét':'tag-default',
 };
+/* Chuẩn hoá trạng thái nguyện vọng trong popup DS nguyện vọng về đúng 4 giá trị:
+   Chờ duyệt, Đã duyệt, Từ chối, Không xét.
+   Không xét: các NV còn lại của SV một khi đã có 1 NV được Đã duyệt. */
+function _nvoStatus(item, hasApproved) {
+  if (item.status === 'Đã duyệt') return 'Đã duyệt';
+  if (item.status === 'Từ chối')  return 'Từ chối';
+  if (hasApproved) return 'Không xét';
+  return 'Chờ duyệt';
+}
 const TOPIC_STATUS_CLR = {
   'Nháp':'tag-default','Chờ duyệt':'tag-warning','Đã duyệt':'tag-success','Từ chối':'tag-error',
 };
@@ -720,8 +728,11 @@ function openNVOrder(wishId) {
   document.getElementById('nvo-gpa').textContent   = w.gpa.toFixed(1);
   document.getElementById('nvo-gpa').style.color   = w.gpa >= 3.0 ? 'var(--success)' : w.gpa >= 2.5 ? 'var(--text-1)' : 'var(--error)';
 
+  const hasApproved = (w.dsNguyenVong || []).some(item => item.status === 'Đã duyệt');
+
   document.getElementById('nvo-list').innerHTML = (w.dsNguyenVong || []).map(item => {
-    const numClass = item.thuTu === 1 ? 'nv1' : item.thuTu === 2 ? 'nv2' : item.thuTu === 3 ? 'nv3' : 'nv4';
+    const numClass  = item.thuTu === 1 ? 'nv1' : item.thuTu === 2 ? 'nv2' : item.thuTu === 3 ? 'nv3' : 'nv4';
+    const dispStatus = _nvoStatus(item, hasApproved);
     return `
     <div class="nv-order-item ${item.isCurrent ? 'current' : ''}">
       <div class="nv-order-num ${numClass}">${item.thuTu}</div>
@@ -732,7 +743,7 @@ function openNVOrder(wishId) {
         </div>
         <div class="nv-order-topic">📋 ${item.topicName}</div>
         <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap">
-          <span class="tag ${NVO_STATUS_CLR[item.status] || 'tag-default'}">${item.status}</span>
+          <span class="tag ${NVO_STATUS_CLR[dispStatus] || 'tag-default'}">${dispStatus}</span>
           ${item.ngayXL ? `<span style="font-size:11px;color:var(--text-3)">${item.ngayXL}</span>` : ''}
         </div>
       </div>

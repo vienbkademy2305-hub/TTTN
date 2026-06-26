@@ -314,11 +314,10 @@
                 <th style="min-width:170px">Giảng viên hướng dẫn</th>
                 <th style="text-align:center;min-width:85px">Đề cương</th>
                 <th style="text-align:center;min-width:80px">File BC</th>
-                <th style="text-align:center;min-width:80px">Điểm QT</th>
-                <th style="text-align:center;min-width:80px">Điểm BC</th>
+                <th style="text-align:center;min-width:110px">Điểm thành phần</th>
                 <th style="text-align:center;min-width:150px">Trạng thái</th>
                 <th style="text-align:center;min-width:130px">Quyết định</th>
-                <th style="text-align:center;min-width:160px">Thao tác</th>
+                <th style="text-align:center;min-width:100px">Hành động</th>
               </tr>
             </thead>
             <tbody>
@@ -344,11 +343,10 @@
                 </td>
                 <td style="text-align:center"><span class="cell-link" onclick="openDeCanvas('B22DCCN001','Nguyễn Văn An')">Chi tiết</span></td>
                 <td style="text-align:center"><span class="cell-link" onclick="openFileBc('B22DCCN001','Nguyễn Văn An')">Chi tiết</span></td>
-                <td style="text-align:center"><span class="cell-score-val" onclick="openDiem('B22DCCN001','Nguyễn Văn An','8.5')">8.5</span></td>
-                <td style="text-align:center"><span class="cell-score-val" onclick="openDiem('B22DCCN001','Nguyễn Văn An','8.5')">9.0</span></td>
+                <td style="text-align:center"><span class="cell-score-val" onclick="openDiemThanhPhan('B22DCCN001','Nguyễn Văn An')">8.8</span></td>
                 <td style="text-align:center"><span class="tpd-7">● Đã công bố</span></td>
                 <td style="text-align:center"><span class="cell-link" onclick="viewQD('125/QĐ-ĐHDT')">125/QĐ-ĐHDT</span></td>
-                <td style="text-align:center;white-space:nowrap;display:flex;gap:4px;justify-content:center;padding:8px 6px"><button class="btn btn-default btn-sm" onclick="openHistory('B22DCCN001','Nguyễn Văn An')" title="Xem lịch sử thao tác">📋 Lịch sử</button><button class="btn btn-default btn-sm" onclick="openRequests('B22DCCN001','Nguyễn Văn An')" title="DS yêu cầu của sinh viên">📩 Yêu cầu</button></td>
+                <td style="text-align:center;white-space:nowrap"><button class="icon-btn" onclick="openDiemThanhPhan('B22DCCN001','Nguyễn Văn An')" title="Chấm điểm">✎</button><button class="icon-btn" onclick="openHistory('B22DCCN001','Nguyễn Văn An')" title="Xem lịch sử thao tác">📋</button><button class="icon-btn" onclick="openRequests('B22DCCN001','Nguyễn Văn An')" title="DS yêu cầu của sinh viên">📩</button></td>
               </tr>
 
               <!-- Row 2 — Đa GVHD ⚠️ -->
@@ -372,11 +370,10 @@
                 </td>
                 <td style="text-align:center"><span class="cell-link" onclick="openDeCanvas('B22DCCN015','Lê Thị Bích')">Chi tiết</span></td>
                 <td style="text-align:center"><span class="cell-na">N/A</span></td>
-                <td style="text-align:center"><span class="cell-score-empty" onclick="openDiem('B22DCCN015','Lê Thị Bích','')">_._</span></td>
-                <td style="text-align:center"><span class="cell-score-empty" onclick="openDiem('B22DCCN015','Lê Thị Bích','')">_._</span></td>
+                <td style="text-align:center"><span class="cell-score-empty" onclick="openDiemThanhPhan('B22DCCN015','Lê Thị Bích')">_._</span></td>
                 <td style="text-align:center"><span class="tpd-3">● Yêu cầu chỉnh sửa</span></td>
                 <td style="text-align:center;color:var(--text-3);font-size:13px">—</td>
-                <td style="text-align:center;white-space:nowrap;display:flex;gap:4px;justify-content:center;padding:8px 6px"><button class="btn btn-default btn-sm" onclick="openHistory('B22DCCN015','Lê Thị Bích')" title="Xem lịch sử thao tác">📋 Lịch sử</button><button class="btn btn-default btn-sm" onclick="openRequests('B22DCCN015','Lê Thị Bích')" title="DS yêu cầu của sinh viên">📩 Yêu cầu</button></td>
+                <td style="text-align:center;white-space:nowrap"><button class="icon-btn" disabled title="Sinh viên chưa nộp báo cáo">✎</button><button class="icon-btn" onclick="openHistory('B22DCCN015','Lê Thị Bích')" title="Xem lịch sử thao tác">📋</button><button class="icon-btn" onclick="openRequests('B22DCCN015','Lê Thị Bích')" title="DS yêu cầu của sinh viên">📩</button></td>
               </tr>
 
               <!-- Row 3 — Chờ chấm điểm -->
@@ -399,12 +396,11 @@
                   <span class="gv-single">TS. Phạm Văn Đức</span>
                 </td>
                 <td style="text-align:center"><span class="cell-link" onclick="openDeCanvas('B22DCCN033','Lê Quốc Cường')">Chi tiết</span></td>
-                <td style="text-align:center"><span class="cell-link" onclick="openFileBc('B22DCCN033','Lê Quốc Cường')">Chi tiết</span></td>
-                <td style="text-align:center"><span class="cell-score-empty" onclick="openDiem('B22DCCN033','Lê Quốc Cường','')">_._</span></td>
-                <td style="text-align:center"><span class="cell-score-empty" onclick="openDiem('B22DCCN033','Lê Quốc Cường','')">_._</span></td>
+                <td style="text-align:center"><span class="cell-na">N/A</span></td>
+                <td style="text-align:center"><span class="cell-na">_._</span></td>
                 <td style="text-align:center"><span class="tpd-4">● Chờ Khoa/Trường duyệt</span></td>
                 <td style="text-align:center;color:var(--text-3);font-size:13px">—</td>
-                <td style="text-align:center;white-space:nowrap;display:flex;gap:4px;justify-content:center;padding:8px 6px"><button class="btn btn-default btn-sm" onclick="openHistory('B22DCCN033','Lê Quốc Cường')" title="Xem lịch sử thao tác">📋 Lịch sử</button><button class="btn btn-default btn-sm" onclick="openRequests('B22DCCN033','Lê Quốc Cường')" title="DS yêu cầu của sinh viên">📩 Yêu cầu</button></td>
+                <td style="text-align:center;white-space:nowrap"><button class="icon-btn" disabled title="Sinh viên chưa nộp báo cáo">✎</button><button class="icon-btn" onclick="openHistory('B22DCCN033','Lê Quốc Cường')" title="Xem lịch sử thao tác">📋</button><button class="icon-btn" onclick="openRequests('B22DCCN033','Lê Quốc Cường')" title="DS yêu cầu của sinh viên">📩</button></td>
               </tr>
 
               <!-- Row 4 — Chưa có GVHD -->
@@ -429,10 +425,9 @@
                 <td style="text-align:center"><span class="cell-na">N/A</span></td>
                 <td style="text-align:center"><span class="cell-na">N/A</span></td>
                 <td style="text-align:center"><span class="cell-na">_._</span></td>
-                <td style="text-align:center"><span class="cell-na">_._</span></td>
                 <td style="text-align:center"><span class="tpd-0">● Chưa phân công GVHD</span></td>
                 <td style="text-align:center;color:var(--text-3);font-size:13px">—</td>
-                <td style="text-align:center;white-space:nowrap;display:flex;gap:4px;justify-content:center;padding:8px 6px"><button class="btn btn-default btn-sm" onclick="openHistory('B22DCCN047','Phạm Thị Dung')" title="Xem lịch sử thao tác">📋 Lịch sử</button><button class="btn btn-default btn-sm" onclick="openRequests('B22DCCN047','Phạm Thị Dung')" title="DS yêu cầu của sinh viên">📩 Yêu cầu</button></td>
+                <td style="text-align:center;white-space:nowrap"><button class="icon-btn" onclick="openHistory('B22DCCN047','Phạm Thị Dung')" title="Xem lịch sử thao tác">📋</button><button class="icon-btn" onclick="openRequests('B22DCCN047','Phạm Thị Dung')" title="DS yêu cầu của sinh viên">📩</button></td>
               </tr>
 
               <!-- Row 5 — QT đã chấm, BC chưa -->
@@ -456,11 +451,10 @@
                 </td>
                 <td style="text-align:center"><span class="cell-link" onclick="openDeCanvas('B22DCCN058','Hoàng Minh Đức')">Chi tiết</span></td>
                 <td style="text-align:center"><span class="cell-link" onclick="openFileBc('B22DCCN058','Hoàng Minh Đức')">Chi tiết</span></td>
-                <td style="text-align:center"><span class="cell-score-val" onclick="openDiem('B22DCCN058','Hoàng Minh Đức','7.5')">7.5</span></td>
-                <td style="text-align:center"><span class="cell-score-empty" onclick="openDiem('B22DCCN058','Hoàng Minh Đức','7.5')">_._</span></td>
+                <td style="text-align:center"><span class="cell-score-empty" onclick="openDiemThanhPhan('B22DCCN058','Hoàng Minh Đức')">_._</span></td>
                 <td style="text-align:center"><span class="tpd-6">● Đã chấm điểm</span></td>
                 <td style="text-align:center;color:var(--text-3);font-size:13px">—</td>
-                <td style="text-align:center;white-space:nowrap;display:flex;gap:4px;justify-content:center;padding:8px 6px"><button class="btn btn-default btn-sm" onclick="openHistory('B22DCCN058','Hoàng Minh Đức')" title="Xem lịch sử thao tác">📋 Lịch sử</button><button class="btn btn-default btn-sm" onclick="openRequests('B22DCCN058','Hoàng Minh Đức')" title="DS yêu cầu của sinh viên">📩 Yêu cầu</button></td>
+                <td style="text-align:center;white-space:nowrap"><button class="icon-btn" onclick="openDiemThanhPhan('B22DCCN058','Hoàng Minh Đức')" title="Chấm điểm">✎</button><button class="icon-btn" onclick="openHistory('B22DCCN058','Hoàng Minh Đức')" title="Xem lịch sử thao tác">📋</button><button class="icon-btn" onclick="openRequests('B22DCCN058','Hoàng Minh Đức')" title="DS yêu cầu của sinh viên">📩</button></td>
               </tr>
 
             </tbody>
@@ -771,7 +765,32 @@
   </div>
 </div>
 
-<!-- Modal: Nhập Điểm -->
+<!-- Modal: Chi tiết Điểm thành phần -->
+<div class="overlay hidden" id="modal-diemthanhphan">
+  <div class="modal-box" style="width:920px;max-width:95vw">
+    <div class="modal-hd">
+      <span class="modal-title">📊 Chi tiết điểm thành phần — <span id="dtp-sv"></span></span>
+      <button class="modal-close" onclick="closeModal('modal-diemthanhphan')">✕</button>
+    </div>
+    <div class="modal-bd">
+      <div style="border:1px solid var(--border);border-radius:8px;overflow:hidden">
+        <div style="background:#fafafa;padding:10px 16px;border-bottom:1px solid var(--border);display:grid;grid-template-columns:1fr 60px 70px 130px 130px 1fr;gap:10px;font-size:12px;font-weight:600;color:var(--text-3)">
+          <span>Điểm thành phần</span><span style="text-align:right">Trọng số</span><span style="text-align:right">Điểm</span><span>Người chấm</span><span>Minh chứng</span><span>Ghi chú</span>
+        </div>
+        <div id="dtp-body"></div>
+      </div>
+      <div style="background:#f6ffed;border:1px solid #b7eb8f;border-radius:6px;padding:10px 14px;font-size:13px;margin-top:10px">
+        Điểm tổng kết: <strong id="dtp-final" style="font-weight:700;font-size:14px;color:var(--success)">—</strong>
+      </div>
+    </div>
+    <div class="modal-ft">
+      <button class="btn btn-default" onclick="closeModal('modal-diemthanhphan')">Đóng</button>
+      <button class="btn btn-primary" onclick="saveDiemThanhPhan()">💾 Lưu điểm</button>
+    </div>
+  </div>
+</div>
+
+<!-- Modal: Nhập Điểm (deprecated, giữ tạm cho dữ liệu cũ) -->
 <div class="overlay hidden" id="modal-diem">
   <div class="modal-box" style="width:880px;max-height:92vh">
     <div class="modal-hd">
@@ -1275,7 +1294,7 @@
               <th style="min-width:160px">Loại yêu cầu</th>
               <th style="min-width:260px">Nội dung</th>
               <th style="text-align:center;min-width:120px">Trạng thái</th>
-              <th style="text-align:center;min-width:80px">Thao tác</th>
+              <th style="text-align:center;min-width:80px">Hành động</th>
             </tr>
           </thead>
           <tbody id="req-body"></tbody>
@@ -1680,6 +1699,55 @@ const studentGVC2 = {
   'B22DCCN047': '',
 };
 
+// Đầu điểm thành phần theo từng SV — số lượng/cấu trúc tùy lớp học phần, không cố định 3 đầu.
+// { [maSV]: [{ key, ten, trongSo, diem, nguoiCham }, ...] }
+const studentDiemThanhPhan = {
+  'B22DCCN001': [
+    { key:'dn',  ten:'Điểm QT (Cơ sở TT)',          trongSo:40, diem:8.5, nguoiCham:'Đại diện FPT Software' },
+    { key:'gv1', ten:'GV Chấm 1 (GVHD)',            trongSo:30, diem:8.5, nguoiCham:'TS. Trần Triệu Long' },
+    { key:'gv2', ten:'GV Chấm 2 (Khoa phân công)',  trongSo:30, diem:9.0, nguoiCham:'TS. Lê Quốc Hùng' },
+  ],
+  'B22DCCN058': [
+    { key:'dn',  ten:'Điểm QT (Cơ sở TT)',          trongSo:40, diem:7.5, nguoiCham:'Đại diện KMS Technology' },
+    { key:'gv1', ten:'GV Chấm 1 (GVHD)',            trongSo:30, diem:null, nguoiCham:'' },
+    { key:'gv2', ten:'GV Chấm 2 (Khoa phân công)',  trongSo:30, diem:null, nguoiCham:'' },
+  ],
+};
+function defaultDiemThanhPhan(id) {
+  return [
+    { key:'dn',  ten:'Điểm QT (Cơ sở TT)',          trongSo:40, diem:null, nguoiCham:'' },
+    { key:'gv1', ten:'GV Chấm 1 (GVHD)',            trongSo:30, diem:null, nguoiCham:'' },
+    { key:'gv2', ten:'GV Chấm 2 (Khoa phân công)',  trongSo:30, diem:null, nguoiCham:'' },
+  ];
+}
+function getDiemThanhPhan(id) {
+  if (!studentDiemThanhPhan[id]) studentDiemThanhPhan[id] = defaultDiemThanhPhan(id);
+  return studentDiemThanhPhan[id];
+}
+function diemTongKet(id) {
+  const items = studentDiemThanhPhan[id];
+  if (!items || !items.length) return null;
+  if (items.some(it => it.diem == null)) return null;
+  const tongTrongSo = items.reduce((s,it) => s + it.trongSo, 0);
+  if (!tongTrongSo) return null;
+  return items.reduce((s,it) => s + it.diem * it.trongSo, 0) / tongTrongSo;
+}
+function hasFullScore(id) {
+  return diemTongKet(id) != null;
+}
+// File minh chứng theo từng đầu điểm thành phần: { [maSV]: { [key]: {name,size} } }
+const studentDTPEvidence = {};
+// Ghi chú theo từng đầu điểm thành phần: { [maSV]: { [key]: '...' } }
+const studentDTPNote = {};
+function gvhdNameOfStudent(id) {
+  const cards = studentMGVData[id];
+  if (cards && cards.length) return cards.map(c => c.name).join(' / ');
+  const row = Array.from(document.querySelectorAll('.row-chk')).map(c => c.closest('tr'))
+    .find(r => getRowMeta(r).id === id);
+  const sp = row && row.querySelector('.cell-gv span');
+  return sp ? sp.textContent.trim() : '—';
+}
+
 function switchScoreTab(idx) {
   [0, 1, 2].forEach(i => {
     document.getElementById('score-pane-' + i).style.display = i === idx ? '' : 'none';
@@ -1836,6 +1904,95 @@ const existingDNFiles = {
   'B22DCCN058': [{ name: 'XacNhanTT_KMS_B22DCCN058.pdf', size: '856 KB', uploaded: true }],
 };
 
+let dtpCurrent = { id: '', name: '' };
+function openDiemThanhPhan(id, name) {
+  dtpCurrent = { id, name };
+  document.getElementById('dtp-sv').textContent = name + ' (' + id + ')';
+
+  const items = getDiemThanhPhan(id);
+  const evidence = studentDTPEvidence[id] || {};
+  const notes = studentDTPNote[id] || {};
+  document.getElementById('dtp-body').innerHTML = items.map((it,i) => {
+    const ev = evidence[it.key];
+    return `
+    <div style="display:grid;grid-template-columns:1fr 60px 70px 130px 130px 1fr;align-items:center;gap:10px;padding:10px 16px;${i<items.length-1?'border-bottom:1px solid var(--border)':''}">
+      <div style="font-size:13px">${it.ten}</div>
+      <div style="font-size:13px;color:var(--text-2);text-align:right">${it.trongSo}%</div>
+      <input type="number" class="fc" min="0" max="10" step="0.1" value="${it.diem != null ? it.diem : ''}" data-key="${it.key}" id="dtp-inp-${it.key}" style="padding:4px 6px;font-size:13px;text-align:right" oninput="recalcDiemThanhPhan()">
+      <div style="font-size:12px;color:var(--text-2)">${it.nguoiCham}</div>
+      <div id="dtp-ev-${it.key}" style="font-size:12px">
+        ${ev
+          ? `<span style="color:var(--primary)" title="${ev.name}">📎 ${ev.name.length > 16 ? ev.name.slice(0,14)+'…' : ev.name}</span>
+             <button class="btn btn-link btn-sm" style="color:var(--danger);padding:0;margin-left:4px" onclick="removeDTPEvidence('${it.key}')">✕</button>`
+          : `<label class="btn btn-default btn-sm" style="cursor:pointer;font-size:11px;padding:2px 8px">📎 Tải lên
+               <input type="file" style="display:none" onchange="uploadDTPEvidence('${it.key}', this)">
+             </label>`}
+      </div>
+      <input type="text" class="fc" id="dtp-note-${it.key}" value="${(notes[it.key] || '').replace(/"/g,'&quot;')}" placeholder="Ghi chú..." style="padding:4px 8px;font-size:12px">
+    </div>`;
+  }).join('');
+
+  recalcDiemThanhPhan();
+  document.getElementById('modal-diemthanhphan').classList.remove('hidden');
+}
+function uploadDTPEvidence(key, input) {
+  const f = input.files && input.files[0];
+  if (!f) return;
+  if (f.size > 10 * 1024 * 1024) { toast('File "' + f.name + '" vượt quá 10 MB', 'error'); return; }
+  if (!studentDTPEvidence[dtpCurrent.id]) studentDTPEvidence[dtpCurrent.id] = {};
+  studentDTPEvidence[dtpCurrent.id][key] = { name: f.name, size: fmtSize(f.size) };
+  openDiemThanhPhan(dtpCurrent.id, dtpCurrent.name);
+  toast('Đã tải lên minh chứng: ' + f.name);
+}
+function removeDTPEvidence(key) {
+  if (studentDTPEvidence[dtpCurrent.id]) delete studentDTPEvidence[dtpCurrent.id][key];
+  openDiemThanhPhan(dtpCurrent.id, dtpCurrent.name);
+}
+function recalcDiemThanhPhan() {
+  const items = getDiemThanhPhan(dtpCurrent.id);
+  const vals = items.map(it => parseFloat(document.getElementById('dtp-inp-' + it.key).value));
+  const tongTrongSo = items.reduce((s,it) => s + it.trongSo, 0);
+  const final = vals.every(v => !isNaN(v)) && tongTrongSo
+    ? items.reduce((s,it,i) => s + vals[i] * it.trongSo, 0) / tongTrongSo
+    : null;
+  document.getElementById('dtp-final').textContent = final != null ? final.toFixed(1) : '—';
+}
+function saveDiemThanhPhan() {
+  const id = dtpCurrent.id;
+  const items = getDiemThanhPhan(id);
+  const nguoiCham = gvhdNameOfStudent(id);
+
+  for (const it of items) {
+    const v = parseFloat(document.getElementById('dtp-inp-' + it.key).value);
+    if (isNaN(v) || v < 0 || v > 10) { toast(`Vui lòng nhập "${it.ten}" hợp lệ (0.0 – 10.0)`, 'error'); return; }
+  }
+
+  items.forEach(it => {
+    it.diem = parseFloat(document.getElementById('dtp-inp-' + it.key).value);
+    if (!it.nguoiCham) it.nguoiCham = nguoiCham;
+  });
+  studentDTPNote[id] = {};
+  items.forEach(it => { studentDTPNote[id][it.key] = document.getElementById('dtp-note-' + it.key).value.trim(); });
+
+  const final = diemTongKet(id);
+  const row = Array.from(document.querySelectorAll('.row-chk')).map(c => c.closest('tr')).find(r => getRowMeta(r).id === id);
+  if (row && final != null) {
+    const span = row.querySelector('.cell-score-val, .cell-score-empty');
+    if (span) {
+      span.textContent = final.toFixed(1);
+      span.className = 'cell-score-val';
+    }
+    const statusSpan = row.querySelector('[class^="tpd-"]');
+    if (statusSpan && statusSpan.className !== 'tpd-7') {
+      statusSpan.className = 'tpd-6';
+      statusSpan.textContent = '● Đã chấm điểm';
+    }
+  }
+
+  closeModal('modal-diemthanhphan');
+  toast('Đã lưu điểm thành phần cho ' + dtpCurrent.name);
+}
+
 function openDiem(id, name, dnScore) {
   document.getElementById('d-sv').textContent = name + ' (' + id + ')';
   document.getElementById('d-dn').value = dnScore || '';
@@ -1902,8 +2059,29 @@ function clearSelection() {
 }
 
 function syncData() {
-  toast('Đang đồng bộ danh sách từ phân hệ Xét điều kiện...', 'warning');
-  setTimeout(() => toast('Đồng bộ hoàn tất — 142 sinh viên đã được khởi tạo'), 2000);
+  const rows = Array.from(document.querySelectorAll('.row-chk:checked')).map(chk => chk.closest('tr'));
+  if (!rows.length) { toast('Vui lòng chọn ít nhất 1 sinh viên để đồng bộ điểm.', 'error'); return; }
+
+  const notReady = [];
+  rows.forEach(row => {
+    const { id, name } = getRowMeta(row);
+    if (!hasFullScore(id)) notReady.push(name + ' (' + id + ')');
+  });
+
+  if (notReady.length) {
+    toast('Có sinh viên chưa đủ điểm thành phần: ' + notReady.join(', ') + ' — không thể đồng bộ.', 'error');
+    return;
+  }
+
+  rows.forEach(row => {
+    const statusSpan = row.querySelector('[class^="tpd-"]');
+    if (statusSpan) {
+      statusSpan.className = 'tpd-7';
+      statusSpan.textContent = '● Đã công bố';
+    }
+  });
+
+  toast('Đồng bộ thành công — ' + rows.length + ' sinh viên đã được công bố điểm, sinh viên có thể xem điểm.');
 }
 
 // Quyết định sinh viên

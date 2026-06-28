@@ -17,6 +17,16 @@
     .hd-chamdiem{background:#fff7e6;color:#d46b08;border-color:#ffd591}
     .hd-phanbien{background:#f9f0ff;color:#722ed1;border-color:#d3adf7}
 
+    .conclusion-tag{font-size:12px;padding:3px 10px;border-radius:10px;border:1px solid;white-space:nowrap;display:inline-block;font-weight:600}
+    .cl-dat{background:#f6ffed;color:#389e0d;border-color:#b7eb8f}
+    .cl-khongdat{background:#fff2f0;color:#cf1322;border-color:#ffa39e}
+    .cl-canchinh{background:#fff7e6;color:#d46b08;border-color:#ffd591}
+    .cl-hoanbaove{background:#f0f5ff;color:#1d39c4;border-color:#adc6ff}
+    .cl-empty{background:#fafafa;color:var(--text-3);border-color:var(--border)}
+    .sync-tag{font-size:11px;padding:2px 8px;border-radius:10px;border:1px solid;white-space:nowrap;display:inline-block}
+    .sync-dong{background:#f6ffed;color:#389e0d;border-color:#b7eb8f}
+    .sync-chua{background:#fafafa;color:var(--text-3);border-color:var(--border)}
+
     .info-tbl{width:100%;border-collapse:collapse;font-size:13px;margin-bottom:4px}
     .info-tbl td{padding:8px 12px;border:1px solid #e8e8e8;vertical-align:top;line-height:1.5}
     .info-tbl .itl{background:#fafafa;color:var(--text-3);font-weight:500;width:170px;white-space:nowrap}
@@ -483,6 +493,8 @@
         <tbody id="dt-mem-tbody"></tbody>
       </table>
 
+      <div id="dt-students-section"></div>
+
       <div class="section-hd">📋 Lịch sử xét duyệt</div>
       <div id="dt-decision-section"></div>
 
@@ -620,6 +632,12 @@ const STATUS_CFG = {
   completed: { label:'Hoàn thành', cls:'tag-blue'     },
   cancelled: { label:'Đã hủy',      cls:'tag-default' }
 };
+const CONCLUSION_CFG = {
+  dat       : { label:'Đạt',                    cls:'cl-dat'      },
+  khongdat  : { label:'Không đạt',               cls:'cl-khongdat' },
+  canchinh  : { label:'Đạt nhưng cần chỉnh sửa', cls:'cl-canchinh' },
+  hoanbaove : { label:'Hoãn bảo vệ',             cls:'cl-hoanbaove' }
+};
 
 /* ── Mock data ────────────────────────────────────────────── */
 let SEQ = 14; // số thứ tự tiếp theo cho mã hội đồng mới
@@ -658,7 +676,14 @@ const COUNCILS = [
     ],
     status:'completed', qdNum:'312/QĐ-CNTT', qdDate:'19/06/2026', qdSignedBy:'Nguyễn Thị Lan — Trưởng phòng Đào tạo', qdFile:'QD_312-QD-CNTT.pdf',
     completedAt:'23/06/2026', completeNote:'Hội đồng đã họp và hoàn tất chấm điểm cho 5 sinh viên.', bienBanFile:'BienBan_HD-2026-013.pdf',
-    createdBy:'TS. Trần Văn Bình', createdAt:'10/06/2026', note:''
+    createdBy:'TS. Trần Văn Bình', createdAt:'10/06/2026', note:'',
+    students:[
+      { maSV:'B22DCCN033', tenSV:'Lê Quốc Cường',  diem:8.4, conclusion:'dat',      dongBoDiem:'Đã đồng bộ' },
+      { maSV:'B22DCCN125', tenSV:'Trương Thị Yến', diem:7.6, conclusion:'dat',      dongBoDiem:'Đã đồng bộ' },
+      { maSV:'B22DCCN048', tenSV:'Phạm Văn Đạt',   diem:5.2, conclusion:'canchinh', dongBoDiem:'Chưa đồng bộ' },
+      { maSV:'B22DCCN077', tenSV:'Hoàng Thị Mai',  diem:null, conclusion:'hoanbaove', dongBoDiem:'Chưa đồng bộ' },
+      { maSV:'B22DCCN090', tenSV:'Đỗ Văn Khôi',    diem:3.8, conclusion:'khongdat', dongBoDiem:'Chưa đồng bộ' }
+    ]
   },
   {
     id:4, code:'HD-2026-014',
@@ -1186,6 +1211,44 @@ function openDetail(id) {
       }).join('')
     : '<tr><td colspan="6" class="tbl-empty">Chưa có thành viên.</td></tr>';
   clearMemberSelectionDt();
+
+  /* Kết quả chấm điểm theo SV — chỉ hiện khi hội đồng đã có dữ liệu (xem/sửa chi tiết tại MH-KCM-09) */
+  const students = c.students || [];
+  const dtStudentsSection = document.getElementById('dt-students-section');
+  if (students.length) {
+    dtStudentsSection.innerHTML = `
+      <div class="section-hd">Kết quả chấm điểm (${students.length} sinh viên)</div>
+      <table class="mem-tbl" style="margin-bottom:14px">
+        <thead>
+          <tr>
+            <th>Mã SV</th><th>Họ và tên</th>
+            <th style="width:90px;text-align:center">Điểm</th>
+            <th style="width:170px;text-align:center">Kết luận hội đồng</th>
+            <th style="width:110px;text-align:center">Đồng bộ điểm</th>
+          </tr>
+        </thead>
+        <tbody>
+          ${students.map(s => {
+            const cl = s.conclusion
+              ? `<span class="conclusion-tag ${CONCLUSION_CFG[s.conclusion].cls}">${CONCLUSION_CFG[s.conclusion].label}</span>`
+              : `<span class="conclusion-tag cl-empty">Chưa kết luận</span>`;
+            const sync = s.dongBoDiem === 'Đã đồng bộ'
+              ? `<span class="sync-tag sync-dong">Đã đồng bộ</span>`
+              : `<span class="sync-tag sync-chua">Chưa đồng bộ</span>`;
+            return `<tr>
+              <td style="font-family:monospace;font-size:12px">${s.maSV}</td>
+              <td style="font-size:13px;font-weight:600">${s.tenSV}</td>
+              <td style="text-align:center;font-weight:700;color:var(--primary)">${s.diem != null ? s.diem.toFixed(1) : '—'}</td>
+              <td style="text-align:center">${cl}</td>
+              <td style="text-align:center">${sync}</td>
+            </tr>`;
+          }).join('')}
+        </tbody>
+      </table>
+      <div class="f-hint" style="margin-bottom:14px">Xem chi tiết điểm thành phần và chỉnh sửa kết luận tại <a href="#" onclick="closeModal('modal-detail');goToWorkspace('${c.code}');return false">Chi tiết &amp; Chấm điểm</a>.</div>`;
+  } else {
+    dtStudentsSection.innerHTML = '';
+  }
 
   /* Lịch sử xét duyệt — dạng timeline, mới nhất ở trên */
   const histEvents = buildHistory(c);

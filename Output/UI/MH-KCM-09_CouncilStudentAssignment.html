@@ -47,6 +47,7 @@
     .cl-dat{background:#f6ffed;color:#389e0d;border-color:#b7eb8f}
     .cl-khongdat{background:#fff2f0;color:#cf1322;border-color:#ffa39e}
     .cl-canchinh{background:#fff7e6;color:#d46b08;border-color:#ffd591}
+    .cl-hoanbaove{background:#f0f5ff;color:#1d39c4;border-color:#adc6ff}
     .cl-empty{background:#fafafa;color:var(--text-3);border-color:var(--border)}
     select.conclusion-select{font-size:12px;padding:4px 6px;border-radius:6px;border:1px solid var(--border);background:#fff;cursor:pointer;max-width:150px}
   </style>
@@ -206,6 +207,7 @@
                 <th style="width:90px;text-align:center" title="Điểm hội đồng">Điểm HĐ</th>
                 <th style="width:90px;text-align:center">Đã chấm</th>
                 <th style="width:160px;text-align:center">Kết luận</th>
+                <th style="min-width:160px">Ghi chú</th>
                 <th style="width:90px;text-align:center">Thao tác</th>
               </tr>
             </thead>
@@ -308,6 +310,7 @@
           <option value="dat">Đạt</option>
           <option value="canchinh">Đạt nhưng cần chỉnh sửa</option>
           <option value="khongdat">Không đạt</option>
+          <option value="hoanbaove">Hoãn bảo vệ</option>
         </select>
       </div>
       <div class="f-hint">Áp dụng cho tất cả sinh viên đang được chọn.</div>
@@ -409,16 +412,16 @@
      MODAL: CHI TIẾT ĐIỂM GVHD (đầu điểm theo lớp học phần)
 ════════════════════════════════════════ -->
 <div class="overlay hidden" id="modal-ghscore">
-  <div class="modal-box w520">
+  <div class="modal-box w960">
     <div class="modal-hd">
-      <span class="modal-title" id="ghs-title">Chi tiết điểm hướng dẫn</span>
+      <span class="modal-title" id="ghs-title">Thông tin chi tiết điểm</span>
       <button class="modal-close" data-close="modal-ghscore">✕</button>
     </div>
     <div class="modal-bd">
       <div class="f-hint" style="margin-bottom:10px">Cấu trúc đầu điểm do lớp học phần quy định, mỗi lớp có thể khác nhau.</div>
       <div style="border:1px solid var(--border);border-radius:8px;overflow:hidden">
-        <div style="background:#fafafa;padding:10px 16px;border-bottom:1px solid var(--border);display:grid;grid-template-columns:1fr 70px 70px 150px;gap:10px;font-size:12px;font-weight:600;color:var(--text-3)">
-          <span>Điểm thành phần</span><span style="text-align:right">Trọng số</span><span style="text-align:right">Điểm</span><span>Người chấm</span>
+        <div style="background:#fafafa;padding:10px 16px;border-bottom:1px solid var(--border);display:grid;grid-template-columns:1fr 70px 70px 130px 140px 1fr;gap:10px;font-size:12px;font-weight:600;color:var(--text-3)">
+          <span>Điểm thành phần</span><span style="text-align:right">Trọng số</span><span style="text-align:right">Điểm</span><span>Người chấm</span><span>Minh chứng</span><span>Ghi chú</span>
         </div>
         <div id="ghs-body"></div>
       </div>
@@ -529,7 +532,8 @@ function isScoringRole(role) { return role !== 'tk'; }
 const CONCLUSION_CFG = {
   dat       : { label:'Đạt',                       cls:'cl-dat'      },
   khongdat  : { label:'Không đạt',                  cls:'cl-khongdat' },
-  canchinh  : { label:'Đạt nhưng cần chỉnh sửa',    cls:'cl-canchinh' }
+  canchinh  : { label:'Đạt nhưng cần chỉnh sửa',    cls:'cl-canchinh' },
+  hoanbaove : { label:'Hoãn bảo vệ',                cls:'cl-hoanbaove' }
 };
 /* Chỉ Chủ tịch & Thư ký được cập nhật kết luận hội đồng cho từng SV */
 function canEditConclusion(c) { const m = c.members.find(x => x.name === currentPersona); return !!m && (m.role === 'ct' || m.role === 'tk'); }
@@ -575,7 +579,7 @@ const COUNCILS = [
     ],
     students:[
       { maSV:'B22DCCN033', tenSV:'Lê Quốc Cường',  svEmail:'b22dccn033@student.edu.vn', lop:'INT3110_2', ctdt:'KHMT', loaiHinh:'KLTN', maDeTai:'DT-2026-003', tenDeTai:'Mô hình học sâu nhận diện khuôn mặt',       linhVuc:'AI', maxSv:1, tomTat:'Xây dựng mô hình học sâu (CNN) nhận diện khuôn mặt phục vụ điểm danh tự động.', yeuCau:'Có kiến thức về Deep Learning và xử lý ảnh.', sanPham:'Mô hình nhận diện khuôn mặt và ứng dụng demo điểm danh.', congNghe:'Python, TensorFlow, OpenCV', gvhd:'TS. Phạm Thu Hà', baoCao:'BC_KLTN_B22DCCN033.pdf', scores:{ 'TS. Phạm Thu Hà':{score:8.5, comment:'Trình bày rõ ràng, đề tài có tính ứng dụng.'} },
-        diemThanhPhan:[{ten:'Quá trình nghiên cứu', trongSo:20, diem:8.5}, {ten:'Báo cáo khóa luận', trongSo:30, diem:8.0}, {ten:'Điểm hội đồng', trongSo:50, type:'hoidong'}] },
+        diemThanhPhan:[{ten:'Quá trình nghiên cứu', trongSo:20, diem:8.5, minhChung:'NhatKy_B22DCCN033.pdf', ghiChu:'Tham gia đầy đủ các buổi báo cáo tiến độ.'}, {ten:'Báo cáo khóa luận', trongSo:30, diem:8.0, minhChung:'BC_KLTN_B22DCCN033.pdf', ghiChu:'Trình bày rõ ràng, đề tài có tính ứng dụng.'}, {ten:'Điểm hội đồng', trongSo:50, type:'hoidong'}] },
       { maSV:'B22DCCN125', tenSV:'Trương Thị Yến', svEmail:'b22dccn125@student.edu.vn', lop:'INT3110_2', ctdt:'KHMT', loaiHinh:'KLTN', maDeTai:'DT-2026-004', tenDeTai:'Xử lý ngôn ngữ tự nhiên tiếng Việt',         linhVuc:'AI', maxSv:1, tomTat:'Nghiên cứu các kỹ thuật xử lý ngôn ngữ tự nhiên áp dụng cho văn bản tiếng Việt.', yeuCau:'Có kiến thức về NLP và lập trình Python.', sanPham:'Mô hình xử lý NLP và báo cáo đánh giá kết quả.', congNghe:'Python, PyTorch, Hugging Face', gvhd:'TS. Lê Đức Thọ',  baoCao:'BC_KLTN_B22DCCN125.pdf', scores:{},
         diemThanhPhan:[{ten:'Quá trình nghiên cứu', trongSo:20, diem:7.5}, {ten:'Báo cáo khóa luận', trongSo:30, diem:7.8}, {ten:'Điểm hội đồng', trongSo:50, type:'hoidong'}] }
     ]
@@ -875,6 +879,9 @@ function renderStudents() {
       : (sv.conclusion
           ? `<span class="conclusion-tag ${CONCLUSION_CFG[sv.conclusion].cls}">${CONCLUSION_CFG[sv.conclusion].label}</span>`
           : `<span class="conclusion-tag cl-empty">Chưa kết luận</span>`);
+    const conclusionNoteCell = canEditConclusion(c)
+      ? `<input type="text" class="fc" value="${sv.conclusionNote || ''}" placeholder="Ghi chú…" style="font-size:12px;padding:4px 6px" onchange="setConclusionNote('${sv.maSV}', this.value)">`
+      : (sv.conclusionNote ? sv.conclusionNote : '<span style="color:var(--text-3)">—</span>');
 
     return `<tr>
       <td style="text-align:center"><input type="checkbox" class="sv-chk" data-masv="${sv.maSV}" onchange="onStudentCheck(this)" style="width:15px;height:15px;cursor:pointer;accent-color:var(--primary)"></td>
@@ -891,6 +898,7 @@ function renderStudents() {
       <td style="text-align:center">${avgCell}</td>
       <td style="text-align:center">${statusCell}</td>
       <td style="text-align:center">${conclusionCell}</td>
+      <td>${conclusionNoteCell}</td>
       <td style="text-align:center">${action}</td>
     </tr>`;
   }).join('');
@@ -967,7 +975,7 @@ function openGvhdScoreDetail(maSV) {
   const chuTich = c.members.find(m => m.role === 'ct');
   const canEdit = canEditDiemThanhPhan(sv, c);
 
-  document.getElementById('ghs-title').textContent = `Chi tiết điểm hướng dẫn — ${sv.tenSV} (${sv.maSV}) · Lớp ${sv.lop}`;
+  document.getElementById('ghs-title').textContent = `Thông tin chi tiết điểm`;
   document.getElementById('ghs-body').innerHTML = dp.length
     ? dp.map((d,i) => {
         const val = resolveDiemThanhPhan(d, sv);
@@ -976,19 +984,24 @@ function openGvhdScoreDetail(maSV) {
         const diemCell = (canEdit && !isHoiDong)
           ? `<input type="number" class="fc" min="0" max="10" step="0.1" value="${d.diem != null ? d.diem : ''}" style="padding:4px 6px;font-size:13px;text-align:right" onchange="saveDiemThanhPhan('${sv.maSV}', ${i}, this.value)">`
           : `<div style="font-size:14px;font-weight:700;color:var(--primary);text-align:right">${val !== null ? val.toFixed(1) : '—'}</div>`;
-        return `<div style="display:grid;grid-template-columns:1fr 70px 70px 150px;align-items:center;gap:10px;padding:10px 16px;${i<dp.length-1?'border-bottom:1px solid var(--border)':''}">
+        const minhChungVal = isHoiDong ? c.bienBanFile : d.minhChung;
+        const ghiChuVal = isHoiDong ? c.completeNote : d.ghiChu;
+        const minhChungCell = minhChungVal
+          ? `📎 ${minhChungVal}`
+          : '<span style="color:var(--text-3)">—</span>';
+        const ghiChuCell = ghiChuVal
+          ? ghiChuVal
+          : '<span style="color:var(--text-3)">—</span>';
+        return `<div style="display:grid;grid-template-columns:1fr 70px 70px 130px 140px 1fr;align-items:center;gap:10px;padding:10px 16px;${i<dp.length-1?'border-bottom:1px solid var(--border)':''}">
         <div style="font-size:13px">${d.ten}${isHoiDong ? ' <span class="hd-type hd-chamdiem" style="margin-left:4px">Điểm hội đồng</span>' : ''}</div>
         <div style="font-size:13px;color:var(--text-2);text-align:right">${d.trongSo}%</div>
         ${diemCell}
-        <div style="font-size:12px;color:var(--text-2)">${nguoiCham}</div>
+        <div style="font-size:12px;color:var(--text-2);word-break:break-word">${nguoiCham}</div>
+        <div style="font-size:12px;color:var(--text-2);word-break:break-word">${minhChungCell}</div>
+        <div style="font-size:12px;color:var(--text-2);word-break:break-word">${ghiChuCell}</div>
       </div>`;
       }).join('')
     : '<div class="tbl-empty">Lớp học phần chưa có dữ liệu đầu điểm.</div>';
-
-  if (canEdit && dp.some(d => d.type !== 'hoidong')) {
-    document.getElementById('ghs-body').insertAdjacentHTML('beforeend',
-      `<div style="padding:8px 16px;font-size:11px;color:var(--text-3);background:#fafafa">⚠️ Đầu điểm thành phần (A, B, C) chưa đồng bộ với lớp học phần — GVHD/GV phản biện có thể tạm sửa trực tiếp tại đây.</div>`);
-  }
 
   const final = gvhdFinalScore(sv);
   document.getElementById('ghs-final').textContent = final !== null ? final.toFixed(2) : '—';
@@ -1139,6 +1152,13 @@ function setConclusion(maSV, value) {
   const sv = c.students.find(s => s.maSV === maSV);
   sv.conclusion = value || null;
   showToast(value ? `Đã ghi kết luận: ${CONCLUSION_CFG[value].label} — ${sv.tenSV}.` : `Đã xóa kết luận của ${sv.tenSV}.`, 'ok');
+}
+function setConclusionNote(maSV, value) {
+  const c  = council();
+  if (!canEditConclusion(c)) { showToast('Chỉ Chủ tịch hoặc Thư ký mới được cập nhật ghi chú kết luận.', 'err'); return; }
+  const sv = c.students.find(s => s.maSV === maSV);
+  sv.conclusionNote = value.trim() || null;
+  showToast(`💾 Đã lưu ghi chú kết luận cho ${sv.tenSV}.`, 'ok');
 }
 
 function openBulkConclusionModal() {

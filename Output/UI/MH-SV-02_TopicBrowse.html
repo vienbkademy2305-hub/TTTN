@@ -471,7 +471,8 @@ function defaultState() {
       { code:'CT001', name:'Công nghệ thông tin', submitted:true, wishes:[
           { id:'ct1_w1', priority:1, type:'gv', topicCode:'DT-2026-0007',
             topicName:'Phát triển ứng dụng di động hỗ trợ người khiếm thị nhận diện môi trường',
-            gvName:'TS. Phạm Quốc Hùng', result:'rejected' },
+            gvName:'TS. Phạm Quốc Hùng', result:'rejected',
+            reason:'Đề tài đã đủ số lượng sinh viên đăng ký được duyệt.' },
           { id:'ct1_w2', priority:2, type:'self', topicCode:'SV-ĐT-2026-001',
             topicName:'Hệ thống gợi ý học tập thích ứng bằng AI',
             gvName:'TS. Nguyễn Minh Tuấn', result:'approved' },
@@ -579,20 +580,20 @@ function renderProgBody(prog) {
     const prio  = `<span class="prio-num${w.type==='self'?' self-type':''}">${w.priority}</span>`;
     const code  = w.topicCode
       ? `<div style="font-size:11px;color:var(--text-3);font-family:monospace;margin-bottom:2px">${w.topicCode}</div>` : '';
-    const typeBadge = w.type === 'self'
-      ? `<span class="tag" style="color:#722ed1;background:#f9f0ff;border-color:#d3adf7;font-size:11px">📝 SV đề xuất</span>`
-      : ``;
     const canCancel = w.result === 'pending';
     const act = canCancel
       ? `<button class="icon-btn warn-btn" title="Hủy nguyện vọng" onclick="confirmCancel('${prog.code}','${w.id}')">🚫</button>`
       : `<span style="color:var(--text-3);display:inline-block;width:28px;text-align:center">—</span>`;
+    const reason = w.result === 'rejected' && w.reason
+      ? `<span style="font-size:12px;color:var(--error)">${w.reason}</span>`
+      : `<span style="color:var(--text-3)">—</span>`;
     return `
       <tr class="${rowCl}">
         <td style="text-align:center;width:56px">${prio}</td>
         <td>${code}<span style="font-size:13px;font-weight:600">${w.topicName}</span></td>
         <td style="white-space:nowrap;font-size:13px;color:var(--text-2)">${w.gvName}</td>
-        <td>${typeBadge}</td>
         <td><span class="tag ${rc.cls}" style="font-size:12px">${rc.label}</span></td>
+        <td>${reason}</td>
         <td style="text-align:center;width:60px">${act}</td>
       </tr>`;
   }).join('');
@@ -605,8 +606,8 @@ function renderProgBody(prog) {
             <th style="text-align:center;width:56px">Ưu tiên</th>
             <th>Tên đề tài</th>
             <th style="width:180px">GV hướng dẫn</th>
-            <th style="width:110px">Loại</th>
             <th style="width:120px">Kết quả</th>
+            <th style="width:200px">Lý do</th>
             <th style="text-align:center;width:60px">Hủy</th>
           </tr>
         </thead>

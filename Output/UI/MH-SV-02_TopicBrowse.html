@@ -388,6 +388,7 @@
     <!-- Modal footer -->
     <div class="modal-ft">
       <button class="btn btn-default" id="btn-back" style="display:none;margin-right:auto" onclick="wizBack()">← Quay lại</button>
+      <button class="btn btn-default" onclick="doSaveDraft()">💾 Lưu nháp</button>
       <button class="btn btn-default" data-close="m-them-nv">Hủy</button>
       <button class="btn btn-primary" id="btn-next" onclick="wizNext()">Tiếp theo →</button>
     </div>
@@ -480,7 +481,7 @@ function defaultState() {
             topicName:'Xây dựng hệ thống phân tích log và phát hiện xâm nhập mạng bằng AI',
             gvName:'TS. Nguyễn Minh Tuấn', result:'skipped' },
       ]},
-      { code:'CT002', name:'Quản trị kinh doanh', submitted:false, wishes:[] },
+      { code:'CT002', name:'Quản trị kinh doanh', submitted:false, draft:false, draftWishes:[], wishes:[] },
     ],
   };
 }
@@ -527,7 +528,10 @@ function renderAll(st) {
 }
 
 function progStatus(prog) {
-  if (!prog.submitted)                               return { label:'N/A',          cls:'tag-default' };
+  if (!prog.submitted) {
+    if (prog.draft && prog.draftWishes && prog.draftWishes.length) return { label:'📝 Lưu nháp', cls:'tag-default' };
+    return { label:'N/A', cls:'tag-default' };
+  }
   if (prog.wishes.some(w => w.result === 'approved')) return { label:'✅ Đã duyệt', cls:'tag-success' };
   return                                                    { label:'⏳ Chờ duyệt', cls:'tag-warning' };
 }
@@ -559,6 +563,20 @@ function renderProgBody(prog) {
         <div class="empty-prog">
           <div class="ep-ico">🔒</div>
           <p>Đợt đăng ký đã đóng. Không thể thêm nguyện vọng cho ngành <strong>${prog.code} - ${prog.name}</strong>.</p>
+        </div>`;
+    }
+    if (prog.draft && prog.draftWishes && prog.draftWishes.length) {
+      const items = prog.draftWishes.map((w, i) =>
+        `<li style="text-align:left">${i+1}. ${w.topicName} <span style="color:var(--text-3)">(${w.gvName})</span></li>`
+      ).join('');
+      return `
+        <div class="empty-prog">
+          <div class="ep-ico">📝</div>
+          <p>Đã lưu nháp <strong>${prog.draftWishes.length}</strong> nguyện vọng cho ngành <strong>${prog.code} - ${prog.name}</strong>:</p>
+          <ul style="max-width:480px;margin:0 auto 14px;font-size:13px;color:var(--text-2);line-height:1.8;list-style:none;padding:0">${items}</ul>
+          <button class="btn btn-primary" onclick="openThemNV('${prog.code}')">
+            ✎ Tiếp tục chỉnh sửa
+          </button>
         </div>`;
     }
     return `
@@ -649,7 +667,7 @@ function openThemNV(ctdtCode) {
 
   wCtdtCode = ctdtCode;
   wTopics   = TOPICS_DB[ctdtCode] || [];
-  wSelList  = [];
+  wSelList  = (prog && prog.draft && prog.draftWishes) ? prog.draftWishes.map(w => ({ ...w })) : [];
 
   // Modal context
   const roundName = currentRound ? currentRound.name : '—';
@@ -1219,6 +1237,24 @@ function editCoGv(itemId, idx) {
 }
 
 /* ════════════════════════════════════════
+   LƯU NHÁP
+════════════════════════════════════════ */
+function doSaveDraft() {
+  if (!wSelList.length) { showToast('Chưa có nguyện vọng nào để lưu nháp', 'warn'); return; }
+
+  const st   = loadState();
+  const prog = st.programs.find(p => p.code === wCtdtCode);
+  if (!prog) return;
+
+  prog.draft       = true;
+  prog.draftWishes = wSelList.map(item => ({ ...item }));
+  saveState(st);
+  closeModal('m-them-nv');
+  renderAll(st);
+  showToast(`Đã lưu nháp ${wSelList.length} nguyện vọng cho ${wCtdtCode} - ${prog.name}`);
+}
+
+/* ════════════════════════════════════════
    SUBMIT
 ════════════════════════════════════════ */
 function doSubmitNV() {
@@ -1229,7 +1265,9 @@ function doSubmitNV() {
   showConfirm(
     `Gửi ${wSelList.length} nguyện vọng cho ${wCtdtCode} - ${prog.name}?`,
     () => {
-      prog.submitted = true;
+      prog.submitted   = true;
+      prog.draft       = false;
+      prog.draftWishes = [];
       prog.wishes    = wSelList.map((item, i) => ({
         id:        item.id,
         priority:  i + 1,

@@ -902,6 +902,8 @@
           <select class="fc" id="cd-loai" onchange="onCdLoaiChange()">
             <option value="Giao đề tài">Giao đề tài</option>
             <option value="Thay đổi đề tài">Thay đổi đề tài</option>
+            <option value="Gia hạn thời gian làm đề tài">Gia hạn thời gian làm đề tài</option>
+            <option value="Bảo vệ trước thời hạn">Bảo vệ trước thời hạn</option>
           </select>
         </div>
       </div>
@@ -917,6 +919,11 @@
           <label>Người ký</label>
           <input class="fc" type="text" id="cd-nguoiky" placeholder="VD: Nguyễn Thị Lan — Trưởng phòng Đào tạo">
         </div>
+      </div>
+      <div class="fi" id="fi-cd-hanmoi" style="margin-bottom:20px;display:none">
+        <label>Hạn hoàn thành mới <span class="req">*</span></label>
+        <input class="fc" type="date" id="cd-hanmoi">
+        <div class="fe">Vui lòng chọn hạn hoàn thành mới.</div>
       </div>
       <div class="fi" style="margin-bottom:20px">
         <label>Nội dung</label>
@@ -1319,6 +1326,7 @@ let students = [
         {tuan:4, nhiemVu:'Xây dựng giao diện web demo, viết báo cáo tổng kết', ketQua:'Ứng dụng web demo + báo cáo ĐATN', ghiChu:'', trangThai:'Đã duyệt'},
       ]},
     qdGiao:{so:'145/QĐ-PĐT', ngay:'01/06/2026', donViBanHanh:'Phòng Đào tạo', nguoiKy:'Nguyễn Thị Lan — Trưởng phòng Đào tạo', file:'QD-145-PDT-2026.pdf'},
+    qdBaoVeSomList:[{so:'149/QĐ-PĐT', ngay:'10/06/2026', donViBanHanh:'Phòng Đào tạo', nguoiKy:'Nguyễn Thị Lan — Trưởng phòng Đào tạo', file:'QD-149-PDT-2026.pdf'}],
     nxGVHD:{diem:8.0, ketLuan:'Đồng ý', noiDung:'Sinh viên thực hiện nghiêm túc, đúng tiến độ, sản phẩm đạt yêu cầu đề ra.', ngay:'19/06/2026', file:'PhieuNhanXet_GVHD_B22DCCN071.docx', ghiChu:'Đề nghị bổ sung thêm test case trước khi nộp bản hoàn chỉnh.'},
     nxGVPB:{diem:7.5, ketLuan:'Đồng ý', noiDung:'Báo cáo trình bày rõ ràng, mô hình ML có độ chính xác khá tốt. Cần bổ sung phân tích so sánh với baseline.', ngay:'20/06/2026', file:'PhieuNhanXet_GVPB_B22DCCN071.docx', ghiChu:''},
     diemHoiDong:8.2, diemTongKet:8.0, dongBoDiem:'Đã đồng bộ', dongBoNgay:'23/06/2026',
@@ -1363,6 +1371,7 @@ let students = [
       ]},
     qdGiao:{so:'077/QĐ-PĐT', ngay:'02/04/2026', donViBanHanh:'Phòng Đào tạo', nguoiKy:'Nguyễn Thị Lan — Trưởng phòng Đào tạo', file:'QD-077-PDT-2026.pdf'},
     qdDoiList:[{so:'112/QĐ-PĐT', ngay:'14/05/2026', donViBanHanh:'Phòng Đào tạo', nguoiKy:'Nguyễn Thị Lan — Trưởng phòng Đào tạo', file:'QD-112-PDT-2026.pdf', deTaiCu:'Hệ thống phân tích dữ liệu bán hàng (bản gốc)', deTaiMoi:'Hệ thống phân tích dữ liệu bán hàng cho doanh nghiệp vừa và nhỏ', gvhdCu:'TS. Lê Thị Mai', gvhdMoi:'TS. Lê Thị Mai', lyDo:'Điều chỉnh phạm vi đề tài theo góp ý hội đồng duyệt đề cương.'}],
+    qdGiaHanList:[{so:'120/QĐ-PĐT', ngay:'20/05/2026', donViBanHanh:'Phòng Đào tạo', nguoiKy:'Nguyễn Thị Lan — Trưởng phòng Đào tạo', file:'QD-120-PDT-2026.pdf', hanMoi:'15/06/2026'}],
     nxGVHD:{diem:8.5, ketLuan:'Đồng ý', noiDung:'Quyển khóa luận trình bày đầy đủ, đúng quy định, sinh viên nắm vững kiến thức chuyên môn.', ngay:'21/06/2026', file:'PhieuNhanXet_GVHD_B21DCCN076.docx', ghiChu:''},
     nxGVPB:{diem:8.0, ketLuan:'Đồng ý', noiDung:'Nội dung đáp ứng yêu cầu khóa luận, dashboard trực quan. Cần làm rõ hơn phần đánh giá hiệu năng hệ thống.', ngay:'22/06/2026', file:'PhieuNhanXet_GVPB_B21DCCN076.docx', ghiChu:'Khuyến nghị bổ sung benchmark hiệu năng ở chương 4.'},
     diemHoiDong:8.3, diemTongKet:8.3, dongBoDiem:'Lỗi đồng bộ', dongBoLoi:'Mã sinh viên không khớp với hệ thống đào tạo (CTMS)',
@@ -1678,12 +1687,9 @@ function render(){
       : s.baoCao
         ? `<span class="ketluan-pill wait" onclick="openNhanXetGvpb(${s.id})" title="Nhập nhận xét GVPB">⏳ Chưa nhận xét</span>`
         : `<span style="color:var(--text-3);font-size:12px">—</span>`;
-    const qdDoiLatest = (s.qdDoiList && s.qdDoiList.length) ? s.qdDoiList[s.qdDoiList.length - 1] : null;
-    const qdCell = s.qdGiao
-      ? `<div style="line-height:1.6">
-          <div style="font-size:11px;white-space:nowrap;cursor:pointer" onclick="openQdDetail(${s.id},'giao')" title="Xem quyết định giao đề tài"><span style="font-family:monospace;font-weight:600;color:var(--text-2);text-decoration:underline;text-underline-offset:2px">${s.qdGiao.so}</span></div>
-          ${qdDoiLatest ? `<div style="font-size:11px;white-space:nowrap;margin-top:1px;cursor:pointer" onclick="openQdDetail(${s.id},'doi')" title="Xem quyết định thay đổi đề tài"><span style="font-family:monospace;font-weight:600;color:var(--warning);text-decoration:underline;text-underline-offset:2px">${qdDoiLatest.so}</span></div>` : ''}
-        </div>`
+    const qdTotalCount = countDecisions(s);
+    const qdCell = qdTotalCount
+      ? `<span class="btn btn-default btn-sm" style="font-size:11px;padding:2px 10px" onclick="openDecision(${s.id})" title="Xem danh sách quyết định">📜 Chi tiết (${qdTotalCount})</span>`
       : `<span style="color:var(--text-3);font-size:12px">—</span>`;
     const yeuCauList = s.yeuCauList || [];
     const daDongBo = s.dongBoDiem === 'Đã đồng bộ';
@@ -2663,64 +2669,71 @@ function openDeCuongInfo(id){
   openModal('m-decuong-info');
 }
 
-/* ════════ MODAL: QUYẾT ĐỊNH ════════ */
+/* ════════ DS QUYẾT ĐỊNH CỦA 1 SV ════════ */
+const QD_TYPE_CFG = {
+  giao:    { label: 'Giao đề tài' },
+  doi:     { label: 'Thay đổi đề tài' },
+  giahan:  { label: 'Gia hạn thời gian làm đề tài' },
+  som:     { label: 'Bảo vệ trước thời hạn' },
+};
+function listAllDecisions(s){
+  const list = [];
+  if (s.qdGiao) list.push({ type:'giao', idx:-1, d:s.qdGiao });
+  (s.qdDoiList||[]).forEach((d,i) => list.push({ type:'doi', idx:i, d }));
+  (s.qdGiaHanList||[]).forEach((d,i) => list.push({ type:'giahan', idx:i, d }));
+  (s.qdBaoVeSomList||[]).forEach((d,i) => list.push({ type:'som', idx:i, d }));
+  return list;
+}
+function countDecisions(s){ return listAllDecisions(s).length; }
+
+/* ════════ MODAL: DS QUYẾT ĐỊNH ════════ */
 function openDecision(id){
   const s = students.find(x => x.id === id);
-  document.getElementById('qd-title').textContent = `Quyết định — ${s.tenSV} (${s.maSV})`;
+  document.getElementById('qd-title').textContent = `DS quyết định — ${s.tenSV} (${s.maSV})`;
 
-  let html = '';
+  const list = listAllDecisions(s);
+  const rows = list.length ? list.map(item => {
+    const cfg = QD_TYPE_CFG[item.type];
+    return `<tr>
+      <td><span style="font-family:monospace;font-weight:700;color:var(--primary);cursor:pointer;text-decoration:underline;text-underline-offset:2px" onclick="openQdDetail(${s.id},'${item.type}',${item.idx})" title="Xem chi tiết quyết định">${item.d.so}</span></td>
+      <td style="font-size:12px">${cfg.label}</td>
+      <td style="font-size:12px">${item.d.ngay}</td>
+      <td style="font-size:12px">${item.d.donViBanHanh || '—'}</td>
+    </tr>`;
+  }).join('') : `<tr><td colspan="4" class="tbl-empty">Chưa có quyết định nào được ban hành</td></tr>`;
 
-  // QĐ giao đề tài
-  html += `<div class="section-title"><span class="section-badge">A</span> Quyết định giao đề tài</div>`;
-  if (s.qdGiao) {
-    html += `<div class="qd-card">
-      <div class="qd-no">${s.qdGiao.so}</div>
-      <div style="font-size:13px;margin-top:4px">Ngày ký: ${s.qdGiao.ngay} &nbsp;|&nbsp; Đơn vị ban hành: ${s.qdGiao.donViBanHanh}</div>
-      <div style="font-size:12px;color:var(--text-3);margin-top:2px">Người ký: ${s.qdGiao.nguoiKy || '—'}</div>
-      ${s.qdGiao.file ? `<div style="font-size:12px;margin-top:4px">📎 ${s.qdGiao.file}</div>` : ''}
-    </div>`;
-  } else if (s.status === 'Chờ quyết định giao đề tài') {
-    html += `<div style="color:var(--text-3);font-size:13px;margin-bottom:10px">Chưa có quyết định giao đề tài.</div>
-    <button class="btn btn-primary btn-sm" onclick="closeModal('m-decision');openCreateDecision(${s.id},'Giao đề tài')">📝 Tạo Quyết định giao đề tài</button>`;
-  } else {
-    html += `<div style="color:var(--text-3);font-size:13px">Chưa đến giai đoạn ban hành quyết định.</div>`;
-  }
-
-  // QĐ thay đổi đề tài
-  html += `<div class="section-title"><span class="section-badge">B</span> Quyết định thay đổi đề tài</div>`;
-  if (s.qdDoiList && s.qdDoiList.length) {
-    html += s.qdDoiList.map(d => `<div class="qd-card">
-      <div class="qd-no">${d.so}</div>
-      <div style="font-size:13px;margin-top:4px">Ngày ký: ${d.ngay} &nbsp;|&nbsp; Đơn vị ban hành: ${d.donViBanHanh}</div>
-      <div style="font-size:12px;margin-top:6px"><span style="color:var(--text-3)">Đề tài cũ:</span> ${d.deTaiCu}</div>
-      <div style="font-size:12px"><span style="color:var(--text-3)">Đề tài mới:</span> ${d.deTaiMoi}</div>
-      <div style="font-size:12px;color:var(--text-3);margin-top:4px">Người ký: ${d.nguoiKy || '—'}</div>
-      ${d.file ? `<div style="font-size:12px;margin-top:4px">📎 ${d.file}</div>` : ''}
-    </div>`).join('');
-  }
-  if (s.status === 'Thay đổi đề tài') {
-    html += `<div class="qd-card" style="background:#fff7e6;border-color:#ffd591">
+  document.getElementById('qd-body').innerHTML = `
+    <div class="tbl-wrap">
+      <table class="tbl" style="width:100%">
+        <thead>
+          <tr>
+            <th style="width:130px">Số quyết định</th>
+            <th style="width:190px">Loại</th>
+            <th style="width:100px">Ngày ký</th>
+            <th>Đơn vị ban hành</th>
+          </tr>
+        </thead>
+        <tbody>${rows}</tbody>
+      </table>
+    </div>
+    ${s.status === 'Chờ quyết định giao đề tài' ? `<div style="margin-top:12px"><button class="btn btn-primary btn-sm" onclick="closeModal('m-decision');openCreateDecision(${s.id},'Giao đề tài')">📝 Tạo Quyết định giao đề tài</button></div>` : ''}
+    ${s.status === 'Thay đổi đề tài' ? `<div class="qd-card" style="background:#fff7e6;border-color:#ffd591;margin-top:12px">
       <div style="font-size:12px;color:var(--text-3)">Yêu cầu đổi đề tài đang chờ xử lý:</div>
       <div style="font-size:13px;margin-top:4px"><strong>Cũ:</strong> ${s.changeRequest.topicCu}</div>
       <div style="font-size:13px"><strong>Mới:</strong> ${s.changeRequest.topicMoi}</div>
       <div style="font-size:12px;margin-top:4px"><em>${s.changeRequest.lyDo}</em></div>
     </div>
-    <button class="btn btn-primary btn-sm" onclick="closeModal('m-decision');openCreateDecision(${s.id},'Thay đổi đề tài')">📝 Tạo Quyết định thay đổi đề tài</button>`;
-  } else if (!(s.qdDoiList && s.qdDoiList.length)) {
-    html += `<div style="color:var(--text-3);font-size:13px">Chưa có yêu cầu thay đổi đề tài.</div>`;
-  }
+    <div style="margin-top:8px"><button class="btn btn-primary btn-sm" onclick="closeModal('m-decision');openCreateDecision(${s.id},'Thay đổi đề tài')">📝 Tạo Quyết định thay đổi đề tài</button></div>` : ''}`;
 
-  document.getElementById('qd-body').innerHTML = html;
-
-  const canExport = ['Đã ban hành quyết định','Thay đổi đề tài','Đã cập nhật quyết định thay đổi'].includes(s.status);
+  const canExport = list.length > 0;
   document.getElementById('qd-footer').innerHTML = `<button class="btn btn-default" data-close="m-decision">Đóng</button>` +
     (canExport ? `<button class="btn btn-primary" onclick="exportDecision(${s.id})">📄 Xuất quyết định</button>` : '');
 
   openModal('m-decision');
 }
 
-/* ════════ MODAL: CHI TIẾT 1 QUYẾT ĐỊNH (click vào dòng Giao/Đổi trong cột Quyết định) ════════ */
-function openQdDetail(id, type){
+/* ════════ MODAL: CHI TIẾT 1 QUYẾT ĐỊNH (click vào số QĐ trong DS quyết định) ════════ */
+function openQdDetail(id, type, idx){
   const s = students.find(x => x.id === id);
   const badgeOk = '<span style="background:#f6ffed;color:#389e0d;border:1px solid #b7eb8f;padding:1px 10px;border-radius:10px;font-size:12px">Đã ban hành</span>';
 
@@ -2729,10 +2742,18 @@ function openQdDetail(id, type){
     d = s.qdGiao;
     loai = 'Giao đề tài';
     noidung = `Giao đề tài <strong>${s.topic ? s.topic.code + ' — ' + s.topic.name : '—'}</strong> cho sinh viên ${s.tenSV} (${s.maSV}), GVHD: ${s.gvhd || '—'}.`;
-  } else {
-    d = (s.qdDoiList && s.qdDoiList.length) ? s.qdDoiList[s.qdDoiList.length - 1] : null;
+  } else if (type === 'doi') {
+    d = (s.qdDoiList || [])[idx];
     loai = 'Thay đổi đề tài';
     noidung = d ? `Thay đổi đề tài cho sinh viên ${s.tenSV} (${s.maSV}).<br><span style="color:var(--text-3)">Đề tài cũ:</span> ${d.deTaiCu}<br><span style="color:var(--text-3)">Đề tài mới:</span> ${d.deTaiMoi}<br><span style="color:var(--text-3)">Lý do:</span> <em>${d.lyDo}</em>` : '';
+  } else if (type === 'giahan') {
+    d = (s.qdGiaHanList || [])[idx];
+    loai = 'Gia hạn thời gian làm đề tài';
+    noidung = d ? `Gia hạn thời gian làm đề tài cho sinh viên ${s.tenSV} (${s.maSV}) đến ngày <strong>${d.hanMoi || '—'}</strong>.` : '';
+  } else {
+    d = (s.qdBaoVeSomList || [])[idx];
+    loai = 'Bảo vệ trước thời hạn';
+    noidung = d ? `Cho phép sinh viên ${s.tenSV} (${s.maSV}) bảo vệ trước thời hạn quy định.` : '';
   }
   if (!d) return;
   if (d.noidung) noidung = d.noidung;
@@ -2901,7 +2922,9 @@ function openCreateDecision(id, presetLoai){
   document.getElementById('cd-donvi').value = 'Phòng Đào tạo';
   document.getElementById('cd-nguoiky').value = '';
   document.getElementById('cd-noidung').value = '';
+  document.getElementById('cd-hanmoi').value = '';
   document.getElementById('fi-cd-so').classList.remove('err');
+  document.getElementById('fi-cd-hanmoi').classList.remove('err');
   clearCdFile();
   document.getElementById('cd-loai').value = presetLoai || _detectLoai(_assignTargetIds);
   onCdLoaiChange();
@@ -2913,10 +2936,17 @@ function _detectLoai(ids){
   const doiCount = list.filter(s => s.status === 'Thay đổi đề tài').length;
   return doiCount > giaoCount ? 'Thay đổi đề tài' : 'Giao đề tài';
 }
+const CD_ELIGIBLE_CHECK = {
+  'Giao đề tài':                      s => s.status === 'Chờ quyết định giao đề tài',
+  'Thay đổi đề tài':                   s => s.status === 'Thay đổi đề tài',
+  'Gia hạn thời gian làm đề tài':       s => !!s.qdGiao,
+  'Bảo vệ trước thời hạn':             s => !!s.qdGiao,
+};
 function onCdLoaiChange(){
   const loai = document.getElementById('cd-loai').value;
+  document.getElementById('fi-cd-hanmoi').style.display = loai === 'Gia hạn thời gian làm đề tài' ? '' : 'none';
   const list = students.filter(s => _assignTargetIds.includes(s.id));
-  const eligible = list.filter(s => loai === 'Giao đề tài' ? s.status === 'Chờ quyết định giao đề tài' : s.status === 'Thay đổi đề tài');
+  const eligible = list.filter(CD_ELIGIBLE_CHECK[loai]);
   const skipped = list.filter(s => !eligible.includes(s));
   renderCdSvTable(eligible, loai);
   const warnEl = document.getElementById('cd-warn');
@@ -2958,8 +2988,7 @@ function removeCdStudent(id){
 function _nextDecisionNumber(){
   let max = 100;
   students.forEach(s => {
-    if (s.qdGiao) { const n = parseInt(s.qdGiao.so); if (!isNaN(n) && n > max) max = n; }
-    (s.qdDoiList||[]).forEach(d => { const n = parseInt(d.so); if (!isNaN(n) && n > max) max = n; });
+    listAllDecisions(s).forEach(item => { const n = parseInt(item.d.so); if (!isNaN(n) && n > max) max = n; });
   });
   return max + 1;
 }
@@ -3010,9 +3039,15 @@ function saveCreateDecision(){
   const noidung = document.getElementById('cd-noidung').value.trim();
   const file = _cdFile;
 
-  const eligibleIds = students.filter(s => _assignTargetIds.includes(s.id) &&
-    (loai === 'Giao đề tài' ? s.status === 'Chờ quyết định giao đề tài' : s.status === 'Thay đổi đề tài')
-  ).map(s => s.id);
+  const hanMoiRaw = document.getElementById('cd-hanmoi').value;
+  if (loai === 'Gia hạn thời gian làm đề tài' && !hanMoiRaw) {
+    document.getElementById('fi-cd-hanmoi').classList.add('err');
+    return;
+  }
+  document.getElementById('fi-cd-hanmoi').classList.remove('err');
+  const hanMoi = hanMoiRaw ? hanMoiRaw.split('-').reverse().join('/') : '';
+
+  const eligibleIds = students.filter(s => _assignTargetIds.includes(s.id) && CD_ELIGIBLE_CHECK[loai](s)).map(s => s.id);
 
   if (!eligibleIds.length) { showToast('Không có sinh viên phù hợp với loại quyết định này', 'warn'); return; }
 
@@ -3023,12 +3058,22 @@ function saveCreateDecision(){
       return { ...s, qdGiao:{so, ngay, donViBanHanh, nguoiKy, noidung, file}, status:'Đã ban hành quyết định',
         history:[...s.history, {time:today, actor:nguoiKy||donViBanHanh, action:'Ban hành Quyết định giao đề tài', result:`Số QĐ: ${so}`, dot:'ok'}] };
     }
-    const doi = { so, ngay, donViBanHanh, nguoiKy, noidung, file,
-      deTaiCu: s.changeRequest ? s.changeRequest.topicCu : (s.topic ? s.topic.name : ''),
-      deTaiMoi: s.changeRequest ? s.changeRequest.topicMoi : '',
-      lyDo: s.changeRequest ? s.changeRequest.lyDo : '' };
-    return { ...s, qdDoiList:[...(s.qdDoiList||[]), doi], status:'Đã cập nhật quyết định thay đổi',
-      history:[...s.history, {time:today, actor:nguoiKy||donViBanHanh, action:'Ban hành Quyết định thay đổi đề tài', result:`Số QĐ: ${so}`, dot:'ok'}] };
+    if (loai === 'Thay đổi đề tài') {
+      const doi = { so, ngay, donViBanHanh, nguoiKy, noidung, file,
+        deTaiCu: s.changeRequest ? s.changeRequest.topicCu : (s.topic ? s.topic.name : ''),
+        deTaiMoi: s.changeRequest ? s.changeRequest.topicMoi : '',
+        lyDo: s.changeRequest ? s.changeRequest.lyDo : '' };
+      return { ...s, qdDoiList:[...(s.qdDoiList||[]), doi], status:'Đã cập nhật quyết định thay đổi',
+        history:[...s.history, {time:today, actor:nguoiKy||donViBanHanh, action:'Ban hành Quyết định thay đổi đề tài', result:`Số QĐ: ${so}`, dot:'ok'}] };
+    }
+    if (loai === 'Gia hạn thời gian làm đề tài') {
+      const giaHan = { so, ngay, donViBanHanh, nguoiKy, noidung, file, hanMoi };
+      return { ...s, qdGiaHanList:[...(s.qdGiaHanList||[]), giaHan],
+        history:[...s.history, {time:today, actor:nguoiKy||donViBanHanh, action:'Ban hành Quyết định gia hạn thời gian làm đề tài', result:`Số QĐ: ${so} — Hạn mới: ${hanMoi}`, dot:'ok'}] };
+    }
+    const baoVeSom = { so, ngay, donViBanHanh, nguoiKy, noidung, file };
+    return { ...s, qdBaoVeSomList:[...(s.qdBaoVeSomList||[]), baoVeSom],
+      history:[...s.history, {time:today, actor:nguoiKy||donViBanHanh, action:'Ban hành Quyết định bảo vệ trước thời hạn', result:`Số QĐ: ${so}`, dot:'ok'}] };
   });
 
   closeModal('m-create-decision');
@@ -3041,8 +3086,7 @@ function saveCreateDecision(){
 function buildDecisionLog(){
   const log = [];
   students.forEach(s => {
-    if (s.qdGiao) log.push({ ...s.qdGiao, loai:'Giao đề tài', sv:[`${s.maSV} — ${s.tenSV}`] });
-    (s.qdDoiList||[]).forEach(d => log.push({ ...d, loai:'Thay đổi đề tài', sv:[`${s.maSV} — ${s.tenSV}`] }));
+    listAllDecisions(s).forEach(item => log.push({ ...item.d, loai:QD_TYPE_CFG[item.type].label, sv:[`${s.maSV} — ${s.tenSV}`] }));
   });
   const merged = {};
   log.forEach(l => { if (merged[l.so]) merged[l.so].sv.push(...l.sv); else merged[l.so] = { ...l }; });
@@ -3053,7 +3097,7 @@ function openDecisionLog(){
   document.getElementById('cdlog-tbody').innerHTML = log.length ? log.map(l => `
     <tr>
       <td style="font-family:monospace;font-weight:700;color:var(--primary)">${l.so}</td>
-      <td><span class="tag ${l.loai==='Giao đề tài'?'tag-success':'tag-error'}">${l.loai}</span></td>
+      <td style="font-size:12px">${l.loai}</td>
       <td style="font-size:12px">${l.ngay}</td>
       <td style="font-size:12px">${l.donViBanHanh||'—'}</td>
       <td style="font-size:12px">${l.nguoiKy||'—'}</td>

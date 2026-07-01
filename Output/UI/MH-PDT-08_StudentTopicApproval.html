@@ -93,9 +93,8 @@
       <li>
         <span class="mn-group">👨‍🏫&nbsp; Hướng dẫn &nbsp;▾</span>
         <ul class="sb-sub open">
+          <li><a href="MH-PDT-10_GraduationProjectManagement.html">Quản lý ĐATN &amp; KLTN</a></li>
           <li><a href="MH-PDT-06_InternshipStudents.html">QL DS thực tập</a></li>
-          <li><a href="#">QL DS đồ án tốt nghiệp</a></li>
-          <li><a href="#">QL DS khoá luận tốt nghiệp</a></li>
           <li><a href="MH-GV-02_ChangeRequestApproval.html">Quản lý yêu cầu thay đổi</a></li>
         </ul>
       </li>
@@ -182,12 +181,12 @@
                 <th style="width:160px">Đơn vị</th>
                 <th style="width:140px">Đợt</th>
                 <th>Đề tài đăng ký</th>
+                <th style="width:110px">Người đề xuất</th>
                 <th style="min-width:150px">Giảng viên hướng dẫn</th>
                 <th style="width:110px;text-align:center">Thứ tự NV</th>
                 <th style="width:100px">Ngày đăng ký</th>
                 <th style="width:130px">Trạng thái</th>
                 <th style="min-width:170px">Lý do từ chối</th>
-                <th style="width:90px;text-align:center">Hành động</th>
               </tr>
             </thead>
             <tbody id="tbody"></tbody>
@@ -280,79 +279,6 @@
     <div class="modal-ft">
       <button class="btn btn-default" data-close="m-nv-order">Đóng</button>
     </div>
-  </div>
-</div>
-
-<!-- ═══════════════════════════════════════════
-     MODAL: XÉT DUYỆT ĐỀ XUẤT (CHỜ KHOA)
-════════════════════════════════════════════ -->
-<div class="overlay hidden" id="m-review">
-  <div class="modal-box w800">
-    <div class="modal-hd">
-      <h4 class="modal-title" id="rv-title">Xét duyệt đề xuất</h4>
-      <button class="modal-close" data-close="m-review">✕</button>
-    </div>
-    <div class="modal-bd">
-
-      <div class="section-title"><span class="section-badge">A</span> Thông tin đề tài đề xuất</div>
-      <table class="desc-tbl"><tbody id="rv-topic-body"></tbody></table>
-
-      <div class="section-title"><span class="section-badge">B</span> Sinh viên & Giảng viên hướng dẫn</div>
-      <div class="sv-gv-grid">
-        <div class="info-card">
-          <div class="info-card-title">🎓 Sinh viên</div>
-          <div class="info-row"><span class="info-lbl">Mã số SV</span><span class="info-val" id="rv-masv" style="font-family:monospace"></span></div>
-          <div class="info-row"><span class="info-lbl">Họ và tên</span><span class="info-val" id="rv-tensv"></span></div>
-          <div class="info-row"><span class="info-lbl">Lớp</span><span class="info-val" id="rv-lop"></span></div>
-          <div class="info-row"><span class="info-lbl">CTĐT</span><span class="info-val" id="rv-ctdt"></span></div>
-          <div class="info-row"><span class="info-lbl">GPA</span><span class="info-val" id="rv-gpa"></span></div>
-        </div>
-        <div class="info-card">
-          <div class="info-card-title">👨‍🏫 Giảng viên hướng dẫn</div>
-          <div class="info-row"><span class="info-lbl">Họ và tên</span><span class="info-val" id="rv-gvname"></span></div>
-          <div class="info-row"><span class="info-lbl">Đơn vị</span><span class="info-val" id="rv-gvunit"></span></div>
-          <div class="info-row"><span class="info-lbl">Ngày đồng ý</span><span class="info-val" id="rv-gvdate"></span></div>
-          <div class="info-row"><span class="info-lbl">Chỉ tiêu đợt</span><span class="info-val" id="rv-gvcap"></span></div>
-          <div style="margin-top:10px">
-            <div class="info-card-title" style="margin-bottom:6px">Nhận xét của GV</div>
-            <div class="gv-note" id="rv-gvnote"></div>
-          </div>
-        </div>
-      </div>
-
-      <div id="rv-gvngoai-wrap" style="display:none;margin-top:12px;background:#fff7e6;border:1px solid #ffd591;border-radius:8px;padding:12px 16px">
-        <div style="font-weight:600;font-size:12px;color:#874d00;margin-bottom:6px">🏛️ Giảng viên ngoài trường đồng hướng dẫn <span style="font-weight:400">(do SV kê khai — cần xác minh trước khi phê duyệt)</span></div>
-        <div id="rv-gvngoai-list" style="font-size:13px;line-height:1.7;color:var(--text-1)"></div>
-      </div>
-
-      <div style="margin-top:12px;background:#fff1f0;border:1px solid #ffccc7;border-radius:8px;padding:10px 14px;font-size:12px;color:#820014;line-height:1.6">
-        ⚠️ <strong>Lưu ý:</strong> Sinh viên chỉ được <u>chính thức ghi nhận phân công</u> cho GV và <u>chỉ tiêu hướng dẫn của GV</u> chỉ được cập nhật <strong>sau khi Khoa phê duyệt</strong> đề xuất này.
-      </div>
-
-      <div class="section-title"><span class="section-badge">C</span> Nhận xét của Khoa</div>
-      <div class="fi">
-        <textarea class="fc" id="rv-nhanxet" rows="4"
-          placeholder="Nhập nhận xét về mức độ phù hợp của đề tài (tính khả thi, phù hợp CTĐT, chất lượng đề xuất...)"></textarea>
-      </div>
-
-      <div id="rv-reject-fi" style="display:none">
-        <div class="fi" style="margin-top:10px">
-          <label>Lý do từ chối <span class="req">*</span></label>
-          <textarea class="fc" id="rv-reject-reason" rows="3"
-            placeholder="Nêu rõ lý do không phê duyệt đề xuất này..."></textarea>
-          <div class="fe" id="rv-reject-err" style="display:none">Vui lòng nhập lý do từ chối</div>
-        </div>
-      </div>
-
-      <div id="rv-history-wrap" style="display:none;margin-top:16px">
-        <div class="section-title" style="margin-top:0">
-          <span class="section-badge" style="background:var(--text-3)">📜</span> Lịch sử xử lý
-        </div>
-        <ul class="history-list" id="rv-history"></ul>
-      </div>
-
-    </div>
-    <div class="modal-ft" id="rv-footer"></div>
   </div>
 </div>
 
@@ -629,11 +555,6 @@ function render() {
               onclick="openTopicDetail(${w.id})" title="Xem chi tiết đề tài (đề xuất)">${w.maDeTaiSV||'Đề xuất mới'}</span>
          <div style="font-size:12px;color:var(--text-2);margin-top:3px;line-height:1.4">${w.topicName||''}</div>`;
 
-    const actions = w.status === 'Chờ Khoa duyệt'
-      ? `<button class="icon-btn" title="Xét duyệt & Phê duyệt" onclick="openReview(${w.id})" style="color:var(--success);font-size:17px">✅</button>
-         <button class="icon-btn" title="Xét duyệt & Từ chối" onclick="openReview(${w.id},true)" style="color:var(--error);font-size:17px">❌</button>`
-      : '';
-
     const nvNum   = w.thuTuNV || 1;
     const nvClass = nvNum === 1 ? 'nv1' : nvNum === 2 ? 'nv2' : 'nv3';
     const nvBadge = `<span class="nv-order-badge ${nvClass}" onclick="openNVOrder(${w.id})" title="Xem danh sách ưu tiên">
@@ -679,12 +600,12 @@ function render() {
         ${_gvCapHtml(w.gvChinh, w.dot)}
       </td>
       <td>${topicDisplay}</td>
+      <td><span class="tag tag-blue" style="font-size:11px">${w.loai === 'Đề xuất mới' ? 'Sinh viên' : 'Giảng viên'}</span></td>
       <td>${gvHD}</td>
       <td style="text-align:center">${nvBadge}</td>
       <td style="font-size:12px;color:var(--text-3);white-space:nowrap">${w.ngayDK}</td>
       <td><span class="tag ${NV_CLR[w.status]}">${w.status}</span></td>
       <td style="max-width:180px">${lyDoTC}</td>
-      <td class="tbl-actions">${actions}</td>
     </tr>`;
   }).join('')
   : `<tr><td colspan="15" class="tbl-empty">Không có nguyện vọng nào phù hợp</td></tr>`;
@@ -792,6 +713,7 @@ function openTopicDetail(wishId) {
   document.getElementById('mt-body').innerHTML = [
     ['Mã đề tài',    t ? `<span style="font-family:monospace;font-size:13px;color:var(--text-2)">${t.code}</span>`
                        : w.maDeTaiSV ? `<span style="font-family:monospace;font-size:13px;color:var(--text-2)">${w.maDeTaiSV}</span><span class="tag tag-warning" style="margin-left:8px;font-size:11px">Đề xuất SV</span>` : ''],
+    ['Người đề xuất', t ? `<span class="tag tag-blue" style="font-size:11px">Giảng viên</span>` : `<span class="tag tag-blue" style="font-size:11px">Sinh viên</span>`],
     ['Tên đề tài',   `<strong>${t ? t.name : v(w.topicName)}</strong>`],
     ['Loại đề tài',  t ? (t.types||[]).join(', ') : (TYPE_ABBR[w.loaiDeTai]||v(w.loaiDeTai))],
     ['CTĐT áp dụng', t ? (t.ctdt||[]).join(', ') : (CTDT_MAP[w.ctdt]||v(w.ctdt))],
@@ -915,153 +837,6 @@ function openGVDetail(wishId) {
 
   document.getElementById('gvhd-body').innerHTML = html;
   openModal('m-gvhd');
-}
-
-/* ── Modal: Xét duyệt (Chờ Khoa duyệt) ── */
-function openReview(id, rejectMode) {
-  _rvId = id;
-  _rvRejectMode = !!rejectMode;
-  const w = wishes.find(x => x.id === id);
-
-  document.getElementById('rv-title').textContent = `Xét duyệt đề xuất — ${w.maDeTaiSV||w.topicName}`;
-
-  /* A — Thông tin đề tài */
-  const fileHtml = w.tailieu && w.tailieu.name
-    ? `<span style="display:inline-flex;align-items:center;gap:6px"><span style="color:#fa8c16;font-size:15px">📎</span>
-       <span style="color:#fa8c16;text-decoration:underline;cursor:pointer;font-size:13px">${w.tailieu.name}</span></span>`
-    : '<span style="color:var(--text-3);font-size:12px">Không có file đính kèm</span>';
-
-  document.getElementById('rv-topic-body').innerHTML = `
-    <tr><th style="width:130px">Mã đề xuất</th><td><span style="font-family:monospace;font-weight:700;color:var(--primary)">${w.maDeTaiSV||'—'}</span></td></tr>
-    <tr><th>Tên đề tài</th><td><strong>${w.topicName||'—'}</strong></td></tr>
-    <tr><th>Loại đề tài</th><td>${TYPE_ABBR[w.loaiDeTai]||w.loaiDeTai||'—'}</td></tr>
-    <tr><th>Tóm tắt</th><td style="font-size:13px;line-height:1.6">${w.moTa||'—'}</td></tr>
-    <tr><th>Sản phẩm DK</th><td style="font-size:13px">${w.svOutput||'—'}</td></tr>
-    <tr><th>Công nghệ</th><td style="font-size:13px">${w.svTech||'—'}</td></tr>
-    <tr><th>Tài liệu đính kèm</th><td>${fileHtml}</td></tr>
-    <tr><th>Ngày nộp</th><td>${w.ngayDK}</td></tr>`;
-
-  /* B — SV & GV */
-  const gpaColor = w.gpa >= 3.0 ? 'var(--success)' : w.gpa >= 2.5 ? 'var(--text-1)' : 'var(--error)';
-  const gpaLabel = w.gpa >= 3.6 ? 'Xuất sắc' : w.gpa >= 3.2 ? 'Giỏi' : w.gpa >= 2.5 ? 'Khá' : 'Trung bình';
-  document.getElementById('rv-masv').textContent   = w.maSV;
-  document.getElementById('rv-tensv').textContent  = w.tenSV;
-  document.getElementById('rv-lop').textContent    = w.lop;
-  document.getElementById('rv-ctdt').textContent   = CTDT_MAP[w.ctdt]||w.ctdt;
-  document.getElementById('rv-gpa').innerHTML      = `<span style="font-weight:700;color:${gpaColor}">${w.gpa.toFixed(2)}</span> <span style="font-size:11px;color:var(--text-3)">${gpaLabel}</span>`;
-  document.getElementById('rv-gvname').textContent = w.gvChinh||'—';
-  document.getElementById('rv-gvunit').textContent = w.gvChinhDonVi||'—';
-  document.getElementById('rv-gvdate').textContent = w.ngayGVDuyet||'—';
-  document.getElementById('rv-gvnote').textContent = w.nhanXetGV||'Không có nhận xét';
-
-  const cap = _gvCapacity(w.gvChinh, w.dot);
-  if (cap) {
-    const after = cap.used + 1;
-    const overLimit = after > cap.max;
-    document.getElementById('rv-gvcap').innerHTML = overLimit
-      ? `<span style="color:var(--error);font-weight:700">${cap.used}/${cap.max} SV</span> <span style="font-size:11px;color:var(--error)">— đã đủ chỉ tiêu, không thể phê duyệt thêm</span>`
-      : `<span style="font-weight:700">${cap.used}/${cap.max} SV</span> <span style="font-size:11px;color:var(--text-3)">(sau khi duyệt: ${after}/${cap.max})</span>`;
-  } else {
-    document.getElementById('rv-gvcap').textContent = '—';
-  }
-
-  const gvNgoaiList = w.gvNgoaiTruong || [];
-  const gvNgoaiWrap = document.getElementById('rv-gvngoai-wrap');
-  if (gvNgoaiList.length) {
-    document.getElementById('rv-gvngoai-list').innerHTML = gvNgoaiList.map(g =>
-      `<div style="margin-bottom:6px"><strong>${g.hoTen||g.ten}</strong> (${g.trongSo}%) — ${g.noiCongTac||'—'}<br>
-       <span style="font-size:12px;color:var(--text-3)">✉️ ${g.email||'—'} &nbsp; 📞 ${g.dienThoai||'—'} &nbsp; CCCD: ${g.cccd||'—'}</span></div>`
-    ).join('');
-    gvNgoaiWrap.style.display = '';
-  } else {
-    gvNgoaiWrap.style.display = 'none';
-  }
-
-  /* C */
-  const nxEl = document.getElementById('rv-nhanxet');
-  nxEl.value    = w.nhanXetKhoa||'';
-  nxEl.readOnly = w.status !== 'Chờ Khoa duyệt';
-  nxEl.style.background = w.status !== 'Chờ Khoa duyệt' ? '#fafafa' : '';
-
-  document.getElementById('rv-reject-fi').style.display    = _rvRejectMode ? '' : 'none';
-  const rrEl = document.getElementById('rv-reject-reason');
-  rrEl.value    = w.lyDoTuChoi||'';
-  rrEl.readOnly = w.status !== 'Chờ Khoa duyệt';
-  document.getElementById('rv-reject-err').style.display = 'none';
-
-  /* Lịch sử */
-  const hw = document.getElementById('rv-history-wrap');
-  if (w.history && w.history.length) {
-    hw.style.display = '';
-    document.getElementById('rv-history').innerHTML = [...w.history].reverse().map(h =>
-      `<li><div class="h-dot ${h.dot}"></div>
-       <div><div style="font-weight:500">${h.action}</div>
-       ${h.result?`<div class="h-meta">${h.result}</div>`:''}
-       <div class="h-meta">${h.date}</div></div></li>`).join('');
-  } else { hw.style.display = 'none'; }
-
-  _refreshFooter(w);
-  openModal('m-review');
-}
-
-function _refreshFooter(w) {
-  const ft = document.getElementById('rv-footer');
-  if (w.status !== 'Chờ Khoa duyệt') {
-    ft.innerHTML = `<button class="btn btn-default" data-close="m-review">Đóng</button>`;
-    return;
-  }
-  if (_rvRejectMode) {
-    ft.innerHTML = `
-      <button class="btn btn-default" data-close="m-review">Đóng</button>
-      <button class="btn btn-default" onclick="_cancelReject()">← Quay lại</button>
-      <button class="btn btn-danger" onclick="confirmReject(${w.id})">❌ Xác nhận từ chối</button>`;
-  } else {
-    ft.innerHTML = `
-      <button class="btn btn-default" data-close="m-review">Đóng</button>
-      <button class="btn btn-default" onclick="openReview(${w.id},true)">❌ Từ chối</button>
-      <button class="btn btn-primary" onclick="confirmApprove(${w.id})">✅ Phê duyệt</button>`;
-  }
-}
-
-function _cancelReject() {
-  _rvRejectMode = false;
-  document.getElementById('rv-reject-fi').style.display = 'none';
-  _refreshFooter(wishes.find(x => x.id === _rvId));
-}
-
-function confirmApprove(id) {
-  const w   = wishes.find(x => x.id === id);
-  const cap = _gvCapacity(w.gvChinh, w.dot);
-  if (cap && cap.used >= cap.max) {
-    showToast(`GV ${w.gvChinh} đã đạt giới hạn ${cap.max} SV trong đợt ${w.dot||'này'}. Không thể phê duyệt thêm.`, 'warn');
-    closeModal('m-review');
-    render();
-    return;
-  }
-  const nhanXet = document.getElementById('rv-nhanxet').value.trim();
-  const today   = new Date().toLocaleDateString('vi');
-  wishes = wishes.map(w => w.id !== id ? w : {
-    ...w, status:'Đã duyệt', nhanXetKhoa:nhanXet, ngayKhoaDuyet:today,
-    history:[...(w.history||[]),{action:'Khoa phê duyệt',date:today,result:nhanXet||'Đề tài được chấp thuận — SV chính thức được phân công cho GV, chỉ tiêu hướng dẫn được cập nhật',dot:'ok'}],
-  });
-  closeModal('m-review');
-  showToast('Đã phê duyệt — SV được phân công cho GV, chỉ tiêu GV đã cập nhật ✅');
-  render();
-}
-
-function confirmReject(id) {
-  const reason  = document.getElementById('rv-reject-reason').value.trim();
-  const nhanXet = document.getElementById('rv-nhanxet').value.trim();
-  if (!reason) { document.getElementById('rv-reject-err').style.display = ''; return; }
-  document.getElementById('rv-reject-err').style.display = 'none';
-  const today = new Date().toLocaleDateString('vi');
-  wishes = wishes.map(w => w.id !== id ? w : {
-    ...w, status:'Từ chối', nhanXetKhoa:nhanXet, lyDoTuChoi:reason, ngayKhoaDuyet:today,
-    history:[...(w.history||[]),{action:'Khoa từ chối',date:today,result:reason,dot:'err'}],
-  });
-  closeModal('m-review');
-  showToast('Đã từ chối đề xuất', 'warn');
-  render();
 }
 
 render();

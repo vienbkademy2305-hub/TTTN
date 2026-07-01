@@ -165,6 +165,7 @@
                   <th style="width:128px">Mã đề tài</th>
                   <th>Tên đề tài</th>
                   <th style="width:170px">Giảng viên HD</th>
+                  <th style="width:170px">Người đề xuất</th>
                   <th style="width:75px;text-align:center">Loại</th>
                   <th style="width:120px">CTĐT</th>
                   <th style="width:170px">Đơn vị quản lý</th>
@@ -403,7 +404,7 @@ function renderTable(list) {
   const tbody = document.getElementById('topic-tbody');
   if (!list.length) {
     tbody.innerHTML = `
-      <tr><td colspan="8">
+      <tr><td colspan="9">
         <div class="topic-empty">
           <div class="te-ico">🔍</div>
           <p>Không tìm thấy đề tài phù hợp với bộ lọc hiện tại.</p>
@@ -418,6 +419,7 @@ function renderTable(list) {
         <td><div class="topic-code">${t.code}</div></td>
         <td><span style="font-size:13px;font-weight:500">${t.name}</span></td>
         <td style="font-size:13px;color:var(--text-2)">${t.gv}</td>
+        <td><span class="tag tag-blue" style="font-size:11px">Giảng viên</span></td>
         <td style="text-align:center"><span class="tag tag-default" style="font-size:11px">${t.type}</span></td>
         <td>
           <div style="font-size:12px;font-weight:600;color:var(--text-1)">${t.ctdt}</div>

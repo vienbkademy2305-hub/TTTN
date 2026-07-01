@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Quản lý ĐATN & KLTN | Khoa CNTT</title>
+  <title>Quản lý ĐATN & KLTN | Phòng Đào tạo</title>
   <link rel="stylesheet" href="_styles.css">
   <style>
     .bulk-bar.hidden{display:none}
@@ -123,43 +123,41 @@
   <nav class="sidebar">
     <div class="sb-logo">
       <div class="sb-logo-icon">🎓</div>
-      <div><div class="sb-logo-text">HTQT Đại học</div><div class="text-muted text-sm">Khoa CNTT</div></div>
+      <div><div class="sb-logo-text">HTQT Đại học</div><div class="text-muted text-sm">Phòng Đào tạo</div></div>
     </div>
     <div class="sb-user">
-      <div class="av">KC</div>
-      <div>
-        <div style="font-size:13px;font-weight:600">TS. Trần Văn Bình</div>
-        <div style="font-size:11px;color:var(--text-3)">Giáo vụ Khoa</div>
-      </div>
+      <div class="av" style="background:#1677ff">PĐT</div>
+      <div><div style="font-size:13px;font-weight:600">Nguyễn Thị Lan</div><span class="tag tag-blue" style="font-size:11px">Phòng Đào tạo</span></div>
     </div>
     <ul class="sb-menu">
-      <li><a href="#">🏠&nbsp; Trang chủ</a></li>
+      <li><a href="MH-PDT-00_Dashboard.html">🏠&nbsp; Trang chủ</a></li>
       <li>
         <span class="mn-group">📅&nbsp; Quản lý đợt &nbsp;▾</span>
         <ul class="sb-sub open">
-          <li><a href="#">Danh sách đợt</a></li>
-          <li><a href="MH-KCM-04_StudentEligibility.html">DS Xét điều kiện</a></li>
+          <li><a href="MH-PDT-01_InternshipRound.html">Danh sách đợt</a></li>
+          <li><a href="MH-PDT-05_StudentEligibility.html">DS Xét điều kiện</a></li>
         </ul>
       </li>
       <li>
         <span class="mn-group">📋&nbsp; Đề tài &nbsp;▾</span>
         <ul class="sb-sub open">
-          <li><a href="MH-KCM-06_StudentTopicApproval.html">DS nguyện vọng đề tài</a></li>
-          <li><a href="MH-KCM-03_TopicApproval.html">Xét duyệt đề tài GV</a></li>
+          <li><a href="MH-PDT-08_StudentTopicApproval.html">DS nguyện vọng đề tài</a></li>
+          <li><a href="MH-KCM-03_TopicApproval.html">Xét duyệt đề tài</a></li>
         </ul>
       </li>
       <li class="active">
         <span class="mn-group">👨‍🏫&nbsp; Hướng dẫn &nbsp;▾</span>
         <ul class="sb-sub open">
-          <li class="active"><a href="MH-KCM-07_GraduationProjectManagement.html">Quản lý ĐATN &amp; KLTN</a></li>
-          <li><a href="MH-GV-01_InternshipTracking.html">QL DS thực tập</a></li>
+          <li class="active"><a href="MH-PDT-10_GraduationProjectManagement.html">Quản lý ĐATN &amp; KLTN</a></li>
+          <li><a href="MH-PDT-06_InternshipStudents.html">QL DS thực tập</a></li>
+          <li><a href="MH-GV-02_ChangeRequestApproval.html">Quản lý yêu cầu thay đổi</a></li>
         </ul>
       </li>
       <li>
         <span class="mn-group">⚖️&nbsp; Hội đồng &nbsp;▾</span>
         <ul class="sb-sub open">
-          <li><a href="MH-KCM-08_CouncilManagement.html">Quản lý hội đồng</a></li>
-          <li><a href="MH-KCM-09_CouncilStudentAssignment.html">Chi tiết &amp; Chấm điểm</a></li>
+          <li><a href="MH-PDT-07_CouncilManagement.html">Quản lý hội đồng</a></li>
+          <li><a href="MH-PDT-09_DecisionTemplateManagement.html">Mẫu quyết định</a></li>
         </ul>
       </li>
     </ul>
@@ -171,7 +169,7 @@
       <span class="h-breadcrumb">Hướng dẫn &gt; Quản lý ĐATN &amp; KLTN</span>
       <div class="h-right">
         <div class="bw"><button class="btn btn-link" style="font-size:18px">🔔</button><span class="bc">3</span></div>
-        <div class="av">KC</div>
+        <div class="av" style="background:#1677ff">PĐT</div>
       </div>
     </header>
 
@@ -193,17 +191,27 @@
             <option>Đồ án tốt nghiệp</option>
             <option>Khóa luận tốt nghiệp</option>
           </select>
-          <select class="fc" style="width:180px" id="f-donvi" onchange="render()">
+          <select class="fc" style="width:200px" id="f-donvi" onchange="render()">
             <option value="">Tất cả đơn vị</option>
-            <option>BM. Công nghệ phần mềm</option>
-            <option>BM. Hệ thống thông tin</option>
-            <option>BM. Trí tuệ nhân tạo</option>
+            <optgroup label="Khoa CNTT">
+              <option>BM. Công nghệ phần mềm</option>
+              <option>BM. Hệ thống thông tin</option>
+              <option>BM. Trí tuệ nhân tạo</option>
+            </optgroup>
+            <optgroup label="Các khoa khác">
+              <option>Khoa Điện - Điện tử</option>
+              <option>Khoa Kinh tế &amp; QTKD</option>
+              <option>Khoa Cơ khí &amp; Cơ điện tử</option>
+            </optgroup>
           </select>
-          <select class="fc" style="width:190px" id="f-gv" onchange="render()">
+          <select class="fc" style="width:200px" id="f-gv" onchange="render()">
             <option value="">Tất cả GVHD</option>
             <option>TS. Nguyễn Minh Tuấn</option>
             <option>TS. Lê Thị Mai</option>
             <option>ThS. Trần Văn Hùng</option>
+            <option>ThS. Nguyễn Văn Dũng</option>
+            <option>TS. Trần Thị Hương</option>
+            <option>ThS. Phạm Văn Thắng</option>
           </select>
           <select class="fc" style="width:210px" id="f-status" onchange="render()">
             <option value="">Tất cả trạng thái</option>
@@ -1221,6 +1229,27 @@ const TOPIC_CATALOG = [
     output:'Mô hình phân loại + bộ dữ liệu gán nhãn + báo cáo thực nghiệm.',
     tech:'Python, PyTorch, scikit-learn',
     file:'De_cuong_PhanLoaiVanBan_DT2026_0021.pdf', created:'02/04/2026'},
+  {code:'DT-2026-0030', name:'Thiết kế bộ điều khiển PID cho hệ thống cánh tay robot công nghiệp', ctdt:['DDT'],
+    types:['Đồ án tốt nghiệp'], field:'Tự động hoá & Robot', qty:2, status:'Đã công bố', active:'Mở', gvhdDeXuat:'ThS. Nguyễn Văn Dũng',
+    desc:'Nghiên cứu và thiết kế bộ điều khiển PID tối ưu cho cánh tay robot 3 bậc tự do ứng dụng trong dây chuyền sản xuất tự động.',
+    req:'GPA ≥ 2.8, kiến thức điều khiển tự động, Matlab/Simulink.',
+    output:'Mô hình robot mô phỏng + báo cáo thiết kế + kết quả thực nghiệm.',
+    tech:'Matlab, Simulink, Arduino',
+    file:'De_cuong_Robot_PID_DT2026_0030.pdf', created:'10/03/2026'},
+  {code:'DT-2026-0031', name:'Phân tích hành vi người tiêu dùng Gen Z trên nền tảng mạng xã hội', ctdt:['QTKD'],
+    types:['Đồ án tốt nghiệp','Khóa luận tốt nghiệp'], field:'Marketing & Hành vi người tiêu dùng', qty:2, status:'Đã công bố', active:'Mở', gvhdDeXuat:'TS. Trần Thị Hương',
+    desc:'Nghiên cứu định lượng và định tính về hành vi mua sắm trực tuyến của thế hệ Gen Z thông qua phân tích dữ liệu mạng xã hội.',
+    req:'GPA ≥ 2.8, kiến thức nghiên cứu marketing, thống kê cơ bản.',
+    output:'Báo cáo nghiên cứu + bộ dữ liệu khảo sát + đề xuất chiến lược.',
+    tech:'SPSS, Excel, Python (pandas)',
+    file:'De_cuong_GenZ_Marketing_DT2026_0031.pdf', created:'15/03/2026'},
+  {code:'DT-2026-0032', name:'Thiết kế và chế tạo máy đóng gói sản phẩm bán tự động', ctdt:['CK'],
+    types:['Đồ án tốt nghiệp'], field:'Cơ khí chế tạo & Tự động hoá', qty:1, status:'Đã công bố', active:'Mở', gvhdDeXuat:'ThS. Phạm Văn Thắng',
+    desc:'Thiết kế và chế tạo mô hình máy đóng gói sản phẩm dạng bột/hạt bán tự động, đáp ứng năng suất 500 gói/giờ.',
+    req:'GPA ≥ 2.8, kiến thức thiết kế máy, vẽ kỹ thuật AutoCAD/SolidWorks.',
+    output:'Bản vẽ thiết kế + mô hình 3D + mô hình thực tế + báo cáo.',
+    tech:'SolidWorks, AutoCAD, PLC Siemens',
+    file:'De_cuong_MayDongGoi_DT2026_0032.pdf', created:'20/03/2026'},
 ];
 const TOPIC_STATUS_CLR = {'Đã công bố':'tag-success', 'Chưa công bố':'tag-default'};
 
@@ -1291,9 +1320,12 @@ const COUNCIL_CATALOG = [
 ];
 
 const GV_CAPACITY = {
-  'TS. Nguyễn Minh Tuấn': {donVi:'BM. Công nghệ phần mềm', max:5},
-  'TS. Lê Thị Mai':       {donVi:'BM. Hệ thống thông tin',  max:3},
-  'ThS. Trần Văn Hùng':   {donVi:'BM. Công nghệ phần mềm', max:2},
+  'TS. Nguyễn Minh Tuấn':  {donVi:'BM. Công nghệ phần mềm',       max:5},
+  'TS. Lê Thị Mai':        {donVi:'BM. Hệ thống thông tin',        max:3},
+  'ThS. Trần Văn Hùng':    {donVi:'BM. Công nghệ phần mềm',       max:2},
+  'ThS. Nguyễn Văn Dũng':  {donVi:'Khoa Điện - Điện tử',          max:4},
+  'TS. Trần Thị Hương':    {donVi:'Khoa Kinh tế & QTKD',          max:4},
+  'ThS. Phạm Văn Thắng':   {donVi:'Khoa Cơ khí & Cơ điện tử',    max:3},
 };
 
 // Đơn vị (bộ môn) quản lý sinh viên, suy ra từ CTĐT
@@ -1301,6 +1333,9 @@ const CTDT_DONVI = {
   'KTPM': 'BM. Công nghệ phần mềm',
   'HTTT': 'BM. Hệ thống thông tin',
   'KHMT': 'BM. Trí tuệ nhân tạo',
+  'DDT':  'Khoa Điện - Điện tử',
+  'QTKD': 'Khoa Kinh tế & QTKD',
+  'CK':   'Khoa Cơ khí & Cơ điện tử',
 };
 
 const STATUS_LIST = [
@@ -1558,6 +1593,92 @@ let students = [
       {time:'23/06/2026', actor:'TS. Trần Văn Bình (Khoa)', action:'Nhận xét & kết luận của GVPB', result:'Đồng ý cho bảo vệ — Điểm GVPB: 8', dot:'ok'},
       {time:'23/06/2026', actor:'Hệ thống', action:'Đủ điều kiện bảo vệ', result:'Cả GVHD và GVPB đều đồng ý cho bảo vệ', dot:'ok'},
       {time:'25/06/2026', actor:'HD-2026-023 (Hội đồng)', action:'Hội đồng duyệt điểm cuối', result:'Điểm cuối: 8.1', dot:'ok'},
+    ]},
+
+  /* ── KHOA ĐIỆN - ĐIỆN TỬ ── */
+  {id:9, maSV:'B22DDDT001', tenSV:'Đinh Thị Lan', lop:'DDT3110_1', ctdt:'DDT', gpa:3.1,
+    dotId:'DA-HK2-2025-2026', loaiHinh:'Đồ án tốt nghiệp',
+    topic:{code:'DT-2026-0030', name:'Thiết kế bộ điều khiển PID cho hệ thống cánh tay robot công nghiệp'},
+    gvhd:'ThS. Nguyễn Văn Dũng', donViGV:'Khoa Điện - Điện tử', gvList:[{name:'ThS. Nguyễn Văn Dũng', dept:'Khoa Điện - Điện tử', type:'internal', weight:100}],
+    gvpb:'TS. Lê Đức Thành', hoiDong:{code:'HD-2026-035', name:'Hội đồng chấm ĐATN Khoa Điện HK2 2025-2026', donvi:'Khoa Điện - Điện tử', ngay:'28/06/2026', gio:'08:00', phong:'A2-201'},
+    status:'Đã ban hành quyết định',
+    decuong:{trangThai:'Đã duyệt', noiDung:'Thiết kế và mô phỏng bộ điều khiển PID tối ưu.', file:'DeCuong_B22DDDT001_v1.docx', ngayNop:'10/04/2026', lanNop:1, ketQua:'Hợp lệ', nguoiDuyet:'ThS. Nguyễn Văn Dũng', ngayDuyet:'15/04/2026', huongNghienCuu:'Điều khiển PID tối ưu với Matlab/Simulink', kePlan:[
+      {tuan:1, nhiemVu:'Khảo sát yêu cầu và thiết kế mô hình robot', ketQua:'Bản vẽ mô hình + tài liệu yêu cầu', ghiChu:'', trangThai:'Đã duyệt'},
+      {tuan:2, nhiemVu:'Thiết kế và mô phỏng bộ điều khiển PID', ketQua:'Mô phỏng Simulink + báo cáo', ghiChu:'', trangThai:'Đã duyệt'},
+    ]},
+    baoCao:'BaoCao_B22DDDT001_final.pdf', sanPhamLink:'', daoVanNoiBo:8, daoVanNgoai:null,
+    qdGiao:{so:'102/QĐ-PĐT', ngay:'05/05/2026', donViBanHanh:'Phòng Đào tạo', nguoiKy:'Nguyễn Thị Lan — Trưởng phòng Đào tạo', file:'QD-102-PDT-2026.pdf'},
+    nxGVHD:{diem:8.0, ketLuan:'Đồng ý', noiDung:'Sinh viên thực hiện tốt, kết quả mô phỏng đạt yêu cầu.', ngay:'20/06/2026', file:'PhieuNhanXet_GVHD_B22DDDT001.docx', ghiChu:''},
+    nxGVPB:{diem:7.5, ketLuan:'Đồng ý', noiDung:'Cần bổ sung thêm thực nghiệm trên phần cứng thực.', ngay:'21/06/2026', file:'PhieuNhanXet_GVPB_B22DDDT001.docx', ghiChu:''},
+    diemHoiDong:8.0, diemTongKet:7.9, dongBoDiem:'Chưa đồng bộ',
+    history:[
+      {time:'01/03/2026', actor:'Hệ thống', action:'Công bố đợt — SV đủ điều kiện', result:'', dot:'ok'},
+      {time:'10/03/2026', actor:'Đinh Thị Lan', action:'Đăng ký nguyện vọng GVHD: ThS. Nguyễn Văn Dũng', result:'', dot:'ok'},
+      {time:'12/03/2026', actor:'ThS. Nguyễn Văn Dũng', action:'Phê duyệt nguyện vọng', result:'', dot:'ok'},
+      {time:'05/05/2026', actor:'Nguyễn Thị Lan (PĐT)', action:'Ban hành Quyết định giao đề tài', result:'Số QĐ: 102/QĐ-PĐT', dot:'ok'},
+    ]},
+
+  {id:10, maSV:'B22DDDT045', tenSV:'Trương Công Minh', lop:'DDT3110_2', ctdt:'DDT', gpa:2.9,
+    dotId:'DA-HK2-2025-2026', loaiHinh:'Đồ án tốt nghiệp',
+    topic:null, gvhd:null, donViGV:'Khoa Điện - Điện tử', gvList:[], gvpb:null, hoiDong:null,
+    status:'Chờ đăng ký nguyện vọng',
+    decuong:{trangThai:'Chờ SV nộp', noiDung:'', file:null, ngayNop:null, lanNop:0, ketQua:'', nguoiDuyet:null, ngayDuyet:null, huongNghienCuu:'', kePlan:[]},
+    baoCao:null, sanPhamLink:null, daoVanNoiBo:null, daoVanNgoai:null,
+    qdGiao:null, yeuCauList:[],
+    history:[
+      {time:'01/03/2026', actor:'Hệ thống', action:'Công bố đợt — SV đủ điều kiện', result:'', dot:'ok'},
+    ]},
+
+  /* ── KHOA KINH TẾ & QTKD ── */
+  {id:11, maSV:'B22DQTKD002', tenSV:'Hoàng Thị Bích Ngọc', lop:'QTK3110_1', ctdt:'QTKD', gpa:3.4,
+    dotId:'KL-HK2-2025-2026', loaiHinh:'Khóa luận tốt nghiệp',
+    topic:{code:'DT-2026-0031', name:'Phân tích hành vi người tiêu dùng Gen Z trên nền tảng mạng xã hội'},
+    gvhd:'TS. Trần Thị Hương', donViGV:'Khoa Kinh tế & QTKD', gvList:[{name:'TS. Trần Thị Hương', dept:'Khoa Kinh tế & QTKD', type:'internal', weight:100}],
+    gvpb:null, hoiDong:null,
+    status:'Chờ quyết định giao đề tài',
+    decuong:{trangThai:'Đã duyệt', noiDung:'Nghiên cứu định lượng hành vi mua sắm Gen Z.', file:'DeCuong_B22DQTKD002_v1.docx', ngayNop:'08/05/2026', lanNop:1, ketQua:'Hợp lệ', nguoiDuyet:'TS. Trần Thị Hương', ngayDuyet:'12/05/2026', huongNghienCuu:'Phương pháp nghiên cứu định lượng kết hợp phỏng vấn sâu', kePlan:[
+      {tuan:1, nhiemVu:'Xây dựng bảng hỏi & thu thập dữ liệu', ketQua:'Bộ dữ liệu khảo sát (n≥200)', ghiChu:'', trangThai:'Đã duyệt'},
+      {tuan:2, nhiemVu:'Phân tích dữ liệu & viết báo cáo', ketQua:'Báo cáo nghiên cứu + đề xuất chiến lược', ghiChu:'', trangThai:'Chờ duyệt'},
+    ]},
+    baoCao:null, sanPhamLink:null, daoVanNoiBo:null, daoVanNgoai:null,
+    qdGiao:null,
+    yeuCauList:[
+      {loai:'Xin gia hạn nộp báo cáo', noiDung:'Em xin gia hạn thêm 7 ngày để hoàn thiện chương phân tích số liệu.', ngayGui:'20/06/2026', trangThai:'Chờ duyệt'},
+    ],
+    history:[
+      {time:'01/04/2026', actor:'Hệ thống', action:'Công bố đợt — SV đủ điều kiện', result:'', dot:'ok'},
+      {time:'10/04/2026', actor:'Hoàng Thị Bích Ngọc', action:'Đăng ký nguyện vọng GVHD: TS. Trần Thị Hương', result:'', dot:'ok'},
+      {time:'12/04/2026', actor:'TS. Trần Thị Hương', action:'Phê duyệt nguyện vọng', result:'', dot:'ok'},
+    ]},
+
+  {id:12, maSV:'B22DQTKD078', tenSV:'Lê Văn Phúc', lop:'QTK3110_2', ctdt:'QTKD', gpa:3.0,
+    dotId:'DA-HK2-2025-2026', loaiHinh:'Đồ án tốt nghiệp',
+    topic:null, gvhd:null, donViGV:'Khoa Kinh tế & QTKD', gvList:[], gvpb:null, hoiDong:null,
+    status:'Đủ điều kiện',
+    decuong:{trangThai:'Chờ SV nộp', noiDung:'', file:null, ngayNop:null, lanNop:0, ketQua:'', nguoiDuyet:null, ngayDuyet:null, huongNghienCuu:'', kePlan:[]},
+    baoCao:null, sanPhamLink:null, daoVanNoiBo:null, daoVanNgoai:null,
+    qdGiao:null, yeuCauList:[],
+    history:[
+      {time:'01/03/2026', actor:'Hệ thống', action:'Công bố đợt — SV đủ điều kiện', result:'', dot:'ok'},
+    ]},
+
+  /* ── KHOA CƠ KHÍ & CƠ ĐIỆN TỬ ── */
+  {id:13, maSV:'B22DCK003', tenSV:'Nguyễn Thanh Sơn', lop:'CKI3110_1', ctdt:'CK', gpa:2.85,
+    dotId:'DA-HK2-2025-2026', loaiHinh:'Đồ án tốt nghiệp',
+    topic:{code:'DT-2026-0032', name:'Thiết kế và chế tạo máy đóng gói sản phẩm bán tự động'},
+    gvhd:'ThS. Phạm Văn Thắng', donViGV:'Khoa Cơ khí & Cơ điện tử', gvList:[{name:'ThS. Phạm Văn Thắng', dept:'Khoa Cơ khí & Cơ điện tử', type:'internal', weight:100}],
+    gvpb:null, hoiDong:null,
+    status:'Đã phân công', canManual:false,
+    decuong:{trangThai:'Chờ duyệt', noiDung:'Thiết kế máy đóng gói tự động năng suất 500 gói/giờ.', file:'DeCuong_B22DCK003_v1.docx', ngayNop:'15/05/2026', lanNop:1, ketQua:'', nguoiDuyet:null, ngayDuyet:null, huongNghienCuu:'Thiết kế cơ khí + lập trình PLC', kePlan:[
+      {tuan:1, nhiemVu:'Thiết kế bản vẽ kỹ thuật & mô hình 3D', ketQua:'Bản vẽ + file SolidWorks', ghiChu:'', trangThai:'Đã duyệt'},
+      {tuan:2, nhiemVu:'Chế tạo mô hình & lập trình PLC', ketQua:'Mô hình thực tế + chương trình PLC', ghiChu:'', trangThai:'Chờ duyệt'},
+    ]},
+    baoCao:null, sanPhamLink:null, daoVanNoiBo:null, daoVanNgoai:null,
+    qdGiao:null, yeuCauList:[],
+    history:[
+      {time:'01/03/2026', actor:'Hệ thống', action:'Công bố đợt — SV đủ điều kiện', result:'', dot:'ok'},
+      {time:'12/03/2026', actor:'Nguyễn Thanh Sơn', action:'Đăng ký nguyện vọng GVHD: ThS. Phạm Văn Thắng', result:'', dot:'ok'},
+      {time:'15/03/2026', actor:'ThS. Phạm Văn Thắng', action:'Phê duyệt nguyện vọng & phân công đề tài', result:'', dot:'ok'},
     ]},
 ];
 

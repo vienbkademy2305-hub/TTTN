@@ -111,6 +111,7 @@
       <li>
         <span class="mn-group">👨‍🏫&nbsp; Hướng dẫn &nbsp;▾</span>
         <ul class="sb-sub open">
+          <li><a href="MH-KCM-07_GraduationProjectManagement.html">Quản lý ĐATN &amp; KLTN</a></li>
           <li><a href="MH-GV-01_InternshipTracking.html">QL DS thực tập</a></li>
         </ul>
       </li>
@@ -191,6 +192,7 @@
           <input class="fc" type="text" id="q" placeholder="Tìm tên, mã hội đồng...">
         </div>
         <button class="btn btn-primary" onclick="openCreate()">+ Tạo hội đồng</button>
+        <button class="btn btn-default" onclick="exportCSV()">⬇ Xuất Excel</button>
       </div>
 
       <!-- Table -->
@@ -678,11 +680,11 @@ const COUNCILS = [
     completedAt:'23/06/2026', completeNote:'Hội đồng đã họp và hoàn tất chấm điểm cho 5 sinh viên.', bienBanFile:'BienBan_HD-2026-013.pdf',
     createdBy:'TS. Trần Văn Bình', createdAt:'10/06/2026', note:'',
     students:[
-      { maSV:'B22DCCN033', tenSV:'Lê Quốc Cường',  diem:8.4, conclusion:'dat',      dongBoDiem:'Đã đồng bộ' },
-      { maSV:'B22DCCN125', tenSV:'Trương Thị Yến', diem:7.6, conclusion:'dat',      dongBoDiem:'Đã đồng bộ' },
-      { maSV:'B22DCCN048', tenSV:'Phạm Văn Đạt',   diem:5.2, conclusion:'canchinh', dongBoDiem:'Chưa đồng bộ' },
+      { maSV:'B22DCCN058', tenSV:'Hoàng Minh Đức', diem:8.1, conclusion:'dat',       dongBoDiem:'Đã đồng bộ' },
+      { maSV:'B22DCCN047', tenSV:'Ngô Thị Hà',     diem:8.8, conclusion:'dat',       dongBoDiem:'Đã đồng bộ' },
+      { maSV:'B22DCCN048', tenSV:'Phạm Văn Đạt',   diem:5.2, conclusion:'canchinh',  dongBoDiem:'Chưa đồng bộ' },
       { maSV:'B22DCCN077', tenSV:'Hoàng Thị Mai',  diem:null, conclusion:'hoanbaove', dongBoDiem:'Chưa đồng bộ' },
-      { maSV:'B22DCCN090', tenSV:'Đỗ Văn Khôi',    diem:3.8, conclusion:'khongdat', dongBoDiem:'Chưa đồng bộ' }
+      { maSV:'B22DCCN090', tenSV:'Đỗ Văn Khôi',    diem:3.8, conclusion:'khongdat',  dongBoDiem:'Chưa đồng bộ' }
     ]
   },
   {
@@ -694,10 +696,14 @@ const COUNCILS = [
       {role:'ct',name:'TS. Phạm Thu Hà',  gvType:'noi', unit:'Khoa CNTT', email:'phamthuha@khoacntt.edu.vn'},
       {role:'tk',name:'ThS. Lê Thị Hoa',   gvType:'noi', unit:'Khoa CNTT', email:'lethihoa@khoacntt.edu.vn'},
       {role:'pb',name:'TS. Lê Đức Thọ',    gvType:'noi', unit:'Khoa CNTT', email:'leductho@khoacntt.edu.vn'},
-      {role:'pb',name:'PGS.TS. Võ Thanh Tùng', gvType:'ngoai', unit:'Trường ĐH Bách Khoa', email:'tung@hcmut.edu.vn', phone:'0912345678'}
+      {role:'pb',name:'PGS.TS. Võ Thanh Tùng', gvType:'ngoai', unit:'Trường ĐH Bách Khoa', email:'vttung@hcmut.edu.vn', phone:'0912345678'}
     ],
     status:'approved', qdNum:'305/QĐ-CNTT', qdDate:'18/06/2026', qdSignedBy:'Nguyễn Thị Lan — Trưởng phòng Đào tạo',
-    createdBy:'TS. Trần Văn Bình', createdAt:'08/06/2026', note:''
+    createdBy:'TS. Trần Văn Bình', createdAt:'08/06/2026', note:'',
+    students:[
+      { maSV:'B22DCCN033', tenSV:'Lê Quốc Cường',  diem:8.5, conclusion:null, dongBoDiem:'Chưa đồng bộ' },
+      { maSV:'B22DCCN125', tenSV:'Trương Thị Yến', diem:null, conclusion:null, dongBoDiem:'Chưa đồng bộ' }
+    ]
   },
   {
     id:5, code:'HD-2026-009',
@@ -1432,6 +1438,56 @@ function removeMember(idx) {
   members.splice(idx, 1);
   if (editingMemberIdx !== null) hideAddForm();
   renderMembers();
+}
+
+/* ── Export CSV ───────────────────────────────────────────── */
+function exportCSV() {
+  const q       = document.getElementById('q').value.toLowerCase();
+  const fType   = document.getElementById('f-type').value;
+  const fDonvi  = document.getElementById('f-donvi').value;
+  const fDot    = document.getElementById('f-dot').value;
+  const fStatus = document.getElementById('f-status').value;
+
+  const list = COUNCILS.filter(c =>
+    (!q       || c.name.toLowerCase().includes(q) || c.code.toLowerCase().includes(q)) &&
+    (!fType   || c.type   === fType)  &&
+    (!fDonvi  || c.donvi  === fDonvi) &&
+    (!fDot    || c.dot    === fDot)   &&
+    (!fStatus || c.status === fStatus)
+  );
+
+  if (!list.length) { showToast('Không có dữ liệu để xuất.', 'err'); return; }
+
+  const headers = ['Mã hội đồng','Tên hội đồng','Phân loại','Đơn vị','Học kỳ','Hình thức','Ngày họp','Giờ họp','Địa điểm / Link','Số thành viên','Trạng thái','Số quyết định','Ngày quyết định'];
+  const rows = list.map(c => [
+    c.code,
+    c.name,
+    TYPE_CFG[c.type]?.label || c.type,
+    c.donvi,
+    c.dot,
+    c.meetForm === 'online' ? 'Trực tuyến' : 'Trực tiếp',
+    c.date,
+    c.time,
+    c.meetForm === 'online' ? (c.link || '') : (c.room || ''),
+    c.members.length,
+    STATUS_CFG[c.status]?.label || c.status,
+    c.qdNum || '',
+    c.qdDate || ''
+  ]);
+
+  const csvContent = [headers, ...rows]
+    .map(row => row.map(v => `"${String(v).replace(/"/g, '""')}"`).join(','))
+    .join('\r\n');
+
+  const bom = '﻿';
+  const blob = new Blob([bom + csvContent], { type: 'text/csv;charset=utf-8;' });
+  const url  = URL.createObjectURL(blob);
+  const a    = document.createElement('a');
+  a.href     = url;
+  a.download = `DanhSachHoiDong_${new Date().toISOString().slice(0,10)}.csv`;
+  a.click();
+  URL.revokeObjectURL(url);
+  showToast(`⬇ Đã xuất ${list.length} hội đồng ra file CSV.`, 'ok');
 }
 
 /* ── Events ───────────────────────────────────────────────── */

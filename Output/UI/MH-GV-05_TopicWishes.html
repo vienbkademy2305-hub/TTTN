@@ -162,6 +162,7 @@
                 <th style="width:100px">Đơn vị</th>
                 <th style="width:110px">Đợt</th>
                 <th>Đề tài đăng ký</th>
+                <th style="width:110px">Người đề xuất</th>
                 <th style="min-width:130px">Giảng viên hướng dẫn</th>
                 <th style="width:110px;text-align:center">Thứ tự NV</th>
                 <th style="width:100px">Ngày đăng ký</th>
@@ -626,6 +627,7 @@ function render() {
           </div>`;
       })()}</td>
       <td>${topicDisplay}</td>
+      <td><span class="tag tag-blue" style="font-size:11px">${w.loai === 'Đề xuất mới' ? 'Sinh viên' : 'Giảng viên'}</span></td>
       <td>${gvHD}</td>
       <td style="text-align:center">${nvBadge}</td>
       <td style="font-size:12px;color:var(--text-3);white-space:nowrap">${w.ngayDK}</td>
@@ -634,7 +636,7 @@ function render() {
       <td class="tbl-actions">${actions}</td>
     </tr>`;
   }).join('')
-  : `<tr><td colspan="14" class="tbl-empty">Không có nguyện vọng nào phù hợp</td></tr>`;
+  : `<tr><td colspan="15" class="tbl-empty">Không có nguyện vọng nào phù hợp</td></tr>`;
 
   document.getElementById('pg-info').textContent = `Hiển thị ${filtered.length} / ${wishes.length} nguyện vọng`;
 }
@@ -910,6 +912,7 @@ function openTopicDetail(wishId) {
       : w.maDeTaiSV
         ? `<span style="font-family:monospace;font-size:13px;color:var(--text-2)">${w.maDeTaiSV}</span><span class="tag tag-warning" style="margin-left:8px;font-size:11px">Đề xuất SV</span>`
         : ''],
+    ['Người đề xuất', t ? `<span class="tag tag-blue" style="font-size:11px">Giảng viên</span>` : `<span class="tag tag-blue" style="font-size:11px">Sinh viên</span>`],
     ['Tên đề tài',    `<strong>${t ? t.name : v(w.topicName)}</strong>`],
     ['Loại đề tài',   t ? (t.types || []).join(', ') : (TYPE_ABBR[w.loaiDeTai] || v(w.loaiDeTai))],
     ['CTĐT áp dụng',  t ? (t.ctdt || []).join(', ') : (CTDT_MAP[w.ctdt] || v(w.ctdt))],

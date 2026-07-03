@@ -1,0 +1,1480 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Quản lý ĐATN & KLTN | Giảng viên | HTQT Đại học</title>
+  <link rel="stylesheet" href="_styles.css">
+  <style>
+    .tbl-truncate{max-width:230px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+    .name-cell{display:block;overflow:hidden;white-space:nowrap;text-overflow:ellipsis;max-width:220px}
+    .mgv-card{display:flex;align-items:center;gap:12px;padding:12px 14px;border-bottom:1px solid var(--border);background:#fff}
+    .mgv-card:last-child{border-bottom:none}
+    .mgv-card.mgv-hl{border-left:3px solid var(--primary);padding-left:11px;background:#f0f7ff}
+    .mgv-card-info{flex:1;min-width:0}
+    .mgv-card-name{font-size:13px;font-weight:600;color:var(--text-1)}
+    .mgv-card-dept{font-size:12px;color:var(--text-3);margin-top:2px}
+    .tag-inhouse{background:#f6ffed;color:#389e0d;border:1px solid #b7eb8f;padding:2px 10px;border-radius:10px;font-size:12px;white-space:nowrap;flex-shrink:0}
+    .tag-external{background:#fff7e6;color:#d46b08;border:1px solid #ffd591;padding:2px 10px;border-radius:10px;font-size:12px;white-space:nowrap;flex-shrink:0}
+    .conclusion-tag{font-size:12px;padding:3px 10px;border-radius:10px;border:1px solid;white-space:nowrap;display:inline-block;font-weight:600}
+    .cl-dat{background:#f6ffed;color:#389e0d;border-color:#b7eb8f}
+    .cl-khongdat{background:#fff2f0;color:#cf1322;border-color:#ffa39e}
+    .cl-canchinh{background:#fff7e6;color:#d46b08;border-color:#ffd591}
+    .cl-hoanbaove{background:#f0f5ff;color:#1d39c4;border-color:#adc6ff}
+    .cl-empty{background:#fafafa;color:var(--text-3);border-color:var(--border)}
+    .ketluan-pill{display:inline-flex;align-items:center;gap:4px;font-size:11px;font-weight:600;padding:2px 9px;border-radius:10px;border:1px solid;white-space:nowrap;cursor:pointer}
+    .ketluan-pill.wait{color:#d48806;background:#fffbe6;border-color:#ffe58f}
+    .ketluan-pill.pass{color:#389e0d;background:#f6ffed;border-color:#b7eb8f}
+    .ketluan-pill.fail{color:#cf1322;background:#fff1f0;border-color:#ffa39e}
+    .stat-row{display:flex;gap:12px;margin-bottom:16px}
+    .stat-box{flex:1;background:#fff;border:1px solid var(--border);border-radius:8px;padding:12px 14px;display:flex;align-items:center;gap:10px;cursor:pointer;transition:box-shadow .15s,border-color .15s}
+    .stat-box:hover{box-shadow:0 4px 14px rgba(0,0,0,.08);border-color:var(--primary)}
+    .stat-box.active{border-color:var(--primary);background:var(--primary-light)}
+    .stat-ico{font-size:22px;line-height:1;flex-shrink:0}
+    .stat-num{font-size:19px;font-weight:700;line-height:1}
+    .stat-lbl{font-size:11px;color:var(--text-3);margin-top:2px;line-height:1.3}
+    .info-tbl{width:100%;border-collapse:collapse;font-size:13px;margin-bottom:4px}
+    .info-tbl td{padding:8px 12px;border:1px solid #e8e8e8;vertical-align:top;line-height:1.5}
+    .info-tbl .itl{background:#fafafa;color:var(--text-3);font-weight:500;width:170px;white-space:nowrap}
+    .qd-num{font-family:monospace;font-size:12px;font-weight:700;color:var(--success)}
+    .code-prev{font-family:monospace;font-size:13px;font-weight:700;color:var(--primary);letter-spacing:.02em}
+    .section-hd{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--text-3);margin:16px 0 8px;padding-bottom:6px;border-bottom:1px solid var(--border)}
+    .type-pill{font-size:11px;font-weight:700;padding:1px 8px;border-radius:10px;border:1px solid;white-space:nowrap}
+    .type-pill.da{color:#0958d9;background:#e6f4ff;border-color:#91caff}
+    .type-pill.kl{color:#d4380d;background:#fff2e8;border-color:#ffbb96}
+    .sec-tabs{display:flex;gap:0;border-bottom:2px solid var(--border);margin-bottom:16px}
+    .sec-tab{padding:9px 22px;font-size:13px;background:none;border:none;border-bottom:3px solid transparent;margin-bottom:-2px;cursor:pointer;color:var(--text-3);transition:all .15s;font-family:inherit;font-weight:500;display:flex;align-items:center;gap:6px}
+    .sec-tab:hover{color:var(--primary);background:#f0f7ff}
+    .sec-tab.active{color:var(--primary);border-bottom-color:var(--primary);font-weight:700}
+    .role-scope-note{font-size:11px;color:var(--text-3);font-style:italic;margin:-4px 0 14px}
+    .plan-tbl{width:100%;border-collapse:collapse;font-size:13px}
+    .plan-tbl th,.plan-tbl td{padding:8px 10px;border:1px solid var(--border);vertical-align:middle}
+    .plan-tbl th{background:#fafafa;font-weight:500;white-space:nowrap}
+    .colvis-wrap{position:relative;display:inline-block}
+    .colvis-panel{position:absolute;top:calc(100% + 6px);right:0;background:#fff;border:1px solid var(--border);border-radius:8px;box-shadow:0 8px 24px rgba(0,0,0,.12);padding:10px 14px;z-index:100;min-width:200px;max-height:340px;overflow-y:auto}
+    .colvis-panel.hidden{display:none}
+    .colvis-hd{font-size:11px;font-weight:700;color:var(--text-3);text-transform:uppercase;letter-spacing:.03em;margin-bottom:8px}
+    .colvis-item{display:flex;align-items:center;gap:8px;font-size:13px;padding:5px 2px;cursor:pointer;white-space:nowrap}
+    .tbl.hide-col-donvi [data-col=donvi],
+    .tbl.hide-col-lop [data-col=lop],
+    .tbl.hide-col-ctdt [data-col=ctdt],
+    .tbl.hide-col-loai [data-col=loai],
+    .tbl.hide-col-dot [data-col=dot],
+    .tbl.hide-col-detai [data-col=detai],
+    .tbl.hide-col-decuong [data-col=decuong],
+    .tbl.hide-col-baocao [data-col=baocao],
+    .tbl.hide-col-daovan [data-col=daovan],
+    .tbl.hide-col-gv [data-col=gv],
+    .tbl.hide-col-hoidong [data-col=hoidong],
+    .tbl.hide-col-nx [data-col=nx],
+    .tbl.hide-col-diem [data-col=diem],
+    .tbl.hide-col-decuongtt [data-col=decuongtt],
+    .tbl.hide-col-ketluanhd [data-col=ketluanhd],
+    .tbl.hide-col-dongbo [data-col=dongbo],
+    .tbl.hide-col-quyetdinh [data-col=quyetdinh],
+    .tbl.hide-col-ghichu [data-col=ghichu]
+    {display:none}
+  </style>
+</head>
+<body>
+<div class="app">
+
+  <!-- ═══ SIDEBAR ═══ -->
+  <nav class="sidebar">
+    <div class="sb-logo">
+      <div class="sb-logo-icon">🎓</div>
+      <div><div class="sb-logo-text">HTQT Đại học</div><div class="text-muted text-sm">Giảng viên</div></div>
+    </div>
+    <div class="sb-user">
+      <div class="av">GV</div>
+      <div>
+        <div style="font-size:13px;font-weight:600">TS. Nguyễn Minh Tuấn</div>
+        <div style="font-size:11px;color:var(--text-3)">Khoa CNTT</div>
+      </div>
+    </div>
+    <ul class="sb-menu">
+      <li><a href="#">🏠&nbsp; Trang chủ</a></li>
+      <li>
+        <span class="mn-group">📋&nbsp; Đề tài &nbsp;▾</span>
+        <ul class="sb-sub open">
+          <li><a href="MH-GV-04_MyTopics.html">DS đề tài của tôi</a></li>
+          <li><a href="MH-GV-05_TopicWishes.html">DS nguyện vọng đề tài</a></li>
+        </ul>
+      </li>
+      <li class="active">
+        <span class="mn-group">👨‍🏫&nbsp; Hướng dẫn &nbsp;▾</span>
+        <ul class="sb-sub open">
+          <li><a href="MH-GV-01_InternshipTracking.html">QL DS thực tập</a></li>
+          <li class="active"><a href="MH-GV-06_GraduationProjectManagement.html">Quản lý ĐATN &amp; KLTN</a></li>
+          <li><a href="#">Thạc sĩ</a></li>
+          <li><a href="#">Tiến sĩ</a></li>
+          <li><a href="MH-GV-02_ChangeRequestApproval.html">QL yêu cầu thay đổi</a></li>
+        </ul>
+      </li>
+    </ul>
+  </nav>
+
+  <!-- ═══ MAIN ═══ -->
+  <div class="main">
+    <header class="app-header">
+      <span class="h-breadcrumb">Hướng dẫn &gt; Quản lý ĐATN &amp; KLTN</span>
+      <div class="h-right">
+        <div class="bw"><button class="btn btn-link" style="font-size:18px">🔔</button><span class="bc">3</span></div>
+        <div class="av">GV</div>
+      </div>
+    </header>
+
+    <main class="content">
+
+      <!-- Dashboard trạng thái -->
+      <div class="stat-row" id="dash" style="display:none"></div>
+
+      <div class="card">
+        <div class="sec-tabs">
+          <button class="sec-tab active" id="tab-btn-hd" onclick="switchSecTab('hd')">👨‍🏫 DS hướng dẫn</button>
+          <button class="sec-tab" id="tab-btn-pb" onclick="switchSecTab('pb')">🧑‍⚖️ DS phản biện</button>
+        </div>
+        <div class="role-scope-note" id="scope-note">Danh sách sinh viên được phân công cho bạn với vai trò <strong>Giảng viên hướng dẫn (GVHD)</strong> — bạn có thể duyệt đề cương tổng, duyệt đề cương theo tuần và nhận xét GVHD. ( bỏ khi dev)</div>
+
+        <div class="filter-bar">
+          <div class="input-search" style="width:230px">
+            <input type="text" class="fc" id="q" placeholder="Tìm mã SV, họ tên, đề tài..." oninput="render()">
+          </div>
+          <select class="fc" style="width:175px" id="f-dot" onchange="render()">
+            <option value="">Tất cả đợt</option>
+          </select>
+          <select class="fc" style="width:175px" id="f-loai" onchange="render()">
+            <option value="">Tất cả loại hình</option>
+            <option>Đồ án tốt nghiệp</option>
+            <option>Khóa luận tốt nghiệp</option>
+          </select>
+          <select class="fc" style="width:200px" id="f-donvi" onchange="render()">
+            <option value="">Tất cả đơn vị</option>
+          </select>
+          <select class="fc" style="width:150px" id="f-ctdt" onchange="render()">
+            <option value="">Tất cả CTĐT</option>
+          </select>
+          <select class="fc" style="width:190px" id="f-decuongtt" onchange="render()">
+            <option value="">Tất cả trạng thái đề cương</option>
+            <option>Chờ SV nộp</option>
+            <option>Chờ duyệt</option>
+            <option>Đã duyệt</option>
+            <option>Yêu cầu chỉnh sửa</option>
+          </select>
+          <select class="fc" style="width:210px" id="f-ketluanhd" onchange="render()">
+            <option value="">Tất cả kết luận hội đồng</option>
+            <option value="_empty">Chưa kết luận</option>
+            <option value="dat">Đạt</option>
+            <option value="canchinh">Đạt nhưng cần chỉnh sửa</option>
+            <option value="khongdat">Không đạt</option>
+            <option value="hoanbaove">Hoãn bảo vệ</option>
+          </select>
+          <button class="btn btn-default" onclick="resetFilter()">🔄 Reset</button>
+          <button class="btn btn-default" onclick="exportSelected()">📤 Xuất DS</button>
+          <div class="colvis-wrap">
+            <button class="btn btn-default" id="colvis-btn" onclick="toggleColVisPanel()">👁️ Cột hiển thị</button>
+            <div class="colvis-panel hidden" id="colvis-panel">
+              <div class="colvis-hd">Hiển thị / ẩn cột</div>
+              <div style="display:flex;gap:10px;margin-bottom:8px">
+                <button type="button" class="btn btn-default btn-sm" style="font-size:11px;padding:3px 8px" onclick="colVisSelectAll(true)">Chọn tất cả</button>
+                <button type="button" class="btn btn-default btn-sm" style="font-size:11px;padding:3px 8px" onclick="colVisSelectAll(false)">Bỏ chọn tất cả</button>
+              </div>
+              <label class="colvis-item"><input type="checkbox" checked onchange="onColVisToggle('donvi',this.checked)"> Đơn vị</label>
+              <label class="colvis-item"><input type="checkbox" checked onchange="onColVisToggle('lop',this.checked)"> Lớp học phần</label>
+              <label class="colvis-item"><input type="checkbox" checked onchange="onColVisToggle('ctdt',this.checked)"> CTĐT</label>
+              <label class="colvis-item"><input type="checkbox" checked onchange="onColVisToggle('loai',this.checked)"> Loại hình</label>
+              <label class="colvis-item"><input type="checkbox" checked onchange="onColVisToggle('dot',this.checked)"> Đợt</label>
+              <label class="colvis-item"><input type="checkbox" checked onchange="onColVisToggle('detai',this.checked)"> Đề tài</label>
+              <label class="colvis-item"><input type="checkbox" checked onchange="onColVisToggle('decuong',this.checked)"> Đề cương</label>
+              <label class="colvis-item"><input type="checkbox" checked onchange="onColVisToggle('baocao',this.checked)"> Báo cáo</label>
+              <label class="colvis-item"><input type="checkbox" checked onchange="onColVisToggle('daovan',this.checked)"> Đạo văn</label>
+              <label class="colvis-item"><input type="checkbox" checked onchange="onColVisToggle('gv',this.checked)"> <span id="colvis-lbl-gv">GVHD</span></label>
+              <label class="colvis-item"><input type="checkbox" checked onchange="onColVisToggle('hoidong',this.checked)"> Hội đồng</label>
+              <label class="colvis-item"><input type="checkbox" checked onchange="onColVisToggle('nx',this.checked)"> <span id="colvis-lbl-nx">Nhận xét GVHD</span></label>
+              <label class="colvis-item"><input type="checkbox" checked onchange="onColVisToggle('diem',this.checked)"> Điểm thành phần</label>
+              <label class="colvis-item"><input type="checkbox" checked onchange="onColVisToggle('decuongtt',this.checked)"> Trạng thái đề cương</label>
+              <label class="colvis-item"><input type="checkbox" checked onchange="onColVisToggle('ketluanhd',this.checked)"> Kết luận hội đồng</label>
+              <label class="colvis-item"><input type="checkbox" checked onchange="onColVisToggle('dongbo',this.checked)"> Đồng bộ điểm</label>
+              <label class="colvis-item"><input type="checkbox" checked onchange="onColVisToggle('quyetdinh',this.checked)"> Quyết định</label>
+              <label class="colvis-item"><input type="checkbox" checked onchange="onColVisToggle('ghichu',this.checked)"> Ghi chú</label>
+            </div>
+          </div>
+        </div>
+
+        <div class="tbl-wrap" id="tbl-wrap-hd">
+          <table class="tbl" id="main-tbl-hd">
+            <thead>
+              <tr>
+                <th style="width:32px;text-align:center"><input type="checkbox" id="chk-all-hd" onchange="toggleSelectAll('hd',this.checked)"></th>
+                <th style="width:150px" data-col="donvi">Đơn vị</th>
+                <th style="width:105px">Mã SV</th>
+                <th style="width:140px">Họ và tên</th>
+                <th style="width:100px" data-col="lop">Lớp học phần</th>
+                <th style="width:58px" data-col="ctdt">CTĐT</th>
+                <th style="width:88px" data-col="loai">Loại hình</th>
+                <th style="width:120px" data-col="dot">Đợt</th>
+                <th style="min-width:180px" data-col="detai">Đề tài</th>
+                <th style="width:150px" data-col="decuong">Đề cương</th>
+                <th style="width:90px;text-align:center" data-col="baocao">Báo cáo</th>
+                <th style="width:100px;text-align:center" data-col="daovan" title="Tỷ lệ trùng lặp / đạo văn">Đạo văn</th>
+                <th style="min-width:130px" data-col="gv">GVHD</th>
+                <th style="min-width:150px" data-col="hoidong">Hội đồng</th>
+                <th style="width:170px" data-col="nx">Nhận xét GVHD</th>
+                <th style="width:90px;text-align:center" data-col="diem">Điểm thành phần</th>
+                <th style="width:150px" data-col="decuongtt">Trạng thái đề cương</th>
+                <th style="width:160px;text-align:center" data-col="ketluanhd">Kết luận hội đồng</th>
+                <th style="width:110px;text-align:center" data-col="dongbo">Đồng bộ điểm</th>
+                <th style="width:128px" data-col="quyetdinh">Quyết định</th>
+                <th style="min-width:170px" data-col="ghichu">Ghi chú</th>
+                <th style="width:70px;text-align:center">Hành động</th>
+              </tr>
+            </thead>
+            <tbody id="tbody-hd"></tbody>
+          </table>
+        </div>
+
+        <div class="tbl-wrap" id="tbl-wrap-pb" style="display:none">
+          <table class="tbl" id="main-tbl-pb">
+            <thead>
+              <tr>
+                <th style="width:32px;text-align:center"><input type="checkbox" id="chk-all-pb" onchange="toggleSelectAll('pb',this.checked)"></th>
+                <th style="width:150px" data-col="donvi">Đơn vị</th>
+                <th style="width:105px">Mã SV</th>
+                <th style="width:140px">Họ và tên</th>
+                <th style="width:100px" data-col="lop">Lớp học phần</th>
+                <th style="width:58px" data-col="ctdt">CTĐT</th>
+                <th style="width:88px" data-col="loai">Loại hình</th>
+                <th style="width:120px" data-col="dot">Đợt</th>
+                <th style="min-width:180px" data-col="detai">Đề tài</th>
+                <th style="width:150px" data-col="decuong">Đề cương</th>
+                <th style="width:90px;text-align:center" data-col="baocao">Báo cáo</th>
+                <th style="width:100px;text-align:center" data-col="daovan" title="Tỷ lệ trùng lặp / đạo văn">Đạo văn</th>
+                <th style="min-width:130px" data-col="gv">GVPB</th>
+                <th style="min-width:150px" data-col="hoidong">Hội đồng</th>
+                <th style="width:170px" data-col="nx">Nhận xét GVPB</th>
+                <th style="width:90px;text-align:center" data-col="diem">Điểm thành phần</th>
+                <th style="width:150px" data-col="decuongtt">Trạng thái đề cương</th>
+                <th style="width:160px;text-align:center" data-col="ketluanhd">Kết luận hội đồng</th>
+                <th style="width:110px;text-align:center" data-col="dongbo">Đồng bộ điểm</th>
+                <th style="width:128px" data-col="quyetdinh">Quyết định</th>
+                <th style="min-width:170px" data-col="ghichu">Ghi chú</th>
+                <th style="width:70px;text-align:center">Hành động</th>
+              </tr>
+            </thead>
+            <tbody id="tbody-pb"></tbody>
+          </table>
+        </div>
+
+        <div class="pagination">
+          <span class="pg-info" id="pg-info"></span>
+          <button class="pg-btn active">1</button>
+        </div>
+      </div>
+    </main>
+  </div>
+</div>
+
+<!-- ═══ MODAL: THÔNG TIN ĐỀ TÀI ═══ -->
+<div class="overlay hidden" id="m-topic-info">
+  <div class="modal-box w640">
+    <div class="modal-hd">
+      <h4 class="modal-title" id="ti-title">Thông tin đề tài</h4>
+      <button class="modal-close" data-close="m-topic-info">✕</button>
+    </div>
+    <div class="modal-bd">
+      <table class="desc-tbl" id="ti-body"></table>
+    </div>
+    <div class="modal-ft">
+      <button class="btn btn-default" data-close="m-topic-info">Đóng</button>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ MODAL: THÔNG TIN SINH VIÊN ═══ -->
+<div class="overlay hidden" id="m-student-info">
+  <div class="modal-box w480">
+    <div class="modal-hd">
+      <span class="modal-title">Thông tin Sinh viên</span>
+      <button class="modal-close" data-close="m-student-info">✕</button>
+    </div>
+    <div class="modal-bd">
+      <table class="info-tbl">
+        <tr><td class="itl">Mã SV</td><td style="font-family:monospace" id="si-masv"></td></tr>
+        <tr><td class="itl">Họ và tên</td><td><strong id="si-name"></strong></td></tr>
+        <tr><td class="itl">Lớp học phần</td><td id="si-lop"></td></tr>
+        <tr><td class="itl">CTĐT</td><td id="si-ctdt"></td></tr>
+        <tr><td class="itl">Loại hình</td><td id="si-loaihinh"></td></tr>
+        <tr><td class="itl">Đợt</td><td id="si-dot"></td></tr>
+        <tr><td class="itl">Đề tài</td><td id="si-detai"></td></tr>
+        <tr><td class="itl">GVHD</td><td id="si-gvhd"></td></tr>
+        <tr><td class="itl">GVPB</td><td id="si-gvpb"></td></tr>
+        <tr><td class="itl">Hội đồng</td><td id="si-hoidong"></td></tr>
+      </table>
+    </div>
+    <div class="modal-ft">
+      <button class="btn btn-default" data-close="m-student-info">Đóng</button>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ MODAL: THÔNG TIN GVHD (XEM — chỉ đọc, không sửa) ═══ -->
+<div class="overlay hidden" id="m-gvhd-info">
+  <div class="modal-box" style="width:520px;max-height:88vh">
+    <div class="modal-hd">
+      <span class="modal-title">👨‍🏫 Giảng viên hướng dẫn</span>
+      <button class="modal-close" data-close="m-gvhd-info">✕</button>
+    </div>
+    <div class="modal-bd" style="overflow-y:auto">
+      <div id="gvi-target" style="font-size:12px;color:var(--text-3);margin-bottom:10px"></div>
+      <div style="display:flex;align-items:center;gap:12px;padding:8px 14px;background:#fafafa;border:1px solid var(--border);border-bottom:none;border-radius:8px 8px 0 0;font-size:12px;font-weight:600;color:var(--text-3)">
+        <div style="flex:1">Giảng viên hướng dẫn</div>
+        <div style="width:100px;flex-shrink:0;text-align:center">Phân loại</div>
+        <div style="width:70px;flex-shrink:0;text-align:center">Trọng số</div>
+      </div>
+      <div id="gvi-card-list" style="border:1px solid var(--border);border-top:none;border-radius:0 0 8px 8px;overflow:hidden;margin-bottom:10px"></div>
+      <div style="display:flex;justify-content:flex-end;align-items:center;gap:8px">
+        <span style="font-size:13px;color:var(--text-2)">Tổng trọng số:</span>
+        <strong id="gvi-total-weight" style="font-size:14px;color:var(--success)">100%</strong>
+      </div>
+    </div>
+    <div class="modal-ft">
+      <button class="btn btn-default" data-close="m-gvhd-info">Đóng</button>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ MODAL: THÔNG TIN HỘI ĐỒNG ═══ -->
+<div class="overlay hidden" id="m-hoidong-info">
+  <div class="modal-box w700" style="max-height:92vh">
+    <div class="modal-hd">
+      <h4 class="modal-title" id="hdi-title">Chi tiết hội đồng</h4>
+      <button class="modal-close" data-close="m-hoidong-info">✕</button>
+    </div>
+    <div class="modal-bd" style="overflow-y:auto">
+      <div class="section-hd" style="margin-top:0">Thông tin Hội đồng</div>
+      <table class="info-tbl">
+        <tr><td class="itl">Mã hội đồng</td><td><strong id="hdi-code" class="code-prev"></strong></td></tr>
+        <tr><td class="itl">Tên hội đồng</td><td><strong id="hdi-name"></strong></td></tr>
+        <tr><td class="itl">Đơn vị</td><td id="hdi-donvi"></td></tr>
+        <tr><td class="itl">Ngành / Lĩnh vực</td><td id="hdi-nganh"></td></tr>
+        <tr><td class="itl">Học kỳ</td><td id="hdi-hocky"></td></tr>
+        <tr><td class="itl">Hình thức &amp; Thời gian họp</td><td id="hdi-datetime"></td></tr>
+        <tr><td class="itl">Địa điểm / Link họp</td><td id="hdi-place"></td></tr>
+      </table>
+      <div class="section-hd">Danh sách Thành viên (<span id="hdi-mem-count">0</span> người)</div>
+      <table class="mem-tbl" style="width:100%;border-collapse:collapse;font-size:13px">
+        <thead>
+          <tr>
+            <th style="background:#fafafa;font-weight:600;padding:7px 10px;border:1px solid #e8e8e8;width:100px">Vai trò</th>
+            <th style="background:#fafafa;font-weight:600;padding:7px 10px;border:1px solid #e8e8e8">Họ và tên</th>
+            <th style="background:#fafafa;font-weight:600;padding:7px 10px;border:1px solid #e8e8e8">Đơn vị</th>
+          </tr>
+        </thead>
+        <tbody id="hdi-mem-tbody"></tbody>
+      </table>
+    </div>
+    <div class="modal-ft">
+      <button class="btn btn-default" data-close="m-hoidong-info">Đóng</button>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ MODAL: ĐỀ CƯƠNG & TIẾN ĐỘ — GVHD DUYỆT TỔNG & DUYỆT THEO TUẦN ═══ -->
+<div class="overlay hidden" id="m-decuong-approve">
+  <div class="modal-box w700" style="max-height:90vh">
+    <div class="modal-hd">
+      <h4 class="modal-title" id="dca-title">Xét đề cương / Kế hoạch</h4>
+      <button class="modal-close" data-close="m-decuong-approve">✕</button>
+    </div>
+    <div class="modal-bd" style="overflow-y:auto">
+      <div class="sec-title" style="margin-top:0"><span class="sec-badge">1</span> Thông tin đề tài</div>
+      <table class="desc-tbl" id="dca-topic-body" style="margin-bottom:20px"></table>
+
+      <div class="sec-title"><span class="sec-badge">2</span> Kế hoạch công việc theo tuần</div>
+      <div class="tbl-wrap" style="margin-bottom:8px">
+        <table class="tbl" style="width:100%;font-size:13px">
+          <thead>
+            <tr>
+              <th style="width:60px;text-align:center">Tuần</th>
+              <th style="min-width:180px">Nhiệm vụ / Công việc</th>
+              <th style="min-width:160px">Kết quả đạt được</th>
+              <th style="min-width:120px">Ghi chú</th>
+              <th style="width:100px;text-align:center">Trạng thái</th>
+              <th style="width:90px;text-align:center">Hành động</th>
+            </tr>
+          </thead>
+          <tbody id="dca-plan-body"></tbody>
+        </table>
+      </div>
+      <button type="button" class="btn btn-default btn-sm" onclick="addTuan()" style="margin-bottom:14px">+ Thêm mới</button>
+    </div>
+    <div class="modal-ft" id="dca-footer">
+      <button class="btn btn-default" data-close="m-decuong-approve">Đóng</button>
+      <button class="btn btn-danger" id="dca-tong-reject-btn" onclick="rejectDeCuongTong()">Yêu cầu chỉnh sửa</button>
+      <button class="btn btn-primary" id="dca-tong-approve-btn" onclick="approveDeCuongTong()">Duyệt</button>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ MODAL: XÁC NHẬN TỪ CHỐI ĐỀ CƯƠNG TỔNG ═══ -->
+<div class="overlay hidden" id="m-reject-dc-tong">
+  <div class="modal-box" style="width:480px">
+    <div class="modal-hd">
+      <span class="modal-title">❌ Từ chối / Yêu cầu chỉnh sửa đề cương</span>
+      <button class="modal-close" data-close="m-reject-dc-tong">✕</button>
+    </div>
+    <div class="modal-bd">
+      <div class="alert alert-warning" style="margin-bottom:16px">
+        <span class="alert-ico">⚠️</span>
+        <div class="alert-body">
+          <div class="alert-title">Xác nhận từ chối đề cương</div>
+          <span class="alert-desc">Sinh viên sẽ nhận được thông báo yêu cầu chỉnh sửa và phải nộp lại đề cương.</span>
+        </div>
+      </div>
+      <div class="fi">
+        <label>Lý do từ chối / Yêu cầu chỉnh sửa <span class="req">*</span></label>
+        <textarea class="fc" id="rdc-tong-reason" rows="4" placeholder="Nhập lý do cụ thể để sinh viên chỉnh sửa..."></textarea>
+        <div class="fe" id="rdc-tong-reason-err" style="display:none">Bắt buộc nhập lý do khi từ chối</div>
+      </div>
+    </div>
+    <div class="modal-ft">
+      <button class="btn btn-default" data-close="m-reject-dc-tong">Hủy</button>
+      <button class="btn btn-danger" onclick="confirmRejectDeCuongTong()">❌ Xác nhận từ chối</button>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ MODAL: DUYỆT / TỪ CHỐI KẾ HOẠCH TUẦN ═══ -->
+<div class="overlay hidden" id="m-reject-tuan">
+  <div class="modal-box" style="width:480px">
+    <div class="modal-hd">
+      <span class="modal-title">⛔ Từ chối kế hoạch tuần <span id="rt-tuan-so"></span></span>
+      <button class="modal-close" data-close="m-reject-tuan">✕</button>
+    </div>
+    <div class="modal-bd">
+      <div class="fi">
+        <label>Lý do từ chối <span class="req">*</span></label>
+        <textarea class="fc" id="rt-reason" rows="3" placeholder="Nhập lý do để sinh viên chỉnh sửa lại nội dung tuần này..."></textarea>
+        <div class="fe" id="rt-reason-err" style="display:none">Bắt buộc nhập lý do khi từ chối</div>
+      </div>
+    </div>
+    <div class="modal-ft">
+      <button class="btn btn-default" data-close="m-reject-tuan">Hủy</button>
+      <button class="btn btn-danger" onclick="confirmRejectTuan()">⛔ Xác nhận từ chối</button>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ MODAL: NHẬN XÉT & KẾT LUẬN — GVHD ═══ -->
+<div class="overlay hidden" id="m-nhanxet-gvhd">
+  <div class="modal-box w640" style="max-height:90vh">
+    <div class="modal-hd">
+      <span class="modal-title">📝 Nhận xét & Kết luận — GVHD</span>
+      <button class="modal-close" data-close="m-nhanxet-gvhd">✕</button>
+    </div>
+    <div class="modal-bd" style="overflow-y:auto">
+      <div class="fi">
+        <label>Kết luận GVHD <span class="req">*</span></label>
+        <select class="fc" id="nx-gvhd-ketluan">
+          <option value="">-- Chọn kết luận --</option>
+          <option value="Đồng ý">✅ Đồng ý cho bảo vệ</option>
+          <option value="Không đồng ý">⛔ Không đồng ý cho bảo vệ</option>
+        </select>
+      </div>
+      <div class="fi">
+        <label>Tài liệu nhận xét (phiếu nhận xét GVHD) <span class="req">*</span>
+          <a href="#" onclick="downloadNxTemplate('gvhd');return false" style="font-size:12px;font-weight:400;margin-left:8px">📥 Tải file mẫu (.docx)</a>
+        </label>
+        <div style="display:flex;gap:8px;align-items:center">
+          <input type="file" id="nx-gvhd-file-input" accept=".doc,.docx,.pdf" style="display:none" onchange="onNxGvhdFileSelect(this)">
+          <button type="button" class="btn btn-default btn-sm" onclick="document.getElementById('nx-gvhd-file-input').click()">📎 Chọn file</button>
+          <span style="font-size:12px;color:var(--text-2)" id="nx-gvhd-file-name">Chưa có file</span>
+          <button type="button" class="btn btn-default btn-sm" id="nx-gvhd-file-clear" style="display:none;color:var(--error)" onclick="clearNxGvhdFile()">✕</button>
+        </div>
+      </div>
+      <div class="fi">
+        <label>Ghi chú</label>
+        <textarea class="fc" id="nx-gvhd-ghichu" rows="2" placeholder="Ghi chú thêm về điểm/nhận xét (không bắt buộc)"></textarea>
+      </div>
+      <div class="fe" id="nx-gvhd-err" style="display:none">Vui lòng chọn kết luận và tải lên tài liệu nhận xét của GVHD.</div>
+    </div>
+    <div class="modal-ft">
+      <button class="btn btn-default" data-close="m-nhanxet-gvhd">Hủy</button>
+      <button class="btn btn-primary" onclick="saveNhanXetGvhd()">Lưu</button>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ MODAL: ĐỀ CƯƠNG (XEM — GVPB chỉ xem) ═══ -->
+<div class="overlay hidden" id="m-decuong-info">
+  <div class="modal-box w700" style="max-height:90vh">
+    <div class="modal-hd">
+      <h4 class="modal-title" id="dci-title">📝 Đề cương &amp; Tiến độ</h4>
+      <button class="modal-close" data-close="m-decuong-info">✕</button>
+    </div>
+    <div class="modal-bd" style="overflow-y:auto">
+      <div class="sec-title" style="margin-top:0"><span class="sec-badge">1</span> Thông tin đề tài</div>
+      <table class="desc-tbl" id="dci-topic-body" style="margin-bottom:20px"></table>
+      <div class="sec-title"><span class="sec-badge">2</span> Kế hoạch công việc theo tuần</div>
+      <div class="tbl-wrap" style="margin-bottom:14px">
+        <table class="tbl" style="width:100%;font-size:13px">
+          <thead>
+            <tr>
+              <th style="width:60px;text-align:center">Tuần</th>
+              <th style="min-width:180px">Nhiệm vụ / Công việc</th>
+              <th style="min-width:160px">Kết quả đạt được</th>
+              <th style="min-width:120px">Ghi chú</th>
+              <th style="width:100px;text-align:center">Trạng thái</th>
+              <th style="width:90px;text-align:center">Hành động</th>
+            </tr>
+          </thead>
+          <tbody id="dci-plan-body"></tbody>
+        </table>
+      </div>
+    </div>
+    <div class="modal-ft">
+      <button class="btn btn-default" data-close="m-decuong-info">Đóng</button>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ MODAL: NHẬN XÉT & KẾT LUẬN — GVPB ═══ -->
+<div class="overlay hidden" id="m-nhanxet-gvpb">
+  <div class="modal-box w640" style="max-height:90vh">
+    <div class="modal-hd">
+      <span class="modal-title">📃 Nhận xét & Kết luận — GVPB</span>
+      <button class="modal-close" data-close="m-nhanxet-gvpb">✕</button>
+    </div>
+    <div class="modal-bd" style="overflow-y:auto">
+      <div class="fi">
+        <label>Kết luận GVPB <span class="req">*</span></label>
+        <select class="fc" id="nx-gvpb-ketluan">
+          <option value="">-- Chọn kết luận --</option>
+          <option value="Đồng ý">✅ Đồng ý cho bảo vệ</option>
+          <option value="Không đồng ý">⛔ Không đồng ý cho bảo vệ</option>
+        </select>
+      </div>
+      <div class="fi">
+        <label>Tài liệu nhận xét (phiếu nhận xét GVPB) <span class="req">*</span>
+          <a href="#" onclick="downloadNxTemplate('gvpb');return false" style="font-size:12px;font-weight:400;margin-left:8px">📥 Tải file mẫu (.docx)</a>
+        </label>
+        <div style="display:flex;gap:8px;align-items:center">
+          <input type="file" id="nx-gvpb-file-input" accept=".doc,.docx,.pdf" style="display:none" onchange="onNxFileSelect(this)">
+          <button type="button" class="btn btn-default btn-sm" onclick="document.getElementById('nx-gvpb-file-input').click()">📎 Chọn file</button>
+          <span style="font-size:12px;color:var(--text-2)" id="nx-gvpb-file-name">Chưa có file</span>
+          <button type="button" class="btn btn-default btn-sm" id="nx-gvpb-file-clear" style="display:none;color:var(--error)" onclick="clearNxFile()">✕</button>
+        </div>
+      </div>
+      <div class="fi">
+        <label>Ghi chú</label>
+        <textarea class="fc" id="nx-gvpb-ghichu" rows="2" placeholder="Ghi chú thêm về điểm/nhận xét (không bắt buộc)"></textarea>
+      </div>
+      <div class="fe" id="nx-gvpb-err" style="display:none">Vui lòng chọn kết luận và tải lên tài liệu nhận xét của GVPB.</div>
+    </div>
+    <div class="modal-ft">
+      <button class="btn btn-default" data-close="m-nhanxet-gvpb">Hủy</button>
+      <button class="btn btn-primary" onclick="saveNhanXetGvpb()">Lưu</button>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ MODAL: ĐIỂM THÀNH PHẦN (XEM) ═══ -->
+<div class="overlay hidden" id="m-diem-info">
+  <div class="modal-box w960">
+    <div class="modal-hd">
+      <h4 class="modal-title" id="di-title">📊 Thông tin điểm</h4>
+      <button class="modal-close" data-close="m-diem-info">✕</button>
+    </div>
+    <div class="modal-bd">
+      <div style="font-size:12px;color:var(--text-3);margin-bottom:10px">Cấu trúc đầu điểm do lớp học phần quy định, mỗi lớp có thể khác nhau.</div>
+      <div id="di-body"></div>
+    </div>
+    <div class="modal-ft">
+      <button class="btn btn-default" data-close="m-diem-info">Đóng</button>
+      <button class="btn btn-primary" id="di-save-btn" onclick="saveDiemInfo()">💾 Lưu</button>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ MODAL: DS QUYẾT ĐỊNH (XEM) ═══ -->
+<div class="overlay hidden" id="m-quyetdinh">
+  <div class="modal-box w700" style="max-height:88vh">
+    <div class="modal-hd">
+      <span class="modal-title">📜 Danh sách Quyết định — <span id="qd-target"></span></span>
+      <button class="modal-close" data-close="m-quyetdinh">✕</button>
+    </div>
+    <div class="modal-bd" id="qd-body" style="overflow-y:auto"></div>
+    <div class="modal-ft">
+      <button class="btn btn-default" data-close="m-quyetdinh">Đóng</button>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ MODAL: BÁO CÁO CUỐI KỲ (XEM — chỉ đọc) ═══ -->
+<div class="overlay hidden" id="m-report-info">
+  <div class="modal-box w480">
+    <div class="modal-hd">
+      <span class="modal-title">📄 Báo cáo cuối kỳ</span>
+      <button class="modal-close" data-close="m-report-info">✕</button>
+    </div>
+    <div class="modal-bd">
+      <div style="font-size:13px;color:var(--text-2);margin-bottom:8px">File báo cáo chính thức</div>
+      <div style="display:flex;align-items:center;gap:8px;margin-bottom:16px">
+        <span id="rp-file-name" style="font-family:monospace;color:#fa8c16"></span>
+        <button class="btn btn-default btn-sm" onclick="viewReportFile()">👁️ Xem</button>
+        <button class="btn btn-default btn-sm" onclick="downloadReportFile()">⬇️ Tải</button>
+      </div>
+      <div style="font-size:13px;color:var(--text-2);margin-bottom:8px">Mã nguồn / Sản phẩm</div>
+      <div style="display:flex;align-items:center;gap:8px">
+        <a href="#" id="rp-sourcelink" onclick="return false" style="color:var(--primary)"></a>
+        <button class="btn btn-default btn-sm" onclick="openReportSource()">🔗 Mở</button>
+      </div>
+    </div>
+    <div class="modal-ft">
+      <button class="btn btn-default" data-close="m-report-info">Đóng</button>
+      <button class="btn btn-primary" onclick="allowResubmit()">🔓 Cho phép nộp lại</button>
+    </div>
+  </div>
+</div>
+
+<script src="_utils.js"></script>
+<script>
+/* ════════ CURRENT USER ════════ */
+const CURRENT_USER = 'TS. Nguyễn Minh Tuấn';
+
+/* ════════ DỮ LIỆU MẪU (dùng chung nguồn dữ liệu với MH-KCM-07) ════════ */
+const ROUNDS = [
+  {id:'DA-HK2-2025-2026', name:'ĐATN HK2 2025-2026', loaiHinh:'Đồ án tốt nghiệp'},
+  {id:'KL-HK2-2025-2026', name:'KLTN HK2 2025-2026', loaiHinh:'Khóa luận tốt nghiệp'},
+  {id:'DA-HK1-2025-2026', name:'ĐATN HK1 2025-2026', loaiHinh:'Đồ án tốt nghiệp'},
+];
+
+const TOPIC_STATUS_CLR = {'Đã công bố':'tag-success', 'Chưa công bố':'tag-default'};
+const TOPIC_CATALOG = [
+  {code:'DT-2026-0001', name:'Xây dựng hệ thống gợi ý học phần thông minh bằng Machine Learning', ctdt:['KTPM','HTTT'],
+    types:['Đồ án tốt nghiệp','Khóa luận tốt nghiệp'], field:'Trí tuệ nhân tạo & Dữ liệu', qty:2, status:'Đã công bố', active:'Mở', gvhdDeXuat:'TS. Nguyễn Minh Tuấn',
+    desc:'Nghiên cứu và xây dựng hệ thống gợi ý học phần dựa trên lịch sử học tập và nguyện vọng của sinh viên sử dụng các thuật toán Machine Learning hiện đại.',
+    req:'GPA ≥ 3.0, có kiến thức Python, ML cơ bản, xử lý dữ liệu.',
+    output:'Ứng dụng web + báo cáo nghiên cứu + mô hình ML đã huấn luyện.',
+    tech:'Python, scikit-learn, FastAPI, React', file:'Mo_ta_de_tai_DT2026_0001.pdf', created:'05/05/2026'},
+  {code:'DT-2026-0002', name:'Phân tích cảm xúc người dùng từ đánh giá sản phẩm trực tuyến', ctdt:['KHMT'],
+    types:['Đồ án tốt nghiệp'], field:'Trí tuệ nhân tạo & Dữ liệu', qty:1, status:'Đã công bố', active:'Mở', gvhdDeXuat:'TS. Lê Thị Mai',
+    desc:'Xây dựng mô hình NLP phân tích cảm xúc từ các bình luận người dùng trên sàn thương mại điện tử tiếng Việt.',
+    req:'GPA ≥ 3.2, Python, NLP cơ bản.', output:'Mô hình phân loại cảm xúc + API + báo cáo so sánh.',
+    tech:'Python, Transformers (BERT), Flask', file:'De_cuong_NLP_cam_xuc_DT2026_0002.pdf', created:'10/12/2025'},
+  {code:'DT-2026-0010', name:'Hệ thống phân tích dữ liệu bán hàng cho doanh nghiệp vừa và nhỏ', ctdt:['HTTT'],
+    types:['Đồ án tốt nghiệp','Khóa luận tốt nghiệp'], field:'Hệ thống thông tin & Phân tích dữ liệu', qty:2, status:'Đã công bố', active:'Mở', gvhdDeXuat:'TS. Lê Thị Mai',
+    desc:'Thiết kế hệ thống thu thập, tổng hợp và trực quan hoá dữ liệu bán hàng cho DN vừa và nhỏ.',
+    req:'GPA ≥ 2.8, SQL, Power BI.', output:'Dashboard + báo cáo phân tích + tài liệu hướng dẫn.',
+    tech:'SQL Server, Power BI, .NET, React', file:'De_cuong_PhanTichBanHang_DT2026_0010.pdf', created:'12/02/2026'},
+  {code:'DT-2026-0021', name:'Nghiên cứu mô hình học máy phân loại văn bản tiếng Việt', ctdt:['KHMT','KTPM'],
+    types:['Đồ án tốt nghiệp','Khóa luận tốt nghiệp'], field:'Trí tuệ nhân tạo & Xử lý ngôn ngữ tự nhiên', qty:1, status:'Đã công bố', active:'Mở', gvhdDeXuat:'TS. Nguyễn Minh Tuấn',
+    desc:'So sánh và đề xuất cải tiến các mô hình học máy/học sâu cho bài toán phân loại văn bản tiếng Việt.',
+    req:'GPA ≥ 3.0, Python, nền tảng học máy/học sâu.', output:'Mô hình phân loại + bộ dữ liệu gán nhãn + báo cáo thực nghiệm.',
+    tech:'Python, PyTorch, scikit-learn', file:'De_cuong_PhanLoaiVanBan_DT2026_0021.pdf', created:'02/04/2026'},
+];
+
+const CONCLUSION_CFG = {
+  dat       : { label:'Đạt',                    cls:'cl-dat'      },
+  khongdat  : { label:'Không đạt',               cls:'cl-khongdat' },
+  canchinh  : { label:'Đạt nhưng cần chỉnh sửa', cls:'cl-canchinh' },
+  hoanbaove : { label:'Hoãn bảo vệ',             cls:'cl-hoanbaove' }
+};
+
+const COUNCIL_CATALOG = [
+  {code:'HD-2026-021', name:'Hội đồng chấm ĐATN & KLTN HK2 2025-2026 (Nhóm CNPM)', donvi:'BM. Công nghệ phần mềm', nganh:'Kỹ thuật phần mềm', hocKy:'HK2 2025-2026',
+    ngay:'05/07/2026', gio:'08:00', hinhThuc:'Trực tiếp', phong:'Phòng họp A1-101',
+    members:[
+      {role:'ct', name:'PGS.TS. Lê Văn Minh', unit:'Khoa CNTT'},
+      {role:'tk', name:'ThS. Nguyễn Thu Hoa',  unit:'Khoa CNTT'},
+      {role:'uv', name:'TS. Nguyễn Minh Tuấn', unit:'BM. Công nghệ phần mềm'},
+      {role:'gc', name:'ThS. Trần Văn Hùng',   unit:'BM. Công nghệ phần mềm'},
+      {role:'pb', name:'TS. Phạm Quốc Hùng',   unit:'Khoa CNTT'},
+    ]},
+  {code:'HD-2025-198', name:'Hội đồng chấm ĐATN & KLTN HK1 2025-2026', donvi:'Văn phòng Khoa', nganh:'Công nghệ thông tin', hocKy:'HK1 2025-2026',
+    ngay:'20/01/2026', gio:'08:00', hinhThuc:'Trực tiếp', phong:'Phòng họp A1-101',
+    members:[
+      {role:'ct', name:'TS. Trần Văn Bình',    unit:'Khoa CNTT'},
+      {role:'tk', name:'ThS. Nguyễn Thu Hoa',  unit:'Khoa CNTT'},
+      {role:'uv', name:'TS. Nguyễn Minh Tuấn', unit:'BM. Công nghệ phần mềm'},
+      {role:'gc', name:'TS. Lê Thị Mai',       unit:'BM. Hệ thống thông tin'},
+      {role:'pb', name:'TS. Phạm Thu Hà',      unit:'Khoa CNTT'},
+    ]},
+];
+
+const CTDT_DONVI = { 'KTPM': 'BM. Công nghệ phần mềm', 'HTTT': 'BM. Hệ thống thông tin', 'KHMT': 'BM. Trí tuệ nhân tạo' };
+
+const HD_ROLE_LABEL = {ct:'Chủ tịch', tk:'Thư ký', uv:'Ủy viên', gc:'GV chấm', pb:'Phản biện'};
+
+let students = [
+  {id:6, maSV:'B22DCCN058', tenSV:'Hoàng Minh Đức', lop:'INT3110_1', ctdt:'HTTT', dotId:'DA-HK2-2025-2026', loaiHinh:'Đồ án tốt nghiệp',
+    topic:TOPIC_CATALOG[2], gvhd:'TS. Nguyễn Minh Tuấn', gvpb:null, baoCao:null,
+    decuong:{trangThai:'Chờ duyệt', file:'DeCuong_B22DCCN058_v1.docx', ngayNop:'08/06/2026',
+      kePlan:[
+        {tuan:1, nhiemVu:'Khảo sát nghiệp vụ quản lý kho hàng, thu thập yêu cầu', ketQua:'Tài liệu yêu cầu nghiệp vụ (BRD)', ghiChu:'', trangThai:'Chờ duyệt'},
+        {tuan:2, nhiemVu:'Thiết kế CSDL & kiến trúc hệ thống', ketQua:'', ghiChu:'', trangThai:'Chờ duyệt'},
+      ]},
+    ghiChu:''},
+
+  {id:8, maSV:'B22DCCN071', tenSV:'Vũ Thanh Long', lop:'INT3110_1', ctdt:'KHMT', dotId:'DA-HK1-2025-2026', loaiHinh:'Đồ án tốt nghiệp',
+    topic:TOPIC_CATALOG[0], gvhd:'TS. Nguyễn Minh Tuấn', gvpb:'TS. Lê Thị Mai',
+    baoCao:{file:'BC_DATN_B22DCCN071.pdf', ngayNop:'15/06/2026 16:40', dungHan:true, sourceUrl:'github.com/vuthanhlong/datn-2026'},
+    hoiDong:COUNCIL_CATALOG[1], conclusion:'dat',
+    decuong:{trangThai:'Đã duyệt', file:'DeCuong_B22DCCN071_v1.docx', ngayNop:'10/04/2026',
+      kePlan:[
+        {tuan:1, nhiemVu:'Khảo sát yêu cầu, thu thập dữ liệu hành vi người dùng', ketQua:'Bộ dữ liệu thô + tài liệu yêu cầu', ghiChu:'', trangThai:'Đã duyệt'},
+        {tuan:2, nhiemVu:'Tiền xử lý dữ liệu, xây dựng mô hình baseline', ketQua:'Mô hình baseline + báo cáo đánh giá', ghiChu:'', trangThai:'Đã duyệt'},
+        {tuan:3, nhiemVu:'Tối ưu mô hình, xây dựng API gợi ý', ketQua:'API gợi ý sản phẩm', ghiChu:'Đã refactor lại kiến trúc API theo góp ý GVHD', trangThai:'Đã duyệt'},
+        {tuan:4, nhiemVu:'Xây dựng giao diện web demo, viết báo cáo tổng kết', ketQua:'Ứng dụng web demo + báo cáo ĐATN', ghiChu:'', trangThai:'Chờ duyệt'},
+      ]},
+    daoVanNoiBo:12,
+    nxGVHD:{diem:8.0, ketLuan:'Đồng ý', ngay:'19/06/2026', file:'PhieuNhanXet_GVHD_B22DCCN071.docx', ghiChu:'Đề nghị bổ sung thêm test case trước khi nộp bản hoàn chỉnh.'},
+    diemHoiDong:8.2, diemTongKet:8.0, dongBoDiem:'Đã đồng bộ', dongBoNgay:'23/06/2026',
+    qdGiao:{so:'145/QĐ-PĐT', ngay:'01/06/2026'}, ghiChu:''},
+
+  {id:13, maSV:'B22DCCN093', tenSV:'Lý Thị Thu Hương', lop:'INT3110_2', ctdt:'KTPM', dotId:'DA-HK1-2025-2026', loaiHinh:'Đồ án tốt nghiệp',
+    topic:TOPIC_CATALOG[0], gvhd:'TS. Nguyễn Minh Tuấn', gvpb:null, baoCao:null,
+    decuong:{trangThai:'Đã duyệt', file:'DeCuong_B22DCCN093_v1.docx', ngayNop:'12/04/2026',
+      kePlan:[
+        {tuan:1, nhiemVu:'Khảo sát UX hiện trạng cổng đăng ký học phần', ketQua:'Báo cáo khảo sát UX', ghiChu:'', trangThai:'Đã duyệt'},
+        {tuan:2, nhiemVu:'Thiết kế wireframe & prototype giao diện gợi ý học phần', ketQua:'', ghiChu:'', trangThai:'Chờ duyệt'},
+      ]},
+    ghiChu:''},
+
+  {id:14, maSV:'B22DCCN104', tenSV:'Trương Gia Bảo', lop:'INT3110_2', ctdt:'KTPM', dotId:'DA-HK1-2025-2026', loaiHinh:'Đồ án tốt nghiệp',
+    topic:TOPIC_CATALOG[3], gvhd:'TS. Lê Thị Mai', gvpb:'TS. Nguyễn Minh Tuấn',
+    baoCao:{file:'BC_DATN_B22DCCN104.pdf', ngayNop:'18/06/2026 23:55', dungHan:false, sourceUrl:'github.com/truonggiabao/datn-nlp-2026'},
+    hoiDong:COUNCIL_CATALOG[0], conclusion:'dat',
+    decuong:{trangThai:'Đã duyệt', file:'DeCuong_B22DCCN104_v1.docx', ngayNop:'08/04/2026',
+      kePlan:[
+        {tuan:1, nhiemVu:'Khảo sát & thu thập bộ dữ liệu văn bản tiếng Việt', ketQua:'Bộ dữ liệu thô + tài liệu khảo sát', ghiChu:'', trangThai:'Đã duyệt'},
+        {tuan:2, nhiemVu:'Xây dựng mô hình baseline & tiền xử lý dữ liệu', ketQua:'Mô hình baseline + báo cáo đánh giá', ghiChu:'', trangThai:'Đã duyệt'},
+        {tuan:3, nhiemVu:'Cải tiến mô hình, thử nghiệm trên nhiều miền dữ liệu', ketQua:'Mô hình cải tiến + báo cáo thực nghiệm', ghiChu:'', trangThai:'Đã duyệt'},
+        {tuan:4, nhiemVu:'Đóng gói sản phẩm, viết báo cáo tổng kết', ketQua:'Ứng dụng hoàn chỉnh + báo cáo ĐATN', ghiChu:'', trangThai:'Đã duyệt'},
+      ]},
+    daoVanNoiBo:8,
+    nxGVPB:{diem:7.8, ketLuan:'Đồng ý', ngay:'20/06/2026', file:'PhieuNhanXet_GVPB_B22DCCN104.docx', ghiChu:''},
+    diemHoiDong:8.4, diemTongKet:8.1, dongBoDiem:'Chưa đồng bộ',
+    qdGiao:{so:'150/QĐ-PĐT', ngay:'03/06/2026'}, ghiChu:''},
+];
+
+/* ════════ TRẠNG THÁI ĐỀ CƯƠNG ════════ */
+const DECUONG_TRANGTHAI_META = {
+  'Chờ SV nộp':        {cls:'wait'},
+  'Chờ duyệt':         {cls:'wait'},
+  'Đã duyệt':          {cls:'pass'},
+  'Yêu cầu chỉnh sửa': {cls:'fail'},
+};
+function getDeCuongStage(s){
+  const dc = s.decuong;
+  const trangThai = (dc && dc.trangThai) || 'Chờ SV nộp';
+  return {key:trangThai, label:trangThai};
+}
+function deCuongPillCls(key){ return (DECUONG_TRANGTHAI_META[key] || {}).cls || 'wait'; }
+
+/* ════════ TAB HƯỚNG DẪN / PHẢN BIỆN ════════ */
+let curTab = 'hd';
+let selectedIds = new Set();
+function switchSecTab(tab){
+  curTab = tab;
+  document.getElementById('tab-btn-hd').classList.toggle('active', tab==='hd');
+  document.getElementById('tab-btn-pb').classList.toggle('active', tab==='pb');
+  document.getElementById('tbl-wrap-hd').style.display = tab==='hd' ? '' : 'none';
+  document.getElementById('tbl-wrap-pb').style.display = tab==='pb' ? '' : 'none';
+  document.getElementById('scope-note').innerHTML = tab==='hd'
+    ? 'Danh sách sinh viên được phân công cho bạn với vai trò <strong>Giảng viên hướng dẫn (GVHD)</strong> — bạn có thể duyệt đề cương tổng, duyệt đề cương theo tuần và nhận xét GVHD. ( bỏ khi dev)'
+    : 'Danh sách sinh viên được phân công cho bạn với vai trò <strong>Giảng viên phản biện (GVPB)</strong> — bạn có thể xem và nhận xét GVPB. Đề cương/kế hoạch tuần chỉ xem. ( bỏ khi dev)';
+  document.getElementById('colvis-lbl-gv').textContent = tab==='hd' ? 'GVHD' : 'GVPB';
+  document.getElementById('colvis-lbl-nx').textContent = tab==='hd' ? 'Nhận xét GVHD' : 'Nhận xét GVPB';
+  render();
+}
+
+/* ════════ DASHBOARD ════════ */
+function renderDash(){
+  const list = curTab === 'hd' ? students.filter(s => s.gvhd === CURRENT_USER) : students.filter(s => s.gvpb === CURRENT_USER);
+  const stats = [
+    {key:'total', ico:'📋', label:'Tổng sinh viên', n:list.length},
+    {key:'decuong-cho', ico:'⏳', label:'Chờ duyệt đề cương', n:list.filter(s=>s.decuong && s.decuong.trangThai==='Chờ duyệt').length},
+    {key:'baocao', ico:'📄', label:'Đã nộp báo cáo', n:list.filter(s=>s.baoCao).length},
+    {key:'nhanxet-cho', ico:'📝', label: curTab==='hd' ? 'Chờ nhận xét GVHD' : 'Chờ nhận xét GVPB', n:list.filter(s=>s.baoCao && !(curTab==='hd'?s.nxGVHD:s.nxGVPB)).length},
+  ];
+  document.getElementById('dash').innerHTML = stats.map(s => `<div class="stat-box"><div class="stat-ico">${s.ico}</div><div><div class="stat-num">${s.n}</div><div class="stat-lbl">${s.label}</div></div></div>`).join('');
+}
+
+/* ════════ RENDER DANH SÁCH ════════ */
+function render(){
+  renderDash();
+  const q = document.getElementById('q').value.toLowerCase();
+  const fdot = document.getElementById('f-dot').value;
+  const floai = document.getElementById('f-loai').value;
+  const fdonvi = document.getElementById('f-donvi').value;
+  const fctdt = document.getElementById('f-ctdt').value;
+  const fdecuongtt = document.getElementById('f-decuongtt').value;
+  const fketluanhd = document.getElementById('f-ketluanhd').value;
+
+  const base = curTab === 'hd' ? students.filter(s => s.gvhd === CURRENT_USER) : students.filter(s => s.gvpb === CURRENT_USER);
+  const filtered = base.filter(s => {
+    const matchQ = !q || s.maSV.toLowerCase().includes(q) || s.tenSV.toLowerCase().includes(q) || (s.topic && s.topic.name.toLowerCase().includes(q));
+    const matchDot = !fdot || s.dotId === fdot;
+    const matchLoai = !floai || s.loaiHinh === floai;
+    const matchDonvi = !fdonvi || CTDT_DONVI[s.ctdt] === fdonvi;
+    const matchCtdt = !fctdt || s.ctdt === fctdt;
+    const matchDecuongtt = !fdecuongtt || getDeCuongStage(s).label === fdecuongtt;
+    const matchKetLuanHd = !fketluanhd || (fketluanhd === '_empty' ? !s.conclusion : s.conclusion === fketluanhd);
+    return matchQ && matchDot && matchLoai && matchDonvi && matchCtdt && matchDecuongtt && matchKetLuanHd;
+  });
+
+  document.getElementById('tbody-' + curTab).innerHTML = filtered.length ? filtered.map(s => renderRow(s)).join('') : `<tr><td colspan="22" class="tbl-empty">Không có sinh viên phù hợp</td></tr>`;
+  document.getElementById('pg-info').textContent = `Hiển thị ${filtered.length} / ${base.length} sinh viên`;
+  const chkAll = document.getElementById('chk-all-' + curTab);
+  chkAll.checked = filtered.length > 0 && filtered.every(s => selectedIds.has(s.id));
+  chkAll.indeterminate = !chkAll.checked && filtered.some(s => selectedIds.has(s.id));
+}
+
+function renderRow(s){
+  const typePill = s.loaiHinh === 'Đồ án tốt nghiệp' ? `<span class="type-pill da">ĐATN</span>` : `<span class="type-pill kl">KLTN</span>`;
+  const dotName = (ROUNDS.find(r => r.id === s.dotId)||{}).name || s.dotId;
+  const donViCell = CTDT_DONVI[s.ctdt] || '—';
+  const topicCell = s.topic
+    ? `<span style="font-family:monospace;font-size:12px;font-weight:700;color:var(--primary);cursor:pointer;text-decoration:underline;text-underline-offset:3px" onclick="openTopicInfo('${s.topic.code}')" title="Xem thông tin đề tài">${s.topic.code}</span>
+       <div class="tbl-truncate" style="font-size:12px;color:var(--text-2);margin-top:2px" title="${s.topic.name}">${s.topic.name}</div>`
+    : `<span style="color:var(--text-3);font-size:12px">—</span>`;
+  const deCuongStage = getDeCuongStage(s);
+  const decuongCell = (!s.topic || !s.decuong || !s.decuong.file)
+    ? `<span style="color:var(--text-3);font-size:12px">—</span>`
+    : curTab === 'hd'
+      ? `<span style="color:var(--primary);cursor:pointer;font-size:13px" onclick="openDeCuongApprove(${s.id})" title="Xét đề cương & tiến độ">Chi tiết</span>`
+      : `<span style="color:var(--primary);cursor:pointer;font-size:13px" onclick="openDeCuongInfo(${s.id})" title="Xem chi tiết đề cương & tiến độ">Chi tiết</span>`;
+  const decuongStatusCell = !s.topic
+    ? `<span style="color:var(--text-3);font-size:12px">—</span>`
+    : `<span class="ketluan-pill ${deCuongPillCls(deCuongStage.key)}" style="cursor:default">${deCuongStage.label}</span>`;
+  const gvCell = curTab === 'hd'
+    ? `<span style="font-size:13px;color:var(--primary);cursor:pointer;text-decoration:underline;text-underline-offset:2px" onclick="openGvInfo(${s.id},'hd')" title="Xem thông tin GVHD">${s.gvhd}</span>`
+    : (s.gvpb ? `<span style="font-size:13px;color:var(--primary);cursor:pointer;text-decoration:underline;text-underline-offset:2px" onclick="openGvInfo(${s.id},'pb')" title="Xem thông tin GVPB">${s.gvpb}</span>` : `<span style="color:var(--text-3);font-size:12px">—</span>`);
+  const hoiDongCell = s.hoiDong
+    ? `<div style="cursor:pointer" onclick="openHoiDongInfo('${s.hoiDong.code}')" title="Xem thông tin hội đồng">
+         <span style="font-family:monospace;font-size:12px;font-weight:700;color:var(--primary);text-decoration:underline;text-underline-offset:3px">${s.hoiDong.code}</span>
+         <div class="tbl-truncate" style="font-size:12px;color:var(--text-2);margin-top:2px">${s.hoiDong.name}</div>
+       </div>`
+    : `<span style="color:var(--text-3);font-size:12px">—</span>`;
+  const baoCaoCell = !s.baoCao
+    ? `<span style="color:var(--text-3);font-size:12px">—</span>`
+    : `<a href="#" onclick="viewReport(${s.id});return false" title="Xem báo cáo">📄 Xem</a>`;
+  const daoVanCell = !s.baoCao
+    ? `<span style="color:var(--text-3);font-size:12px">—</span>`
+    : s.daoVanNoiBo != null
+      ? `<span style="font-size:13px;font-weight:700;color:${s.daoVanNoiBo>=30?'var(--error)':s.daoVanNoiBo>=15?'var(--warning)':'var(--success)'}">${s.daoVanNoiBo}%</span>`
+      : `<span style="color:var(--text-3);font-size:12px">—</span>`;
+  const diemCell = (s.nxGVHD || s.nxGVPB || s.diemHoiDong != null)
+    ? `<span style="color:#fa8c16;cursor:pointer;font-size:13px;text-decoration:underline;text-underline-offset:2px" onclick="openDiemInfo(${s.id})">Chi tiết</span>`
+    : `<span style="color:var(--text-3);font-size:12px">—</span>`;
+  const ketLuanHoiDongCell = s.conclusion
+    ? (s.conclusion === 'dat'
+        ? `<span style="font-size:13px">${CONCLUSION_CFG[s.conclusion].label}</span>`
+        : `<span class="conclusion-tag ${CONCLUSION_CFG[s.conclusion].cls}">${CONCLUSION_CFG[s.conclusion].label}</span>`)
+    : `<span style="color:var(--text-3);font-size:12px">— Chưa kết luận —</span>`;
+  const dongBoCell = s.diemTongKet != null && s.dongBoDiem === 'Đã đồng bộ'
+    ? `<span style="font-size:12px" title="Đã đồng bộ ${s.dongBoNgay||''}">Đã đồng bộ</span>`
+    : `<span style="color:var(--text-3);font-size:12px">Chưa đồng bộ</span>`;
+  const ghiChuCell = s.ghiChu
+    ? `<span style="font-size:12px;color:var(--text-2)">${s.ghiChu}</span>`
+    : `<span style="color:var(--text-3);font-size:12px">—</span>`;
+  const qdCell = s.qdGiao
+    ? `<span class="btn btn-default btn-sm" style="font-size:11px;padding:2px 10px" onclick="openQuyetDinh(${s.id})" title="Xem quyết định">📜 Chi tiết</span>`
+    : `<span style="color:var(--text-3);font-size:12px">—</span>`;
+
+  let nxCell, actions;
+  if (curTab === 'hd') {
+    nxCell = s.nxGVHD
+      ? `<span class="tag ${s.nxGVHD.ketLuan==='Đồng ý'?'tag-success':'tag-error'}" style="cursor:pointer" onclick="openNhanXetGvhd(${s.id})" title="Xem/sửa nhận xét GVHD">${s.nxGVHD.ketLuan==='Đồng ý'?'✅':'⛔'} ${s.nxGVHD.ketLuan} cho BV</span>`
+      : s.baoCao
+        ? `<span class="ketluan-pill wait" onclick="openNhanXetGvhd(${s.id})" title="Nhập nhận xét GVHD">⏳ Chưa nhận xét</span>`
+        : `<span style="color:var(--text-3);font-size:12px">—</span>`;
+    actions = `<button class="icon-btn" title="Nhập nhận xét GVHD" onclick="openNhanXetGvhd(${s.id})" ${s.baoCao ? '' : 'disabled'}>✏️</button>
+      <button class="icon-btn" title="Chấm điểm" onclick="openDiemInfo(${s.id})" ${s.dongBoDiem === 'Đã đồng bộ' ? 'disabled' : ''}>📊</button>`;
+  } else {
+    nxCell = s.nxGVPB
+      ? `<span class="tag ${s.nxGVPB.ketLuan==='Đồng ý'?'tag-success':'tag-error'}" style="cursor:pointer" onclick="openNhanXetGvpb(${s.id})" title="Xem/sửa nhận xét GVPB">${s.nxGVPB.ketLuan==='Đồng ý'?'✅':'⛔'} ${s.nxGVPB.ketLuan} cho BV</span>`
+      : s.baoCao
+        ? `<span class="ketluan-pill wait" onclick="openNhanXetGvpb(${s.id})" title="Nhập nhận xét GVPB">⏳ Chưa nhận xét</span>`
+        : `<span style="color:var(--text-3);font-size:12px">—</span>`;
+    actions = `<button class="icon-btn" title="Nhập nhận xét GVPB" onclick="openNhanXetGvpb(${s.id})" ${s.baoCao ? '' : 'disabled'}>✏️</button>
+      <button class="icon-btn" title="Chấm điểm" onclick="openDiemInfo(${s.id})" ${s.dongBoDiem === 'Đã đồng bộ' ? 'disabled' : ''}>📊</button>`;
+  }
+
+  return `<tr>
+    <td style="text-align:center"><input type="checkbox" class="row-chk" data-id="${s.id}" ${selectedIds.has(s.id) ? 'checked' : ''} onchange="toggleRowSelect(${s.id},this.checked)"></td>
+    <td style="font-size:12px;color:var(--text-2)" data-col="donvi">${donViCell}</td>
+    <td style="font-family:monospace;font-size:12px;white-space:nowrap">${s.maSV}</td>
+    <td><a href="#" class="name-cell" style="font-size:13px;font-weight:600" onclick="openStudentInfo(${s.id});return false">${s.tenSV}</a></td>
+    <td style="font-size:12px;color:var(--text-2)" data-col="lop">${s.lop}</td>
+    <td style="font-size:12px;color:var(--text-2)" data-col="ctdt">${s.ctdt}</td>
+    <td data-col="loai">${typePill}</td>
+    <td style="font-size:12px;font-family:monospace;color:var(--text-2);white-space:nowrap" data-col="dot">${dotName}</td>
+    <td data-col="detai">${topicCell}</td>
+    <td data-col="decuong">${decuongCell}</td>
+    <td style="text-align:center" data-col="baocao">${baoCaoCell}</td>
+    <td style="text-align:center" data-col="daovan">${daoVanCell}</td>
+    <td data-col="gv">${gvCell}</td>
+    <td data-col="hoidong">${hoiDongCell}</td>
+    <td data-col="nx">${nxCell}</td>
+    <td style="text-align:center" data-col="diem">${diemCell}</td>
+    <td data-col="decuongtt">${decuongStatusCell}</td>
+    <td style="text-align:center" data-col="ketluanhd">${ketLuanHoiDongCell}</td>
+    <td style="text-align:center" data-col="dongbo">${dongBoCell}</td>
+    <td data-col="quyetdinh">${qdCell}</td>
+    <td data-col="ghichu">${ghiChuCell}</td>
+    <td class="tbl-actions">${actions}</td>
+  </tr>`;
+}
+
+function resetFilter(){
+  ['q','f-dot','f-loai','f-donvi','f-ctdt','f-decuongtt','f-ketluanhd'].forEach(id => document.getElementById(id).value = '');
+  render();
+}
+
+/* ════════ CHỌN DÒNG & XUẤT DANH SÁCH ════════ */
+function toggleRowSelect(id, checked){
+  if (checked) selectedIds.add(id); else selectedIds.delete(id);
+  render();
+}
+function toggleSelectAll(tab, checked){
+  const list = tab === 'hd' ? students.filter(s => s.gvhd === CURRENT_USER) : students.filter(s => s.gvpb === CURRENT_USER);
+  list.forEach(s => checked ? selectedIds.add(s.id) : selectedIds.delete(s.id));
+  render();
+}
+function exportSelected(){
+  const list = students.filter(s => selectedIds.has(s.id));
+  if (!list.length) { showToast('Vui lòng chọn ít nhất 1 sinh viên để xuất danh sách.'); return; }
+  showToast(`Đang xuất danh sách ${list.length} sinh viên (mô phỏng).`);
+}
+
+/* ════════ ẨN/HIỆN CỘT (áp dụng cho cả 2 tab) ════════ */
+function toggleColVisPanel(){
+  document.getElementById('colvis-panel').classList.toggle('hidden');
+}
+function onColVisToggle(key, visible){
+  document.getElementById('main-tbl-hd').classList.toggle('hide-col-' + key, !visible);
+  document.getElementById('main-tbl-pb').classList.toggle('hide-col-' + key, !visible);
+}
+function colVisSelectAll(visible){
+  document.querySelectorAll('#colvis-panel .colvis-item input[type=checkbox]').forEach(chk => {
+    chk.checked = visible;
+    chk.dispatchEvent(new Event('change'));
+  });
+}
+document.addEventListener('click', e => {
+  const panel = document.getElementById('colvis-panel');
+  const btn = document.getElementById('colvis-btn');
+  if (!panel || panel.classList.contains('hidden')) return;
+  if (!panel.contains(e.target) && e.target !== btn) panel.classList.add('hidden');
+});
+
+/* ════════ MODAL: THÔNG TIN SINH VIÊN ════════ */
+function openStudentInfo(id){
+  const s = students.find(x => x.id === id);
+  if (!s) return;
+  const dotName = (ROUNDS.find(r => r.id === s.dotId)||{}).name || s.dotId;
+  document.getElementById('si-masv').textContent = s.maSV;
+  document.getElementById('si-name').textContent = s.tenSV;
+  document.getElementById('si-lop').textContent = s.lop;
+  document.getElementById('si-ctdt').textContent = s.ctdt;
+  document.getElementById('si-loaihinh').textContent = s.loaiHinh;
+  document.getElementById('si-dot').textContent = dotName;
+  document.getElementById('si-detai').innerHTML = s.topic
+    ? `<a href="#" onclick="closeModal('m-student-info');openTopicInfo('${s.topic.code}');return false">${s.topic.code} — ${s.topic.name}</a>`
+    : '—';
+  document.getElementById('si-gvhd').textContent = s.gvhd || '—';
+  document.getElementById('si-gvpb').textContent = s.gvpb || '—';
+  document.getElementById('si-hoidong').textContent = s.hoiDong ? `${s.hoiDong.code} — ${s.hoiDong.name}` : '—';
+  openModal('m-student-info');
+}
+
+/* ════════ MODAL: THÔNG TIN GVHD/GVPB (chỉ xem) ════════ */
+function openGvInfo(id, role){
+  const s = students.find(x => x.id === id);
+  if (!s) return;
+  const name = role === 'hd' ? s.gvhd : s.gvpb;
+  if (!name) return;
+  document.getElementById('gvi-target').textContent = `Sinh viên: ${s.tenSV} (${s.maSV})`;
+  const cards = (s.gvList && s.gvList.length > 1)
+    ? s.gvList
+    : [{ name, dept: CTDT_DONVI[s.ctdt] || '', type: 'internal', weight: 100 }];
+  const maxW = Math.max(...cards.map(c => c.weight || 0));
+  document.getElementById('gvi-card-list').innerHTML = cards.map(c => `
+    <div class="mgv-card${(c.weight||0)===maxW ? ' mgv-hl' : ''}">
+      <div class="mgv-card-info">
+        <div class="mgv-card-name">${c.name}</div>
+        <div class="mgv-card-dept">🏛️ ${c.dept || '—'}</div>
+      </div>
+      <span class="${c.type==='internal'?'tag-inhouse':'tag-external'}" style="width:100px;text-align:center;flex-shrink:0">${c.type==='internal'?'Trong Trường':'Ngoài Trường'}</span>
+      <strong style="color:var(--primary);font-size:13px;width:70px;text-align:center;flex-shrink:0">${c.weight}%</strong>
+    </div>`).join('');
+  const total = cards.reduce((sum,c) => sum + (c.weight||0), 0);
+  document.getElementById('gvi-total-weight').textContent = total + '%';
+  openModal('m-gvhd-info');
+}
+
+/* ════════ MODAL: THÔNG TIN ĐỀ TÀI ════════ */
+function openTopicInfo(code){
+  const t = TOPIC_CATALOG.find(x => x.code === code);
+  if (!t) return;
+  document.getElementById('ti-title').textContent = `Thông tin đề tài`;
+  const activeBadge = t.active === 'Mở'
+    ? `<span style="display:inline-flex;align-items:center;gap:5px;font-size:12px;font-weight:600;padding:2px 10px;border-radius:4px;border:1px solid #b7eb8f;color:#389e0d;background:#f6ffed">🟢 Mở</span>`
+    : `<span style="display:inline-flex;align-items:center;gap:5px;font-size:12px;font-weight:600;padding:2px 10px;border-radius:4px;border:1px solid #d9d9d9;color:#8c8c8c;background:#fafafa">🔴 Đóng</span>`;
+  const fileHtml = t.file
+    ? `<span style="color:#fa8c16;text-decoration:underline;cursor:pointer;display:inline-flex;align-items:center;gap:6px">📎 ${t.file}</span>`
+    : `<span style="color:var(--text-3)">—</span>`;
+  const rows = [
+    ['Mã đề tài', `<span style="font-family:monospace;font-weight:700;color:var(--primary)">${t.code}</span>`],
+    ['Tên đề tài', `<strong>${t.name}</strong>`],
+    ['Loại đề tài', (t.types||[]).join(', ')],
+    ['CTĐT áp dụng', (t.ctdt||[]).join(', ')],
+    ['Lĩnh vực', t.field],
+    ['Số SV tối đa', `${t.qty} sinh viên`],
+    ['Trạng thái', `<span class="tag ${TOPIC_STATUS_CLR[t.status]||'tag-default'}">${t.status}</span>`],
+    ['Hoạt động', activeBadge],
+    ['Tóm tắt', t.desc],
+    ['Yêu cầu SV', t.req],
+    ['Sản phẩm DK', t.output],
+    ['Công nghệ', t.tech],
+    ['Tài liệu đính kèm', fileHtml],
+    ['Ngày gửi', t.created],
+  ];
+  document.getElementById('ti-body').innerHTML = rows.map(([l,v]) => `<tr><th style="width:150px">${l}</th><td style="white-space:pre-wrap;line-height:1.6">${v}</td></tr>`).join('');
+  openModal('m-topic-info');
+}
+
+/* ════════ MODAL: THÔNG TIN HỘI ĐỒNG ════════ */
+function openHoiDongInfo(code){
+  const c = COUNCIL_CATALOG.find(x => x.code === code);
+  if (!c) return;
+  document.getElementById('hdi-title').textContent = `Chi tiết hội đồng`;
+  document.getElementById('hdi-code').textContent = c.code;
+  document.getElementById('hdi-name').textContent = c.name;
+  document.getElementById('hdi-donvi').textContent = c.donvi;
+  document.getElementById('hdi-nganh').textContent = c.nganh;
+  document.getElementById('hdi-hocky').textContent = c.hocKy;
+  document.getElementById('hdi-datetime').textContent = `${c.hinhThuc} — ${c.ngay} ${c.gio}`;
+  document.getElementById('hdi-place').textContent = c.phong;
+  document.getElementById('hdi-mem-count').textContent = c.members.length;
+  document.getElementById('hdi-mem-tbody').innerHTML = c.members.map(m => `
+    <tr>
+      <td style="padding:7px 10px;border:1px solid #e8e8e8"><span class="role-tag" style="background:#fafafa;border-color:var(--border)">${HD_ROLE_LABEL[m.role]}</span></td>
+      <td style="padding:7px 10px;border:1px solid #e8e8e8">${m.name}</td>
+      <td style="padding:7px 10px;border:1px solid #e8e8e8;color:var(--text-2)">${m.unit}</td>
+    </tr>`).join('');
+  openModal('m-hoidong-info');
+}
+
+/* ════════ MODAL: ĐỀ CƯƠNG (XEM — GVPB) ════════ */
+// Số SV đã được duyệt đề cương hợp lệ trên cùng đề tài + đợt (dùng để tính SLSV và bắt buộc hướng nghiên cứu).
+function countSvDaDuyetCungDeTai(s){
+  return students.filter(x => x.topic && s.topic && x.topic.code === s.topic.code && x.dotId === s.dotId
+    && x.decuong && x.decuong.ketQua === 'Hợp lệ').length;
+}
+function planTrangThaiPill(tt){
+  if (tt === 'Đã duyệt') return '<span class="tag tag-success">✅ Đã duyệt</span>';
+  if (tt === 'Từ chối') return '<span class="tag tag-error">✗ Từ chối</span>';
+  return '<span class="tag tag-warning">⏳ Chờ duyệt</span>';
+}
+function buildTopicRows(s, editable){
+  const dc = s.decuong || {};
+  const slDaDuyet = countSvDaDuyetCungDeTai(s);
+  const canHuongNghienCuu = slDaDuyet >= 2;
+  const huongNghienCuuCell = editable
+    ? `<textarea class="fc" id="dca-huongnghiencuu" rows="2" placeholder="${canHuongNghienCuu ? '⚠️ Bắt buộc nhập — đề tài có từ 2 SV được duyệt trong đợt' : 'Nhập phân công nhiệm vụ cho sinh viên...'}" onchange="saveHuongNghienCuu()">${dc.huongNghienCuu || ''}</textarea>`
+    : dc.huongNghienCuu
+      ? dc.huongNghienCuu
+      : canHuongNghienCuu
+        ? '<span class="tag tag-error">⚠️ Bắt buộc nhập — đề tài có từ 2 SV được duyệt trong đợt</span>'
+        : '<span style="color:var(--text-3)">—</span>';
+  const fileCell = editable
+    ? `<div style="display:flex;align-items:center;gap:8px">
+         <input type="file" id="dca-file-input" accept=".doc,.docx,.pdf" style="display:none" onchange="onDcaFileSelect(this)">
+         <span style="font-size:13px;color:${dc.file ? 'var(--primary)' : 'var(--text-3)'}" id="dca-file-name">${dc.file ? '📎 ' + dc.file : 'Chưa nộp'}</span>
+         ${dc.file ? `<button type="button" style="background:none;border:none;color:var(--error);cursor:pointer;font-size:14px;line-height:1;padding:0" title="Xóa file" onclick="deleteDcaFile()">✕</button>` : ''}
+         <button type="button" class="btn btn-default btn-sm" onclick="document.getElementById('dca-file-input').click()">📎 Upload</button>
+       </div>`
+    : (dc.file ? `<a href="#" onclick="return false" title="Xem/tải file đề cương">📎 ${dc.file}</a>` : '<span style="color:var(--text-3)">Chưa nộp</span>');
+  return [
+    ['Mã đợt', s.dotId],
+    ['Mã đề tài', `<span class="code-prev">${s.topic.code}</span>`],
+    ['Tên đề tài', s.topic.name],
+    ['Số lượng sinh viên', `${slDaDuyet} / ${s.topic.qty}`],
+    ['Phân công nhiệm vụ', huongNghienCuuCell],
+    ['File đề cương', fileCell],
+  ];
+}
+function saveHuongNghienCuu(){
+  const val = document.getElementById('dca-huongnghiencuu').value.trim();
+  students = students.map(s => s.id !== _dcaTargetId ? s : { ...s, decuong: { ...s.decuong, huongNghienCuu: val } });
+  showToast('Đã lưu phân công nhiệm vụ');
+}
+function refreshDcaTopicBody(){
+  const s = students.find(x => x.id === _dcaTargetId);
+  const topicRows = buildTopicRows(s, true);
+  document.getElementById('dca-topic-body').innerHTML = topicRows.map(([l,v]) => `<tr><th style="width:170px">${l}</th><td>${v}</td></tr>`).join('');
+}
+function onDcaFileSelect(input){
+  if (!input.files || !input.files[0]) return;
+  const fileName = input.files[0].name;
+  students = students.map(s => s.id !== _dcaTargetId ? s : { ...s, decuong: { ...s.decuong, file: fileName } });
+  refreshDcaTopicBody();
+  showToast('Đã cập nhật file đề cương');
+  render();
+}
+function deleteDcaFile(){
+  students = students.map(s => s.id !== _dcaTargetId ? s : { ...s, decuong: { ...s.decuong, file: null } });
+  refreshDcaTopicBody();
+  showToast('Đã xóa file đề cương', 'warn');
+  render();
+}
+function openDeCuongInfo(id){
+  const s = students.find(x => x.id === id);
+  if (!s || !s.topic) return;
+  document.getElementById('dci-title').textContent = `Xét đề cương / Kế hoạch`;
+  const dc = s.decuong || {};
+  const topicRows = buildTopicRows(s, false);
+  document.getElementById('dci-topic-body').innerHTML = topicRows.map(([l,v]) => `<tr><th style="width:170px">${l}</th><td>${v}</td></tr>`).join('');
+  const plan = dc.kePlan || [];
+  document.getElementById('dci-plan-body').innerHTML = plan.length ? plan.map(p => `
+    <tr>
+      <td style="text-align:center;font-weight:600">${p.tuan}</td>
+      <td>${p.nhiemVu}</td>
+      <td>${p.trangThai === 'Đã duyệt' && p.ketQua ? p.ketQua : '<span style="color:var(--text-3)">—</span>'}</td>
+      <td style="color:var(--text-2)">${p.ghiChu || '<span style="color:var(--text-3)">—</span>'}</td>
+      <td style="text-align:center">${planTrangThaiPill(p.trangThai)}</td>
+      <td style="text-align:center">
+        <button class="icon-btn" disabled title="Xóa — chỉ khi đề cương chưa duyệt (thao tác tại tab DS hướng dẫn)">🗑️</button>
+        <button class="icon-btn success-btn" disabled title="Đồng ý (thao tác tại tab DS hướng dẫn)">✅</button>
+        <button class="icon-btn" disabled title="Từ chối (thao tác tại tab DS hướng dẫn)">⛔</button>
+      </td>
+    </tr>`).join('') : `<tr><td colspan="6" style="text-align:center;color:var(--text-3);padding:16px;font-style:italic">Chưa có kế hoạch công việc nào được nộp</td></tr>`;
+  openModal('m-decuong-info');
+}
+
+/* ════════ MODAL: ĐỀ CƯƠNG — GVHD DUYỆT TỔNG & THEO TUẦN + NHẬN XÉT ════════ */
+let _dcaTargetId = null;
+function openDeCuongApprove(id){
+  const s = students.find(x => x.id === id);
+  if (!s || !s.topic) return;
+  _dcaTargetId = id;
+  document.getElementById('dca-title').textContent = `Xét đề cương / Kế hoạch`;
+  const topicRows = buildTopicRows(s, true);
+  document.getElementById('dca-topic-body').innerHTML = topicRows.map(([l,v]) => `<tr><th style="width:170px">${l}</th><td>${v}</td></tr>`).join('');
+
+  renderDcaPlanBody(s);
+  renderDcaFooter(s);
+
+  openModal('m-decuong-approve');
+}
+function renderDcaFooter(s){
+  const dc = s.decuong || {};
+  const hasFile = !!dc.file;
+  document.getElementById('dca-tong-reject-btn').disabled = !hasFile;
+  document.getElementById('dca-tong-approve-btn').disabled = !hasFile;
+}
+function renderDcaPlanBody(s){
+  const plan = (s.decuong && s.decuong.kePlan) || [];
+  document.getElementById('dca-plan-body').innerHTML = plan.length ? plan.map((p,i) => {
+    const editable = p.trangThai !== 'Đã duyệt';
+    return `
+    <tr>
+      <td style="text-align:center;font-weight:600">
+        ${editable ? `<input class="fc" type="number" min="1" style="width:56px;text-align:center;padding:4px 6px" value="${p.tuan}" onchange="updateTuanField(${i},'tuan',this.value)">` : p.tuan}
+      </td>
+      <td>${editable ? `<textarea class="fc" rows="2" onchange="updateTuanField(${i},'nhiemVu',this.value)">${p.nhiemVu||''}</textarea>` : p.nhiemVu}</td>
+      <td>${editable ? `<textarea class="fc" rows="2" onchange="updateTuanField(${i},'ketQua',this.value)">${p.ketQua||''}</textarea>` : (p.ketQua || '<span style="color:var(--text-3)">—</span>')}</td>
+      <td>${editable ? `<textarea class="fc" rows="2" onchange="updateTuanField(${i},'ghiChu',this.value)">${p.ghiChu||''}</textarea>` : `<span style="color:var(--text-2)">${p.ghiChu || '<span style="color:var(--text-3)">—</span>'}</span>`}</td>
+      <td style="text-align:center">${planTrangThaiPill(p.trangThai)}</td>
+      <td style="text-align:center">
+        <button class="icon-btn" ${p.trangThai === 'Chờ duyệt' ? '' : 'disabled'} title="Xóa — chỉ khi tuần chưa duyệt" onclick="deleteTuan(${i})">🗑️</button>
+        <button class="icon-btn success-btn" ${p.trangThai === 'Chờ duyệt' ? '' : 'disabled'} title="Duyệt tuần ${p.tuan}" onclick="approveTuan(${i})">✅</button>
+        <button class="icon-btn" ${p.trangThai === 'Chờ duyệt' ? '' : 'disabled'} title="Từ chối tuần ${p.tuan}" onclick="openRejectTuan(${i})">⛔</button>
+      </td>
+    </tr>`;
+  }).join('') : `<tr><td colspan="6" style="text-align:center;color:var(--text-3);padding:16px;font-style:italic">Chưa có kế hoạch công việc nào được nộp</td></tr>`;
+}
+function updateTuanField(idx, field, value){
+  students = students.map(s => {
+    if (s.id !== _dcaTargetId) return s;
+    const kePlan = s.decuong.kePlan.map((p,i) => i !== idx ? p : { ...p, [field]: field === 'tuan' ? (parseInt(value)||p.tuan) : value });
+    return { ...s, decuong: { ...s.decuong, kePlan } };
+  });
+  render();
+}
+function addTuan(){
+  const s = students.find(x => x.id === _dcaTargetId);
+  if (!s) return;
+  const kePlan = s.decuong.kePlan || [];
+  const nextTuan = kePlan.length ? Math.max(...kePlan.map(p => p.tuan)) + 1 : 1;
+  const newPlan = [...kePlan, { tuan: nextTuan, nhiemVu:'', ketQua:'', ghiChu:'', trangThai:'Chờ duyệt' }];
+  students = students.map(x => x.id !== _dcaTargetId ? x : { ...x, decuong: { ...x.decuong, kePlan: newPlan } });
+  const updated = students.find(x => x.id === _dcaTargetId);
+  renderDcaPlanBody(updated);
+  showToast('Đã thêm tuần mới');
+  render();
+}
+function approveDeCuongTong(){
+  students = students.map(s => s.id !== _dcaTargetId ? s : { ...s, decuong: { ...s.decuong, trangThai: 'Đã duyệt' } });
+  const s = students.find(x => x.id === _dcaTargetId);
+  renderDcaFooter(s);
+  showToast('Đã phê duyệt đề cương tổng');
+  render();
+}
+function rejectDeCuongTong(){
+  document.getElementById('rdc-tong-reason').value = '';
+  document.getElementById('rdc-tong-reason-err').style.display = 'none';
+  openModal('m-reject-dc-tong');
+}
+function confirmRejectDeCuongTong(){
+  const reason = document.getElementById('rdc-tong-reason').value.trim();
+  if (!reason) { document.getElementById('rdc-tong-reason-err').style.display = ''; return; }
+  students = students.map(s => s.id !== _dcaTargetId ? s : { ...s, decuong: { ...s.decuong, trangThai: 'Yêu cầu chỉnh sửa' }, ghiChu: reason });
+  closeModal('m-reject-dc-tong');
+  const s = students.find(x => x.id === _dcaTargetId);
+  renderDcaFooter(s);
+  showToast('Đã yêu cầu sinh viên chỉnh sửa đề cương', 'warn');
+  render();
+}
+let _rtIdx = null;
+function openRejectTuan(idx){
+  _rtIdx = idx;
+  const s = students.find(x => x.id === _dcaTargetId);
+  const p = s.decuong.kePlan[idx];
+  document.getElementById('rt-tuan-so').textContent = p.tuan;
+  document.getElementById('rt-reason').value = '';
+  document.getElementById('rt-reason-err').style.display = 'none';
+  openModal('m-reject-tuan');
+}
+function confirmRejectTuan(){
+  const reason = document.getElementById('rt-reason').value.trim();
+  if (!reason) { document.getElementById('rt-reason-err').style.display = ''; return; }
+  students = students.map(s => {
+    if (s.id !== _dcaTargetId) return s;
+    const kePlan = s.decuong.kePlan.map((p,i) => i !== _rtIdx ? p : { ...p, trangThai:'Từ chối', ghiChu: reason });
+    return { ...s, decuong: { ...s.decuong, kePlan } };
+  });
+  closeModal('m-reject-tuan');
+  const s = students.find(x => x.id === _dcaTargetId);
+  renderDcaPlanBody(s);
+  showToast('Đã từ chối kế hoạch tuần', 'warn');
+  render();
+}
+function approveTuan(idx){
+  students = students.map(s => {
+    if (s.id !== _dcaTargetId) return s;
+    const kePlan = s.decuong.kePlan.map((p,i) => i !== idx ? p : { ...p, trangThai:'Đã duyệt' });
+    return { ...s, decuong: { ...s.decuong, kePlan } };
+  });
+  const s = students.find(x => x.id === _dcaTargetId);
+  renderDcaPlanBody(s);
+  showToast('Đã duyệt kế hoạch tuần');
+  render();
+}
+function deleteTuan(idx){
+  students = students.map(s => {
+    if (s.id !== _dcaTargetId) return s;
+    const kePlan = s.decuong.kePlan.filter((p,i) => i !== idx);
+    return { ...s, decuong: { ...s.decuong, kePlan } };
+  });
+  const s = students.find(x => x.id === _dcaTargetId);
+  renderDcaPlanBody(s);
+  showToast('Đã xóa kế hoạch tuần', 'warn');
+  render();
+}
+function downloadNxTemplate(who){
+  showToast(`Đang tải file mẫu nhận xét ${who==='gvhd'?'GVHD':'GVPB'} (mô phỏng).`);
+}
+
+/* ════════ MODAL: NHẬN XÉT & KẾT LUẬN — GVHD ════════ */
+let _nxGvhdTargetId = null;
+let _nxGvhdFile = null;
+function openNhanXetGvhd(id){
+  const s = students.find(x => x.id === id);
+  if (!s || !s.baoCao) return;
+  _nxGvhdTargetId = id;
+  document.getElementById('nx-gvhd-ketluan').value = s.nxGVHD ? s.nxGVHD.ketLuan : '';
+  document.getElementById('nx-gvhd-ghichu').value = (s.nxGVHD && s.nxGVHD.ghiChu) || '';
+  _nxGvhdFile = (s.nxGVHD && s.nxGVHD.file) || null;
+  document.getElementById('nx-gvhd-file-name').textContent = _nxGvhdFile ? '📎 ' + _nxGvhdFile : 'Chưa có file';
+  document.getElementById('nx-gvhd-file-name').style.color = _nxGvhdFile ? 'var(--primary)' : 'var(--text-2)';
+  document.getElementById('nx-gvhd-file-clear').style.display = _nxGvhdFile ? '' : 'none';
+  document.getElementById('nx-gvhd-err').style.display = 'none';
+  openModal('m-nhanxet-gvhd');
+}
+function onNxGvhdFileSelect(input){
+  if (input.files && input.files[0]) _nxGvhdFile = input.files[0].name;
+  document.getElementById('nx-gvhd-file-name').textContent = _nxGvhdFile ? '📎 ' + _nxGvhdFile : 'Chưa có file';
+  document.getElementById('nx-gvhd-file-name').style.color = _nxGvhdFile ? 'var(--primary)' : 'var(--text-2)';
+  document.getElementById('nx-gvhd-file-clear').style.display = _nxGvhdFile ? '' : 'none';
+}
+function clearNxGvhdFile(){
+  _nxGvhdFile = null;
+  document.getElementById('nx-gvhd-file-input').value = '';
+  onNxGvhdFileSelect({files:null});
+}
+function saveNhanXetGvhd(){
+  const ketLuan = document.getElementById('nx-gvhd-ketluan').value;
+  const ghiChu = document.getElementById('nx-gvhd-ghichu').value.trim();
+  const errEl = document.getElementById('nx-gvhd-err');
+  if (!ketLuan || !_nxGvhdFile) { errEl.style.display = ''; return; }
+  errEl.style.display = 'none';
+  const today = new Date().toLocaleDateString('vi');
+  students = students.map(s => s.id !== _nxGvhdTargetId ? s : { ...s, nxGVHD: { ...(s.nxGVHD||{}), ketLuan, ngay:today, file:_nxGvhdFile, ghiChu } });
+  closeModal('m-nhanxet-gvhd');
+  showToast('Đã lưu nhận xét & kết luận của GVHD');
+  render();
+}
+
+/* ════════ MODAL: NHẬN XÉT & KẾT LUẬN — GVPB ════════ */
+let _nxTargetId = null;
+let _nxFile = null;
+function openNhanXetGvpb(id){
+  const s = students.find(x => x.id === id);
+  if (!s || !s.baoCao) return;
+  _nxTargetId = id;
+  document.getElementById('nx-gvpb-ketluan').value = s.nxGVPB ? s.nxGVPB.ketLuan : '';
+  document.getElementById('nx-gvpb-ghichu').value = (s.nxGVPB && s.nxGVPB.ghiChu) || '';
+  _nxFile = (s.nxGVPB && s.nxGVPB.file) || null;
+  document.getElementById('nx-gvpb-file-name').textContent = _nxFile ? '📎 ' + _nxFile : 'Chưa có file';
+  document.getElementById('nx-gvpb-file-name').style.color = _nxFile ? 'var(--primary)' : 'var(--text-2)';
+  document.getElementById('nx-gvpb-file-clear').style.display = _nxFile ? '' : 'none';
+  document.getElementById('nx-gvpb-err').style.display = 'none';
+  openModal('m-nhanxet-gvpb');
+}
+function onNxFileSelect(input){
+  if (input.files && input.files[0]) _nxFile = input.files[0].name;
+  document.getElementById('nx-gvpb-file-name').textContent = _nxFile ? '📎 ' + _nxFile : 'Chưa có file';
+  document.getElementById('nx-gvpb-file-name').style.color = _nxFile ? 'var(--primary)' : 'var(--text-2)';
+  document.getElementById('nx-gvpb-file-clear').style.display = _nxFile ? '' : 'none';
+}
+function clearNxFile(){
+  _nxFile = null;
+  document.getElementById('nx-gvpb-file-input').value = '';
+  onNxFileSelect({files:null});
+}
+function saveNhanXetGvpb(){
+  const ketLuan = document.getElementById('nx-gvpb-ketluan').value;
+  const ghiChu = document.getElementById('nx-gvpb-ghichu').value.trim();
+  const errEl = document.getElementById('nx-gvpb-err');
+  if (!ketLuan || !_nxFile) { errEl.style.display = ''; return; }
+  errEl.style.display = 'none';
+  const today = new Date().toLocaleDateString('vi');
+  students = students.map(s => s.id !== _nxTargetId ? s : { ...s, nxGVPB: { ...(s.nxGVPB||{}), ketLuan, ngay:today, file:_nxFile, ghiChu } });
+  closeModal('m-nhanxet-gvpb');
+  showToast('Đã lưu nhận xét & kết luận của GVPB');
+  render();
+}
+
+/* ════════ MODAL: THÔNG TIN ĐIỂM (SỬA ĐƯỢC) ════════ */
+let _diemTargetId = null;
+const DIEM_COLS = '1.6fr 70px 90px 1.3fr 1.6fr 1.6fr';
+function openDiemInfo(id){
+  const s = students.find(x => x.id === id);
+  if (!s) return;
+  _diemTargetId = id;
+  const readonly = s.dongBoDiem === 'Đã đồng bộ';
+  document.getElementById('di-title').textContent = `Thông tin điểm — ${s.tenSV}`;
+  document.getElementById('di-save-btn').style.display = readonly ? 'none' : '';
+  const rows = [];
+  if (s.nxGVHD) rows.push({key:'gvhd', label:'GV Chấm 1 (GVHD)', trongso:25, diem:s.nxGVHD.diem, nguoiCham:s.gvhd, file:s.nxGVHD.file, ghiChu:s.nxGVHD.ghiChu||''});
+  if (s.nxGVPB) rows.push({key:'gvpb', label:'GV Chấm 2 (GVPB)', trongso:25, diem:s.nxGVPB.diem, nguoiCham:s.gvpb, file:s.nxGVPB.file, ghiChu:s.nxGVPB.ghiChu||''});
+  if (s.diemHoiDong != null) rows.push({key:'hoidong', label:'Điểm Hội đồng duyệt', trongso:50, diem:s.diemHoiDong, nguoiCham:s.hoiDong ? s.hoiDong.chuTich || s.gvhd : '—', file:s.diemHoiDongFile||'', ghiChu:s.diemHoiDongGhiChu||''});
+  document.getElementById('di-body').innerHTML = `
+    <div style="border:1px solid var(--border);border-radius:8px;overflow:hidden">
+      <div style="background:#fafafa;padding:10px 16px;border-bottom:1px solid var(--border);display:grid;grid-template-columns:${DIEM_COLS};gap:10px;font-size:12px;font-weight:600;color:var(--text-3)">
+        <span>Điểm thành phần</span><span>Trọng số</span><span>Điểm</span><span>Người chấm</span><span>Minh chứng</span><span>Ghi chú</span>
+      </div>
+      ${rows.map(r => `<div style="padding:10px 16px;border-bottom:1px solid var(--border);display:grid;grid-template-columns:${DIEM_COLS};gap:10px;font-size:13px;align-items:center">
+        <span>${r.label}</span>
+        <span>${r.trongso}%</span>
+        <input class="fc" type="number" min="0" max="10" step="0.1" id="di-diem-${r.key}" value="${r.diem}" style="width:100%;box-sizing:border-box;padding:4px 6px" ${readonly?'disabled':''}>
+        <span>${r.nguoiCham}</span>
+        <span>${r.file ? `📎 ${r.file}` : '<span style="color:var(--text-3)">—</span>'}</span>
+        <input class="fc" type="text" id="di-ghichu-${r.key}" value="${r.ghiChu.replace(/"/g,'&quot;')}" placeholder="Ghi chú..." style="width:100%;box-sizing:border-box;padding:4px 6px" ${readonly?'disabled':''}>
+      </div>`).join('')}
+    </div>
+  `;
+  openModal('m-diem-info');
+}
+function saveDiemInfo(){
+  const s = students.find(x => x.id === _diemTargetId);
+  if (!s) return;
+  if (s.nxGVHD){
+    s.nxGVHD.diem = parseFloat(document.getElementById('di-diem-gvhd').value) || 0;
+    s.nxGVHD.ghiChu = document.getElementById('di-ghichu-gvhd').value.trim();
+  }
+  if (s.nxGVPB){
+    s.nxGVPB.diem = parseFloat(document.getElementById('di-diem-gvpb').value) || 0;
+    s.nxGVPB.ghiChu = document.getElementById('di-ghichu-gvpb').value.trim();
+  }
+  if (s.diemHoiDong != null){
+    s.diemHoiDong = parseFloat(document.getElementById('di-diem-hoidong').value) || 0;
+    s.diemHoiDongGhiChu = document.getElementById('di-ghichu-hoidong').value.trim();
+  }
+  closeModal('m-diem-info');
+  showToast('Đã lưu thông tin điểm.');
+  render();
+}
+
+/* ════════ MODAL: QUYẾT ĐỊNH (XEM) ════════ */
+function openQuyetDinh(id){
+  const s = students.find(x => x.id === id);
+  if (!s || !s.qdGiao) return;
+  document.getElementById('qd-target').textContent = `${s.tenSV} (${s.maSV})`;
+  document.getElementById('qd-body').innerHTML = `
+    <div style="padding:16px">
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;font-size:13px">
+        <div><span style="color:var(--text-3)">Số quyết định</span><br><strong class="qd-num">${s.qdGiao.so}</strong></div>
+        <div><span style="color:var(--text-3)">Ngày ban hành</span><br><strong>${s.qdGiao.ngay}</strong></div>
+      </div>
+    </div>`;
+  openModal('m-quyetdinh');
+}
+
+/* ════════ BÁO CÁO ════════ */
+let curReportStudentId = null;
+function viewReport(id){
+  const s = students.find(x => x.id === id);
+  if (!s || !s.baoCao) return;
+  curReportStudentId = id;
+  const bc = s.baoCao;
+  document.getElementById('rp-file-name').textContent = '📎 ' + bc.file;
+  const linkEl = document.getElementById('rp-sourcelink');
+  linkEl.textContent = bc.sourceUrl || '—';
+  linkEl.style.display = bc.sourceUrl ? '' : 'none';
+  openModal('m-report-info');
+}
+function viewReportFile(){
+  const s = students.find(x => x.id === curReportStudentId);
+  if (s && s.baoCao) showToast(`Đang mở ${s.baoCao.file} (mô phỏng).`);
+}
+function downloadReportFile(){
+  const s = students.find(x => x.id === curReportStudentId);
+  if (s && s.baoCao) showToast(`Đang tải ${s.baoCao.file} (mô phỏng).`);
+}
+function openReportSource(){
+  const s = students.find(x => x.id === curReportStudentId);
+  if (s && s.baoCao && s.baoCao.sourceUrl) showToast(`Đang mở ${s.baoCao.sourceUrl} (mô phỏng).`);
+}
+function allowResubmit(){
+  const s = students.find(x => x.id === curReportStudentId);
+  if (!s) return;
+  s.baoCao = null;
+  s.daoVanNoiBo = null;
+  closeModal('m-report-info');
+  showToast(`Đã cho phép ${s.tenSV} nộp lại báo cáo.`);
+  render();
+}
+
+/* ════════ INIT ════════ */
+document.getElementById('f-dot').innerHTML += ROUNDS.map(r => `<option value="${r.id}">${r.name}</option>`).join('');
+document.getElementById('f-donvi').innerHTML += Object.values(CTDT_DONVI).map(d => `<option value="${d}">${d}</option>`).join('');
+document.getElementById('f-ctdt').innerHTML += Object.keys(CTDT_DONVI).map(c => `<option value="${c}">${c}</option>`).join('');
+switchSecTab('hd');
+</script>
+</body>
+</html>

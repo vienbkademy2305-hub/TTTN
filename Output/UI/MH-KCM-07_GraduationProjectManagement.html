@@ -281,6 +281,7 @@
               <button type="button" class="func-item" onclick="closeFuncPanel();exportBulk()">📄 Xuất quyết định</button>
               <button type="button" class="func-item" onclick="closeFuncPanel();openBulkKetLuanHoiDong()">✅ Cập nhật kết luận</button>
               <button type="button" class="func-item" onclick="closeFuncPanel();syncDiemBulk()">🔄 Đồng bộ điểm</button>
+              <button type="button" class="func-item" onclick="closeFuncPanel();exportDSSV()">📊 Xuất DSSV</button>
             </div>
           </div>
         </div>
@@ -1317,6 +1318,7 @@ const STATUS_LIST = [
 const STATUS_MAP = Object.fromEntries(STATUS_LIST.map(s=>[s.key,s]));
 const STEP_LABELS = ['Đủ ĐK','Chờ ĐK NV','Chờ duyệt NV','Đã phân công','Chờ QĐ giao','Đã ban hành QĐ'];
 
+let lastFiltered = [];
 let students = [
   {id:1, maSV:'B22DCCN001', tenSV:'Nguyễn Văn An', lop:'INT3110_1', ctdt:'KTPM', gpa:3.2,
     dotId:'DA-HK2-2025-2026', loaiHinh:'Đồ án tốt nghiệp',
@@ -1811,6 +1813,7 @@ function render(){
   }).join('') : `<tr><td colspan="27" class="tbl-empty">Không có sinh viên phù hợp</td></tr>`;
 
   document.getElementById('pg-info').textContent = `Hiển thị ${filtered.length} / ${students.length} sinh viên`;
+  lastFiltered = filtered;
   refreshBulkBar();
 }
 
@@ -2999,6 +3002,56 @@ function exportBulk(){
   const list = students.filter(s => selectedIds.includes(s.id) && ['Đã ban hành quyết định','Thay đổi đề tài','Đã cập nhật quyết định thay đổi'].includes(s.status));
   if (!list.length) { showToast('Các sinh viên đã chọn chưa có quyết định để xuất', 'warn'); return; }
   showToast(`Đang xuất quyết định cho ${list.length} sinh viên...`);
+}
+
+/* ── Xuất DSSV (theo bộ lọc đang áp dụng) ─────────────────── */
+function exportDSSV(){
+  const list = lastFiltered && lastFiltered.length ? lastFiltered : students;
+  if (!list.length) { showToast('Không có sinh viên phù hợp để xuất', 'warn'); return; }
+
+  const headers = ['Mã SV','Họ và tên','Lớp học phần','CTĐT','Loại hình','Đợt','Đề tài','GVHD','GVPB','Hội đồng','Trạng thái đề cương','Điểm tổng kết','Đồng bộ điểm','Kết luận hội đồng','Trạng thái'];
+
+  const rows = list.map(s => {
+    const dotName = (ROUNDS.find(r => r.id === s.dotId)||{}).name || s.dotId;
+    const deCuongStage = s.topic ? getDeCuongStage(s) : null;
+    const conclLabel = s.conclusion ? CONCLUSION_CFG[s.conclusion].label : 'Chưa kết luận';
+    return [
+      s.maSV,
+      s.tenSV,
+      s.lop,
+      s.ctdt,
+      s.loaiHinh,
+      dotName,
+      s.topic ? `${s.topic.code} - ${s.topic.name}` : '—',
+      s.gvhd || '—',
+      s.gvpb || '—',
+      s.hoiDong ? `${s.hoiDong.code} - ${s.hoiDong.name}` : '—',
+      deCuongStage ? deCuongStage.label : '—',
+      s.diemTongKet != null ? s.diemTongKet.toFixed(1) : '—',
+      s.dongBoDiem || '—',
+      conclLabel,
+      s.status
+    ];
+  });
+
+  const csvLines = [headers, ...rows].map(row =>
+    row.map(cell => `"${String(cell).replace(/"/g,'""')}"`).join(',')
+  );
+  const bom = '﻿';
+  const csv = bom + csvLines.join('\r\n');
+
+  const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+  const url  = URL.createObjectURL(blob);
+  const a    = document.createElement('a');
+  a.href     = url;
+  const today = new Date().toISOString().slice(0,10);
+  a.download = `DSSV_DATN-KLTN_${today}.csv`;
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+
+  showToast(`📥 Đã xuất ${list.length} sinh viên — ${a.download}`, 'ok');
 }
 
 /* ════════ MODAL: DS YÊU CẦU CỦA SINH VIÊN (XEM) ════════ */

@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Danh sách màn hình | HTQT Đại học</title>
+  <link rel="stylesheet" href="_styles.css">
+  <style>
+    body{background:#f5f6f8;}
+    .idx-wrap{max-width:1100px;margin:0 auto;padding:32px 24px 64px;}
+    .idx-header{margin-bottom:28px;}
+    .idx-header h1{font-size:22px;font-weight:700;margin:0 0 4px;}
+    .idx-header p{color:#6b7280;font-size:14px;margin:0;}
+    .idx-group{margin-bottom:28px;}
+    .idx-group h2{font-size:15px;font-weight:700;margin:0 0 12px;padding-bottom:8px;border-bottom:2px solid #e5e7eb;display:flex;align-items:center;gap:8px;}
+    .idx-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:12px;}
+    .idx-card{display:block;background:#fff;border:1px solid #e5e7eb;border-radius:10px;padding:14px 16px;text-decoration:none;color:inherit;transition:box-shadow .15s,border-color .15s;}
+    .idx-card:hover{box-shadow:0 2px 10px rgba(0,0,0,.08);border-color:#93c5fd;}
+    .idx-card .code{font-size:11px;font-weight:700;color:#2563eb;letter-spacing:.02em;}
+    .idx-card .name{font-size:13.5px;font-weight:600;margin-top:4px;color:#111827;}
+  </style>
+</head>
+<body>
+<div class="idx-wrap">
+  <div class="idx-header">
+    <h1>🎓 Danh sách màn hình theo vai trò</h1>
+    <p>Hệ thống Quản trị Đại học — Quản lý Thực tập &amp; Đồ án/Khóa luận</p>
+  </div>
+
+  <div class="idx-group">
+    <h2>🏢 Doanh nghiệp (DN)</h2>
+    <div class="idx-grid">
+      <a class="idx-card" href="MH-DN-00_Login.html"><div class="code">MH-DN-00</div><div class="name">Đăng nhập</div></a>
+      <a class="idx-card" href="MH-DN-01_Register.html"><div class="code">MH-DN-01</div><div class="name">Đăng ký</div></a>
+      <a class="idx-card" href="MH-DN-02_Dashboard.html"><div class="code">MH-DN-02</div><div class="name">Trang chủ</div></a>
+      <a class="idx-card" href="MH-DN-03_Profile.html"><div class="code">MH-DN-03</div><div class="name">Hồ sơ doanh nghiệp</div></a>
+      <a class="idx-card" href="MH-DN-04_Partnership.html"><div class="code">MH-DN-04</div><div class="name">Hợp tác</div></a>
+      <a class="idx-card" href="MH-DN-05_News.html"><div class="code">MH-DN-05</div><div class="name">Tin tức</div></a>
+      <a class="idx-card" href="MH-DN-05A_NewsForm.html"><div class="code">MH-DN-05A</div><div class="name">Tạo/Sửa tin tức</div></a>
+      <a class="idx-card" href="MH-DN-06_Topics.html"><div class="code">MH-DN-06</div><div class="name">Đề tài</div></a>
+      <a class="idx-card" href="MH-DN-07_Internship.html"><div class="code">MH-DN-07</div><div class="name">Thực tập</div></a>
+    </div>
+  </div>
+
+  <div class="idx-group">
+    <h2>🎓 Sinh viên (SV)</h2>
+    <div class="idx-grid">
+      <a class="idx-card" href="MH-SV-01_MyInternships.html"><div class="code">MH-SV-01</div><div class="name">Thực tập của tôi</div></a>
+      <a class="idx-card" href="MH-SV-02_TopicBrowse.html"><div class="code">MH-SV-02</div><div class="name">Duyệt đề tài</div></a>
+      <a class="idx-card" href="MH-SV-03_TopicReference.html"><div class="code">MH-SV-03</div><div class="name">Tham khảo đề tài</div></a>
+      <a class="idx-card" href="MH-SV-04_ThemNguyenVong.html"><div class="code">MH-SV-04</div><div class="name">Thêm nguyện vọng</div></a>
+    </div>
+  </div>
+
+  <div class="idx-group">
+    <h2>👨‍🏫 Giảng viên (GV)</h2>
+    <div class="idx-grid">
+      <a class="idx-card" href="MH-GV-01_InternshipTracking.html"><div class="code">MH-GV-01</div><div class="name">Theo dõi thực tập</div></a>
+      <a class="idx-card" href="MH-GV-02_ChangeRequestApproval.html"><div class="code">MH-GV-02</div><div class="name">Duyệt yêu cầu thay đổi</div></a>
+      <a class="idx-card" href="MH-GV-03_AdvisorWishApproval.html"><div class="code">MH-GV-03</div><div class="name">Duyệt nguyện vọng hướng dẫn</div></a>
+      <a class="idx-card" href="MH-GV-04_MyTopics.html"><div class="code">MH-GV-04</div><div class="name">Đề tài của tôi</div></a>
+      <a class="idx-card" href="MH-GV-05_TopicWishes.html"><div class="code">MH-GV-05</div><div class="name">Nguyện vọng đề tài</div></a>
+      <a class="idx-card" href="MH-GV-06_GraduationProjectManagement.html"><div class="code">MH-GV-06</div><div class="name">Quản lý đồ án/khóa luận</div></a>
+    </div>
+  </div>
+
+  <div class="idx-group">
+    <h2>🏛️ Khoa / Chủ nhiệm bộ môn (KCM)</h2>
+    <div class="idx-grid">
+      <a class="idx-card" href="MH-KCM-03_TopicApproval.html"><div class="code">MH-KCM-03</div><div class="name">Duyệt đề tài</div></a>
+      <a class="idx-card" href="MH-KCM-04_StudentEligibility.html"><div class="code">MH-KCM-04</div><div class="name">Điều kiện sinh viên</div></a>
+      <a class="idx-card" href="MH-KCM-05_AdvisorWishApproval.html"><div class="code">MH-KCM-05</div><div class="name">Duyệt nguyện vọng hướng dẫn</div></a>
+      <a class="idx-card" href="MH-KCM-06_StudentTopicApproval.html"><div class="code">MH-KCM-06</div><div class="name">Duyệt đề tài sinh viên</div></a>
+      <a class="idx-card" href="MH-KCM-07_GraduationProjectManagement.html"><div class="code">MH-KCM-07</div><div class="name">Quản lý đồ án/khóa luận</div></a>
+      <a class="idx-card" href="MH-KCM-08_CouncilManagement.html"><div class="code">MH-KCM-08</div><div class="name">Quản lý hội đồng</div></a>
+      <a class="idx-card" href="MH-KCM-09_CouncilStudentAssignment.html"><div class="code">MH-KCM-09</div><div class="name">Phân công sinh viên vào hội đồng</div></a>
+    </div>
+  </div>
+
+  <div class="idx-group">
+    <h2>🏫 Phòng đào tạo (PĐT)</h2>
+    <div class="idx-grid">
+      <a class="idx-card" href="MH-PDT-00_Dashboard.html"><div class="code">MH-PDT-00</div><div class="name">Trang chủ</div></a>
+      <a class="idx-card" href="MH-PDT-01_InternshipRound.html"><div class="code">MH-PDT-01</div><div class="name">Đợt thực tập</div></a>
+      <a class="idx-card" href="MH-PDT-04_InternshipRound_Create.html"><div class="code">MH-PDT-04</div><div class="name">Tạo đợt thực tập</div></a>
+      <a class="idx-card" href="MH-PDT-05_StudentEligibility.html"><div class="code">MH-PDT-05</div><div class="name">Điều kiện sinh viên</div></a>
+      <a class="idx-card" href="MH-PDT-06_InternshipStudents.html"><div class="code">MH-PDT-06</div><div class="name">Sinh viên thực tập</div></a>
+      <a class="idx-card" href="MH-PDT-07_CouncilManagement.html"><div class="code">MH-PDT-07</div><div class="name">Quản lý hội đồng</div></a>
+      <a class="idx-card" href="MH-PDT-08_StudentTopicApproval.html"><div class="code">MH-PDT-08</div><div class="name">Duyệt đề tài sinh viên</div></a>
+      <a class="idx-card" href="MH-PDT-09_DecisionTemplateManagement.html"><div class="code">MH-PDT-09</div><div class="name">Quản lý mẫu quyết định</div></a>
+      <a class="idx-card" href="MH-PDT-10_GraduationProjectManagement.html"><div class="code">MH-PDT-10</div><div class="name">Quản lý đồ án/khóa luận</div></a>
+    </div>
+  </div>
+
+</div>
+</body>
+</html>

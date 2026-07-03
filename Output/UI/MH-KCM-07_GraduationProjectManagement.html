@@ -906,7 +906,7 @@
 <div class="overlay hidden" id="m-diem-info">
   <div class="modal-box w960">
     <div class="modal-hd">
-      <h4 class="modal-title" id="di-title">📊 Thông tin điểm</h4>
+      <h4 class="modal-title">📊 Chi tiết điểm thành phần — <span id="di-title" style="color:var(--primary)"></span></h4>
       <button class="modal-close" data-close="m-diem-info">✕</button>
     </div>
     <div class="modal-bd" id="di-body"></div>
@@ -1767,7 +1767,7 @@ function render(){
              </span>`
           : `<button class="btn btn-default btn-sm" onclick="checkDaoVanNoiBo(${s.id})" style="font-size:11px;padding:2px 8px;white-space:nowrap" title="So khớp với kho đồ án/luận văn của khoa — miễn phí">🔍 KT nội bộ</button>`;
     const diemCell = coduDiemThanhPhan(s)
-      ? `<button class="btn btn-default btn-sm" onclick="openDiemInfo(${s.id})" style="font-size:11px;padding:2px 8px;white-space:nowrap">Xem chi tiết</button>`
+      ? `<span style="color:#d46b08;cursor:pointer;font-size:13px" onclick="openDiemInfo(${s.id})" title="Xem chi tiết điểm thành phần">Chi tiết</span>`
       : `<span style="color:var(--text-3);font-size:12px">—</span>`;
     const ketLuanHoiDongCell = s.conclusion
       ? `<span style="font-size:12px">${CONCLUSION_CFG[s.conclusion].label}</span>`
@@ -2625,34 +2625,60 @@ function cauTrucDiem(s){
   return CAU_TRUC_DIEM_LHP[s.lop] || [];
 }
 function diemBangHtml(s, cauTruc, editable){
-  const rowsHtml = cauTruc.map((c,i) => {
+  const rowsHtml = cauTruc.map(c => {
     const v = dauDiemGiaTri(s, c);
     const nguoiCham = dauDiemNguoiCham(s, c);
     const minhChung = dauDiemMinhChung(s, c);
     const ghiChu = dauDiemGhiChu(s, c);
     const trongSoCell = c.trongSo != null ? `${c.trongSo}%` : '—';
     const diemCell = editable
-      ? `<input class="fc" type="number" min="0" max="10" step="0.1" id="dm-c-${c.id}" value="${v != null ? v : ''}" oninput="previewDiemTongKet()" style="padding:4px 6px;font-size:13px;text-align:right" placeholder="0.0">`
-      : `<div style="font-size:14px;font-weight:700;color:var(--primary);text-align:right">${v != null ? v.toFixed(1) : '—'}</div>`;
+      ? `<input class="fc" type="number" min="0" max="10" step="0.1" id="dm-c-${c.id}" value="${v != null ? v : ''}" oninput="previewDiemTongKet()" style="width:70px;padding:5px 8px;font-size:13px">`
+      : `<div style="font-size:14px;font-weight:700;color:var(--primary)">${v != null ? v.toFixed(1) : '—'}</div>`;
     const ghiChuCell = editable && c.type !== 'Hội đồng'
-      ? `<input class="fc" type="text" id="dm-c-${c.id}-ghichu" value="${ghiChu}" placeholder="Ghi chú…" style="font-size:12px;padding:4px 6px">`
+      ? `<input class="fc" type="text" id="dm-c-${c.id}-ghichu" value="${ghiChu}" placeholder="Ghi chú…" style="width:100%;box-sizing:border-box;padding:5px 8px;font-size:13px">`
       : (ghiChu ? ghiChu : '<span style="color:var(--text-3)">—</span>');
-    return `<div style="display:grid;grid-template-columns:1fr 70px 70px 130px 140px 1fr;align-items:center;gap:10px;padding:10px 16px;${i<cauTruc.length-1?'border-bottom:1px solid var(--border)':''}">
-      <div style="font-size:13px">${c.ten}</div>
-      <div style="font-size:13px;color:var(--text-2);text-align:right">${trongSoCell}</div>
-      ${diemCell}
-      <div style="font-size:12px;color:var(--text-2);word-break:break-word">${nguoiCham}</div>
-      <div style="font-size:12px;color:var(--text-2);word-break:break-word">${minhChung ? `📎 ${minhChung}` : '<span style="color:var(--text-3)">—</span>'}</div>
-      <div style="font-size:12px;color:var(--text-2);word-break:break-word">${ghiChuCell}</div>
-    </div>`;
+    return `<tr>
+      <td style="padding:14px;font-size:13px;color:var(--text-2);border-bottom:1px solid var(--border);vertical-align:top">${c.type || '—'}</td>
+      <td style="padding:14px;font-size:13px;border-bottom:1px solid var(--border);vertical-align:top">${c.ten}</td>
+      <td style="padding:14px;font-size:13px;color:var(--text-2);border-bottom:1px solid var(--border);vertical-align:top">${trongSoCell}</td>
+      <td style="padding:14px;border-bottom:1px solid var(--border);vertical-align:top">${diemCell}</td>
+      <td style="padding:14px;font-size:13px;color:var(--text-2);border-bottom:1px solid var(--border);vertical-align:top">${nguoiCham || '—'}</td>
+      <td style="padding:14px;border-bottom:1px solid var(--border);vertical-align:top">
+        <input type="file" id="dm-c-${c.id}-file-input" accept=".pdf,.doc,.docx,.jpg,.jpeg,.png" style="display:none" onchange="onDmFileSelect(this,'${c.id}')" ${editable?'':'disabled'}>
+        <div style="display:flex;align-items:center;gap:6px">
+          <button type="button" class="btn btn-default btn-sm" style="font-size:12px;padding:2px 8px" onclick="document.getElementById('dm-c-${c.id}-file-input').click()" ${editable?'':'disabled'}>📎 Chọn file</button>
+          <span style="font-size:12px;color:var(--text-2)" id="dm-c-${c.id}-file-name">${minhChung || 'Chưa có file'}</span>
+          <button type="button" class="btn btn-default btn-sm" id="dm-c-${c.id}-file-clear" style="display:${minhChung?'':'none'};color:var(--error);font-size:12px;padding:2px 6px" onclick="clearDmFile('${c.id}')" ${editable?'':'disabled'}>✕</button>
+        </div>
+      </td>
+      <td style="padding:14px;border-bottom:1px solid var(--border);vertical-align:top">${ghiChuCell}</td>
+    </tr>`;
   }).join('');
-  return `<div class="f-hint" style="margin-bottom:10px">Cấu trúc đầu điểm do lớp học phần quy định, mỗi lớp có thể khác nhau.</div>
-  <div style="border:1px solid var(--border);border-radius:8px;overflow:hidden">
-    <div style="background:#fafafa;padding:10px 16px;border-bottom:1px solid var(--border);display:grid;grid-template-columns:1fr 70px 70px 130px 140px 1fr;gap:10px;font-size:12px;font-weight:600;color:var(--text-3)">
-      <span>Điểm thành phần</span><span style="text-align:right">Trọng số</span><span style="text-align:right">Điểm</span><span>Người chấm</span><span>Minh chứng</span><span>Ghi chú</span>
-    </div>
-    ${rowsHtml}
-  </div>`;
+  return `
+  <table style="width:100%;border-collapse:collapse">
+    <thead>
+      <tr style="background:#fafafa">
+        <th style="padding:10px 14px;text-align:left;font-size:12px;font-weight:600;color:var(--text-3);border-bottom:1px solid var(--border)">Loại thành phần</th>
+        <th style="padding:10px 14px;text-align:left;font-size:12px;font-weight:600;color:var(--text-3);border-bottom:1px solid var(--border)">Điểm thành phần</th>
+        <th style="padding:10px 14px;text-align:left;font-size:12px;font-weight:600;color:var(--text-3);border-bottom:1px solid var(--border)">Trọng số</th>
+        <th style="padding:10px 14px;text-align:left;font-size:12px;font-weight:600;color:var(--text-3);border-bottom:1px solid var(--border)">Điểm</th>
+        <th style="padding:10px 14px;text-align:left;font-size:12px;font-weight:600;color:var(--text-3);border-bottom:1px solid var(--border)">Người chấm</th>
+        <th style="padding:10px 14px;text-align:left;font-size:12px;font-weight:600;color:var(--text-3);border-bottom:1px solid var(--border)">Minh chứng</th>
+        <th style="padding:10px 14px;text-align:left;font-size:12px;font-weight:600;color:var(--text-3);border-bottom:1px solid var(--border)">Ghi chú</th>
+      </tr>
+    </thead>
+    <tbody>${rowsHtml}</tbody>
+  </table>`;
+}
+function onDmFileSelect(input, cId){
+  if (!input.files || !input.files[0]) return;
+  document.getElementById(`dm-c-${cId}-file-name`).textContent = input.files[0].name;
+  document.getElementById(`dm-c-${cId}-file-clear`).style.display = '';
+}
+function clearDmFile(cId){
+  document.getElementById(`dm-c-${cId}-file-input`).value = '';
+  document.getElementById(`dm-c-${cId}-file-name`).textContent = 'Chưa có file';
+  document.getElementById(`dm-c-${cId}-file-clear`).style.display = 'none';
 }
 
 /* ════════ MODAL: ĐIỂM TỔNG KẾT (NHẬP) ════════ */
@@ -2724,7 +2750,7 @@ function openDiemInfo(id){
   const s = students.find(x => x.id === id);
   if (!s || !coduDiemThanhPhan(s)) return;
   _diTargetId = id;
-  document.getElementById('di-title').textContent = `📊 Thông tin điểm`;
+  document.getElementById('di-title').textContent = `${s.tenSV} (${s.maSV})`;
   const cauTruc = cauTrucDiem(s);
   document.getElementById('di-body').innerHTML = `${diemBangHtml(s, cauTruc, true)}`;
   /* ẩn tạm — điểm tổng kết
@@ -2735,7 +2761,7 @@ function openDiemInfo(id){
   bindDiPreview();
   document.getElementById('di-footer').innerHTML = `
     <button class="btn btn-default" data-close="m-diem-info">Đóng</button>
-    <button class="btn btn-primary" onclick="saveDiemInfo()">💾 Lưu</button>`;
+    <button class="btn" onclick="saveDiemInfo()" style="background:#fa8c16;color:#fff;border:1px solid #fa8c16">💾 Lưu điểm</button>`;
   openModal('m-diem-info');
 }
 function bindDiPreview(){
@@ -2759,21 +2785,24 @@ function saveDiemInfo(){
   const tongKet = tinhDiemTongKetFromInputs(s);
   if (tongKet == null) { showToast('Vui lòng nhập đầy đủ các đầu điểm.', 'warn'); return; }
   let gvhd, gvpb, hoiDong;
-  const ghiChuByType = {};
+  const ghiChuByType = {}, fileByType = {};
   for (const c of cauTruc) {
     const v = parseFloat(document.getElementById(`dm-c-${c.id}`).value);
-    if (c.type === 'GVHD') { gvhd = v; ghiChuByType.GVHD = document.getElementById(`dm-c-${c.id}-ghichu`).value.trim(); }
-    if (c.type === 'GVPB') { gvpb = v; ghiChuByType.GVPB = document.getElementById(`dm-c-${c.id}-ghichu`).value.trim(); }
-    if (c.type === 'Hội đồng') hoiDong = v;
+    const fileName = document.getElementById(`dm-c-${c.id}-file-name`).textContent.trim();
+    const file = fileName === 'Chưa có file' ? '' : fileName;
+    if (c.type === 'GVHD') { gvhd = v; ghiChuByType.GVHD = document.getElementById(`dm-c-${c.id}-ghichu`).value.trim(); fileByType.GVHD = file; }
+    if (c.type === 'GVPB') { gvpb = v; ghiChuByType.GVPB = document.getElementById(`dm-c-${c.id}-ghichu`).value.trim(); fileByType.GVPB = file; }
+    if (c.type === 'Hội đồng') { hoiDong = v; fileByType.HoiDong = file; }
   }
   const today = new Date().toLocaleDateString('vi');
   const action = s.loaiHinh === 'Khóa luận tốt nghiệp' ? 'Hội đồng duyệt điểm cuối' : 'Hội đồng chấm điểm bảo vệ';
   students = students.map(x => {
     if (x.id !== _diTargetId) return x;
     return { ...x,
-      nxGVHD: {...(x.nxGVHD||{}), diem: gvhd, ghiChu: ghiChuByType.GVHD != null ? ghiChuByType.GVHD : (x.nxGVHD&&x.nxGVHD.ghiChu) || ''},
-      nxGVPB: {...(x.nxGVPB||{}), diem: gvpb, ghiChu: ghiChuByType.GVPB != null ? ghiChuByType.GVPB : (x.nxGVPB&&x.nxGVPB.ghiChu) || ''},
+      nxGVHD: {...(x.nxGVHD||{}), diem: gvhd, ghiChu: ghiChuByType.GVHD != null ? ghiChuByType.GVHD : (x.nxGVHD&&x.nxGVHD.ghiChu) || '', file: fileByType.GVHD || (x.nxGVHD&&x.nxGVHD.file) || ''},
+      nxGVPB: {...(x.nxGVPB||{}), diem: gvpb, ghiChu: ghiChuByType.GVPB != null ? ghiChuByType.GVPB : (x.nxGVPB&&x.nxGVPB.ghiChu) || '', file: fileByType.GVPB || (x.nxGVPB&&x.nxGVPB.file) || ''},
       diemHoiDong: hoiDong, diemTongKet: tongKet,
+      hoiDong: {...x.hoiDong, bienBanFile: fileByType.HoiDong || (x.hoiDong&&x.hoiDong.bienBanFile) || ''},
       history:[...x.history, {time:today, actor:`${x.hoiDong.code} (Hội đồng)`, action, result:`Điểm cuối: ${tongKet.toFixed(1)}`, dot:'ok'}] };
   });
   closeModal('m-diem-info');
@@ -2873,21 +2902,14 @@ function openDecision(id){
           <tr>
             <th style="width:130px">Số quyết định</th>
             <th style="width:190px">Loại</th>
-            <th style="width:100px">Ngày ký</th>
+            <th style="width:100px">Ngày ban hành</th>
             <th>Đơn vị ban hành</th>
           </tr>
         </thead>
         <tbody>${rows}</tbody>
       </table>
     </div>
-    ${s.status === 'Chờ quyết định giao đề tài' ? `<div style="margin-top:12px"><button class="btn btn-primary btn-sm" onclick="closeModal('m-decision');openCreateDecision(${s.id},'Giao đề tài')">📝 Tạo Quyết định giao đề tài</button></div>` : ''}
-    ${s.status === 'Thay đổi đề tài' ? `<div class="qd-card" style="background:#fff7e6;border-color:#ffd591;margin-top:12px">
-      <div style="font-size:12px;color:var(--text-3)">Yêu cầu đổi đề tài đang chờ xử lý:</div>
-      <div style="font-size:13px;margin-top:4px"><strong>Cũ:</strong> ${s.changeRequest.topicCu}</div>
-      <div style="font-size:13px"><strong>Mới:</strong> ${s.changeRequest.topicMoi}</div>
-      <div style="font-size:12px;margin-top:4px"><em>${s.changeRequest.lyDo}</em></div>
-    </div>
-    <div style="margin-top:8px"><button class="btn btn-primary btn-sm" onclick="closeModal('m-decision');openCreateDecision(${s.id},'Thay đổi đề tài')">📝 Tạo Quyết định thay đổi đề tài</button></div>` : ''}`;
+    ${s.status === 'Chờ quyết định giao đề tài' ? `<div style="margin-top:12px"><button class="btn btn-primary btn-sm" onclick="closeModal('m-decision');openCreateDecision(${s.id},'Giao đề tài')">📝 Tạo Quyết định giao đề tài</button></div>` : ''}`;
 
   const canExport = list.length > 0;
   document.getElementById('qd-footer').innerHTML = `<button class="btn btn-default" data-close="m-decision">Đóng</button>` +

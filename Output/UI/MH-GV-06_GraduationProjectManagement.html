@@ -582,16 +582,15 @@
 <div class="overlay hidden" id="m-diem-info">
   <div class="modal-box w960">
     <div class="modal-hd">
-      <h4 class="modal-title" id="di-title">📊 Thông tin điểm</h4>
+      <h4 class="modal-title">📊 Chi tiết điểm thành phần — <span id="di-title" style="color:var(--primary)"></span></h4>
       <button class="modal-close" data-close="m-diem-info">✕</button>
     </div>
     <div class="modal-bd">
-      <div style="font-size:12px;color:var(--text-3);margin-bottom:10px">Cấu trúc đầu điểm do lớp học phần quy định, mỗi lớp có thể khác nhau.</div>
       <div id="di-body"></div>
     </div>
     <div class="modal-ft">
       <button class="btn btn-default" data-close="m-diem-info">Đóng</button>
-      <button class="btn btn-primary" id="di-save-btn" onclick="saveDiemInfo()">💾 Lưu</button>
+      <button class="btn" id="di-save-btn" onclick="saveDiemInfo()" style="background:#fa8c16;color:#fff;border:1px solid #fa8c16">💾 Lưu điểm</button>
     </div>
   </div>
 </div>
@@ -1371,34 +1370,61 @@ function saveNhanXetGvpb(){
 
 /* ════════ MODAL: THÔNG TIN ĐIỂM (SỬA ĐƯỢC) ════════ */
 let _diemTargetId = null;
-const DIEM_COLS = '1.6fr 70px 90px 1.3fr 1.6fr 1.6fr';
 function openDiemInfo(id){
   const s = students.find(x => x.id === id);
   if (!s) return;
   _diemTargetId = id;
   const readonly = s.dongBoDiem === 'Đã đồng bộ';
-  document.getElementById('di-title').textContent = `Thông tin điểm — ${s.tenSV}`;
+  document.getElementById('di-title').textContent = `${s.tenSV} (${s.maSV})`;
   document.getElementById('di-save-btn').style.display = readonly ? 'none' : '';
   const rows = [];
-  if (s.nxGVHD) rows.push({key:'gvhd', label:'GV Chấm 1 (GVHD)', trongso:25, diem:s.nxGVHD.diem, nguoiCham:s.gvhd, file:s.nxGVHD.file, ghiChu:s.nxGVHD.ghiChu||''});
-  if (s.nxGVPB) rows.push({key:'gvpb', label:'GV Chấm 2 (GVPB)', trongso:25, diem:s.nxGVPB.diem, nguoiCham:s.gvpb, file:s.nxGVPB.file, ghiChu:s.nxGVPB.ghiChu||''});
-  if (s.diemHoiDong != null) rows.push({key:'hoidong', label:'Điểm Hội đồng duyệt', trongso:50, diem:s.diemHoiDong, nguoiCham:s.hoiDong ? s.hoiDong.chuTich || s.gvhd : '—', file:s.diemHoiDongFile||'', ghiChu:s.diemHoiDongGhiChu||''});
+  if (s.nxGVHD) rows.push({key:'gvhd', loai:'GVHD', label:'GV Chấm 1 (GVHD)', trongso:30, diem:s.nxGVHD.diem, nguoiCham:s.gvhd, file:s.nxGVHD.file, ghiChu:s.nxGVHD.ghiChu||''});
+  if (s.nxGVPB) rows.push({key:'gvpb', loai:'GVPB', label:'GV Chấm 2 (GVPB)', trongso:20, diem:s.nxGVPB.diem, nguoiCham:s.gvpb, file:s.nxGVPB.file, ghiChu:s.nxGVPB.ghiChu||''});
+  if (s.diemHoiDong != null) rows.push({key:'hoidong', loai:'Hội đồng', label:'Điểm Hội đồng duyệt', trongso:50, diem:s.diemHoiDong, nguoiCham:s.hoiDong ? s.hoiDong.chuTich || s.gvhd : '—', file:s.diemHoiDongFile||'', ghiChu:s.diemHoiDongGhiChu||''});
   document.getElementById('di-body').innerHTML = `
-    <div style="border:1px solid var(--border);border-radius:8px;overflow:hidden">
-      <div style="background:#fafafa;padding:10px 16px;border-bottom:1px solid var(--border);display:grid;grid-template-columns:${DIEM_COLS};gap:10px;font-size:12px;font-weight:600;color:var(--text-3)">
-        <span>Điểm thành phần</span><span>Trọng số</span><span>Điểm</span><span>Người chấm</span><span>Minh chứng</span><span>Ghi chú</span>
-      </div>
-      ${rows.map(r => `<div style="padding:10px 16px;border-bottom:1px solid var(--border);display:grid;grid-template-columns:${DIEM_COLS};gap:10px;font-size:13px;align-items:center">
-        <span>${r.label}</span>
-        <span>${r.trongso}%</span>
-        <input class="fc" type="number" min="0" max="10" step="0.1" id="di-diem-${r.key}" value="${r.diem}" style="width:100%;box-sizing:border-box;padding:4px 6px" ${readonly?'disabled':''}>
-        <span>${r.nguoiCham}</span>
-        <span>${r.file ? `📎 ${r.file}` : '<span style="color:var(--text-3)">—</span>'}</span>
-        <input class="fc" type="text" id="di-ghichu-${r.key}" value="${r.ghiChu.replace(/"/g,'&quot;')}" placeholder="Ghi chú..." style="width:100%;box-sizing:border-box;padding:4px 6px" ${readonly?'disabled':''}>
-      </div>`).join('')}
-    </div>
+    <table style="width:100%;border-collapse:collapse">
+      <thead>
+        <tr style="background:#fafafa">
+          <th style="padding:10px 14px;text-align:left;font-size:12px;font-weight:600;color:var(--text-3);border-bottom:1px solid var(--border)">Loại thành phần</th>
+          <th style="padding:10px 14px;text-align:left;font-size:12px;font-weight:600;color:var(--text-3);border-bottom:1px solid var(--border)">Điểm thành phần</th>
+          <th style="padding:10px 14px;text-align:left;font-size:12px;font-weight:600;color:var(--text-3);border-bottom:1px solid var(--border)">Trọng số</th>
+          <th style="padding:10px 14px;text-align:left;font-size:12px;font-weight:600;color:var(--text-3);border-bottom:1px solid var(--border)">Điểm</th>
+          <th style="padding:10px 14px;text-align:left;font-size:12px;font-weight:600;color:var(--text-3);border-bottom:1px solid var(--border)">Người chấm</th>
+          <th style="padding:10px 14px;text-align:left;font-size:12px;font-weight:600;color:var(--text-3);border-bottom:1px solid var(--border)">Minh chứng</th>
+          <th style="padding:10px 14px;text-align:left;font-size:12px;font-weight:600;color:var(--text-3);border-bottom:1px solid var(--border)">Ghi chú</th>
+        </tr>
+      </thead>
+      <tbody>
+        ${rows.map(r => `<tr>
+          <td style="padding:14px;font-size:13px;color:var(--text-2);border-bottom:1px solid var(--border);vertical-align:top">${r.loai}</td>
+          <td style="padding:14px;font-size:13px;border-bottom:1px solid var(--border);vertical-align:top">${r.label}</td>
+          <td style="padding:14px;font-size:13px;color:var(--text-2);border-bottom:1px solid var(--border);vertical-align:top">${r.trongso}%</td>
+          <td style="padding:14px;border-bottom:1px solid var(--border);vertical-align:top"><input class="fc" type="number" min="0" max="10" step="0.1" id="di-diem-${r.key}" value="${r.diem}" style="width:70px;padding:5px 8px;font-size:13px" ${readonly?'disabled':''}></td>
+          <td style="padding:14px;font-size:13px;color:var(--text-2);border-bottom:1px solid var(--border);vertical-align:top">${r.nguoiCham || '—'}</td>
+          <td style="padding:14px;border-bottom:1px solid var(--border);vertical-align:top">
+            <input type="file" id="di-file-input-${r.key}" accept=".pdf,.doc,.docx,.jpg,.jpeg,.png" style="display:none" onchange="onDiFileSelect(this,'${r.key}')">
+            <div style="display:flex;align-items:center;gap:6px" id="di-file-wrap-${r.key}">
+              <button type="button" class="btn btn-default btn-sm" style="font-size:12px;padding:2px 8px" onclick="document.getElementById('di-file-input-${r.key}').click()" ${readonly?'disabled':''}>📎 Chọn file</button>
+              <span style="font-size:12px;color:var(--text-2)" id="di-file-name-${r.key}">${r.file || 'Chưa có file'}</span>
+              <button type="button" class="btn btn-default btn-sm" id="di-file-clear-${r.key}" style="display:${r.file?'':'none'};color:var(--error);font-size:12px;padding:2px 6px" onclick="clearDiFile('${r.key}')" ${readonly?'disabled':''}>✕</button>
+            </div>
+          </td>
+          <td style="padding:14px;border-bottom:1px solid var(--border);vertical-align:top"><input class="fc" type="text" id="di-ghichu-${r.key}" value="${r.ghiChu.replace(/"/g,'&quot;')}" placeholder="Ghi chú..." style="width:100%;box-sizing:border-box;padding:5px 8px;font-size:13px" ${readonly?'disabled':''}></td>
+        </tr>`).join('')}
+      </tbody>
+    </table>
   `;
   openModal('m-diem-info');
+}
+function onDiFileSelect(input, key){
+  if (!input.files || !input.files[0]) return;
+  document.getElementById(`di-file-name-${key}`).textContent = input.files[0].name;
+  document.getElementById(`di-file-clear-${key}`).style.display = '';
+}
+function clearDiFile(key){
+  document.getElementById(`di-file-input-${key}`).value = '';
+  document.getElementById(`di-file-name-${key}`).textContent = 'Chưa có file';
+  document.getElementById(`di-file-clear-${key}`).style.display = 'none';
 }
 function saveDiemInfo(){
   const s = students.find(x => x.id === _diemTargetId);
@@ -1406,14 +1432,20 @@ function saveDiemInfo(){
   if (s.nxGVHD){
     s.nxGVHD.diem = parseFloat(document.getElementById('di-diem-gvhd').value) || 0;
     s.nxGVHD.ghiChu = document.getElementById('di-ghichu-gvhd').value.trim();
+    s.nxGVHD.file = document.getElementById('di-file-name-gvhd').textContent.trim();
+    if (s.nxGVHD.file === 'Chưa có file') s.nxGVHD.file = '';
   }
   if (s.nxGVPB){
     s.nxGVPB.diem = parseFloat(document.getElementById('di-diem-gvpb').value) || 0;
     s.nxGVPB.ghiChu = document.getElementById('di-ghichu-gvpb').value.trim();
+    s.nxGVPB.file = document.getElementById('di-file-name-gvpb').textContent.trim();
+    if (s.nxGVPB.file === 'Chưa có file') s.nxGVPB.file = '';
   }
   if (s.diemHoiDong != null){
     s.diemHoiDong = parseFloat(document.getElementById('di-diem-hoidong').value) || 0;
     s.diemHoiDongGhiChu = document.getElementById('di-ghichu-hoidong').value.trim();
+    s.diemHoiDongFile = document.getElementById('di-file-name-hoidong').textContent.trim();
+    if (s.diemHoiDongFile === 'Chưa có file') s.diemHoiDongFile = '';
   }
   closeModal('m-diem-info');
   showToast('Đã lưu thông tin điểm.');

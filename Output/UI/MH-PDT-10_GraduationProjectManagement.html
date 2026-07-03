@@ -52,6 +52,11 @@
     .type-pill{font-size:11px;font-weight:700;padding:1px 8px;border-radius:10px;border:1px solid;white-space:nowrap}
     .type-pill.da{color:#0958d9;background:#e6f4ff;border-color:#91caff}
     .type-pill.kl{color:#d4380d;background:#fff2e8;border-color:#ffbb96}
+    .qd-type-pill{font-size:11px;font-weight:600;padding:2px 9px;border-radius:10px;border:1px solid;white-space:nowrap;display:inline-block}
+    .qd-type-pill.giao{color:#0958d9;background:#e6f4ff;border-color:#91caff}
+    .qd-type-pill.doi{color:#d46b08;background:#fff7e6;border-color:#ffd591}
+    .qd-type-pill.giahan{color:#08979c;background:#e6fffb;border-color:#87e8de}
+    .qd-type-pill.som{color:#722ed1;background:#f9f0ff;border-color:#d3adf7}
     .mgv-card{display:flex;align-items:center;gap:12px;padding:12px 14px;border-bottom:1px solid var(--border);background:#fff;transition:background .15s}
     .mgv-card:last-child{border-bottom:none}
     .mgv-card.mgv-hl{border-left:3px solid var(--primary);padding-left:11px;background:#f0f7ff}
@@ -286,6 +291,7 @@
               <button type="button" class="func-item" onclick="closeFuncPanel();openAssignGvpb()">🧑‍⚖️ Phân công GVPB</button>
               <button type="button" class="func-item" onclick="closeFuncPanel();openAssignHoiDong()">🏛️ Phân hội đồng</button>
               <button type="button" class="func-item" onclick="closeFuncPanel();openCreateDecision()">📝 Nhập quyết định</button>
+              <button type="button" class="func-item" onclick="closeFuncPanel();openDecisionLog()">📜 Danh sách quyết định</button>
               <button type="button" class="func-item" onclick="closeFuncPanel();exportBulk()">📄 Xuất quyết định</button>
               <button type="button" class="func-item" onclick="closeFuncPanel();openBulkKetLuanHoiDong()">✅ Cập nhật kết luận</button>
               <button type="button" class="func-item" onclick="closeFuncPanel();syncDiemBulk()">🔄 Đồng bộ điểm</button>
@@ -1077,6 +1083,15 @@
       <button class="modal-close" data-close="m-decision-log">✕</button>
     </div>
     <div class="modal-bd">
+      <div class="filter-bar" style="margin-bottom:12px">
+        <select class="fc" style="width:240px" id="cdlog-f-loai" onchange="renderDecisionLog()">
+          <option value="">Tất cả loại quyết định</option>
+          <option value="giao">Giao đề tài</option>
+          <option value="doi">Thay đổi đề tài</option>
+          <option value="giahan">Gia hạn thời gian làm đề tài</option>
+          <option value="som">Bảo vệ trước thời hạn</option>
+        </select>
+      </div>
       <div class="tbl-wrap">
         <table class="tbl">
           <thead>
@@ -2938,10 +2953,10 @@ function openDeCuongInfo(id){
 
 /* ════════ DS QUYẾT ĐỊNH CỦA 1 SV ════════ */
 const QD_TYPE_CFG = {
-  giao:    { label: 'Giao đề tài' },
-  doi:     { label: 'Thay đổi đề tài' },
-  giahan:  { label: 'Gia hạn thời gian làm đề tài' },
-  som:     { label: 'Bảo vệ trước thời hạn' },
+  giao:    { label: 'Giao đề tài', cls: 'giao' },
+  doi:     { label: 'Thay đổi đề tài', cls: 'doi' },
+  giahan:  { label: 'Gia hạn thời gian làm đề tài', cls: 'giahan' },
+  som:     { label: 'Bảo vệ trước thời hạn', cls: 'som' },
 };
 function listAllDecisions(s){
   const list = [];
@@ -2963,7 +2978,7 @@ function openDecision(id){
     const cfg = QD_TYPE_CFG[item.type];
     return `<tr>
       <td><span style="font-family:monospace;font-weight:700;color:var(--primary);cursor:pointer;text-decoration:underline;text-underline-offset:2px" onclick="openQdDetail(${s.id},'${item.type}',${item.idx})" title="Xem chi tiết quyết định">${item.d.so}</span></td>
-      <td style="font-size:12px">${cfg.label}</td>
+      <td><span class="qd-type-pill ${cfg.cls}">${cfg.label}</span></td>
       <td style="font-size:12px">${item.d.ngay}</td>
       <td style="font-size:12px">${item.d.donViBanHanh || '—'}</td>
     </tr>`;
@@ -3370,18 +3385,19 @@ function saveCreateDecision(){
 function buildDecisionLog(){
   const log = [];
   students.forEach(s => {
-    listAllDecisions(s).forEach(item => log.push({ ...item.d, loai:QD_TYPE_CFG[item.type].label, sv:[`${s.maSV} — ${s.tenSV}`] }));
+    listAllDecisions(s).forEach(item => log.push({ ...item.d, type:item.type, loai:QD_TYPE_CFG[item.type].label, loaiCls:QD_TYPE_CFG[item.type].cls, sv:[`${s.maSV} — ${s.tenSV}`] }));
   });
   const merged = {};
   log.forEach(l => { if (merged[l.so]) merged[l.so].sv.push(...l.sv); else merged[l.so] = { ...l }; });
   return Object.values(merged);
 }
-function openDecisionLog(){
-  const log = buildDecisionLog();
+function renderDecisionLog(){
+  const filterType = document.getElementById('cdlog-f-loai').value;
+  const log = buildDecisionLog().filter(l => !filterType || l.type === filterType);
   document.getElementById('cdlog-tbody').innerHTML = log.length ? log.map(l => `
     <tr>
       <td style="font-family:monospace;font-weight:700;color:var(--primary)">${l.so}</td>
-      <td style="font-size:12px">${l.loai}</td>
+      <td><span class="qd-type-pill ${l.loaiCls}">${l.loai}</span></td>
       <td style="font-size:12px">${l.ngay}</td>
       <td style="font-size:12px">${l.donViBanHanh||'—'}</td>
       <td style="font-size:12px">${l.nguoiKy||'—'}</td>
@@ -3391,6 +3407,10 @@ function openDecisionLog(){
         <button class="icon-btn" title="Xem DS SV" onclick="showToast('SV áp dụng: ${l.sv.join(', ')}')">👁️</button>
       </td>
     </tr>`).join('') : `<tr><td colspan="8" class="tbl-empty">Chưa có quyết định nào được ban hành</td></tr>`;
+}
+function openDecisionLog(){
+  document.getElementById('cdlog-f-loai').value = '';
+  renderDecisionLog();
   openModal('m-decision-log');
 }
 

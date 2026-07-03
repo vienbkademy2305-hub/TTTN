@@ -29,9 +29,11 @@
       font-size: 10px; font-weight: 700; padding: 2px 8px; border-radius: 4px;
       white-space: nowrap; flex-shrink: 0;
     }
-    .badge-gv  { background: #e6f4ff; color: #0958d9; }
-    .badge-pdt { background: #f6ffed; color: #389e0d; }
+    .badge-dn  { background: #fff0f6; color: #c41d7f; }
     .badge-sv  { background: #fff7e6; color: #d46b08; }
+    .badge-gv  { background: #e6f4ff; color: #0958d9; }
+    .badge-kcm { background: #f9f0ff; color: #722ed1; }
+    .badge-pdt { background: #f6ffed; color: #389e0d; }
     .card-name { font-size: 13px; font-weight: 500; color: #262626; }
     .card-code { font-size: 11px; color: #8c8c8c; margin-top: 2px; }
     footer { text-align: center; padding: 32px; color: #bfbfbf; font-size: 12px; }
@@ -45,76 +47,67 @@
 <main>
 
   <div class="section">
-    <div class="section-title">Giảng viên hướng dẫn (GV)</div>
+    <div class="section-title">Doanh nghiệp (DN)</div>
     <div class="grid">
-      <a class="card" href="Output/UI/MH-GV-01_InternshipTracking.html">
-        <span class="badge badge-gv">GV</span>
-        <div>
-          <div class="card-name">Theo dõi thực tập</div>
-          <div class="card-code">MH-GV-01</div>
-        </div>
-      </a>
-      <a class="card" href="Output/UI/MH-GV-02_ChangeRequestApproval.html">
-        <span class="badge badge-gv">GV</span>
-        <div>
-          <div class="card-name">Phê duyệt thay đổi</div>
-          <div class="card-code">MH-GV-02</div>
-        </div>
-      </a>
-    </div>
-  </div>
-
-  <div class="section">
-    <div class="section-title">Phòng Đào tạo (PDT)</div>
-    <div class="grid">
-      <a class="card" href="Output/UI/MH-PDT-00_Dashboard.html">
-        <span class="badge badge-pdt">PDT</span>
-        <div>
-          <div class="card-name">Dashboard</div>
-          <div class="card-code">MH-PDT-00</div>
-        </div>
-      </a>
-      <a class="card" href="Output/UI/MH-PDT-01_InternshipRound.html">
-        <span class="badge badge-pdt">PDT</span>
-        <div>
-          <div class="card-name">Quản lý đợt thực tập</div>
-          <div class="card-code">MH-PDT-01</div>
-        </div>
-      </a>
-      <a class="card" href="Output/UI/MH-PDT-04_InternshipRound_Create.html">
-        <span class="badge badge-pdt">PDT</span>
-        <div>
-          <div class="card-name">Tạo đợt thực tập</div>
-          <div class="card-code">MH-PDT-04</div>
-        </div>
-      </a>
-      <a class="card" href="Output/UI/MH-PDT-05_StudentEligibility.html">
-        <span class="badge badge-pdt">PDT</span>
-        <div>
-          <div class="card-name">Điều kiện sinh viên</div>
-          <div class="card-code">MH-PDT-05</div>
-        </div>
-      </a>
-      <a class="card" href="Output/UI/MH-PDT-06_InternshipStudents.html">
-        <span class="badge badge-pdt">PDT</span>
-        <div>
-          <div class="card-name">Danh sách SV thực tập</div>
-          <div class="card-code">MH-PDT-06</div>
-        </div>
-      </a>
+      <a class="card" href="Output/UI/MH-DN-00_Login.html"><span class="badge badge-dn">DN</span><div><div class="card-name">Đăng nhập</div><div class="card-code">MH-DN-00</div></div></a>
+      <a class="card" href="Output/UI/MH-DN-01_Register.html"><span class="badge badge-dn">DN</span><div><div class="card-name">Đăng ký</div><div class="card-code">MH-DN-01</div></div></a>
+      <a class="card" href="Output/UI/MH-DN-02_Dashboard.html"><span class="badge badge-dn">DN</span><div><div class="card-name">Trang chủ</div><div class="card-code">MH-DN-02</div></div></a>
+      <a class="card" href="Output/UI/MH-DN-03_Profile.html"><span class="badge badge-dn">DN</span><div><div class="card-name">Hồ sơ doanh nghiệp</div><div class="card-code">MH-DN-03</div></div></a>
+      <a class="card" href="Output/UI/MH-DN-04_Partnership.html"><span class="badge badge-dn">DN</span><div><div class="card-name">Hợp tác</div><div class="card-code">MH-DN-04</div></div></a>
+      <a class="card" href="Output/UI/MH-DN-05_News.html"><span class="badge badge-dn">DN</span><div><div class="card-name">Tin tức</div><div class="card-code">MH-DN-05</div></div></a>
+      <a class="card" href="Output/UI/MH-DN-05A_NewsForm.html"><span class="badge badge-dn">DN</span><div><div class="card-name">Tạo/Sửa tin tức</div><div class="card-code">MH-DN-05A</div></div></a>
+      <a class="card" href="Output/UI/MH-DN-06_Topics.html"><span class="badge badge-dn">DN</span><div><div class="card-name">Đề tài</div><div class="card-code">MH-DN-06</div></div></a>
+      <a class="card" href="Output/UI/MH-DN-07_Internship.html"><span class="badge badge-dn">DN</span><div><div class="card-name">Thực tập</div><div class="card-code">MH-DN-07</div></div></a>
     </div>
   </div>
 
   <div class="section">
     <div class="section-title">Sinh viên (SV)</div>
     <div class="grid">
-      <a class="card" href="Output/UI/MH-SV-01_MyInternships.html">
-        <span class="badge badge-sv">SV</span>
-        <div>
-          <div class="card-name">Thực tập của tôi</div>
-          <div class="card-code">MH-SV-01</div>
-        </div>
-      </a>
+      <a class="card" href="Output/UI/MH-SV-01_MyInternships.html"><span class="badge badge-sv">SV</span><div><div class="card-name">Thực tập của tôi</div><div class="card-code">MH-SV-01</div></div></a>
+      <a class="card" href="Output/UI/MH-SV-02_TopicBrowse.html"><span class="badge badge-sv">SV</span><div><div class="card-name">Duyệt đề tài</div><div class="card-code">MH-SV-02</div></div></a>
+      <a class="card" href="Output/UI/MH-SV-03_TopicReference.html"><span class="badge badge-sv">SV</span><div><div class="card-name">Tham khảo đề tài</div><div class="card-code">MH-SV-03</div></div></a>
+      <a class="card" href="Output/UI/MH-SV-04_ThemNguyenVong.html"><span class="badge badge-sv">SV</span><div><div class="card-name">Thêm nguyện vọng</div><div class="card-code">MH-SV-04</div></div></a>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="section-title">Giảng viên hướng dẫn (GV)</div>
+    <div class="grid">
+      <a class="card" href="Output/UI/MH-GV-01_InternshipTracking.html"><span class="badge badge-gv">GV</span><div><div class="card-name">Theo dõi thực tập</div><div class="card-code">MH-GV-01</div></div></a>
+      <a class="card" href="Output/UI/MH-GV-02_ChangeRequestApproval.html"><span class="badge badge-gv">GV</span><div><div class="card-name">Phê duyệt thay đổi</div><div class="card-code">MH-GV-02</div></div></a>
+      <a class="card" href="Output/UI/MH-GV-03_AdvisorWishApproval.html"><span class="badge badge-gv">GV</span><div><div class="card-name">Duyệt nguyện vọng hướng dẫn</div><div class="card-code">MH-GV-03</div></div></a>
+      <a class="card" href="Output/UI/MH-GV-04_MyTopics.html"><span class="badge badge-gv">GV</span><div><div class="card-name">Đề tài của tôi</div><div class="card-code">MH-GV-04</div></div></a>
+      <a class="card" href="Output/UI/MH-GV-05_TopicWishes.html"><span class="badge badge-gv">GV</span><div><div class="card-name">Nguyện vọng đề tài</div><div class="card-code">MH-GV-05</div></div></a>
+      <a class="card" href="Output/UI/MH-GV-06_GraduationProjectManagement.html"><span class="badge badge-gv">GV</span><div><div class="card-name">Quản lý đồ án/khóa luận</div><div class="card-code">MH-GV-06</div></div></a>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="section-title">Khoa / Chủ nhiệm bộ môn (KCM)</div>
+    <div class="grid">
+      <a class="card" href="Output/UI/MH-KCM-03_TopicApproval.html"><span class="badge badge-kcm">KCM</span><div><div class="card-name">Duyệt đề tài</div><div class="card-code">MH-KCM-03</div></div></a>
+      <a class="card" href="Output/UI/MH-KCM-04_StudentEligibility.html"><span class="badge badge-kcm">KCM</span><div><div class="card-name">Điều kiện sinh viên</div><div class="card-code">MH-KCM-04</div></div></a>
+      <a class="card" href="Output/UI/MH-KCM-05_AdvisorWishApproval.html"><span class="badge badge-kcm">KCM</span><div><div class="card-name">Duyệt nguyện vọng hướng dẫn</div><div class="card-code">MH-KCM-05</div></div></a>
+      <a class="card" href="Output/UI/MH-KCM-06_StudentTopicApproval.html"><span class="badge badge-kcm">KCM</span><div><div class="card-name">Duyệt đề tài sinh viên</div><div class="card-code">MH-KCM-06</div></div></a>
+      <a class="card" href="Output/UI/MH-KCM-07_GraduationProjectManagement.html"><span class="badge badge-kcm">KCM</span><div><div class="card-name">Quản lý đồ án/khóa luận</div><div class="card-code">MH-KCM-07</div></div></a>
+      <a class="card" href="Output/UI/MH-KCM-08_CouncilManagement.html"><span class="badge badge-kcm">KCM</span><div><div class="card-name">Quản lý hội đồng</div><div class="card-code">MH-KCM-08</div></div></a>
+      <a class="card" href="Output/UI/MH-KCM-09_CouncilStudentAssignment.html"><span class="badge badge-kcm">KCM</span><div><div class="card-name">Phân công sinh viên vào hội đồng</div><div class="card-code">MH-KCM-09</div></div></a>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="section-title">Phòng Đào tạo (PDT)</div>
+    <div class="grid">
+      <a class="card" href="Output/UI/MH-PDT-00_Dashboard.html"><span class="badge badge-pdt">PDT</span><div><div class="card-name">Dashboard</div><div class="card-code">MH-PDT-00</div></div></a>
+      <a class="card" href="Output/UI/MH-PDT-01_InternshipRound.html"><span class="badge badge-pdt">PDT</span><div><div class="card-name">Quản lý đợt thực tập</div><div class="card-code">MH-PDT-01</div></div></a>
+      <a class="card" href="Output/UI/MH-PDT-04_InternshipRound_Create.html"><span class="badge badge-pdt">PDT</span><div><div class="card-name">Tạo đợt thực tập</div><div class="card-code">MH-PDT-04</div></div></a>
+      <a class="card" href="Output/UI/MH-PDT-05_StudentEligibility.html"><span class="badge badge-pdt">PDT</span><div><div class="card-name">Điều kiện sinh viên</div><div class="card-code">MH-PDT-05</div></div></a>
+      <a class="card" href="Output/UI/MH-PDT-06_InternshipStudents.html"><span class="badge badge-pdt">PDT</span><div><div class="card-name">Danh sách SV thực tập</div><div class="card-code">MH-PDT-06</div></div></a>
+      <a class="card" href="Output/UI/MH-PDT-07_CouncilManagement.html"><span class="badge badge-pdt">PDT</span><div><div class="card-name">Quản lý hội đồng</div><div class="card-code">MH-PDT-07</div></div></a>
+      <a class="card" href="Output/UI/MH-PDT-08_StudentTopicApproval.html"><span class="badge badge-pdt">PDT</span><div><div class="card-name">Duyệt đề tài sinh viên</div><div class="card-code">MH-PDT-08</div></div></a>
+      <a class="card" href="Output/UI/MH-PDT-09_DecisionTemplateManagement.html"><span class="badge badge-pdt">PDT</span><div><div class="card-name">Quản lý mẫu quyết định</div><div class="card-code">MH-PDT-09</div></div></a>
+      <a class="card" href="Output/UI/MH-PDT-10_GraduationProjectManagement.html"><span class="badge badge-pdt">PDT</span><div><div class="card-name">Quản lý đồ án/khóa luận</div><div class="card-code">MH-PDT-10</div></div></a>
     </div>
   </div>
 

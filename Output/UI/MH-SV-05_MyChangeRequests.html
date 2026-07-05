@@ -1,0 +1,691 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>DS yêu cầu — Yêu cầu đã gửi | Sinh viên</title>
+  <link rel="stylesheet" href="_styles.css">
+  <style>
+    .icon-btn {
+      display: inline-flex; align-items: center; justify-content: center;
+      width: 30px; height: 30px; border-radius: 6px; border: 1px solid var(--border);
+      background: #fff; cursor: pointer; font-size: 14px; transition: background .15s, border-color .15s;
+      margin: 0 2px;
+    }
+    .icon-btn:hover { background: #f0f0f0; border-color: #bbb; }
+
+    /* ---- File list popup ---- */
+    .file-item-row { display:flex; align-items:center; gap:10px; padding:10px 12px;
+      border:1px solid var(--border); border-radius:6px; background:#fafafa; }
+    .file-item-row:hover { background:#f0f5ff; border-color:#adc6ff; }
+    .file-item-name { flex:1; font-size:13px; }
+  </style>
+</head>
+<body>
+<div class="app">
+
+  <!-- Sidebar Sinh viên -->
+  <nav class="sidebar">
+    <div class="sb-logo">
+      <div class="sb-logo-icon">🎓</div>
+      <div>
+        <div style="font-weight:700;font-size:14px">HTQT Đại học</div>
+        <div class="text-muted text-sm">Cổng Sinh viên</div>
+      </div>
+    </div>
+    <div class="sb-user">
+      <div class="av">SV</div>
+      <div>
+        <div style="font-size:13px;font-weight:600">Nguyễn Văn An</div>
+        <span class="text-muted text-sm">B22DCCN001 · K68</span>
+      </div>
+    </div>
+    <ul class="sb-menu">
+      <li><a href="#">🏠&nbsp; Trang chủ</a></li>
+      <li class="active">
+        <a href="#">🎓&nbsp; Đồ án &amp; Thực tập</a>
+        <ul class="sb-sub open">
+          <li><a href="MH-SV-01_MyInternships.html">📚 Đợt học tập</a></li>
+          <li><a href="MH-SV-01_MyInternships.html">🏢 Thực tập</a></li>
+          <li><a href="MH-SV-01_MyInternships.html">📖 Đồ án / Khoá luận tốt nghiệp</a></li>
+          <li><a href="MH-SV-01_MyInternships.html">🔬 Đồ án cơ sở</a></li>
+          <li><a href="MH-SV-03_TopicReference.html">🔍 Đề tài tham khảo</a></li>
+          <li><a href="MH-SV-02_TopicBrowse.html">📝 Quản lý nguyện vọng</a></li>
+          <li class="active"><a href="#">📋 DS yêu cầu</a></li>
+        </ul>
+      </li>
+      <li><a href="#">👤&nbsp; Hồ sơ cá nhân</a></li>
+      <li><a href="#">📰&nbsp; Thông báo</a></li>
+      <li><a href="#">❓&nbsp; Hỗ trợ</a></li>
+    </ul>
+  </nav>
+
+  <!-- Main -->
+  <div class="main">
+    <header class="app-header">
+      <span class="h-breadcrumb">🎓 Đồ án &amp; Thực tập &nbsp;/&nbsp; <strong>DS yêu cầu — Yêu cầu đã gửi</strong></span>
+      <div class="h-right">
+        <div class="bw"><button class="btn btn-link" style="font-size:18px">🔔</button><span class="bc">1</span></div>
+        <div class="av">SV</div>
+      </div>
+    </header>
+
+    <main class="content">
+      <!-- Summary stats -->
+      <div style="display:flex;gap:12px;margin-bottom:20px">
+        <div class="stat-card" style="background:#fff;border:1px solid var(--border);border-radius:8px;padding:14px 20px;display:flex;align-items:center;gap:12px;flex:1;cursor:pointer" onclick="filterByStatus('')">
+          <span style="font-size:28px">📊</span>
+          <div><div style="font-size:22px;font-weight:700;color:var(--text-1)" id="stat-all">0</div><div class="text-muted text-sm">Tất cả</div></div>
+        </div>
+        <div class="stat-card" style="background:#fff;border:1px solid var(--border);border-radius:8px;padding:14px 20px;display:flex;align-items:center;gap:12px;flex:1;cursor:pointer" onclick="filterByStatus('pending')">
+          <span style="font-size:28px">📥</span>
+          <div><div style="font-size:22px;font-weight:700;color:var(--warning)" id="stat-pending">0</div><div class="text-muted text-sm">Chờ duyệt</div></div>
+        </div>
+        <div class="stat-card" style="background:#fff;border:1px solid var(--border);border-radius:8px;padding:14px 20px;display:flex;align-items:center;gap:12px;flex:1;cursor:pointer" onclick="filterByStatus('approved')">
+          <span style="font-size:28px">✅</span>
+          <div><div style="font-size:22px;font-weight:700;color:var(--success)" id="stat-approved">0</div><div class="text-muted text-sm">Đã duyệt</div></div>
+        </div>
+        <div class="stat-card" style="background:#fff;border:1px solid var(--border);border-radius:8px;padding:14px 20px;display:flex;align-items:center;gap:12px;flex:1;cursor:pointer" onclick="filterByStatus('rejected')">
+          <span style="font-size:28px">❌</span>
+          <div><div style="font-size:22px;font-weight:700;color:var(--error)" id="stat-rejected">0</div><div class="text-muted text-sm">Từ chối</div></div>
+        </div>
+      </div>
+
+      <!-- Filter -->
+      <div class="filter-bar">
+        <select class="fc" id="f-dot" style="width:200px" onchange="renderTable()">
+          <option value="">Tất cả đợt</option>
+          <option value="TTTN HK1 2025-2026">TTTN HK1 2025-2026</option>
+        </select>
+        <select class="fc" id="f-type" style="width:175px" onchange="renderTable()">
+          <option value="">Tất cả loại yêu cầu</option>
+          <option value="change">Đổi doanh nghiệp</option>
+          <option value="extend">Gia hạn TT</option>
+          <option value="extend_dt">Gia hạn ĐA/KLTN</option>
+          <option value="change_dt">Đổi đề tài</option>
+        </select>
+        <select class="fc" id="f-status" style="width:150px" onchange="renderTable()">
+          <option value="">Tất cả trạng thái</option>
+          <option value="pending">Chờ duyệt</option>
+          <option value="approved">Đã duyệt</option>
+          <option value="rejected">Từ chối</option>
+        </select>
+      </div>
+
+      <!-- Table -->
+      <div class="card" style="padding:0">
+        <div class="tbl-wrap">
+          <table class="tbl">
+            <thead>
+              <tr>
+                <th style="width:44px;text-align:center">STT</th>
+                <th>Đợt</th>
+                <th>CTĐT</th>
+                <th>Lớp Học phần</th>
+                <th style="min-width:130px">Thời gian học</th>
+                <th>Loại yêu cầu</th>
+                <th>Ngày gửi</th>
+                <th style="min-width:200px">Nội dung tóm tắt</th>
+                <th>Tài liệu</th>
+                <th>Trạng thái</th>
+                <th style="min-width:200px">Lý do (GV/Khoa từ chối)</th>
+                <th style="text-align:center">Thao tác</th>
+              </tr>
+            </thead>
+            <tbody id="req-tbody"><!-- rendered by JS --></tbody>
+          </table>
+        </div>
+      </div>
+    </main>
+  </div>
+</div>
+
+<!-- ========== POPUP: XEM CHI TIẾT (READ-ONLY) ========== -->
+<div class="overlay hidden" id="modal-detail">
+  <div class="modal-box" style="width:820px;max-height:92vh">
+    <div class="modal-hd">
+      <span class="modal-title" id="d-title">Xem chi tiết Yêu cầu</span>
+      <button class="modal-close" onclick="closeDetail()">✕</button>
+    </div>
+    <div class="modal-bd" style="overflow-y:auto">
+
+      <!-- Header: loại + ngày gửi + trạng thái -->
+      <div style="background:#f0f5ff;border:1px solid #adc6ff;border-radius:8px;padding:12px 16px;margin-bottom:16px;display:none;align-items:center;gap:14px">
+        <div style="flex:1;min-width:0">
+          <div id="d-type-header" style="font-size:15px"></div>
+          <div style="font-size:12px;color:#597ef7;margin-top:4px">Ngày gửi: <span id="d-date-header">—</span></div>
+        </div>
+        <div style="text-align:right;flex-shrink:0" id="d-status-header"></div>
+      </div>
+
+      <!-- ===== BLOCK: ĐỔI DOANH NGHIỆP ===== -->
+      <div id="d-change-block" style="display:none">
+
+        <div class="sec-title" style="font-size:13px;margin-bottom:10px"><span class="sec-badge">1</span> Cơ sở TT hiện tại</div>
+        <div class="f-row col-2" style="margin-bottom:16px">
+          <div class="fi" style="grid-column:1/-1">
+            <label>Tên Cơ sở TT</label>
+            <input class="fc" type="text" id="d-cu-dn" readonly style="background:#fafafa;cursor:default">
+          </div>
+          <div class="fi">
+            <label>Tỉnh / Thành phố</label>
+            <input class="fc" type="text" id="d-cu-tinh" readonly style="background:#fafafa;cursor:default">
+          </div>
+          <div class="fi">
+            <label>Phường / Xã</label>
+            <input class="fc" type="text" id="d-cu-phuong" readonly style="background:#fafafa;cursor:default">
+          </div>
+          <div class="fi">
+            <label>Địa chỉ chi tiết</label>
+            <input class="fc" type="text" id="d-cu-addr" readonly style="background:#fafafa;cursor:default">
+          </div>
+          <div class="fi">
+            <label>Ngày bắt đầu</label>
+            <input class="fc" type="date" id="d-cu-from" readonly style="background:#fafafa;cursor:default">
+          </div>
+          <div class="fi">
+            <label>Ngày kết thúc</label>
+            <input class="fc" type="date" id="d-cu-to" readonly style="background:#fafafa;cursor:default">
+          </div>
+        </div>
+
+        <div class="sec-title" style="font-size:13px;margin-bottom:10px"><span class="sec-badge">2</span> Cơ sở TT mới đề nghị</div>
+        <div class="f-row col-2" style="margin-bottom:16px">
+          <div class="fi" style="grid-column:1/-1">
+            <label>Tên Cơ sở TT mới</label>
+            <input class="fc" type="text" id="d-moi-dn" readonly style="background:#fafafa;cursor:default">
+          </div>
+          <div class="fi">
+            <label>Tỉnh / Thành phố</label>
+            <input class="fc" type="text" id="d-moi-tinh" readonly style="background:#fafafa;cursor:default">
+          </div>
+          <div class="fi">
+            <label>Phường / Xã</label>
+            <input class="fc" type="text" id="d-moi-phuong" readonly style="background:#fafafa;cursor:default">
+          </div>
+          <div class="fi">
+            <label>Địa chỉ chi tiết</label>
+            <input class="fc" type="text" id="d-moi-addr" readonly style="background:#fafafa;cursor:default">
+          </div>
+          <div class="fi" style="grid-column:1/-1">
+            <label>Người liên hệ tại cơ sở</label>
+            <input class="fc" type="text" id="d-moi-contact" readonly style="background:#fafafa;cursor:default">
+          </div>
+        </div>
+
+        <div class="sec-title" style="font-size:13px;margin-bottom:10px"><span class="sec-badge">3</span> Lý do đề nghị đổi</div>
+
+      </div>
+      <!-- /BLOCK: ĐỔI DOANH NGHIỆP -->
+
+      <!-- ===== BLOCK: GIA HẠN THỰC TẬP ===== -->
+      <div id="d-extend-block" style="display:none">
+
+        <div class="sec-title" style="font-size:13px;margin-bottom:10px"><span class="sec-badge">1</span> Thông tin gia hạn</div>
+        <div class="f-row col-2" style="margin-bottom:16px">
+          <div class="fi" style="grid-column:1/-1">
+            <label>Loại hình thực tập</label>
+            <input class="fc" type="text" id="d-gh-loaihinh" readonly style="background:#e6f4ff;cursor:default;font-weight:600;color:#0958d9">
+          </div>
+          <div class="fi">
+            <label>Ngày kết thúc hiện tại</label>
+            <input class="fc" type="date" id="d-gh-to-cu" readonly style="background:#fafafa;cursor:default">
+          </div>
+          <div class="fi">
+            <label>Ngày kết thúc đề nghị</label>
+            <input class="fc" type="date" id="d-gh-to-moi" readonly style="background:#fafafa;cursor:default">
+          </div>
+        </div>
+
+        <div class="sec-title" style="font-size:13px;margin-bottom:10px"><span class="sec-badge">2</span> Lý do gia hạn</div>
+
+      </div>
+      <!-- /BLOCK: GIA HẠN THỰC TẬP -->
+
+      <!-- ===== BLOCK: GIA HẠN ĐỒ ÁN / KHÓA LUẬN ===== -->
+      <div id="d-extenddt-block" style="display:none">
+
+        <div class="sec-title" style="font-size:13px;margin-bottom:10px"><span class="sec-badge">1</span> Thông tin đề tài</div>
+        <div class="f-row col-2" style="margin-bottom:16px">
+          <div class="fi">
+            <label>Mã đợt</label>
+            <input class="fc" type="text" id="d-ghdt-madot" readonly style="background:#fafafa;cursor:default">
+          </div>
+          <div class="fi">
+            <label>Loại hình</label>
+            <input class="fc" type="text" id="d-ghdt-loaihinh" readonly style="background:#fafafa;cursor:default">
+          </div>
+          <div class="fi" style="grid-column:1/-1">
+            <label>Tên đề tài</label>
+            <textarea class="fc" id="d-ghdt-tende" readonly rows="2" style="background:#fafafa;cursor:default;resize:none"></textarea>
+          </div>
+          <div class="fi">
+            <label>Số Quyết định giao đề tài</label>
+            <input class="fc" type="text" id="d-ghdt-soqd" readonly style="background:#fafafa;cursor:default">
+          </div>
+          <div class="fi">
+            <label>GVHD</label>
+            <input class="fc" type="text" id="d-ghdt-gvhd" readonly style="background:#fafafa;cursor:default">
+          </div>
+        </div>
+
+        <div class="sec-title" style="font-size:13px;margin-bottom:10px"><span class="sec-badge">2</span> Thời gian gia hạn</div>
+        <div class="f-row col-2" style="margin-bottom:16px">
+          <div class="fi">
+            <label>Ngày kết thúc hiện tại</label>
+            <input class="fc" type="date" id="d-ghdt-to-cu" readonly style="background:#fafafa;cursor:default">
+          </div>
+          <div class="fi">
+            <label>Ngày kết thúc đề nghị</label>
+            <input class="fc" type="date" id="d-ghdt-to-moi" readonly style="background:#e6f4ff;cursor:default;font-weight:600;color:#0958d9">
+          </div>
+        </div>
+
+        <div class="sec-title" style="font-size:13px;margin-bottom:10px"><span class="sec-badge">3</span> Lý do xin gia hạn</div>
+
+      </div>
+      <!-- /BLOCK: GIA HẠN ĐỒ ÁN / KHÓA LUẬN -->
+
+      <!-- ===== BLOCK: ĐỔI ĐỀ TÀI ===== -->
+      <div id="d-changedt-block" style="display:none">
+
+        <div class="sec-title" style="font-size:13px;margin-bottom:10px"><span class="sec-badge">1</span> Thông tin đề tài theo Quyết định</div>
+        <div class="f-row col-2" style="margin-bottom:16px">
+          <div class="fi">
+            <label>Mã đợt</label>
+            <input class="fc" type="text" id="d-cdt-madot" readonly style="background:#fafafa;cursor:default">
+          </div>
+          <div class="fi">
+            <label>Loại hình</label>
+            <input class="fc" type="text" id="d-cdt-loaihinh" readonly style="background:#fafafa;cursor:default">
+          </div>
+          <div class="fi" style="grid-column:1/-1">
+            <label>Tên đề tài theo Quyết định</label>
+            <textarea class="fc" id="d-cdt-tende-cu" readonly rows="2" style="background:#fafafa;cursor:default;resize:none"></textarea>
+          </div>
+          <div class="fi">
+            <label>GVHD</label>
+            <input class="fc" type="text" id="d-cdt-gvhd" readonly style="background:#fafafa;cursor:default">
+          </div>
+          <div class="fi">
+            <label>Số Quyết định giao đề tài</label>
+            <input class="fc" type="text" id="d-cdt-soqd" readonly style="background:#fafafa;cursor:default">
+          </div>
+        </div>
+
+        <div class="sec-title" style="font-size:13px;margin-bottom:10px"><span class="sec-badge">2</span> Đề nghị thay đổi</div>
+        <div class="fi" style="margin-bottom:12px">
+          <div style="display:flex;gap:24px;align-items:center">
+            <label style="display:flex;align-items:center;gap:6px;font-weight:400;cursor:default">
+              <input type="radio" name="d-cdt-hinhthuc-radio" id="d-cdt-radio-cosan" disabled style="width:15px;height:15px;accent-color:#1677ff">
+              Chọn đề tài có sẵn (GVHD/GV khác đề xuất)
+            </label>
+            <label style="display:flex;align-items:center;gap:6px;font-weight:400;cursor:default">
+              <input type="radio" name="d-cdt-hinhthuc-radio" id="d-cdt-radio-tude" disabled style="width:15px;height:15px;accent-color:#1677ff">
+              Tự đề xuất đề tài
+            </label>
+          </div>
+        </div>
+
+        <!-- Trường hợp: Chọn đề tài có sẵn -->
+        <div class="fi" id="d-cdt-cosan-block" style="margin-bottom:16px">
+          <label>Tên đề tài đã chọn</label>
+          <textarea class="fc" id="d-cdt-tende-moi" readonly rows="2" style="background:#fff7e6;cursor:default;resize:none;font-weight:600;color:#d46b08"></textarea>
+        </div>
+
+        <!-- Trường hợp: Tự đề xuất đề tài -->
+        <div id="d-cdt-tude-block" style="display:none">
+          <div class="f-row col-2" style="margin-bottom:16px">
+            <div class="fi">
+              <label>Mã đề tài</label>
+              <input class="fc" type="text" id="d-cdt-tude-ma" readonly style="background:#fff7e6;cursor:default;font-weight:600;color:#d46b08">
+            </div>
+            <div class="fi">
+              <label>Chương trình đào tạo</label>
+              <input class="fc" type="text" id="d-cdt-tude-ctdt" readonly style="background:#fafafa;cursor:default">
+            </div>
+            <div class="fi" style="grid-column:1/-1">
+              <label>Loại đề tài</label>
+              <input class="fc" type="text" id="d-cdt-tude-loaidt" readonly style="background:#fafafa;cursor:default">
+            </div>
+            <div class="fi" style="grid-column:1/-1">
+              <label>Tên đề tài</label>
+              <input class="fc" type="text" id="d-cdt-tude-ten" readonly style="background:#fafafa;cursor:default">
+            </div>
+            <div class="fi" style="grid-column:1/-1">
+              <label>Tóm tắt đề tài</label>
+              <textarea class="fc" id="d-cdt-tude-tomtat" readonly rows="3" style="background:#fafafa;cursor:default;resize:none"></textarea>
+            </div>
+            <div class="fi" style="grid-column:1/-1">
+              <label>Sản phẩm / Kết quả dự kiến</label>
+              <textarea class="fc" id="d-cdt-tude-sanpham" readonly rows="2" style="background:#fafafa;cursor:default;resize:none"></textarea>
+            </div>
+            <div class="fi" style="grid-column:1/-1">
+              <label>Công nghệ / Công cụ dự kiến</label>
+              <input class="fc" type="text" id="d-cdt-tude-congnghe" readonly style="background:#fafafa;cursor:default">
+            </div>
+          </div>
+        </div>
+
+        <div class="sec-title" style="font-size:13px;margin-bottom:10px"><span class="sec-badge">3</span> Lý do đề nghị chỉnh sửa / thay đổi</div>
+
+      </div>
+      <!-- /BLOCK: ĐỔI ĐỀ TÀI -->
+
+      <!-- Lý do / Nội dung nguyện vọng (dùng chung) -->
+      <div class="fi" style="margin-bottom:14px">
+        <div id="d-reason" style="padding:10px 12px;border:1px solid var(--border);border-radius:6px;background:#fafafa;font-size:13px;line-height:1.6;min-height:80px"></div>
+      </div>
+
+      <!-- Tài liệu minh chứng -->
+      <div class="fi" id="d-files-block" style="margin-bottom:16px">
+        <div class="sec-title" style="font-size:13px;margin-bottom:10px" id="d-files-title"><label style="margin:0">Tài liệu minh chứng</label></div>
+        <div style="display:flex;flex-direction:column;gap:8px" id="d-files"></div>
+      </div>
+
+      <!-- Thông tin phản hồi từ Giáo vụ (hiện khi status != chờ duyệt) -->
+      <div id="d-done-block" style="display:none">
+        <div class="alert alert-success">
+          <span class="alert-ico">✅</span>
+          <div class="alert-body"><div class="alert-title" id="d-done-status"></div><span class="alert-desc" id="d-done-feedback"></span></div>
+        </div>
+      </div>
+    </div>
+    <div class="modal-ft">
+      <button class="btn btn-default" onclick="closeDetail()">Đóng</button>
+    </div>
+  </div>
+</div>
+
+<!-- ========== POPUP: DANH SÁCH FILE ========== -->
+<div class="overlay hidden" id="modal-files-list">
+  <div class="modal-box" style="width:480px">
+    <div class="modal-hd">
+      <span class="modal-title" id="fl-title">📎 Tài liệu minh chứng</span>
+      <button class="modal-close" onclick="closeFilesList()">✕</button>
+    </div>
+    <div class="modal-bd">
+      <div style="margin-bottom:10px;font-size:12px;color:var(--text-2)" id="fl-meta"></div>
+      <div style="display:flex;flex-direction:column;gap:8px" id="fl-list"></div>
+    </div>
+    <div class="modal-ft">
+      <button class="btn btn-default" onclick="closeFilesList()">Đóng</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast-box" id="toast-box"></div>
+
+<script>
+const DOTS = {
+  'TTTN HK1 2025-2026':  'Thực tập tốt nghiệp',
+  'Kiến tập HK hè 2024': 'Kiến tập',
+};
+
+/* Yêu cầu do sinh viên B22DCCN001 (Nguyễn Văn An) đã gửi — học song ngành KTPM & KHMT */
+const REQUESTS = [
+  { id:1, dot:'TTTN HK1 2025-2026', ctdtChung:'KTPM', lhp:'INT3110_1', thoiGianHoc:'01/09/2025 – 31/12/2025', type:'change', date:'20/09/2025 14:32', status:'pending',
+    reason:'Doanh nghiệp FPT Software thông báo tạm dừng nhận thực tập sinh do tái cơ cấu nội bộ từ tháng 10/2025. Kính mong Giáo vụ chấp thuận để tôi chuyển sang DN mới phù hợp hơn.',
+    files:['DonXinDoi_B22DCCN001.pdf','QuyetDinhTaiCoSo_FPT.pdf'],
+    cuDn:'FPT Software', cuTinh:'Hà Nội', cuPhuong:'Dịch Vọng Hậu', cuAddr:'Tòa nhà FPT, Phố Duy Tân', cuFrom:'2025-09-01', cuTo:'2025-12-31',
+    moiDn:'Tập đoàn FPT Telecom', moiTinh:'Hà Nội', moiPhuong:'Mỹ Đình', moiAddr:'Số 89 Phạm Hùng, Nam Từ Liêm', moiContact:'Nguyễn Thị Lan (HR)' },
+
+  { id:2, dot:'TTTN HK1 2025-2026', ctdtChung:'KTPM', lhp:'INT3110_1', thoiGianHoc:'01/09/2025 – 31/12/2025', type:'extend', date:'05/10/2025 09:40', status:'approved',
+    reason:'Dự án tại doanh nghiệp bị kéo dài thêm 3 tuần so với kế hoạch ban đầu do phát sinh yêu cầu từ khách hàng. Cần thêm thời gian để hoàn thiện công việc và viết báo cáo.',
+    files:['XacNhanDoanhNghiep_GiaHan.pdf'],
+    ghToCu:'2025-12-15', ghToMoi:'2026-01-05',
+    feedback:'Đã xem xét và chấp thuận gia hạn thêm 3 tuần theo đề nghị.' },
+
+  { id:3, dot:'TTTN HK1 2025-2026', ctdtChung:'KTPM', lhp:'INT3110_1', thoiGianHoc:'01/09/2025 – 31/12/2025', type:'extend_dt', date:'25/09/2025 10:05', status:'pending',
+    reason:'Mô hình học máy cần thêm thời gian huấn luyện và đánh giá lại trên tập dữ liệu mới bổ sung theo yêu cầu của GVHD. Kính mong Khoa xem xét gia hạn thêm 3 tuần để hoàn thiện đồ án.',
+    files:['DonXinGiaHanDoAn_B22DCCN001.pdf'],
+    madot:'DA-HK1-2025-2026', loaihinh:'Đồ án tốt nghiệp',
+    tenDeTai:'DT-2025-0058 — Ứng dụng học máy dự đoán nhu cầu tuyển dụng theo ngành nghề',
+    soQD:'156/QĐ-CNTT', gvhd:'TS. Lê Thị Mai',
+    ghdtToCu:'2025-12-15', ghdtToMoi:'2026-01-05' },
+
+  { id:4, dot:'TTTN HK1 2025-2026', ctdtChung:'KHMT', lhp:'INT3110_3', thoiGianHoc:'01/09/2025 – 31/12/2025', type:'change_dt', date:'26/09/2025 15:40', status:'rejected',
+    reason:'Đề tài hiện tại trùng hướng nghiên cứu với một nhóm sinh viên khác trong cùng lớp học phần. Kính mong Khoa xem xét cho phép đổi sang đề tài phù hợp hơn với năng lực và định hướng cá nhân.',
+    files:[],
+    madot:'DA-HK1-2025-2026', loaihinh:'Đồ án tốt nghiệp',
+    tenDeTaiCu:'DT-2025-0072 — Hệ thống khuyến nghị việc làm dựa trên hồ sơ ứng viên',
+    gvhd:'ThS. Đặng Văn Khoa', soQD:'156/QĐ-CNTT',
+    hinhThuc:'Chọn đề tài có sẵn (GVHD/GV khác đề xuất)',
+    maDeTaiMoi:'DT-2025-0121',
+    tenDeTaiMoi:'Xây dựng hệ thống phân loại văn bản tự động bằng học sâu',
+    feedback:'Không đủ căn cứ để đổi đề tài tại thời điểm này. Đề nghị sinh viên trao đổi thêm với GVHD hiện tại.' },
+
+  { id:5, dot:'TTTN HK1 2025-2026', ctdtChung:'KHMT', lhp:'INT3110_3', thoiGianHoc:'01/09/2025 – 31/12/2025', type:'change_dt', date:'28/09/2025 13:15', status:'pending',
+    reason:'Trong quá trình thực tập tại doanh nghiệp, tôi nhận thấy bài toán tối ưu tuyến vận chuyển tại đơn vị thực tập rất phù hợp với năng lực và có dữ liệu thực tế để triển khai. Kính mong Khoa xem xét cho phép tự đề xuất đề tài này thay cho đề tài đã giao.',
+    files:[],
+    madot:'DA-HK1-2025-2026', loaihinh:'Đồ án tốt nghiệp',
+    tenDeTaiCu:'DT-2025-0105 — Xây dựng website quản lý bán hàng trực tuyến',
+    gvhd:'ThS. Trịnh Thu Hằng', soQD:'156/QĐ-CNTT',
+    hinhThuc:'Tự đề xuất đề tài',
+    maDeTaiTuDe:'SV-ĐT-2026-512', ctdt:'KHMT – Khoa học máy tính',
+    tenDeTaiMoi:'Tối ưu hóa tuyến vận chuyển hàng hóa bằng thuật toán di truyền tại Công ty Logistics ABC',
+    tomTatDeTai:'Nghiên cứu và xây dựng giải pháp tối ưu hóa tuyến đường vận chuyển hàng hóa dựa trên thuật toán di truyền (Genetic Algorithm), áp dụng trên dữ liệu thực tế của Công ty Logistics ABC nhằm giảm chi phí và thời gian giao hàng.',
+    sanPhamDuKien:'Hệ thống phần mềm tối ưu tuyến vận chuyển, báo cáo đồ án tốt nghiệp, bộ dữ liệu thử nghiệm và kết quả đánh giá so sánh với phương pháp hiện tại.',
+    congNgheDuKien:'Python, OR-Tools, PostgreSQL, React' },
+];
+
+const TYPE_LABEL_MAP = {
+  change:    { icon:'🔄', text:'Đổi doanh nghiệp', tagClass:'tag-blue' },
+  extend:    { icon:'📅', text:'Gia hạn TT',        tagClass:'tag-default' },
+  extend_dt: { icon:'📘', text:'Gia hạn ĐA/KLTN',    tagClass:'tag-purple' },
+  change_dt: { icon:'🔀', text:'Đổi đề tài',         tagClass:'tag-cyan' },
+};
+
+const STATUS_MAP = {
+  pending:  { icon:'⏳', text:'Chờ duyệt', tagClass:'tag-warning' },
+  approved: { icon:'✅', text:'Đã duyệt',  tagClass:'tag-success' },
+  rejected: { icon:'❌', text:'Từ chối',   tagClass:'tag-error' },
+};
+
+function filterByStatus(status) {
+  document.getElementById('f-status').value = status;
+  renderTable();
+}
+
+function renderTable() {
+  const fDot    = document.getElementById('f-dot').value;
+  const fType   = document.getElementById('f-type').value;
+  const fStatus = document.getElementById('f-status').value;
+
+  const filtered = REQUESTS.filter(r =>
+    (!fDot || r.dot === fDot) &&
+    (!fType || r.type === fType) &&
+    (!fStatus || r.status === fStatus)
+  );
+
+  document.getElementById('stat-all').textContent      = REQUESTS.length;
+  document.getElementById('stat-pending').textContent  = REQUESTS.filter(r=>r.status==='pending').length;
+  document.getElementById('stat-approved').textContent = REQUESTS.filter(r=>r.status==='approved').length;
+  document.getElementById('stat-rejected').textContent = REQUESTS.filter(r=>r.status==='rejected').length;
+
+  const tbody = document.getElementById('req-tbody');
+  if (filtered.length === 0) {
+    tbody.innerHTML = `<tr><td colspan="12" style="text-align:center;padding:32px;color:var(--text-3)">Không có yêu cầu nào phù hợp bộ lọc.</td></tr>`;
+    return;
+  }
+
+  tbody.innerHTML = filtered.map((r, idx) => {
+    const t = TYPE_LABEL_MAP[r.type];
+    const s = STATUS_MAP[r.status];
+    const filesCell = (r.files && r.files.length > 0)
+      ? `<button class="btn btn-link text-link" style="font-size:12px;padding:0" onclick="openDetailFiles(${r.id})">📎 Xem (${r.files.length} file)</button>`
+      : `<span style="color:var(--text-3);font-size:12px">—</span>`;
+    return `<tr>
+      <td style="text-align:center;color:var(--text-3)">${idx + 1}</td>
+      <td style="font-size:12px;white-space:nowrap">${r.dot}</td>
+      <td style="font-size:13px;color:var(--text-2)">${r.ctdtChung || '—'}</td>
+      <td style="font-size:12px;font-weight:500">${r.lhp || '—'}</td>
+      <td style="font-size:12px;white-space:nowrap">${r.thoiGianHoc || '—'}</td>
+      <td><span class="tag ${t.tagClass}">${t.icon} ${t.text}</span></td>
+      <td style="font-size:12px;white-space:nowrap">${r.date}</td>
+      <td style="font-size:12px">${r.reason.length > 70 ? r.reason.slice(0,70) + '...' : r.reason}</td>
+      <td>${filesCell}</td>
+      <td><span class="tag ${s.tagClass}">${s.text}</span></td>
+      <td style="font-size:12px;color:var(--error)">${r.status === 'rejected' && r.feedback ? r.feedback : '<span style="color:var(--text-3)">—</span>'}</td>
+      <td style="text-align:center">
+        <button class="icon-btn" onclick="openDetail(${r.id})" title="Xem chi tiết">👁️</button>
+      </td>
+    </tr>`;
+  }).join('');
+}
+
+function openDetailFiles(id) {
+  const req = REQUESTS.find(r => r.id === id);
+  document.getElementById('fl-title').textContent = '📎 Tài liệu minh chứng';
+  document.getElementById('fl-meta').textContent = req.files.length + ' file đính kèm';
+
+  const list = document.getElementById('fl-list');
+  list.innerHTML = req.files.map(f => {
+    const ext = f.split('.').pop().toLowerCase();
+    const icon = ext === 'pdf' ? '📕' : (ext === 'docx' || ext === 'doc') ? '📘' : ext === 'xlsx' || ext === 'xls' ? '📗' : '📄';
+    return `<div class="file-item-row">
+      <span style="font-size:18px">${icon}</span>
+      <span class="file-item-name">${f}</span>
+      <button class="btn btn-primary btn-sm" onclick="downloadFile('${f}')">⬇️ Tải xuống</button>
+    </div>`;
+  }).join('');
+
+  document.getElementById('modal-files-list').classList.remove('hidden');
+}
+
+function closeFilesList() {
+  document.getElementById('modal-files-list').classList.add('hidden');
+}
+
+function openDetail(id) {
+  const req = REQUESTS.find(r=>r.id===id);
+  const t = TYPE_LABEL_MAP[req.type];
+  const s = STATUS_MAP[req.status];
+
+  const TITLE_MAP = {
+    change:    '🔄 ĐƠN XIN ĐỔI DOANH NGHIỆP',
+    extend:    '📅 ĐƠN XIN GIA HẠN THỰC TẬP',
+    extend_dt: '📘 ĐƠN XIN GIA HẠN ' + (req.loaihinh ? req.loaihinh.toUpperCase() : 'ĐỒ ÁN / KHÓA LUẬN'),
+    change_dt: '🔀 ĐƠN ĐỀ NGHỊ ĐỔI ĐỀ TÀI',
+  };
+  document.getElementById('d-title').textContent = TITLE_MAP[req.type] || '';
+
+  document.getElementById('d-type-header').innerHTML = `<span class="tag ${t.tagClass}">${t.icon} ${t.text}</span>`;
+  document.getElementById('d-date-header').textContent = req.date;
+  document.getElementById('d-status-header').innerHTML = `<span class="tag ${s.tagClass}">${s.text}</span>`;
+
+  document.getElementById('d-reason').textContent = req.reason;
+
+  document.getElementById('d-change-block').style.display    = req.type==='change'    ? '' : 'none';
+  document.getElementById('d-extend-block').style.display    = req.type==='extend'    ? '' : 'none';
+  document.getElementById('d-extenddt-block').style.display  = req.type==='extend_dt' ? '' : 'none';
+  document.getElementById('d-changedt-block').style.display  = req.type==='change_dt' ? '' : 'none';
+
+  if (req.type === 'change') {
+    document.getElementById('d-cu-dn').value      = req.cuDn      || '';
+    document.getElementById('d-cu-tinh').value    = req.cuTinh    || '';
+    document.getElementById('d-cu-phuong').value  = req.cuPhuong  || '';
+    document.getElementById('d-cu-addr').value    = req.cuAddr    || '';
+    document.getElementById('d-cu-from').value    = req.cuFrom    || '';
+    document.getElementById('d-cu-to').value      = req.cuTo      || '';
+    document.getElementById('d-moi-dn').value     = req.moiDn     || '';
+    document.getElementById('d-moi-tinh').value   = req.moiTinh   || '';
+    document.getElementById('d-moi-phuong').value = req.moiPhuong || '';
+    document.getElementById('d-moi-addr').value   = req.moiAddr   || '';
+    document.getElementById('d-moi-contact').value= req.moiContact|| '';
+  } else if (req.type === 'extend') {
+    document.getElementById('d-gh-loaihinh').value = DOTS[req.dot] || req.dot || '—';
+    document.getElementById('d-gh-to-cu').value    = req.ghToCu   || '';
+    document.getElementById('d-gh-to-moi').value   = req.ghToMoi  || '';
+  } else if (req.type === 'extend_dt') {
+    document.getElementById('d-ghdt-madot').value    = req.madot    || '';
+    document.getElementById('d-ghdt-loaihinh').value = req.loaihinh || '';
+    document.getElementById('d-ghdt-tende').value    = req.tenDeTai || '';
+    document.getElementById('d-ghdt-soqd').value     = req.soQD     || '';
+    document.getElementById('d-ghdt-gvhd').value     = req.gvhd     || '';
+    document.getElementById('d-ghdt-to-cu').value    = req.ghdtToCu || '';
+    document.getElementById('d-ghdt-to-moi').value   = req.ghdtToMoi|| '';
+  } else if (req.type === 'change_dt') {
+    document.getElementById('d-cdt-madot').value     = req.madot      || '';
+    document.getElementById('d-cdt-loaihinh').value  = req.loaihinh   || '';
+    document.getElementById('d-cdt-tende-cu').value  = req.tenDeTaiCu || '';
+    document.getElementById('d-cdt-gvhd').value      = req.gvhd       || '';
+    document.getElementById('d-cdt-soqd').value      = req.soQD       || '';
+
+    const isCoSan = /có sẵn/i.test(req.hinhThuc || '');
+    document.getElementById('d-cdt-radio-cosan').checked = isCoSan;
+    document.getElementById('d-cdt-radio-tude').checked  = !isCoSan;
+
+    document.getElementById('d-cdt-cosan-block').style.display = isCoSan ? '' : 'none';
+    document.getElementById('d-cdt-tude-block').style.display  = isCoSan ? 'none' : '';
+
+    if (isCoSan) {
+      document.getElementById('d-cdt-tende-moi').value = req.maDeTaiMoi
+        ? req.maDeTaiMoi + ' — ' + (req.tenDeTaiMoi || '')
+        : (req.tenDeTaiMoi || '');
+    } else {
+      document.getElementById('d-cdt-tude-ma').value       = req.maDeTaiTuDe    || '';
+      document.getElementById('d-cdt-tude-ctdt').value     = req.ctdt           || '';
+      document.getElementById('d-cdt-tude-loaidt').value   = req.loaihinh       || '';
+      document.getElementById('d-cdt-tude-ten').value      = req.tenDeTaiMoi    || '';
+      document.getElementById('d-cdt-tude-tomtat').value   = req.tomTatDeTai    || '';
+      document.getElementById('d-cdt-tude-sanpham').value  = req.sanPhamDuKien  || '';
+      document.getElementById('d-cdt-tude-congnghe').value = req.congNgheDuKien || '';
+    }
+  }
+
+  document.getElementById('d-files-block').style.display = req.type === 'change_dt' ? 'none' : '';
+  document.getElementById('d-files-title').innerHTML = req.type === 'extend_dt'
+    ? '<span class="sec-badge">4</span> Minh chứng'
+    : '<label style="margin:0">Tài liệu minh chứng</label>';
+
+  const filesEl = document.getElementById('d-files');
+  filesEl.innerHTML = req.files.map((f)=>{
+    const ext = f.split('.').pop().toLowerCase();
+    const icon = ext==='pdf' ? '📕' : (ext==='docx'||ext==='doc') ? '📘' : ext==='xlsx'||ext==='xls' ? '📗' : '📄';
+    return `<div class="file-item-row">
+      <span style="font-size:16px">${icon}</span>
+      <span class="file-item-name">${f}</span>
+      <button class="btn btn-default btn-sm" onclick="downloadFile('${f}')">⬇️ Tải</button>
+    </div>`;
+  }).join('');
+
+  const isPending = req.status === 'pending';
+  document.getElementById('d-done-block').style.display = 'none';
+  if (!isPending) {
+    const clsMap = {approved:'alert alert-success', rejected:'alert alert-warning'};
+    document.getElementById('d-done-block').className = clsMap[req.status] || 'alert alert-info';
+    document.getElementById('d-done-status').textContent = STATUS_MAP[req.status].text;
+    document.getElementById('d-done-feedback').textContent = req.feedback ? ('Phản hồi: ' + req.feedback) : 'Chưa có phản hồi chi tiết.';
+  }
+
+  document.getElementById('modal-detail').classList.remove('hidden');
+}
+
+function closeDetail(){ document.getElementById('modal-detail').classList.add('hidden'); }
+
+function downloadFile(filename) {
+  const content = `Tên file: ${filename}\nHệ thống: QLDSTT\nNội dung thực tế sẽ được stream từ server.`;
+  const blob = new Blob([content], { type: 'text/plain;charset=utf-8' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url; a.download = filename;
+  document.body.appendChild(a); a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+  toast('Đang tải xuống: ' + filename);
+}
+
+function toast(msg,type='success'){
+  const box=document.getElementById('toast-box');
+  const t=document.createElement('div');
+  t.className='toast'+(type==='error'?' err':type==='warning'?' warn':'');
+  t.innerHTML=(type==='success'?'✅ ':type==='error'?'❌ ':'⚠️ ')+msg;
+  box.appendChild(t);
+  setTimeout(()=>t.remove(),3500);
+}
+
+renderTable();
+</script>
+</body>
+</html>

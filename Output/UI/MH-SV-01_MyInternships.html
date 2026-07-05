@@ -53,6 +53,21 @@
     .mtab{display:flex;align-items:center;padding:10px 16px;font-size:13px;color:var(--text-2);text-decoration:none;border-bottom:2px solid transparent;white-space:nowrap;cursor:pointer;transition:color .15s,border-color .15s;gap:5px}
     .mtab:hover{color:var(--primary)}
     .mtab.active{color:var(--primary);border-bottom-color:var(--primary);font-weight:600}
+
+    #dc-alert .alert-info{display:none}
+    #modal-dakl-decuong .btn[disabled]{opacity:.4;cursor:not-allowed}
+
+    /* Đồ án / Khoá luận — trạng thái đề cương & kết luận hội đồng */
+    .ketluan-pill{display:inline-flex;align-items:center;gap:4px;font-size:11px;font-weight:600;padding:2px 9px;border-radius:10px;border:1px solid;white-space:nowrap;cursor:pointer}
+    .ketluan-pill.wait{color:#d48806;background:#fffbe6;border-color:#ffe58f}
+    .ketluan-pill.pass{color:#389e0d;background:#f6ffed;border-color:#b7eb8f}
+    .ketluan-pill.fail{color:#cf1322;background:#fff1f0;border-color:#ffa39e}
+    .conclusion-tag{font-size:12px;padding:3px 10px;border-radius:10px;border:1px solid;white-space:nowrap;display:inline-block;font-weight:600;cursor:pointer}
+    .cl-dat{background:#f6ffed;color:#389e0d;border-color:#b7eb8f}
+    .cl-khongdat{background:#fff2f0;color:#cf1322;border-color:#ffa39e}
+    .cl-canchinh{background:#fff7e6;color:#d46b08;border-color:#ffd591}
+    .cl-hoanbaove{background:#f0f5ff;color:#1d39c4;border-color:#adc6ff}
+    .tbl-truncate{max-width:230px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
   </style>
 </head>
 <body>
@@ -86,7 +101,7 @@
             <a href="javascript:void(0)" onclick="switchTab('thuc-tap')">🏢 Thực tập</a>
           </li>
           <li id="sub-do-an-kl">
-            <a href="javascript:void(0)" onclick="switchTab('do-an-kl')">📖 Đồ án / Khoá luận</a>
+            <a href="javascript:void(0)" onclick="switchTab('do-an-kl')">📖 Đồ án / Khoá luận tốt nghiệp</a>
           </li>
           <li id="sub-do-an-co-so">
             <a href="javascript:void(0)" onclick="switchTab('do-an-co-so')">🔬 Đồ án cơ sở</a>
@@ -96,6 +111,9 @@
           </li>
           <li>
             <a href="MH-SV-02_TopicBrowse.html">📝 Quản lý nguyện vọng</a>
+          </li>
+          <li>
+            <a href="MH-SV-05_MyChangeRequests.html">📋 DS yêu cầu</a>
           </li>
         </ul>
       </li>
@@ -375,10 +393,35 @@
 
       <!-- ===== TAB: Đồ án / Khoá luận ===== -->
       <div class="tab-panel" id="tab-do-an-kl">
-        <div class="card" style="text-align:center;padding:60px 20px;color:var(--text-3)">
-          <div style="font-size:48px;margin-bottom:12px">📖</div>
-          <div style="font-size:16px;font-weight:600;margin-bottom:6px;color:var(--text-2)">Đồ án / Khoá luận</div>
-          <div class="text-sm">Tính năng đang được phát triển</div>
+        <div class="card" style="padding:0">
+          <div style="padding:14px 20px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between">
+            <span style="font-weight:600;font-size:14px">B22DCCN001 — Nguyễn Văn An &nbsp;|&nbsp; <span class="text-muted" style="font-weight:400">Sắp xếp: Đợt mới nhất lên đầu</span></span>
+          </div>
+          <div class="tbl-wrap" style="overflow-x:auto">
+            <table class="tbl" style="min-width:1680px">
+              <thead>
+                <tr>
+                  <th style="width:44px;text-align:center">STT</th>
+                  <th style="min-width:140px">Đơn vị</th>
+                  <th style="min-width:110px">Mã SV</th>
+                  <th style="min-width:150px">Họ và tên</th>
+                  <th style="min-width:120px">CTĐT</th>
+                  <th style="min-width:150px">Mã đợt</th>
+                  <th style="min-width:130px">Lớp học phần</th>
+                  <th style="min-width:220px">Đề tài</th>
+                  <th style="min-width:170px">GVHD</th>
+                  <th style="text-align:center;min-width:120px">Đề cương</th>
+                  <th style="text-align:center;min-width:150px">Trạng thái đề cương</th>
+                  <th style="text-align:center;min-width:110px">Báo cáo</th>
+                  <th style="min-width:170px">Hội đồng</th>
+                  <th style="text-align:center;min-width:170px">Kết luận hội đồng</th>
+                  <th style="min-width:150px">Ghi chú</th>
+                  <th style="text-align:center;min-width:110px">Thao tác</th>
+                </tr>
+              </thead>
+              <tbody id="dakl-tbody"><!-- rendered by JS --></tbody>
+            </table>
+          </div>
         </div>
       </div>
       <!-- /TAB: Đồ án / Khoá luận -->
@@ -946,6 +989,488 @@
   </div>
 </div>
 
+<!-- ======================== POPUP: THÔNG TIN ĐỀ TÀI (ĐATN/KLTN — SV, chỉ đọc) ======================== -->
+<div class="overlay hidden" id="modal-dakl-topic">
+  <div class="modal-box" style="width:620px;max-width:96vw;max-height:92vh">
+    <div class="modal-hd">
+      <h4 class="modal-title">Thông tin đề tài</h4>
+      <button class="modal-close" onclick="closeModal('modal-dakl-topic')">✕</button>
+    </div>
+    <div class="modal-bd" style="padding:20px 24px;overflow-y:auto">
+      <table class="desc-tbl" style="width:100%">
+        <tr><th style="width:30%">Mã đề tài</th><td id="dtp-ma" style="font-family:monospace;color:var(--primary);font-weight:600"></td></tr>
+        <tr><th>Tên đề tài</th><td id="dtp-ten" style="font-weight:600"></td></tr>
+        <tr><th>Loại đề tài</th><td id="dtp-loai"></td></tr>
+        <tr><th>CTĐT áp dụng</th><td id="dtp-ctdt"></td></tr>
+        <tr><th>Lĩnh vực</th><td id="dtp-linhvuc"></td></tr>
+        <tr><th>Số SV tối đa</th><td id="dtp-soluong"></td></tr>
+        <tr><th>Trạng thái</th><td id="dtp-trangthai"></td></tr>
+        <tr><th>Hoạt động</th><td id="dtp-hoatdong"></td></tr>
+        <tr><th>Tóm tắt</th><td id="dtp-tomtat"></td></tr>
+        <tr><th>Yêu cầu SV</th><td id="dtp-yeucau"></td></tr>
+        <tr><th>Sản phẩm ĐK</th><td id="dtp-sanpham"></td></tr>
+        <tr><th>Công nghệ</th><td id="dtp-congnghe"></td></tr>
+        <tr><th>Tài liệu đính kèm</th><td id="dtp-file"></td></tr>
+        <tr><th>Ngày gửi</th><td id="dtp-ngaygui"></td></tr>
+      </table>
+    </div>
+    <div class="modal-ft">
+      <button class="btn btn-default" onclick="closeModal('modal-dakl-topic')">Đóng</button>
+    </div>
+  </div>
+</div>
+
+<!-- ======================== POPUP: XEM ĐỀ CƯƠNG & KẾ HOẠCH (ĐATN/KLTN — SV, chỉ đọc) ======================== -->
+<div class="overlay hidden" id="modal-dakl-decuong">
+  <div class="modal-box" style="width:900px;max-height:92vh">
+    <div class="modal-hd">
+      <span class="modal-title">📄 Đề cương / Kế hoạch</span>
+      <button class="modal-close" onclick="closeModal('modal-dakl-decuong')">✕</button>
+    </div>
+    <div class="modal-bd" style="overflow-y:auto">
+      <div id="dc-alert" style="margin-bottom:14px"></div>
+
+      <div class="sec-title" style="margin-top:0"><span class="sec-badge">1</span> Thông tin đề tài</div>
+      <table class="desc-tbl" style="margin-bottom:20px">
+        <tr><th>Mã đợt</th><td id="dc-madot"></td></tr>
+        <tr><th>Mã đề tài</th><td id="dc-matopic" style="font-family:monospace;color:var(--primary);font-weight:600"></td></tr>
+        <tr><th>Tên đề tài</th><td id="dc-tentopic"></td></tr>
+        <tr><th>Số lượng sinh viên</th><td id="dc-soluong"></td></tr>
+        <tr>
+          <th>Phân công nhiệm vụ</th>
+          <td><textarea class="fc" id="dc-phancong" rows="3" readonly placeholder="GVHD chưa phân công nhiệm vụ cụ thể." style="background:#fafafa;cursor:default;resize:none"></textarea></td>
+        </tr>
+        <tr>
+          <th>File đề cương</th>
+          <td>
+            <div style="display:flex;align-items:center;gap:8px">
+              <input type="file" id="dc-file-input" accept=".pdf,.doc,.docx" style="display:none" onchange="onDaklDcFileSelect(this)">
+              <span style="font-size:13px" id="dc-filename-wrap">
+                <span id="dc-filename" style="color:var(--primary)"></span>
+                <button type="button" class="btn btn-link" style="color:var(--error);padding:0 4px" id="dc-file-clear" onclick="clearDaklDcFile()" title="Xóa file đã chọn">✕</button>
+              </span>
+              <button type="button" class="btn btn-default btn-sm" id="dc-upload-btn" onclick="document.getElementById('dc-file-input').click()">📎 Upload</button>
+            </div>
+          </td>
+        </tr>
+      </table>
+
+      <div class="sec-title"><span class="sec-badge">2</span> Kế hoạch công việc theo tuần</div>
+      <div style="overflow-x:auto;margin-bottom:8px">
+        <table class="plan-tbl" id="dc-plan-table">
+          <thead>
+            <tr>
+              <th style="width:36px;text-align:center">#</th>
+              <th style="width:70px">Tuần</th>
+              <th style="min-width:200px">Nhiệm vụ / Công việc</th>
+              <th style="min-width:180px">Kết quả đạt được</th>
+              <th style="min-width:120px">Ghi chú</th>
+              <th style="width:110px;text-align:center">Trạng thái</th>
+              <th style="width:40px" id="dc-plan-th-del"></th>
+            </tr>
+          </thead>
+          <tbody id="dc-plan-body"></tbody>
+        </table>
+      </div>
+      <div style="display:flex;align-items:center;gap:8px;margin-top:8px" id="dc-plan-add-wrap">
+        <button class="btn btn-default btn-sm" id="dc-plan-add-btn" onclick="dcPlanAdd()">➕ Thêm mới</button>
+        <span class="text-muted text-sm">STT tự động tăng</span>
+      </div>
+    </div>
+    <div class="modal-ft">
+      <button class="btn btn-default" onclick="closeModal('modal-dakl-decuong')">Đóng</button>
+      <button class="btn btn-default" id="dc-save-btn" onclick="saveDaklDeCuong()">Lưu</button>
+      <button class="btn btn-primary" id="dc-submit-btn" onclick="confirmDaklSubmitDeCuong()">Nộp</button>
+    </div>
+  </div>
+</div>
+
+<!-- ======================== POPUP: XÁC NHẬN GỬI ĐỀ CƯƠNG (ĐATN/KLTN) ======================== -->
+<div class="overlay hidden" id="modal-dakl-confirm-dc" style="z-index:1100">
+  <div class="confirm-box">
+    <div class="confirm-title">Xác nhận nộp đề cương?</div>
+    <div class="confirm-desc">Sau khi nộp, đề cương sẽ chuyển sang trạng thái "Chờ duyệt" và bạn không thể tự chỉnh sửa cho đến khi GVHD phản hồi. Bạn chắc chắn muốn nộp?</div>
+    <div class="confirm-actions">
+      <button class="btn btn-default" onclick="closeModal('modal-dakl-confirm-dc')">Hủy</button>
+      <button class="btn btn-primary" onclick="submitDaklDeCuong()">Xác nhận nộp</button>
+    </div>
+  </div>
+</div>
+
+<!-- ======================== POPUP: XÁC NHẬN NỘP BÁO CÁO (ĐATN/KLTN) ======================== -->
+<div class="overlay hidden" id="modal-dakl-confirm-bc" style="z-index:1100">
+  <div class="confirm-box">
+    <div class="confirm-title">Xác nhận nộp báo cáo?</div>
+    <div class="confirm-desc">Báo cáo chỉ được nộp <strong>1 lần duy nhất</strong>. Bạn có chắc chắn muốn nộp không?</div>
+    <div class="confirm-actions">
+      <button class="btn btn-default" onclick="closeModal('modal-dakl-confirm-bc')">Hủy</button>
+      <button class="btn btn-primary" onclick="submitDaklBaoCao()">Xác nhận nộp</button>
+    </div>
+  </div>
+</div>
+
+<!-- ======================== POPUP: NỘP / XEM BÁO CÁO CUỐI KỲ (ĐATN/KLTN — SV) ======================== -->
+<div class="overlay hidden" id="modal-dakl-report">
+  <div class="modal-box" style="width:540px">
+    <div class="modal-hd">
+      <span class="modal-title">Báo cáo cuối kỳ</span>
+      <span id="dbc-dot" style="display:none"></span>
+      <button class="modal-close" onclick="closeModal('modal-dakl-report')">✕</button>
+    </div>
+    <div class="modal-bd">
+
+      <!-- Nếu đã nộp (view mode) -->
+      <div id="dbc-view" style="display:none">
+        <div id="dbc-resubmit-alert" style="margin-bottom:14px;display:none"></div>
+        <div class="fi">
+          <label>File báo cáo đã nộp</label>
+          <div style="display:flex;align-items:center;gap:10px;padding:10px 12px;border:1px solid var(--border);border-radius:6px;background:#fafafa">
+            <span style="font-size:20px">📄</span>
+            <div style="flex:1">
+              <div id="dbc-filename" style="font-size:13px;font-weight:500;color:var(--primary)"></div>
+              <div id="dbc-submitted" class="text-muted text-sm"></div>
+            </div>
+            <button class="btn btn-default btn-sm">👁️ Xem</button>
+            <button class="btn btn-default btn-sm">⬇️ Tải</button>
+          </div>
+        </div>
+        <div class="fi" id="dbc-link-wrap">
+          <label>Mã nguồn / Sản phẩm</label>
+          <div style="display:flex;align-items:center;gap:8px">
+            <span style="font-size:13px;color:var(--primary);text-decoration:underline;cursor:pointer" id="dbc-link"></span>
+            <button class="btn btn-default btn-sm">🔗 Mở</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Nếu chưa nộp hoặc được yêu cầu nộp lại (upload mode) -->
+      <div id="dbc-upload">
+        <div class="alert alert-info" style="margin-bottom:14px" id="dbc-upload-alert">
+          <span class="alert-ico">ℹ️</span>
+          <div class="alert-body"><span class="alert-desc">Đảm bảo file đúng định dạng và đầy đủ nội dung trước khi gửi.</span></div>
+        </div>
+        <div class="fi">
+          <label>File Báo cáo <span class="req">*</span> &nbsp;<span style="font-weight:400;color:var(--text-3)">(PDF · tối đa 30MB)</span></label>
+          <div class="upload-zone" onclick="document.getElementById('dbc-file-input').click()">
+            <input type="file" id="dbc-file-input" accept=".pdf" style="display:none" onchange="onDaklBcFileSelect(this)">
+            <div class="uz-icon">📄</div>
+            <div class="uz-text">Nhấn để chọn hoặc kéo thả file PDF</div>
+            <div class="uz-hint">Chỉ chấp nhận .pdf · Tối đa 30 MB</div>
+          </div>
+          <div class="upload-list" id="dbc-file-list"></div>
+        </div>
+        <div class="fi">
+          <label>Link Mã nguồn / Sản phẩm &nbsp;<span style="font-weight:400;color:var(--text-3)">(không bắt buộc)</span></label>
+          <input class="fc" type="url" id="dbc-link-input" placeholder="https://github.com/...">
+        </div>
+      </div>
+
+    </div>
+    <div class="modal-ft" id="dbc-footer">
+      <button class="btn btn-default" onclick="closeModal('modal-dakl-report')">Đóng</button>
+      <button class="btn btn-primary" id="dbc-submit-btn" onclick="confirmDaklSubmitBaoCao()">Nộp</button>
+    </div>
+  </div>
+</div>
+
+<!-- ======================== POPUP: ĐIỂM THÀNH PHẦN & KẾT LUẬN HỘI ĐỒNG (ĐATN/KLTN — SV, chỉ xem) ======================== -->
+<div class="overlay hidden" id="modal-dakl-diem">
+  <div class="modal-box" style="width:640px">
+    <div class="modal-hd">
+      <span class="modal-title">Điểm &amp; Kết luận hội đồng</span>
+      <span id="ddi-dot" style="display:none"></span>
+      <button class="modal-close" onclick="closeModal('modal-dakl-diem')">✕</button>
+    </div>
+    <div class="modal-bd">
+      <div style="border:1px solid var(--border);border-radius:8px;overflow:hidden;margin-bottom:14px">
+        <div style="background:#fafafa;padding:10px 16px;border-bottom:1px solid var(--border);display:grid;grid-template-columns:1fr 80px;gap:10px;font-size:12px;font-weight:600;color:var(--text-3)">
+          <span>Điểm thành phần</span><span style="text-align:right">Điểm</span>
+        </div>
+        <div id="ddi-body"></div>
+      </div>
+      <div style="background:#f6ffed;border:1px solid #b7eb8f;border-radius:6px;padding:10px 14px;font-size:13px;margin-bottom:14px">
+        Điểm tổng kết: <strong id="ddi-final" style="font-weight:700;font-size:14px;color:var(--success)">—</strong>
+      </div>
+      <div class="sec-title" style="margin-top:0">Kết luận hội đồng</div>
+      <div id="ddi-ketluan"></div>
+    </div>
+    <div class="modal-ft">
+      <button class="btn btn-default" onclick="closeModal('modal-dakl-diem')">Đóng</button>
+    </div>
+  </div>
+</div>
+
+<!-- ======================== POPUP: CHI TIẾT HỘI ĐỒNG (ĐATN/KLTN — SV, chỉ đọc) ======================== -->
+<div class="overlay hidden" id="modal-dakl-hoidong">
+  <div class="modal-box" style="width:700px;max-height:90vh">
+    <div class="modal-hd">
+      <span class="modal-title">Chi tiết hội đồng</span>
+      <button class="modal-close" onclick="closeModal('modal-dakl-hoidong')">✕</button>
+    </div>
+    <div class="modal-bd" style="overflow-y:auto">
+      <div class="sec-title" style="margin-top:0"><span class="sec-badge">1</span> Thông tin hội đồng</div>
+      <table class="desc-tbl" style="margin-bottom:20px">
+        <tr><th>Mã hội đồng</th><td id="hd-ma" style="font-family:monospace;color:var(--primary);font-weight:600"></td></tr>
+        <tr><th>Tên hội đồng</th><td id="hd-ten" style="font-weight:600"></td></tr>
+        <tr><th>Đơn vị</th><td id="hd-donvi"></td></tr>
+        <tr><th>Ngành / Lĩnh vực</th><td id="hd-nganh"></td></tr>
+        <tr><th>Học kỳ</th><td id="hd-hocky"></td></tr>
+        <tr><th>Hình thức &amp; Thời gian họp</th><td id="hd-hinhthuc"></td></tr>
+        <tr><th>Địa điểm / Link họp</th><td id="hd-diadiem"></td></tr>
+      </table>
+
+      <div class="sec-title"><span class="sec-badge">2</span> Danh sách thành viên (<span id="hd-soluong"></span> người)</div>
+      <div class="tbl-wrap">
+        <table class="tbl" style="width:100%">
+          <thead>
+            <tr>
+              <th style="min-width:110px">Vai trò</th>
+              <th style="min-width:180px">Họ và tên</th>
+              <th style="min-width:140px">Đơn vị</th>
+            </tr>
+          </thead>
+          <tbody id="hd-members-body"></tbody>
+        </table>
+      </div>
+    </div>
+    <div class="modal-ft">
+      <button class="btn btn-default" onclick="closeModal('modal-dakl-hoidong')">Đóng</button>
+    </div>
+  </div>
+</div>
+
+<!-- ======================== POPUP: THÔNG TIN GIẢNG VIÊN HƯỚNG DẪN (ĐATN/KLTN — SV, chỉ đọc) ======================== -->
+<div class="overlay hidden" id="modal-dakl-gvhd">
+  <div class="modal-box" style="width:420px">
+    <div class="modal-hd">
+      <span class="modal-title">Thông tin giảng viên</span>
+      <button class="modal-close" onclick="closeModal('modal-dakl-gvhd')">✕</button>
+    </div>
+    <div class="modal-bd" style="text-align:center;padding:24px">
+      <div id="gvi-avatar" style="width:80px;height:80px;border-radius:50%;background:var(--primary-light);color:var(--primary);display:flex;align-items:center;justify-content:center;font-size:28px;font-weight:700;margin:0 auto 14px"></div>
+      <div id="gvi-ten" style="font-size:16px;font-weight:600;color:var(--text-1);margin-bottom:4px"></div>
+      <div id="gvi-donvi" class="text-muted text-sm" style="margin-bottom:16px"></div>
+      <table class="desc-tbl" style="text-align:left">
+        <tr><th style="width:35%">Email</th><td id="gvi-email"></td></tr>
+        <tr><th>Số điện thoại</th><td id="gvi-sdt"></td></tr>
+      </table>
+    </div>
+    <div class="modal-ft">
+      <button class="btn btn-default" onclick="closeModal('modal-dakl-gvhd')">Đóng</button>
+    </div>
+  </div>
+</div>
+
+<!-- ======================== POPUP: ĐƠN ĐỀ NGHỊ ĐỔI ĐỀ TÀI (ĐATN/KLTN — SV) ======================== -->
+<div class="overlay hidden" id="modal-dakl-doidetai">
+  <div class="modal-box" style="width:620px;max-height:92vh">
+    <div class="modal-hd">
+      <span class="modal-title">Đơn đề nghị chỉnh sửa, thay đổi đề tài</span>
+      <span id="ddt2-topic" style="display:none"></span>
+      <button class="modal-close" onclick="closeModal('modal-dakl-doidetai')">✕</button>
+    </div>
+    <div class="modal-bd" style="overflow-y:auto">
+      <div class="alert alert-info" style="margin-bottom:14px">
+        <span class="alert-ico">ℹ️</span>
+        <div class="alert-body"><span class="alert-desc">Việc thay đổi đề tài ĐAKLTN chỉ được phép thực hiện trong 02 tuần đầu của thời gian làm ĐAKLTN (Mẫu QT.ĐT.19.M05).</span></div>
+      </div>
+
+      <div class="sec-title" style="font-size:13px;margin-bottom:10px"><span class="sec-badge">1</span> Thông tin đề tài theo Quyết định</div>
+      <div class="f-row col-2" style="margin-bottom:16px">
+        <div class="fi">
+          <label>Mã đợt</label>
+          <input class="fc" type="text" id="ddt2-madot" readonly style="background:#fafafa;cursor:default">
+        </div>
+        <div class="fi">
+          <label>Loại hình</label>
+          <input class="fc" type="text" id="ddt2-loaihinh" readonly style="background:#fafafa;cursor:default">
+        </div>
+        <div class="fi" style="grid-column:1/-1">
+          <label>Tên đề tài theo Quyết định</label>
+          <textarea class="fc" id="ddt2-tende-cu" readonly style="background:#fafafa;cursor:default;height:52px;resize:none"></textarea>
+        </div>
+        <div class="fi">
+          <label>GVHD</label>
+          <input class="fc" type="text" id="ddt2-gvhd" readonly style="background:#fafafa;cursor:default">
+        </div>
+        <div class="fi">
+          <label>Số Quyết định giao đề tài</label>
+          <input class="fc" type="text" id="ddt2-soqd" readonly style="background:#fafafa;cursor:default" placeholder="Chưa có quyết định">
+        </div>
+      </div>
+
+      <div class="sec-title" style="font-size:13px;margin-bottom:10px"><span class="sec-badge">2</span> Đề nghị thay đổi</div>
+
+      <div style="display:flex;gap:16px;margin-bottom:14px">
+        <label style="display:flex;align-items:center;gap:6px;font-size:13px;cursor:pointer">
+          <input type="radio" name="ddt2-mode" value="list" checked onchange="ddt2SwitchMode('list')"> Chọn đề tài có sẵn (GVHD/GV khác đề xuất)
+        </label>
+        <label style="display:flex;align-items:center;gap:6px;font-size:13px;cursor:pointer">
+          <input type="radio" name="ddt2-mode" value="propose" onchange="ddt2SwitchMode('propose')"> Tự đề xuất đề tài
+        </label>
+      </div>
+
+      <!-- Chọn đề tài có sẵn -->
+      <div id="ddt2-pane-list">
+        <div class="filter-bar" style="margin-bottom:10px">
+          <div class="input-search" style="flex:1;min-width:160px">
+            <input type="text" class="fc" id="ddt2-list-q" placeholder="Tìm mã, tên đề tài, GVHD..." oninput="ddt2RenderList()">
+          </div>
+          <select class="fc" style="width:150px" id="ddt2-list-type" onchange="ddt2RenderList()">
+            <option value="">Tất cả loại</option>
+          </select>
+        </div>
+        <div style="border:1px solid var(--border);border-radius:6px;overflow:hidden;margin-bottom:8px">
+          <div class="tbl-wrap" style="max-height:260px;overflow-y:auto">
+            <table class="tbl" style="width:100%">
+              <thead>
+                <tr>
+                  <th style="width:36px"></th>
+                  <th style="width:110px">Mã đề tài</th>
+                  <th>Tên đề tài</th>
+                  <th style="width:150px">GVHD</th>
+                  <th style="width:80px;text-align:center">SL</th>
+                </tr>
+              </thead>
+              <tbody id="ddt2-list-body"></tbody>
+            </table>
+          </div>
+        </div>
+        <div class="fi" style="margin-bottom:16px">
+          <label>Tên đề tài đã chọn</label>
+          <textarea class="fc" id="ddt2-tende-moi" readonly style="background:#fafafa;cursor:default;height:52px;resize:none" placeholder="Chọn 1 đề tài trong bảng phía trên..."></textarea>
+          <div class="fe" id="ddt2-tende-moi-err" style="display:none">Vui lòng chọn một đề tài đề nghị thay đổi</div>
+        </div>
+      </div>
+
+      <!-- Tự đề xuất đề tài -->
+      <div id="ddt2-pane-propose" style="display:none">
+        <div class="f-row col-2" style="margin-bottom:14px">
+          <div class="fi">
+            <label>Mã đề tài</label>
+            <input class="fc" type="text" id="ddt2-p-ma" readonly style="background:#fafafa;cursor:default;color:var(--primary);font-weight:600">
+          </div>
+          <div class="fi">
+            <label>Chương trình đào tạo</label>
+            <input class="fc" type="text" id="ddt2-p-ctdt" readonly style="background:#fafafa;cursor:default">
+          </div>
+          <div class="fi">
+            <label>Loại đề tài</label>
+            <input class="fc" type="text" id="ddt2-p-loai" readonly style="background:#fafafa;cursor:default">
+          </div>
+          <div class="fi" style="grid-column:1/-1">
+            <label>Tên đề tài <span class="req">*</span></label>
+            <input class="fc" type="text" id="ddt2-p-ten" placeholder="Nhập tên đề tài đề xuất...">
+          </div>
+          <div class="fi" style="grid-column:1/-1">
+            <label>Tóm tắt đề tài <span class="req">*</span> <span style="font-weight:400;color:var(--text-3)">(Mô tả, mục tiêu)</span></label>
+            <textarea class="fc" id="ddt2-p-tomtat" style="height:70px;resize:none" placeholder="Mô tả ngắn gọn về đề tài, mục tiêu, phạm vi..."></textarea>
+          </div>
+          <div class="fi" style="grid-column:1/-1">
+            <label>Sản phẩm / Kết quả dự kiến <span class="req">*</span></label>
+            <textarea class="fc" id="ddt2-p-sanpham" style="height:70px;resize:none" placeholder="Hệ thống, báo cáo, phần mềm, bài báo..."></textarea>
+          </div>
+          <div class="fi">
+            <label>Công nghệ / Công cụ dự kiến</label>
+            <input class="fc" type="text" id="ddt2-p-congnghe" placeholder="Python, React, Power BI, Arduino...">
+          </div>
+          <div class="fi">
+            <label>Tài liệu đính kèm</label>
+            <input type="file" id="ddt2-p-file-input" class="fc" accept=".pdf,.doc,.docx" onchange="onDdt2ProposeFileSelect(this)" style="padding:5px 10px">
+            <div class="f-hint" style="font-size:11px;color:var(--text-3);margin-top:3px">PDF / Word, tối đa 5 MB</div>
+          </div>
+        </div>
+        <div class="fe" id="ddt2-propose-err" style="display:none;margin-bottom:16px">Vui lòng điền đầy đủ các trường bắt buộc (*)</div>
+      </div>
+
+      <div class="sec-title" style="font-size:13px;margin-bottom:10px"><span class="sec-badge">3</span> Lý do đề nghị chỉnh sửa / thay đổi</div>
+      <div class="fi" style="margin-bottom:16px">
+        <textarea class="fc" id="ddt2-lydo" style="height:80px;resize:none" placeholder="Nêu rõ lý do đề nghị chỉnh sửa/thay đổi đề tài..."></textarea>
+        <div class="fe" id="ddt2-lydo-err" style="display:none">Vui lòng nhập lý do đề nghị</div>
+      </div>
+    </div>
+    <div class="modal-ft">
+      <button class="btn btn-default" onclick="closeModal('modal-dakl-doidetai')">Hủy</button>
+      <button class="btn btn-primary" onclick="submitDaklDoiDeTai()">Gửi yêu cầu</button>
+    </div>
+  </div>
+</div>
+
+<!-- ======================== POPUP: ĐƠN XIN GIA HẠN ĐỀ TÀI (ĐATN/KLTN — SV) ======================== -->
+<div class="overlay hidden" id="modal-dakl-giahan">
+  <div class="modal-box" style="width:560px">
+    <div class="modal-hd">
+      <span class="modal-title">Đơn xin gia hạn thời gian làm đồ án, khóa luận</span>
+      <span id="dgh-topic" style="display:none"></span>
+      <button class="modal-close" onclick="closeModal('modal-dakl-giahan')">✕</button>
+    </div>
+    <div class="modal-bd">
+      <div class="alert alert-info" style="margin-bottom:14px">
+        <span class="alert-ico">ℹ️</span>
+        <div class="alert-body"><span class="alert-desc">Đơn sẽ được gửi đến Giảng viên HD, Khoa và Phòng Đào tạo để xem xét. Thời gian gia hạn không quá 4 tuần.</span></div>
+      </div>
+
+      <div class="sec-title" style="font-size:13px;margin-bottom:10px"><span class="sec-badge">1</span> Thông tin đề tài</div>
+      <div class="f-row col-2" style="margin-bottom:16px">
+        <div class="fi">
+          <label>Mã đợt</label>
+          <input class="fc" type="text" id="dgh-madot" readonly style="background:#fafafa;cursor:default">
+        </div>
+        <div class="fi">
+          <label>Loại hình</label>
+          <input class="fc" type="text" id="dgh-loaihinh" readonly style="background:#fafafa;cursor:default">
+        </div>
+        <div class="fi" style="grid-column:1/-1">
+          <label>Tên đề tài</label>
+          <textarea class="fc" id="dgh-tende" readonly style="background:#fafafa;cursor:default;height:52px;resize:none"></textarea>
+        </div>
+        <div class="fi">
+          <label>Số Quyết định giao đề tài</label>
+          <input class="fc" type="text" id="dgh-soqd" readonly style="background:#fafafa;cursor:default" placeholder="Chưa có quyết định">
+        </div>
+        <div class="fi">
+          <label>GVHD</label>
+          <input class="fc" type="text" id="dgh-gvhd" readonly style="background:#fafafa;cursor:default">
+        </div>
+      </div>
+
+      <div class="sec-title" style="font-size:13px;margin-bottom:10px"><span class="sec-badge">2</span> Thời gian gia hạn</div>
+      <div class="f-row col-2" style="margin-bottom:16px">
+        <div class="fi">
+          <label>Ngày kết thúc hiện tại</label>
+          <input class="fc" type="date" id="dgh-to-cu" readonly style="background:#fafafa;cursor:default">
+        </div>
+        <div class="fi">
+          <label>Ngày kết thúc đề nghị <span class="req">*</span> &nbsp;<span style="font-weight:400;color:var(--text-3)">(không quá 4 tuần)</span></label>
+          <input class="fc" type="date" id="dgh-to-moi">
+        </div>
+      </div>
+
+      <div class="sec-title" style="font-size:13px;margin-bottom:10px"><span class="sec-badge">3</span> Lý do xin gia hạn</div>
+      <div class="fi" style="margin-bottom:16px">
+        <textarea class="fc" id="dgh-lydo" style="height:80px;resize:none" placeholder="Nêu rõ lý do cần gia hạn thời gian làm đồ án/khóa luận..."></textarea>
+        <div class="fe" id="dgh-lydo-err" style="display:none">Vui lòng nhập lý do xin gia hạn</div>
+      </div>
+
+      <div class="sec-title" style="font-size:13px;margin-bottom:10px"><span class="sec-badge">4</span> Minh chứng</div>
+      <div class="fi" style="margin-bottom:4px">
+        <label style="font-weight:400;color:var(--text-3);font-size:12px">Không bắt buộc · Đơn nộp kèm minh chứng cho lý do gia hạn (VD: bệnh án, xác nhận gia đình, địa phương...) · PDF/Word · tối đa 5MB</label>
+        <div class="upload-zone" onclick="document.getElementById('dgh-file-input').click()">
+          <input type="file" id="dgh-file-input" accept=".pdf,.doc,.docx" style="display:none" onchange="onDghFileSelect(this)">
+          <div class="uz-icon">📎</div>
+          <div class="uz-text">Nhấn để chọn hoặc kéo thả file</div>
+          <div class="uz-hint">PDF / Word · Tối đa 5 MB</div>
+        </div>
+        <div class="upload-list" id="dgh-file-list"></div>
+      </div>
+    </div>
+    <div class="modal-ft">
+      <button class="btn btn-default" onclick="closeModal('modal-dakl-giahan')">Hủy</button>
+      <button class="btn btn-primary" onclick="submitDaklGiaHan()">Gửi yêu cầu</button>
+    </div>
+  </div>
+</div>
+
 <div class="toast-box" id="toast-box"></div>
 
 <script>
@@ -970,7 +1495,7 @@ function switchTab(tabName) {
   const labels = {
     'dot-hoc-tap': 'Đợt học tập',
     'thuc-tap': 'Thực tập',
-    'do-an-kl': 'Đồ án / Khoá luận',
+    'do-an-kl': 'Đồ án / Khoá luận tốt nghiệp',
     'do-an-co-so': 'Đồ án cơ sở'
   };
   document.querySelector('.h-breadcrumb').innerHTML =
@@ -1501,6 +2026,760 @@ function submitSvKetQua() {
   closeModal('modal-sv-ketqua');
   toast('Đã lưu kết quả tuần thành công.');
 }
+
+/* ════════════════════════════════════════
+   ĐỒ ÁN / KHOÁ LUẬN (ĐATN & KLTN) — SV
+════════════════════════════════════════ */
+const DAKL_CTDT_DONVI = 'BM. Công nghệ phần mềm';
+
+const DECUONGTT_CFG = {
+  'Chờ SV nộp':        {cls:'wait', pillCls:'wait'},
+  'Chờ duyệt':         {cls:'wait', pillCls:'wait'},
+  'Đã duyệt':          {cls:'pass', pillCls:'pass'},
+  'Yêu cầu chỉnh sửa': {cls:'fail', pillCls:'fail'},
+};
+
+const CONCLUSION_CFG = {
+  dat:        {label:'Đạt',                          cls:'cl-dat'},
+  canchinh:   {label:'Đạt nhưng cần chỉnh sửa',       cls:'cl-canchinh'},
+  khongdat:   {label:'Không đạt',                     cls:'cl-khongdat'},
+  hoanbaove:  {label:'Hoãn bảo vệ',                   cls:'cl-hoanbaove'},
+};
+
+let DAKL_DATA = [
+  {
+    maDot:'DA-HK1-2025-2026', tenDot:'Đồ án tốt nghiệp HK1 2025-2026', loaiHinh:'Đồ án tốt nghiệp', lop:'INT3110_1',
+    topic:{
+      ma:'DT-2026-0002', ten:'Xây dựng hệ thống quản lý kho hàng thông minh ứng dụng IoT',
+      loai:'Đồ án tốt nghiệp', ctdt:'KTPM', linhVuc:'Hệ thống thông tin & IoT', nguon:'Duyệt theo nguyện vọng',
+      soLuong:2, trangThai:'Đã duyệt', hoatDong:true,
+      tomTat:'Nghiên cứu và xây dựng hệ thống quản lý kho hàng tự động sử dụng cảm biến IoT để theo dõi tồn kho theo thời gian thực, tích hợp dashboard trực quan cho quản lý.',
+      yeuCau:'GPA ≥ 2.8, có kiến thức lập trình nhúng và IoT cơ bản.',
+      sanPham:'Ứng dụng quản lý kho + thiết bị IoT prototype + báo cáo đánh giá.',
+      congNghe:'ESP32, MQTT, Node.js, React, InfluxDB',
+      file:'DeCuong_KhoHangIoT_DT2026_0002.pdf', ngayGui:'20/05/2026',
+    },
+    gvhd:'TS. Nguyễn Minh Tuấn', gvpb:null,
+    decuong:{ trangThai:'Chờ duyệt', file:'DeCuong_B22DCCN001_v1.docx', ngayNop:'08/06/2026', soLanNop:1,
+      plan:[
+        {tuan:1, nhiemVu:'Khảo sát nghiệp vụ quản lý kho hàng, thu thập yêu cầu', ketQua:'Tài liệu yêu cầu nghiệp vụ (BRD)', ghiChu:'', trangThai:'Chờ duyệt'},
+        {tuan:2, nhiemVu:'Thiết kế CSDL & kiến trúc hệ thống', ketQua:'', ghiChu:'', trangThai:'Chờ duyệt'},
+      ]},
+    baoCao:null, conclusion:null, diem:null, ghiChu:'',
+  },
+  {
+    maDot:'DA-HK2-2024-2025', tenDot:'Đồ án tốt nghiệp HK2 2024-2025', loaiHinh:'Đồ án tốt nghiệp', lop:'INT3110_1',
+    topic:{
+      ma:'DT-2025-0014', ten:'Ứng dụng học máy dự đoán nhu cầu tuyển dụng theo ngành nghề',
+      loai:'Đồ án tốt nghiệp', ctdt:'KHMT', linhVuc:'Trí tuệ nhân tạo & Dữ liệu', nguon:'Phân công thủ công (Khoa)',
+      soLuong:1, trangThai:'Đã duyệt', hoatDong:false,
+      tomTat:'Xây dựng mô hình dự đoán xu hướng tuyển dụng theo ngành nghề dựa trên dữ liệu lịch sử thị trường lao động, hỗ trợ SV định hướng nghề nghiệp.',
+      yeuCau:'GPA ≥ 3.0, có kiến thức Python, Machine Learning cơ bản.',
+      sanPham:'Mô hình dự đoán + dashboard trực quan + báo cáo nghiên cứu.',
+      congNghe:'Python, Scikit-learn, Pandas, FastAPI',
+      file:'DeCuong_DuDoanTuyenDung_DT2025_0014.docx', ngayGui:'02/09/2025',
+    },
+    gvhd:'TS. Lê Thị Mai', gvpb:'TS. Nguyễn Minh Tuấn',
+    decuong:{ trangThai:'Yêu cầu chỉnh sửa', file:'DeCuong_B22DCCN001_v1.docx', ngayNop:'15/09/2025', soLanNop:1,
+      ketQua:'Cần bổ sung mục tiêu nghiên cứu rõ ràng hơn ở Chương 1, làm rõ nguồn dữ liệu huấn luyện dự kiến sử dụng.',
+      plan:[
+        {tuan:1, nhiemVu:'Khảo sát tài liệu, xác định phạm vi bài toán', ketQua:'Báo cáo khảo sát tài liệu', ghiChu:'', trangThai:'Yêu cầu chỉnh sửa'},
+        {tuan:2, nhiemVu:'Thu thập và tiền xử lý dữ liệu tuyển dụng', ketQua:'', ghiChu:'', trangThai:'Chờ duyệt'},
+      ]},
+    baoCao:null, conclusion:null, diem:null, ghiChu:'⚠️ Đề cương bị yêu cầu chỉnh sửa, vui lòng nộp lại.',
+  },
+  {
+    maDot:'DA-HK1-2024-2025', tenDot:'Đồ án tốt nghiệp HK1 2024-2025', loaiHinh:'Đồ án tốt nghiệp', lop:'INT3108_2',
+    topic:{
+      ma:'DT-2024-0031', ten:'Xây dựng nền tảng thương mại điện tử B2B cho doanh nghiệp vừa và nhỏ',
+      loai:'Đồ án tốt nghiệp', ctdt:'KTPM', linhVuc:'Phát triển phần mềm & Thương mại điện tử', nguon:'Duyệt theo nguyện vọng',
+      soLuong:2, trangThai:'Đã duyệt', hoatDong:false,
+      tomTat:'Thiết kế và xây dựng nền tảng thương mại điện tử B2B hỗ trợ doanh nghiệp vừa và nhỏ giao dịch, quản lý đơn hàng và thanh toán trực tuyến.',
+      yeuCau:'GPA ≥ 2.8, có kiến thức lập trình web, CSDL.',
+      sanPham:'Nền tảng TMĐT B2B hoàn chỉnh + báo cáo ĐATN.',
+      congNghe:'React, Node.js, PostgreSQL, Redis',
+      file:'DeCuong_TMDT_B2B_DT2024_0031.docx', ngayGui:'01/09/2024',
+    },
+    gvhd:'TS. Trần Văn Bình', gvpb:'ThS. Phạm Thu Hà',
+    decuong:{ trangThai:'Đã duyệt', file:'DeCuong_B22DCCN001_v1.docx', ngayNop:'10/09/2024', soLanNop:1,
+      nguoiDuyet:'TS. Trần Văn Bình', ngayDuyet:'18/09/2024', ketQua:'Đề cương đạt yêu cầu, đồng ý cho triển khai.',
+      plan:[
+        {tuan:1, nhiemVu:'Khảo sát yêu cầu nghiệp vụ B2B, phân tích đối thủ cạnh tranh', ketQua:'Tài liệu yêu cầu nghiệp vụ', ghiChu:'', trangThai:'Đã duyệt'},
+        {tuan:2, nhiemVu:'Thiết kế CSDL, kiến trúc hệ thống microservices', ketQua:'Tài liệu thiết kế kiến trúc', ghiChu:'', trangThai:'Đã duyệt'},
+        {tuan:3, nhiemVu:'Xây dựng module quản lý đơn hàng & thanh toán', ketQua:'Module đơn hàng hoạt động', ghiChu:'', trangThai:'Đã duyệt'},
+        {tuan:4, nhiemVu:'Hoàn thiện giao diện, viết báo cáo tổng kết', ketQua:'Ứng dụng hoàn chỉnh + báo cáo ĐATN', ghiChu:'', trangThai:'Đã duyệt'},
+      ]},
+    baoCao:{file:'BC_DATN_B22DCCN001_2425K1.pdf', ngayNop:'20/12/2024 21:10', dungHan:true, sourceUrl:'github.com/nva001/datn-b2b-2025'},
+    choPhepNopLai:true, lyDoNopLai:'GVHD yêu cầu bổ sung thêm phần đánh giá hiệu năng hệ thống ở Chương 4 trước khi chấm điểm chính thức.',
+    conclusion:null,
+    diem:{gvhd:null, gvpb:null, hoiDong:null, tongKet:null},
+    ghiChu:'',
+  },
+  {
+    maDot:'KL-HK2-2025-2026', tenDot:'Khóa luận tốt nghiệp HK2 2025-2026', loaiHinh:'Khóa luận tốt nghiệp', lop:'INT3115_1',
+    topic:{
+      ma:'DT-2026-0021', ten:'Nghiên cứu giải pháp tối ưu hóa truy vấn cơ sở dữ liệu NoSQL cho hệ thống Big Data',
+      loai:'Khóa luận tốt nghiệp', ctdt:'KTPM', linhVuc:'Hệ thống & Hạ tầng dữ liệu', nguon:'Duyệt theo nguyện vọng',
+      soLuong:1, trangThai:'Đã duyệt', hoatDong:true,
+      tomTat:'Nghiên cứu các kỹ thuật tối ưu hóa truy vấn trong hệ quản trị CSDL NoSQL (MongoDB, Cassandra) áp dụng cho hệ thống xử lý dữ liệu lớn, đề xuất giải pháp cải thiện hiệu năng đọc/ghi.',
+      yeuCau:'GPA ≥ 2.8, có kiến thức CSDL nâng cao.',
+      sanPham:'Báo cáo nghiên cứu + bộ benchmark hiệu năng + đề xuất giải pháp tối ưu.',
+      congNghe:'MongoDB, Cassandra, Docker, Python',
+      file:'DeCuong_ToiUuNoSQL_DT2026_0021.pdf', ngayGui:'01/06/2026',
+    },
+    gvhd:'TS. Trần Văn Bình', gvpb:null,
+    decuong:null,
+    baoCao:null, conclusion:null, diem:null, ghiChu:'',
+  },
+  {
+    maDot:'DA-HK2-2025-2026', tenDot:'Đồ án tốt nghiệp HK2 2025-2026', loaiHinh:'Đồ án tốt nghiệp', lop:'INT3110_2',
+    topic:{
+      ma:'DT-2026-0009', ten:'Xây dựng hệ thống chatbot hỗ trợ tư vấn tuyển sinh bằng NLP',
+      loai:'Đồ án tốt nghiệp', ctdt:'KHMT', linhVuc:'Trí tuệ nhân tạo & Xử lý ngôn ngữ tự nhiên', nguon:'Duyệt theo nguyện vọng',
+      soLuong:2, trangThai:'Đã duyệt', hoatDong:true,
+      tomTat:'Xây dựng chatbot tư vấn tuyển sinh sử dụng mô hình NLP tiếng Việt, tích hợp vào website nhà trường để hỗ trợ thí sinh tra cứu thông tin ngành học, học phí, chỉ tiêu tuyển sinh theo thời gian thực.',
+      yeuCau:'GPA ≥ 2.8, có kiến thức NLP và lập trình Python.',
+      sanPham:'Chatbot hoạt động trên web + mô hình NLP huấn luyện + báo cáo ĐATN.',
+      congNghe:'Python, PhoBERT, FastAPI, React',
+      file:'DeCuong_ChatbotTuVanTuyenSinh_DT2026_0009.pdf', ngayGui:'15/03/2026',
+    },
+    gvhd:'TS. Nguyễn Minh Tuấn', gvpb:'ThS. Trần Văn Hùng',
+    decuong:{ trangThai:'Đã duyệt', file:'DeCuong_B22DCCN045_v1.docx', ngayNop:'20/03/2026', soLanNop:1,
+      nguoiDuyet:'TS. Nguyễn Minh Tuấn', ngayDuyet:'25/03/2026', ketQua:'Đề cương đạt yêu cầu, đồng ý cho triển khai.',
+      plan:[
+        {tuan:1, nhiemVu:'Khảo sát dữ liệu tuyển sinh, thu thập câu hỏi thường gặp', ketQua:'Bộ dữ liệu FAQ tuyển sinh', ghiChu:'', trangThai:'Đã duyệt'},
+        {tuan:2, nhiemVu:'Huấn luyện mô hình NLP nhận diện ý định câu hỏi', ketQua:'Mô hình phân loại ý định', ghiChu:'', trangThai:'Đã duyệt'},
+        {tuan:3, nhiemVu:'Xây dựng API chatbot & tích hợp giao diện web', ketQua:'Chatbot demo hoạt động trên web', ghiChu:'', trangThai:'Đã duyệt'},
+        {tuan:4, nhiemVu:'Kiểm thử, tối ưu độ chính xác, viết báo cáo tổng kết', ketQua:'Ứng dụng hoàn chỉnh + báo cáo ĐATN', ghiChu:'', trangThai:'Đã duyệt'},
+      ]},
+    baoCao:{file:'BC_DATN_B22DCCN045_2526K2.pdf', ngayNop:'02/06/2026 20:30', dungHan:true, sourceUrl:'github.com/b22dccn045/chatbot-tuyensinh'},
+    hoiDong:{
+      ma:'HD-2025-198', ten:'Hội đồng chấm ĐATN & KLTN HK1 2025-2026', donvi:'Văn phòng Khoa', nganh:'Công nghệ thông tin',
+      hocKy:'HK1 2025-2026', hinhThuc:'Trực tiếp — 20/01/2026 08:00', diaDiem:'Phòng họp A1-101',
+      members:[
+        {role:'Chủ tịch', name:'TS. Trần Văn Bình', unit:'Khoa CNTT'},
+        {role:'Thư ký', name:'ThS. Nguyễn Thu Hoa', unit:'Khoa CNTT'},
+        {role:'Ủy viên', name:'TS. Nguyễn Minh Tuấn', unit:'BM. Công nghệ phần mềm'},
+        {role:'GV chấm', name:'TS. Lê Thị Mai', unit:'BM. Hệ thống thông tin'},
+        {role:'Phản biện', name:'TS. Phạm Thu Hà', unit:'Khoa CNTT'},
+      ]},
+    conclusion:null,
+    diem:{gvhd:null, gvpb:null, hoiDong:null, tongKet:null},
+    ghiChu:'',
+  },
+];
+
+let curDaklMaDot = null;
+
+function getDaklByMaDot(maDot) { return DAKL_DATA.find(d => d.maDot === maDot); }
+
+function daklDeCuongStage(d) {
+  return (d.decuong && d.decuong.trangThai) || 'Chờ SV nộp';
+}
+
+function renderDaklTable() {
+  const tbody = document.getElementById('dakl-tbody');
+  if (!tbody) return;
+  tbody.innerHTML = DAKL_DATA.map((d, i) => {
+    const stage = daklDeCuongStage(d);
+    const stageCfg = DECUONGTT_CFG[stage] || {pillCls:'wait'};
+
+    const detaiCell = d.topic
+      ? `<span style="font-family:monospace;font-size:12px;font-weight:700;color:var(--primary);cursor:pointer;text-decoration:underline;text-underline-offset:3px" onclick="openDaklTopicInfo('${d.maDot}')" title="Xem thông tin đề tài">${d.topic.ma}</span>
+         <div class="tbl-truncate" style="font-size:12px;color:var(--text-2);margin-top:2px;cursor:pointer" onclick="openDaklTopicInfo('${d.maDot}')" title="${d.topic.ten}">${d.topic.ten}</div>`
+      : `<span class="cell-na">Chưa có đề tài</span>`;
+
+    const gvhdCell = d.gvhd
+      ? `<span style="font-size:12px;color:var(--primary);cursor:pointer;text-decoration:underline;text-underline-offset:2px" onclick="openDaklGvhdInfo('${d.gvhd.replace(/'/g,"\\'")}')" title="Xem thông tin giảng viên">${d.gvhd}</span>`
+      : `<span class="cell-na">—</span>`;
+
+    const decuongCell = !d.topic
+      ? `<span class="cell-na">N/A</span>`
+      : (stage === 'Chờ duyệt' || stage === 'Đã duyệt')
+        ? `<span class="cell-link" onclick="openDaklDeCuongView('${d.maDot}')">Chi tiết</span>`
+        : `<button class="btn btn-primary btn-sm" onclick="openDaklDeCuongView('${d.maDot}')">Nộp</button>`;
+
+    const decuongStatusCell = !d.topic
+      ? `<span class="cell-na">—</span>`
+      : `<span class="ketluan-pill ${stageCfg.pillCls}" onclick="openDaklDeCuongView('${d.maDot}')" style="cursor:pointer">${stage}</span>`;
+
+    const baoCaoCell = (!d.decuong || stage !== 'Đã duyệt')
+      ? `<span class="cell-na" title="Chỉ mở sau khi đề cương được duyệt">N/A</span>`
+      : (d.baoCao && !d.choPhepNopLai)
+        ? `<span class="cell-link" onclick="openDaklReport('${d.maDot}')">Chi tiết</span>`
+        : `<button class="btn btn-primary btn-sm" onclick="openDaklReport('${d.maDot}')">Nộp</button>`;
+
+    const hoiDongCell = d.hoiDong
+      ? `<div style="cursor:pointer" onclick="openDaklHoiDong('${d.maDot}')" title="Xem thông tin hội đồng">
+           <span style="font-family:monospace;font-size:12px;font-weight:700;color:var(--primary);text-decoration:underline;text-underline-offset:3px">${d.hoiDong.ma}</span>
+           <div class="tbl-truncate" style="font-size:12px;color:var(--text-2);margin-top:2px">${d.hoiDong.ten}</div>
+         </div>`
+      : `<span class="cell-na">—</span>`;
+
+    const ketLuanCell = d.conclusion
+      ? `<span class="conclusion-tag ${CONCLUSION_CFG[d.conclusion].cls}" style="cursor:pointer" onclick="openDaklDiem('${d.maDot}')">${CONCLUSION_CFG[d.conclusion].label}</span>`
+      : (d.baoCao
+          ? `<span class="ketluan-pill wait" onclick="openDaklDiem('${d.maDot}')">— Chưa kết luận —</span>`
+          : `<span class="cell-na">—</span>`);
+
+    const ghiChuCell = d.ghiChu
+      ? `<span class="note-warn">${d.ghiChu}</span>`
+      : `<span class="cell-na" style="font-style:italic">—</span>`;
+
+    return `<tr>
+      <td style="text-align:center;color:var(--text-3)">${i+1}</td>
+      <td style="font-size:12px;color:var(--text-2)">${DAKL_CTDT_DONVI}</td>
+      <td style="font-size:12px;font-family:monospace">B22DCCN001</td>
+      <td style="font-size:13px;font-weight:500">Nguyễn Văn An</td>
+      <td style="font-size:12px;color:var(--text-2)">Kỹ thuật phần mềm</td>
+      <td>
+        <div style="font-weight:600;font-size:12px;font-family:monospace">${d.maDot}</div>
+        <div class="text-muted text-sm">${d.tenDot}</div>
+      </td>
+      <td style="font-size:12px;color:var(--text-2)">${d.lop}</td>
+      <td>${detaiCell}</td>
+      <td>${gvhdCell}</td>
+      <td style="text-align:center">${decuongCell}</td>
+      <td style="text-align:center">${decuongStatusCell}</td>
+      <td style="text-align:center">${baoCaoCell}</td>
+      <td>${hoiDongCell}</td>
+      <td style="text-align:center">${ketLuanCell}</td>
+      <td>${ghiChuCell}</td>
+      <td style="text-align:center">
+        <div style="display:flex;gap:6px;justify-content:center">
+          <button class="btn btn-link btn-sm" title="Xem chi tiết đề tài" onclick="openDaklTopicInfo('${d.maDot}')" style="font-size:16px;padding:2px 4px" ${d.topic ? '' : 'disabled'}>👁️</button>
+          <button class="btn btn-link btn-sm" title="Yêu cầu đổi đề tài" onclick="openDaklDoiDeTai('${d.maDot}')" style="font-size:16px;padding:2px 4px" ${d.topic ? '' : 'disabled'}>🔄</button>
+          <button class="btn btn-link btn-sm" title="Yêu cầu gia hạn đề tài" onclick="openDaklGiaHan('${d.maDot}')" style="font-size:16px;padding:2px 4px" ${d.topic ? '' : 'disabled'}>⏰</button>
+        </div>
+      </td>
+    </tr>`;
+  }).join('');
+}
+
+/* ---- Thông tin giảng viên hướng dẫn (chỉ đọc) ---- */
+const GVHD_INFO = {
+  'TS. Nguyễn Minh Tuấn': { donvi:'BM. Công nghệ phần mềm', email:'tuan.nm@phenikaa-uni.edu.vn', sdt:'0912 345 678' },
+  'TS. Lê Thị Mai':        { donvi:'BM. Hệ thống thông tin',  email:'mai.lt@phenikaa-uni.edu.vn',  sdt:'0987 654 321' },
+  'TS. Trần Văn Bình':     { donvi:'BM. Công nghệ phần mềm', email:'binh.tv@phenikaa-uni.edu.vn', sdt:'0909 111 222' },
+};
+
+function daklGvhdInitials(name) {
+  const parts = name.replace(/^(TS\.|ThS\.|PGS\.|GS\.)\s*/, '').trim().split(' ');
+  return parts.slice(-1)[0] ? parts.slice(-1)[0].charAt(0).toUpperCase() : '?';
+}
+
+function openDaklGvhdInfo(name) {
+  const info = GVHD_INFO[name] || {};
+  document.getElementById('gvi-avatar').textContent = daklGvhdInitials(name);
+  document.getElementById('gvi-ten').textContent = name;
+  document.getElementById('gvi-donvi').textContent = info.donvi || '—';
+  document.getElementById('gvi-email').textContent = info.email || '—';
+  document.getElementById('gvi-sdt').textContent = info.sdt || '—';
+  document.getElementById('modal-dakl-gvhd').classList.remove('hidden');
+}
+
+/* ---- Thông tin đề tài & GVHD (chỉ đọc) ---- */
+function openDaklTopicInfo(maDot) {
+  const d = getDaklByMaDot(maDot);
+  if (!d || !d.topic) return;
+  const t = d.topic;
+  document.getElementById('dtp-ma').textContent = t.ma;
+  document.getElementById('dtp-ten').textContent = t.ten;
+  document.getElementById('dtp-loai').textContent = t.loai;
+  document.getElementById('dtp-ctdt').textContent = t.ctdt || '—';
+  document.getElementById('dtp-linhvuc').textContent = t.linhVuc;
+  document.getElementById('dtp-soluong').textContent = t.soLuong ? `${t.soLuong} sinh viên` : '—';
+  document.getElementById('dtp-trangthai').innerHTML = `<span class="tag tag-success">${t.trangThai || 'Đã duyệt'}</span>`;
+  document.getElementById('dtp-hoatdong').innerHTML = t.hoatDong === false
+    ? `<span class="tag tag-error">🔴 Đóng</span>`
+    : `<span class="tag tag-success">🟢 Mở</span>`;
+  document.getElementById('dtp-tomtat').textContent = t.tomTat;
+  document.getElementById('dtp-yeucau').textContent = t.yeuCau || '—';
+  document.getElementById('dtp-sanpham').textContent = t.sanPham || '—';
+  document.getElementById('dtp-congnghe').textContent = t.congNghe || '—';
+  document.getElementById('dtp-file').innerHTML = t.file
+    ? `<a href="#" onclick="return false" style="color:var(--primary)">📎 ${t.file}</a>`
+    : '—';
+  document.getElementById('dtp-ngaygui').textContent = t.ngayGui || '—';
+  document.getElementById('modal-dakl-topic').classList.remove('hidden');
+}
+
+/* ---- Xét đề cương / kế hoạch (SV: xem + nộp/nộp lại + cập nhật kết quả tuần) ---- */
+let dcPendingFile = null; // File vừa chọn qua Upload, chưa lưu/nộp
+
+function daklDcEditable(stage) {
+  // Trước khi nộp lần đầu hoặc bị yêu cầu chỉnh sửa: được thêm/sửa toàn bộ dòng kế hoạch
+  return stage === 'Chờ SV nộp' || stage === 'Yêu cầu chỉnh sửa';
+}
+
+function openDaklDeCuongView(maDot) {
+  const d = getDaklByMaDot(maDot);
+  if (!d) return;
+  curDaklMaDot = maDot;
+  dcPendingFile = null;
+  const dc = d.decuong || (d.decuong = { trangThai:'Chờ SV nộp', file:null, ngayNop:null, soLanNop:0, plan:[] });
+  const stage = daklDeCuongStage(d);
+  const editable = daklDcEditable(stage);
+
+  document.getElementById('dc-madot').textContent = maDot;
+  document.getElementById('dc-matopic').textContent = d.topic ? d.topic.ma : '—';
+  document.getElementById('dc-tentopic').textContent = d.topic ? d.topic.ten : '—';
+  document.getElementById('dc-soluong').textContent = d.topic ? `${(d.topic.daDangKy||1)}/${d.topic.soLuong||1}` : '—';
+  document.getElementById('dc-phancong').value = dc.phanCong || '';
+
+  document.getElementById('dc-filename').textContent = dc.file || 'Chưa có file';
+  document.getElementById('dc-file-clear').disabled = !(editable && dc.file);
+  document.getElementById('dc-upload-btn').disabled = !editable;
+
+  const alertBox = document.getElementById('dc-alert');
+  if (stage === 'Chờ duyệt') {
+    alertBox.innerHTML = `<div class="alert alert-info"><span class="alert-ico">⏳</span><div class="alert-body"><div class="alert-title">Chờ phê duyệt</div><span class="alert-desc">Đề cương đang chờ GVHD phê duyệt.</span></div></div>`;
+  } else {
+    alertBox.innerHTML = '';
+  }
+
+  renderDaklDcPlan(dc.plan || [], editable);
+
+  document.getElementById('dc-plan-add-btn').disabled = !editable;
+  document.getElementById('dc-save-btn').disabled = false;
+  document.getElementById('dc-submit-btn').disabled = !editable;
+  document.getElementById('dc-submit-btn').textContent = 'Nộp';
+
+  document.getElementById('modal-dakl-decuong').classList.remove('hidden');
+}
+
+function renderDaklDcPlan(plan, editable) {
+  const tbody = document.getElementById('dc-plan-body');
+  if (!plan.length && editable) {
+    plan = [{tuan:1, nhiemVu:'', ketQua:'', ghiChu:'', trangThai:'Chờ SV nộp'}];
+  }
+  tbody.innerHTML = plan.map((r, i) => {
+    if (editable) {
+      return `<tr>
+        <td style="text-align:center;color:var(--text-3)">${i+1}</td>
+        <td><input class="fc" type="text" value="${r.tuan}" placeholder="Tuần ${i+1}"></td>
+        <td><textarea class="fc" style="height:52px;resize:none" placeholder="Mô tả nhiệm vụ...">${r.nhiemVu || ''}</textarea></td>
+        <td><textarea class="fc" style="height:52px;resize:none" placeholder="Kết quả dự kiến...">${r.ketQua || ''}</textarea></td>
+        <td><input class="fc" type="text" value="${r.ghiChu || ''}" placeholder="Ghi chú..."></td>
+        <td style="text-align:center">—</td>
+        <td style="text-align:center"><button class="btn btn-link" style="color:var(--error)" onclick="dcPlanDel(this)" title="Xóa dòng">🗑️</button></td>
+      </tr>`;
+    }
+    const cfg = DECUONGTT_CFG[r.trangThai] || {pillCls:'wait'};
+    return `<tr>
+      <td style="text-align:center;color:var(--text-3)">${i+1}</td>
+      <td><input class="fc" value="Tuần ${r.tuan}" readonly style="background:#fafafa;cursor:default;font-size:12px"></td>
+      <td><textarea class="fc" readonly style="background:#fafafa;cursor:default;height:52px;font-size:12px;resize:none">${r.nhiemVu}</textarea></td>
+      <td><textarea class="fc" style="height:52px;font-size:12px;resize:none" placeholder="Nhập kết quả đạt được...">${r.ketQua || ''}</textarea></td>
+      <td><input class="fc" value="${r.ghiChu || ''}" readonly style="background:#fafafa;cursor:default;font-size:12px"></td>
+      <td style="text-align:center"><span class="ketluan-pill ${cfg.pillCls}" style="cursor:default">${r.trangThai}</span></td>
+      <td style="text-align:center"><button class="btn btn-link" style="color:var(--error)" onclick="dcPlanDel(this)" title="Xóa dòng" disabled>🗑️</button></td>
+    </tr>`;
+  }).join('');
+}
+
+let dcRowCount = 1;
+function dcPlanAdd() {
+  const tbody = document.getElementById('dc-plan-body');
+  dcRowCount = tbody.querySelectorAll('tr').length + 1;
+  const tr = document.createElement('tr');
+  tr.innerHTML = `
+    <td style="text-align:center;color:var(--text-3)">${dcRowCount}</td>
+    <td><input class="fc" type="text" placeholder="Tuần ${dcRowCount}"></td>
+    <td><textarea class="fc" style="height:52px;resize:none" placeholder="Mô tả nhiệm vụ..."></textarea></td>
+    <td><textarea class="fc" style="height:52px;resize:none" placeholder="Kết quả dự kiến..."></textarea></td>
+    <td><input class="fc" type="text" placeholder="Ghi chú..."></td>
+    <td style="text-align:center">—</td>
+    <td style="text-align:center"><button class="btn btn-link" style="color:var(--error)" onclick="dcPlanDel(this)">🗑️</button></td>`;
+  tbody.appendChild(tr);
+  dcReindex();
+}
+function dcPlanDel(btn) {
+  const rows = document.querySelectorAll('#dc-plan-body tr');
+  if (rows.length <= 1) { toast('Cần ít nhất 1 tuần', 'warning'); return; }
+  btn.closest('tr').remove();
+  dcReindex();
+}
+function dcReindex() {
+  document.querySelectorAll('#dc-plan-body tr').forEach((tr, i) => {
+    tr.querySelector('td:first-child').textContent = i + 1;
+  });
+}
+
+function onDaklDcFileSelect(input) {
+  if (!input.files.length) return;
+  dcPendingFile = input.files[0];
+  document.getElementById('dc-filename').textContent = dcPendingFile.name;
+  document.getElementById('dc-file-clear').style.display = '';
+}
+function clearDaklDcFile() {
+  dcPendingFile = null;
+  document.getElementById('dc-file-input').value = '';
+  document.getElementById('dc-filename').textContent = 'Chưa có file';
+  document.getElementById('dc-file-clear').style.display = 'none';
+}
+
+function readDaklDcPlanFromForm(editable) {
+  if (!editable) return null;
+  const rows = [...document.querySelectorAll('#dc-plan-body tr')];
+  return rows.map((tr, i) => {
+    const inputs = tr.querySelectorAll('input, textarea');
+    return { tuan: inputs[0].value.trim() || String(i+1), nhiemVu: inputs[1].value.trim(), ketQua: inputs[2].value.trim(), ghiChu: inputs[3].value.trim(), trangThai:'Chờ SV nộp' };
+  });
+}
+
+function readDaklDcKetQuaFromForm() {
+  const rows = [...document.querySelectorAll('#dc-plan-body tr')];
+  return rows.map(tr => tr.querySelectorAll('input, textarea')[2].value.trim());
+}
+
+/* ---- Lưu nháp (không đổi trạng thái duyệt) ---- */
+function saveDaklDeCuong() {
+  const d = getDaklByMaDot(curDaklMaDot);
+  if (!d) return;
+  const stage = daklDeCuongStage(d);
+  const editable = daklDcEditable(stage);
+  const dc = d.decuong;
+
+  if (dcPendingFile) dc.file = dcPendingFile.name;
+
+  if (editable) {
+    dc.plan = readDaklDcPlanFromForm(true);
+  } else {
+    const ketQuaList = readDaklDcKetQuaFromForm();
+    dc.plan.forEach((r, i) => { if (ketQuaList[i] !== undefined) r.ketQua = ketQuaList[i]; });
+  }
+  dcPendingFile = null;
+  renderDaklTable();
+  closeModal('modal-dakl-decuong');
+  toast('Đã lưu thay đổi.');
+}
+
+/* ---- Nộp / Nộp lại đề cương ---- */
+function confirmDaklSubmitDeCuong() {
+  if (!dcPendingFile && !(getDaklByMaDot(curDaklMaDot).decuong || {}).file) { toast('Vui lòng chọn file đề cương', 'error'); return; }
+  document.getElementById('modal-dakl-confirm-dc').classList.remove('hidden');
+}
+
+function submitDaklDeCuong() {
+  const d = getDaklByMaDot(curDaklMaDot);
+  if (d) {
+    const dc = d.decuong;
+    const soLanNop = (dc.soLanNop || 0) + 1;
+    const plan = readDaklDcPlanFromForm(true);
+    d.decuong = { trangThai:'Chờ duyệt', file:dcPendingFile ? dcPendingFile.name : dc.file,
+      ngayNop:new Date().toLocaleDateString('vi-VN'), soLanNop, plan };
+    d.ghiChu = '';
+    dcPendingFile = null;
+    renderDaklTable();
+  }
+  closeModal('modal-dakl-confirm-dc');
+  closeModal('modal-dakl-decuong');
+  toast('Đã nộp đề cương thành công. Chờ Giảng viên HD phê duyệt.');
+}
+
+/* ---- Nộp / Xem báo cáo cuối kỳ ---- */
+function openDaklReport(maDot) {
+  const d = getDaklByMaDot(maDot);
+  if (!d) return;
+  curDaklMaDot = maDot;
+  document.getElementById('dbc-dot').textContent = maDot;
+  const viewEl = document.getElementById('dbc-view');
+  const uploadEl = document.getElementById('dbc-upload');
+  const submitBtn = document.getElementById('dbc-submit-btn');
+  const resubmitAlert = document.getElementById('dbc-resubmit-alert');
+
+  if (d.baoCao && !d.choPhepNopLai) {
+    viewEl.style.display = '';
+    uploadEl.style.display = 'none';
+    submitBtn.style.display = 'none';
+    resubmitAlert.style.display = 'none';
+    document.getElementById('dbc-filename').textContent = d.baoCao.file;
+    document.getElementById('dbc-submitted').textContent = `Nộp lúc: ${d.baoCao.ngayNop} — ${d.baoCao.dungHan ? 'đúng hạn' : 'trễ hạn'}`;
+    const linkEl = document.getElementById('dbc-link');
+    const linkWrap = document.getElementById('dbc-link-wrap');
+    if (d.baoCao.sourceUrl) { linkEl.textContent = d.baoCao.sourceUrl; linkWrap.style.display = ''; }
+    else { linkWrap.style.display = 'none'; }
+  } else {
+    viewEl.style.display = 'none';
+    uploadEl.style.display = '';
+    submitBtn.style.display = '';
+    document.getElementById('dbc-file-list').innerHTML = '';
+    document.getElementById('dbc-link-input').value = d.baoCao ? (d.baoCao.sourceUrl || '') : '';
+    document.getElementById('dbc-file-input').value = '';
+
+    if (d.baoCao && d.choPhepNopLai) {
+      resubmitAlert.style.display = '';
+      resubmitAlert.innerHTML = `<div class="alert" style="border-color:#ffa39e;background:#fff1f0"><span class="alert-ico">⚠️</span><div class="alert-body"><div class="alert-title" style="color:var(--error)">Giảng viên yêu cầu nộp lại báo cáo</div><span class="alert-desc">${d.lyDoNopLai || 'Vui lòng chỉnh sửa và nộp lại báo cáo theo góp ý của giảng viên.'}</span></div></div>`;
+    } else {
+      resubmitAlert.style.display = 'none';
+    }
+  }
+  document.getElementById('modal-dakl-report').classList.remove('hidden');
+}
+
+function onDaklBcFileSelect(input) {
+  const list = document.getElementById('dbc-file-list');
+  list.innerHTML = '';
+  if (!input.files.length) return;
+  const f = input.files[0];
+  list.innerHTML = `<div class="upload-item">
+    <span class="ui-icon">📄</span>
+    <span class="ui-name">${f.name}</span>
+    <span class="ui-size">${(f.size/1024/1024).toFixed(2)} MB</span>
+    <button class="ui-del" onclick="document.getElementById('dbc-file-input').value='';document.getElementById('dbc-file-list').innerHTML=''">✕</button>
+  </div>`;
+}
+
+function confirmDaklSubmitBaoCao() {
+  const fileInput = document.getElementById('dbc-file-input');
+  if (!fileInput.files.length) { toast('Vui lòng chọn file báo cáo', 'error'); return; }
+  document.getElementById('modal-dakl-confirm-bc').classList.remove('hidden');
+}
+
+function submitDaklBaoCao() {
+  const fileInput = document.getElementById('dbc-file-input');
+  const d = getDaklByMaDot(curDaklMaDot);
+  if (d) {
+    d.baoCao = {
+      file: fileInput.files[0].name,
+      ngayNop: new Date().toLocaleString('vi-VN'),
+      dungHan: true,
+      sourceUrl: document.getElementById('dbc-link-input').value.trim() || null,
+    };
+    d.choPhepNopLai = false;
+    d.lyDoNopLai = '';
+    renderDaklTable();
+  }
+  closeModal('modal-dakl-confirm-bc');
+  closeModal('modal-dakl-report');
+  toast('Nộp báo cáo thành công. Chờ giảng viên chấm điểm.');
+}
+
+/* ---- Điểm thành phần & kết luận hội đồng (chỉ xem) ---- */
+function openDaklDiem(maDot) {
+  const d = getDaklByMaDot(maDot);
+  if (!d) return;
+  document.getElementById('ddi-dot').textContent = maDot;
+
+  const rows = [
+    {ten:'Điểm GVHD', v:d.diem && d.diem.gvhd},
+    {ten:'Điểm GVPB', v:d.diem && d.diem.gvpb},
+    {ten:'Điểm hội đồng', v:d.diem && d.diem.hoiDong},
+  ];
+  document.getElementById('ddi-body').innerHTML = rows.map(r => `
+    <div style="padding:9px 16px;border-bottom:1px solid var(--border);display:grid;grid-template-columns:1fr 80px;gap:10px;font-size:13px;align-items:center">
+      <span>${r.ten}</span><span style="text-align:right;font-weight:600">${r.v != null ? r.v.toFixed(1) : '—'}</span>
+    </div>`).join('');
+  document.getElementById('ddi-final').textContent = (d.diem && d.diem.tongKet != null) ? d.diem.tongKet.toFixed(1) : '—';
+
+  const kl = d.conclusion
+    ? `<span class="conclusion-tag ${CONCLUSION_CFG[d.conclusion].cls}">${CONCLUSION_CFG[d.conclusion].label}</span>`
+    : `<span class="cell-na">Chưa kết luận</span>`;
+  document.getElementById('ddi-ketluan').innerHTML = kl;
+
+  document.getElementById('modal-dakl-diem').classList.remove('hidden');
+}
+
+/* ---- Chi tiết hội đồng (chỉ đọc) ---- */
+function openDaklHoiDong(maDot) {
+  const d = getDaklByMaDot(maDot);
+  if (!d || !d.hoiDong) return;
+  const h = d.hoiDong;
+  document.getElementById('hd-ma').textContent = h.ma;
+  document.getElementById('hd-ten').textContent = h.ten;
+  document.getElementById('hd-donvi').textContent = h.donvi || '—';
+  document.getElementById('hd-nganh').textContent = h.nganh || '—';
+  document.getElementById('hd-hocky').textContent = h.hocKy || '—';
+  document.getElementById('hd-hinhthuc').textContent = h.hinhThuc || '—';
+  document.getElementById('hd-diadiem').textContent = h.diaDiem || '—';
+  document.getElementById('hd-soluong').textContent = (h.members || []).length;
+  document.getElementById('hd-members-body').innerHTML = (h.members || []).map(m => `
+    <tr>
+      <td style="font-size:13px">${m.role}</td>
+      <td style="font-size:13px">${m.name}</td>
+      <td style="font-size:13px;color:var(--text-2)">${m.unit}</td>
+    </tr>`).join('');
+  document.getElementById('modal-dakl-hoidong').classList.remove('hidden');
+}
+
+/* ---- Đơn đề nghị đổi đề tài ---- */
+
+/* Danh sách đề tài do GVHD/GV khác đề xuất — SV có thể chọn để đề nghị thay đổi (đồng bộ nguồn với MH-SV-03) */
+const DDT2_TOPIC_LIST = [
+  { ma:'DT-2026-0003', ten:'Ứng dụng Blockchain trong quản lý chuỗi cung ứng thực phẩm', gv:'ThS. Nguyễn Thu Hà', type:'ĐACS', ctdt:'KTPM', maxQty:2, taken:0 },
+  { ma:'DT-2026-0004', ten:'Xây dựng hệ thống phân tích log và phát hiện xâm nhập mạng bằng AI', gv:'TS. Nguyễn Minh Tuấn', type:'ĐATN', ctdt:'KTPM', maxQty:1, taken:0 },
+  { ma:'DT-2026-0005', ten:'Nghiên cứu tối ưu hóa hiệu năng truy vấn cơ sở dữ liệu phân tán', gv:'TS. Trần Văn Bình', type:'KLTN', ctdt:'KTPM', maxQty:2, taken:2 },
+  { ma:'DT-2026-0006', ten:'Xây dựng hệ thống giám sát IoT trong nông nghiệp thông minh', gv:'ThS. Lê Minh Đức', type:'TTTN', ctdt:'KHMT', maxQty:3, taken:1 },
+  { ma:'DT-2026-0007', ten:'Phát triển ứng dụng di động hỗ trợ người khiếm thị nhận diện môi trường', gv:'TS. Phạm Quốc Hùng', type:'ĐALN', ctdt:'KHMT', maxQty:2, taken:2 },
+];
+const DDT2_TYPE_LABEL = { TTTN:'TTTN', ĐATN:'ĐATN', KLTN:'KLTN', ĐACS:'ĐACS', ĐALN:'ĐALN' };
+let ddt2SelectedMa = null;
+
+function openDaklDoiDeTai(maDot) {
+  const d = getDaklByMaDot(maDot);
+  if (!d || !d.topic) return;
+  curDaklMaDot = maDot;
+  document.getElementById('ddt2-topic').textContent = `${d.topic.ma} — ${d.topic.ten}`;
+  document.getElementById('ddt2-madot').value = maDot;
+  document.getElementById('ddt2-loaihinh').value = d.loaiHinh || '—';
+  document.getElementById('ddt2-gvhd').value = d.gvhd || '—';
+  document.getElementById('ddt2-soqd').value = (d.qdGiao && d.qdGiao.so) || '';
+  document.getElementById('ddt2-tende-cu').value = `${d.topic.ma} — ${d.topic.ten}`;
+  document.getElementById('ddt2-lydo').value = '';
+  document.getElementById('ddt2-lydo-err').style.display = 'none';
+
+  document.querySelector('input[name="ddt2-mode"][value="list"]').checked = true;
+  ddt2SwitchMode('list');
+  ddt2SelectedMa = null;
+  document.getElementById('ddt2-tende-moi').value = '';
+  document.getElementById('ddt2-tende-moi-err').style.display = 'none';
+
+  const typeSel = document.getElementById('ddt2-list-type');
+  typeSel.innerHTML = '<option value="">Tất cả loại</option>' +
+    [...new Set(DDT2_TOPIC_LIST.map(t => t.type))].map(t => `<option value="${t}">${DDT2_TYPE_LABEL[t]||t}</option>`).join('');
+  document.getElementById('ddt2-list-q').value = '';
+  ddt2RenderList();
+
+  document.getElementById('ddt2-p-ma').value = ddt2GenMaDeTai();
+  document.getElementById('ddt2-p-ctdt').value = `${d.topic.ctdt||''} – ${CTDT_DONVI_LABEL[d.topic.ctdt]||''}`.replace(/^\s*–\s*/, '') || (d.topic.ctdt || '—');
+  document.getElementById('ddt2-p-loai').value = d.loaiHinh || '—';
+  document.getElementById('ddt2-p-ten').value = '';
+  document.getElementById('ddt2-p-tomtat').value = '';
+  document.getElementById('ddt2-p-sanpham').value = '';
+  document.getElementById('ddt2-p-congnghe').value = '';
+  document.getElementById('ddt2-p-file-input').value = '';
+  document.getElementById('ddt2-propose-err').style.display = 'none';
+
+  document.getElementById('modal-dakl-doidetai').classList.remove('hidden');
+}
+
+function ddt2GenMaDeTai() {
+  const year = new Date().getFullYear();
+  const seq = String(Math.floor(Math.random() * 900) + 100).padStart(3, '0');
+  return `SV-ĐT-${year}-${seq}`;
+}
+
+const CTDT_DONVI_LABEL = { KTPM:'Kỹ thuật phần mềm', KHMT:'Khoa học máy tính', HTTT:'Hệ thống thông tin', CT001:'Công nghệ thông tin', CT002:'Quản trị kinh doanh' };
+
+function ddt2SwitchMode(mode) {
+  document.getElementById('ddt2-pane-list').style.display = mode === 'list' ? '' : 'none';
+  document.getElementById('ddt2-pane-propose').style.display = mode === 'propose' ? '' : 'none';
+  document.getElementById('ddt2-tende-moi-err').style.display = 'none';
+  document.getElementById('ddt2-propose-err').style.display = 'none';
+}
+
+function ddt2RenderList() {
+  const q = (document.getElementById('ddt2-list-q').value || '').toLowerCase();
+  const type = document.getElementById('ddt2-list-type').value;
+  const d = getDaklByMaDot(curDaklMaDot);
+  const gvhd = d ? d.gvhd : null;
+  const list = DDT2_TOPIC_LIST.filter(t =>
+    (!gvhd || t.gv === gvhd) &&
+    (!type || t.type === type) &&
+    (!q || t.ma.toLowerCase().includes(q) || t.ten.toLowerCase().includes(q) || t.gv.toLowerCase().includes(q))
+  );
+  const tbody = document.getElementById('ddt2-list-body');
+  if (!list.length) {
+    tbody.innerHTML = `<tr><td colspan="5" style="text-align:center;color:var(--text-3);padding:20px">Không có đề tài phù hợp</td></tr>`;
+    return;
+  }
+  tbody.innerHTML = list.map(t => {
+    const full = t.taken >= t.maxQty;
+    const checked = ddt2SelectedMa === t.ma ? 'checked' : '';
+    return `<tr style="${full?'opacity:.6':''}" onclick="${full?'':`ddt2SelectTopic('${t.ma}')`}">
+      <td style="text-align:center"><input type="radio" name="ddt2-radio" ${checked} ${full?'disabled':''} onclick="ddt2SelectTopic('${t.ma}')"></td>
+      <td style="font-family:monospace;font-size:12px;color:var(--primary)">${t.ma}</td>
+      <td style="font-size:13px">${t.ten}${full?' <span class="tag tag-error" style="font-size:11px">Đã đủ SV</span>':''}</td>
+      <td style="font-size:12px;color:var(--text-2)">${t.gv}</td>
+      <td style="text-align:center;font-size:12px">${t.taken}/${t.maxQty}</td>
+    </tr>`;
+  }).join('');
+}
+
+function ddt2SelectTopic(ma) {
+  const t = DDT2_TOPIC_LIST.find(x => x.ma === ma);
+  if (!t || t.taken >= t.maxQty) return;
+  ddt2SelectedMa = ma;
+  document.getElementById('ddt2-tende-moi').value = `${t.ma} — ${t.ten}`;
+  document.getElementById('ddt2-tende-moi-err').style.display = 'none';
+  ddt2RenderList();
+}
+
+function onDdt2ProposeFileSelect(input) {
+  if (input.files.length && input.files[0].size > 5 * 1024 * 1024) {
+    toast('File vượt quá dung lượng 5 MB', 'error');
+    input.value = '';
+  }
+}
+
+function submitDaklDoiDeTai() {
+  const mode = document.querySelector('input[name="ddt2-mode"]:checked').value;
+  const lydoEl = document.getElementById('ddt2-lydo');
+  let hasError = false;
+
+  if (mode === 'list') {
+    if (!ddt2SelectedMa) { document.getElementById('ddt2-tende-moi-err').style.display = 'block'; hasError = true; }
+    else { document.getElementById('ddt2-tende-moi-err').style.display = 'none'; }
+  } else {
+    const required = ['ddt2-p-ten', 'ddt2-p-tomtat', 'ddt2-p-sanpham'];
+    const missing = required.some(id => !document.getElementById(id).value.trim());
+    document.getElementById('ddt2-propose-err').style.display = missing ? 'block' : 'none';
+    if (missing) hasError = true;
+  }
+
+  if (!lydoEl.value.trim()) { document.getElementById('ddt2-lydo-err').style.display = 'block'; hasError = true; }
+  else { document.getElementById('ddt2-lydo-err').style.display = 'none'; }
+
+  if (hasError) return;
+  closeModal('modal-dakl-doidetai');
+  toast('Đã gửi đơn đề nghị đổi đề tài. Chờ GVHD và Khoa xem xét.');
+}
+
+/* ---- Đơn xin gia hạn đề tài ---- */
+function openDaklGiaHan(maDot) {
+  const d = getDaklByMaDot(maDot);
+  if (!d || !d.topic) return;
+  curDaklMaDot = maDot;
+  document.getElementById('dgh-topic').textContent = `${d.topic.ma} — ${d.topic.ten}`;
+  document.getElementById('dgh-madot').value = maDot;
+  document.getElementById('dgh-loaihinh').value = d.loaiHinh || '—';
+  document.getElementById('dgh-soqd').value = (d.qdGiao && d.qdGiao.so) || '';
+  document.getElementById('dgh-gvhd').value = d.gvhd || '—';
+  document.getElementById('dgh-tende').value = `${d.topic.ma} — ${d.topic.ten}`;
+  document.getElementById('dgh-to-cu').value = (d.qdGiao && d.qdGiao.hanKetThuc) || '';
+  document.getElementById('dgh-to-moi').value = '';
+  document.getElementById('dgh-lydo').value = '';
+  document.getElementById('dgh-lydo-err').style.display = 'none';
+  document.getElementById('dgh-file-list').innerHTML = '';
+  document.getElementById('dgh-file-input').value = '';
+  document.getElementById('modal-dakl-giahan').classList.remove('hidden');
+}
+
+function onDghFileSelect(input) {
+  const list = document.getElementById('dgh-file-list');
+  list.innerHTML = '';
+  if (!input.files.length) return;
+  const f = input.files[0];
+  list.innerHTML = `<div class="upload-item">
+    <span class="ui-icon">📎</span>
+    <span class="ui-name">${f.name}</span>
+    <span class="ui-size">${(f.size/1024/1024).toFixed(2)} MB</span>
+    <button class="ui-del" onclick="document.getElementById('dgh-file-input').value='';document.getElementById('dgh-file-list').innerHTML=''">✕</button>
+  </div>`;
+}
+
+function submitDaklGiaHan() {
+  if (!document.getElementById('dgh-to-moi').value) { toast('Vui lòng chọn ngày kết thúc đề nghị', 'error'); return; }
+  const lydoEl = document.getElementById('dgh-lydo');
+  const errEl = document.getElementById('dgh-lydo-err');
+  if (!lydoEl.value.trim()) { errEl.style.display = 'block'; lydoEl.focus(); return; }
+  errEl.style.display = 'none';
+  closeModal('modal-dakl-giahan');
+  toast('Đã gửi đơn xin gia hạn. Chờ GVHD, Khoa và Phòng Đào tạo xem xét.');
+}
+
+renderDaklTable();
 
 function toast(msg, type = 'success') {
   const box = document.getElementById('toast-box');

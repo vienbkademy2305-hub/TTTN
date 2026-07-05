@@ -6,6 +6,7 @@
   <title>Quản lý ĐATN & KLTN | Giảng viên | HTQT Đại học</title>
   <link rel="stylesheet" href="_styles.css">
   <style>
+    .btn[disabled]{opacity:.4;cursor:not-allowed;pointer-events:none}
     .tbl-truncate{max-width:230px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
     .name-cell{display:block;overflow:hidden;white-space:nowrap;text-overflow:ellipsis;max-width:220px}
     .mgv-card{display:flex;align-items:center;gap:12px;padding:12px 14px;border-bottom:1px solid var(--border);background:#fff}
@@ -406,7 +407,7 @@
           <tbody id="dca-plan-body"></tbody>
         </table>
       </div>
-      <button type="button" class="btn btn-default btn-sm" onclick="addTuan()" style="margin-bottom:14px">+ Thêm mới</button>
+      <button type="button" class="btn btn-default btn-sm" id="dca-plan-add-btn" onclick="addTuan()" style="margin-bottom:14px">+ Thêm mới</button>
     </div>
     <div class="modal-ft" id="dca-footer">
       <button class="btn btn-default" data-close="m-decuong-approve">Đóng</button>
@@ -755,6 +756,20 @@ let students = [
     nxGVPB:{diem:7.8, ketLuan:'Đồng ý', ngay:'20/06/2026', file:'PhieuNhanXet_GVPB_B22DCCN104.docx', ghiChu:''},
     diemHoiDong:8.4, diemTongKet:8.1, dongBoDiem:'Chưa đồng bộ',
     qdGiao:{so:'150/QĐ-PĐT', ngay:'03/06/2026'}, ghiChu:''},
+
+  {id:16, maSV:'B22DCCN112', tenSV:'Đặng Thị Kim Ngân', lop:'INT3110_2', ctdt:'KTPM', dotId:'DA-HK1-2025-2026', loaiHinh:'Đồ án tốt nghiệp',
+    topic:TOPIC_CATALOG[3], gvhd:'TS. Nguyễn Minh Tuấn', gvpb:null, baoCao:null,
+    decuong:{trangThai:'Yêu cầu chỉnh sửa', file:'DeCuong_B22DCCN112_v1.docx', ngayNop:'02/06/2026',
+      kePlan:[
+        {tuan:1, nhiemVu:'Khảo sát tài liệu, xác định phạm vi bài toán phân loại văn bản', ketQua:'Báo cáo khảo sát tài liệu', ghiChu:'', trangThai:'Chờ duyệt'},
+        {tuan:2, nhiemVu:'Thu thập bộ dữ liệu văn bản tiếng Việt', ketQua:'', ghiChu:'', trangThai:'Chờ duyệt'},
+      ]},
+    ghiChu:'⚠️ Đề cương bị yêu cầu chỉnh sửa, sinh viên cần nộp lại.'},
+
+  {id:17, maSV:'B22DCCN128', tenSV:'Phan Đức Anh', lop:'INT3110_1', ctdt:'HTTT', dotId:'DA-HK2-2025-2026', loaiHinh:'Đồ án tốt nghiệp',
+    topic:TOPIC_CATALOG[2], gvhd:'TS. Nguyễn Minh Tuấn', gvpb:null, baoCao:null,
+    decuong:{trangThai:'Chờ SV nộp', file:null, ngayNop:null, kePlan:[]},
+    ghiChu:''},
 ];
 
 /* ════════ TRẠNG THÁI ĐỀ CƯƠNG ════════ */
@@ -1083,18 +1098,19 @@ function buildTopicRows(s, editable){
   const slDaDuyet = countSvDaDuyetCungDeTai(s);
   const canHuongNghienCuu = slDaDuyet >= 2;
   const huongNghienCuuCell = editable
-    ? `<textarea class="fc" id="dca-huongnghiencuu" rows="2" placeholder="${canHuongNghienCuu ? '⚠️ Bắt buộc nhập — đề tài có từ 2 SV được duyệt trong đợt' : 'Nhập phân công nhiệm vụ cho sinh viên...'}" onchange="saveHuongNghienCuu()">${dc.huongNghienCuu || ''}</textarea>`
+    ? `<textarea class="fc" id="dca-huongnghiencuu" rows="2" placeholder="${canHuongNghienCuu ? '⚠️ Bắt buộc nhập — đề tài có từ 2 SV được duyệt trong đợt' : 'Nhập phân công nhiệm vụ cho sinh viên, đặc biệt khi nhiều sinh viên cùng thực hiện chung một đề tài trong đợt...'}" onchange="saveHuongNghienCuu()">${dc.huongNghienCuu || ''}</textarea>`
     : dc.huongNghienCuu
       ? dc.huongNghienCuu
       : canHuongNghienCuu
         ? '<span class="tag tag-error">⚠️ Bắt buộc nhập — đề tài có từ 2 SV được duyệt trong đợt</span>'
         : '<span style="color:var(--text-3)">—</span>';
+  const khoaFile = dc.trangThai === 'Đã duyệt' || dc.trangThai === 'Yêu cầu chỉnh sửa';
   const fileCell = editable
     ? `<div style="display:flex;align-items:center;gap:8px">
-         <input type="file" id="dca-file-input" accept=".doc,.docx,.pdf" style="display:none" onchange="onDcaFileSelect(this)">
+         <input type="file" id="dca-file-input" accept=".doc,.docx,.pdf" style="display:none" onchange="onDcaFileSelect(this)" ${khoaFile ? 'disabled' : ''}>
          <span style="font-size:13px;color:${dc.file ? 'var(--primary)' : 'var(--text-3)'}" id="dca-file-name">${dc.file ? '📎 ' + dc.file : 'Chưa nộp'}</span>
-         ${dc.file ? `<button type="button" style="background:none;border:none;color:var(--error);cursor:pointer;font-size:14px;line-height:1;padding:0" title="Xóa file" onclick="deleteDcaFile()">✕</button>` : ''}
-         <button type="button" class="btn btn-default btn-sm" onclick="document.getElementById('dca-file-input').click()">📎 Upload</button>
+         <button type="button" style="background:none;border:none;color:var(--error);cursor:pointer;font-size:14px;line-height:1;padding:0" title="Xóa file" onclick="deleteDcaFile()" ${(!dc.file || khoaFile) ? 'disabled' : ''}>✕</button>
+         <button type="button" class="btn btn-default btn-sm" onclick="document.getElementById('dca-file-input').click()" ${khoaFile ? 'disabled' : ''}>📎 Upload</button>
        </div>`
     : (dc.file ? `<a href="#" onclick="return false" title="Xem/tải file đề cương">📎 ${dc.file}</a>` : '<span style="color:var(--text-3)">Chưa nộp</span>');
   return [
@@ -1172,13 +1188,17 @@ function openDeCuongApprove(id){
 function renderDcaFooter(s){
   const dc = s.decuong || {};
   const hasFile = !!dc.file;
-  document.getElementById('dca-tong-reject-btn').disabled = !hasFile;
-  document.getElementById('dca-tong-approve-btn').disabled = !hasFile;
+  const daXuLy = dc.trangThai === 'Đã duyệt' || dc.trangThai === 'Yêu cầu chỉnh sửa';
+  document.getElementById('dca-tong-reject-btn').disabled = !hasFile || daXuLy;
+  document.getElementById('dca-tong-approve-btn').disabled = !hasFile || daXuLy;
 }
 function renderDcaPlanBody(s){
   const plan = (s.decuong && s.decuong.kePlan) || [];
+  const trangThaiTong = s.decuong && s.decuong.trangThai;
+  const khoaKeHoach = trangThaiTong === 'Đã duyệt' || trangThaiTong === 'Yêu cầu chỉnh sửa';
+  document.getElementById('dca-plan-add-btn').disabled = khoaKeHoach;
   document.getElementById('dca-plan-body').innerHTML = plan.length ? plan.map((p,i) => {
-    const editable = p.trangThai !== 'Đã duyệt';
+    const editable = p.trangThai !== 'Đã duyệt' && !khoaKeHoach;
     return `
     <tr>
       <td style="text-align:center;font-weight:600">
@@ -1189,9 +1209,9 @@ function renderDcaPlanBody(s){
       <td>${editable ? `<textarea class="fc" rows="2" onchange="updateTuanField(${i},'ghiChu',this.value)">${p.ghiChu||''}</textarea>` : `<span style="color:var(--text-2)">${p.ghiChu || '<span style="color:var(--text-3)">—</span>'}</span>`}</td>
       <td style="text-align:center">${planTrangThaiPill(p.trangThai)}</td>
       <td style="text-align:center">
-        <button class="icon-btn" ${p.trangThai === 'Chờ duyệt' ? '' : 'disabled'} title="Xóa — chỉ khi tuần chưa duyệt" onclick="deleteTuan(${i})">🗑️</button>
-        <button class="icon-btn success-btn" ${p.trangThai === 'Chờ duyệt' ? '' : 'disabled'} title="Duyệt tuần ${p.tuan}" onclick="approveTuan(${i})">✅</button>
-        <button class="icon-btn" ${p.trangThai === 'Chờ duyệt' ? '' : 'disabled'} title="Từ chối tuần ${p.tuan}" onclick="openRejectTuan(${i})">⛔</button>
+        <button class="icon-btn" ${p.trangThai === 'Chờ duyệt' && !khoaKeHoach ? '' : 'disabled'} title="Xóa — chỉ khi tuần chưa duyệt" onclick="deleteTuan(${i})">🗑️</button>
+        <button class="icon-btn success-btn" ${p.trangThai === 'Chờ duyệt' && !khoaKeHoach ? '' : 'disabled'} title="Duyệt tuần ${p.tuan}" onclick="approveTuan(${i})">✅</button>
+        <button class="icon-btn" ${p.trangThai === 'Chờ duyệt' && !khoaKeHoach ? '' : 'disabled'} title="Từ chối tuần ${p.tuan}" onclick="openRejectTuan(${i})">⛔</button>
       </td>
     </tr>`;
   }).join('') : `<tr><td colspan="6" style="text-align:center;color:var(--text-3);padding:16px;font-style:italic">Chưa có kế hoạch công việc nào được nộp</td></tr>`;

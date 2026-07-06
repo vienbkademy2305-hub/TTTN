@@ -191,8 +191,8 @@
         <div class="input-search" style="flex:1;max-width:260px">
           <input class="fc" type="text" id="q" placeholder="Tìm tên, mã hội đồng...">
         </div>
-        <button class="btn btn-primary" onclick="openCreate()">+ Tạo hội đồng</button>
-        <button class="btn btn-default" onclick="exportCSV()">⬇ Xuất Excel</button>
+        <button class="btn btn-primary" onclick="goToCreateCouncil()">+ Tạo hội đồng</button>
+        <button class="btn btn-default" onclick="exportCSV()">Xuất Excel</button>
       </div>
 
       <!-- Table -->
@@ -213,7 +213,7 @@
                 <th style="width:200px">Thành viên</th>
                 <th style="width:105px">Trạng thái</th>
                 <th style="width:130px">Số quyết định</th>
-                <th style="width:130px;text-align:center">Thao tác</th>
+                <th style="width:230px;text-align:center">Thao tác</th>
               </tr>
             </thead>
             <tbody id="tbody"></tbody>
@@ -241,93 +241,92 @@
     <div class="modal-bd">
 
       <div class="section-hd" style="margin-top:0">Thông tin Hội đồng</div>
-
-      <div class="fi">
-        <label>Mã hội đồng <span class="f-hint" style="margin:0">(tự sinh)</span></label>
-        <input type="text" class="fc readonly" id="cr-code" disabled>
-      </div>
-
-      <div class="fi">
-        <label>Tên hội đồng <span class="req">*</span></label>
-        <input type="text" class="fc" id="cr-name" placeholder="Ví dụ: Hội đồng chấm điểm TTTN HK2 2025-2026 (Nhóm CNPM)">
-      </div>
-
-      <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
-        <div class="fi">
-          <label>Đơn vị <span class="req">*</span></label>
-          <select class="fc" id="cr-donvi">
-            <option value="">-- Chọn đơn vị --</option>
-            <option>Bộ môn Công nghệ phần mềm</option>
-            <option>Bộ môn Hệ thống thông tin</option>
-            <option>Bộ môn Khoa học máy tính</option>
-            <option>Văn phòng Khoa</option>
-          </select>
-        </div>
-        <div class="fi">
-          <label>Ngành / Lĩnh vực <span class="req">*</span></label>
-          <select class="fc" id="cr-nganh">
-            <option value="">-- Chọn ngành/lĩnh vực --</option>
-            <option value="CNTT">Công nghệ thông tin</option>
-            <option value="KTPM">Kỹ thuật phần mềm</option>
-            <option value="HTTT">Hệ thống thông tin</option>
-            <option value="KHMT">Khoa học máy tính</option>
-            <option value="KHDL">Khoa học dữ liệu</option>
-          </select>
-        </div>
-      </div>
-
-      <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
-        <div class="fi">
-          <label>Phân loại <span class="req">*</span></label>
-          <select class="fc" id="cr-type">
-            <option value="">-- Chọn loại --</option>
-            <option value="danhgia">Hội đồng Đánh giá</option>
-            <option value="chamdiem">Hội đồng Chấm điểm</option>
-            <option value="phanbien">Hội đồng Phản biện</option>
-          </select>
-        </div>
-        <div class="fi">
-          <label>Học kỳ <span class="req">*</span></label>
-          <select class="fc" id="cr-dot">
-            <option value="">-- Chọn đợt --</option>
-            <option>HK2 2025-2026</option>
-            <option>HK1 2025-2026</option>
-            <option>HK1 2024-2025</option>
-          </select>
-        </div>
-      </div>
-
-      <div class="fi">
-        <label>Hình thức họp <span class="req">*</span></label><br>
-        <div class="meet-form">
-          <button type="button" class="meet-btn active" id="mf-offline" onclick="setMeetForm('offline')">🏛 Trực tiếp</button>
-          <button type="button" class="meet-btn" id="mf-online" onclick="setMeetForm('online')">🖥 Trực tuyến</button>
-        </div>
-      </div>
-
-      <div style="display:grid;grid-template-columns:1fr 1fr 2fr;gap:12px">
-        <div class="fi">
-          <label>Ngày họp <span class="req">*</span></label>
-          <input type="date" class="fc" id="cr-date" value="2026-06-28">
-        </div>
-        <div class="fi">
-          <label>Giờ họp <span class="req">*</span></label>
-          <input type="time" class="fc" id="cr-time" value="08:00">
-        </div>
-        <div class="fi" id="fi-room">
-          <label>Địa điểm <span class="req">*</span></label>
-          <input type="text" class="fc" id="cr-room" placeholder="Ví dụ: Phòng họp A1-101">
-        </div>
-        <div class="fi" id="fi-link" style="display:none;grid-column:3">
-          <label>Link họp trực tuyến <span class="req">*</span></label>
-          <input type="text" class="fc" id="cr-link" placeholder="https://meet.google.com/...">
-        </div>
-      </div>
-
-      <div class="fi">
-        <label>Ghi chú</label>
-        <textarea class="fc" id="cr-note" rows="2" placeholder="Ghi chú thêm (nếu có)..."></textarea>
-      </div>
+      <table class="info-tbl">
+        <tr>
+          <td class="itl">Mã hội đồng</td>
+          <td><input type="text" class="fc readonly" id="cr-code" disabled style="max-width:220px"></td>
+        </tr>
+        <tr>
+          <td class="itl">Tên hội đồng <span class="req">*</span></td>
+          <td><input type="text" class="fc" id="cr-name" placeholder="Ví dụ: Hội đồng chấm điểm TTTN HK2 2025-2026 (Nhóm CNPM)"></td>
+        </tr>
+        <tr>
+          <td class="itl">Đơn vị <span class="req">*</span></td>
+          <td>
+            <select class="fc" id="cr-donvi" style="max-width:320px">
+              <option value="">-- Chọn đơn vị --</option>
+              <option>Bộ môn Công nghệ phần mềm</option>
+              <option>Bộ môn Hệ thống thông tin</option>
+              <option>Bộ môn Khoa học máy tính</option>
+              <option>Văn phòng Khoa</option>
+            </select>
+          </td>
+        </tr>
+        <tr>
+          <td class="itl">Ngành / Lĩnh vực <span class="req">*</span></td>
+          <td>
+            <select class="fc" id="cr-nganh" style="max-width:320px">
+              <option value="">-- Chọn ngành/lĩnh vực --</option>
+              <option value="CNTT">Công nghệ thông tin</option>
+              <option value="KTPM">Kỹ thuật phần mềm</option>
+              <option value="HTTT">Hệ thống thông tin</option>
+              <option value="KHMT">Khoa học máy tính</option>
+              <option value="KHDL">Khoa học dữ liệu</option>
+            </select>
+          </td>
+        </tr>
+        <tr>
+          <td class="itl">Phân loại <span class="req">*</span></td>
+          <td>
+            <select class="fc" id="cr-type" style="max-width:320px">
+              <option value="">-- Chọn loại --</option>
+              <option value="danhgia">Hội đồng Đánh giá</option>
+              <option value="chamdiem">Hội đồng Chấm điểm</option>
+              <option value="phanbien">Hội đồng Phản biện</option>
+            </select>
+          </td>
+        </tr>
+        <tr>
+          <td class="itl">Học kỳ <span class="req">*</span></td>
+          <td>
+            <select class="fc" id="cr-dot" style="max-width:320px">
+              <option value="">-- Chọn đợt --</option>
+              <option>HK2 2025-2026</option>
+              <option>HK1 2025-2026</option>
+              <option>HK1 2024-2025</option>
+            </select>
+          </td>
+        </tr>
+        <tr>
+          <td class="itl">Hình thức họp <span class="req">*</span></td>
+          <td>
+            <select class="fc" id="cr-meetform" onchange="setMeetForm(this.value)" style="max-width:220px">
+              <option value="offline">🏛 Trực tiếp</option>
+              <option value="online">🖥 Trực tuyến</option>
+            </select>
+          </td>
+        </tr>
+        <tr>
+          <td class="itl">Ngày &amp; giờ họp <span class="req">*</span></td>
+          <td>
+            <div style="display:flex;gap:10px">
+              <input type="date" class="fc" id="cr-date" value="2026-06-28" style="max-width:180px">
+              <input type="time" class="fc" id="cr-time" value="08:00" style="max-width:140px">
+            </div>
+          </td>
+        </tr>
+        <tr>
+          <td class="itl" id="fi-room-label">Địa điểm <span class="req">*</span></td>
+          <td>
+            <input type="text" class="fc" id="cr-room" placeholder="Ví dụ: Phòng họp A1-101" style="max-width:420px">
+            <input type="text" class="fc" id="cr-link" placeholder="https://meet.google.com/..." style="max-width:420px;display:none">
+          </td>
+        </tr>
+        <tr>
+          <td class="itl">Ghi chú</td>
+          <td><textarea class="fc" id="cr-note" rows="2" placeholder="Ghi chú thêm (nếu có)..."></textarea></td>
+        </tr>
+      </table>
 
       <div class="section-hd">Danh sách thành viên</div>
       <div class="tbl-wrap" style="margin-bottom:10px">
@@ -439,8 +438,8 @@
     <div class="modal-ft">
       <button class="btn btn-default" data-close="modal-create">Hủy</button>
       <div style="flex:1"></div>
-      <button class="btn btn-default" onclick="submitForm('draft')">💾 Lưu nháp</button>
-      <button class="btn btn-primary" onclick="submitForm('submit')">📨 Gửi yêu cầu thành lập</button>
+      <button class="btn btn-default" onclick="submitForm('draft')">Lưu nháp</button>
+      <button class="btn btn-primary" onclick="submitForm('submit')">Gửi yêu cầu thành lập</button>
     </div>
   </div>
 </div>
@@ -479,7 +478,7 @@
       <div class="section-hd">Danh sách Thành viên (<span id="dt-mem-count">0</span> người)</div>
       <div class="bulk-bar" id="dt-mem-bulk-bar" style="display:none">
         <span>Đã chọn <strong id="dt-mem-bulk-count">0</strong> thành viên</span>
-        <button class="btn btn-primary btn-sm" onclick="sendBulkEmailDt()">📧 Gửi email</button>
+        <button class="btn btn-primary btn-sm" onclick="sendBulkEmailDt()">Gửi email</button>
       </div>
       <table class="mem-tbl" style="margin-bottom:14px">
         <thead>
@@ -494,11 +493,6 @@
         </thead>
         <tbody id="dt-mem-tbody"></tbody>
       </table>
-
-      <div id="dt-students-section"></div>
-
-      <div class="section-hd">📋 Lịch sử xét duyệt</div>
-      <div id="dt-decision-section"></div>
 
     </div>
     <div class="modal-ft" id="dt-footer"></div>
@@ -528,7 +522,7 @@
     </div>
     <div class="modal-ft">
       <button class="btn btn-default" data-close="modal-cancel">Đóng</button>
-      <button class="btn btn-danger" onclick="submitCancel()">❌ Xác nhận hủy</button>
+      <button class="btn btn-danger" onclick="submitCancel()">Xác nhận hủy</button>
     </div>
   </div>
 </div>
@@ -573,7 +567,23 @@
     </div>
     <div class="modal-ft">
       <button class="btn btn-default" data-close="modal-complete">Hủy</button>
-      <button class="btn btn-primary" onclick="submitComplete()">✓ Xác nhận hoàn thành</button>
+      <button class="btn btn-primary" onclick="submitComplete()">Xác nhận hoàn thành</button>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════════
+     MODAL: DS QUYẾT ĐỊNH
+════════════════════════════════════════ -->
+<div class="overlay hidden" id="modal-qdlist">
+  <div class="modal-box w700">
+    <div class="modal-hd">
+      <span class="modal-title">DS quyết định</span>
+      <button class="modal-close" data-close="modal-qdlist">✕</button>
+    </div>
+    <div class="modal-bd" id="qdl-body"></div>
+    <div class="modal-ft" id="qdl-footer">
+      <button class="btn btn-default" data-close="modal-qdlist">Đóng</button>
     </div>
   </div>
 </div>
@@ -604,7 +614,7 @@
     </div>
     <div class="modal-ft">
       <button class="btn btn-default" data-close="modal-email">Hủy</button>
-      <button class="btn btn-primary" onclick="confirmSendEmailDt()">📧 Gửi email</button>
+      <button class="btn btn-primary" onclick="confirmSendEmailDt()">Gửi email</button>
     </div>
   </div>
 </div>
@@ -677,6 +687,10 @@ const COUNCILS = [
       {role:'pb',name:'TS. Lê Đức Thọ',         gvType:'noi', unit:'Khoa CNTT', email:'leductho@khoacntt.edu.vn'}
     ],
     status:'completed', qdNum:'312/QĐ-CNTT', qdDate:'19/06/2026', qdSignedBy:'Nguyễn Thị Lan — Trưởng phòng Đào tạo', qdFile:'QD_312-QD-CNTT.pdf',
+    qdList:[
+      {so:'312/QĐ-CNTT',     ngay:'19/06/2026', nguoiKy:'Nguyễn Thị Lan — Trưởng phòng Đào tạo', file:'QD_312-QD-CNTT.pdf',     loai:'Thành lập hội đồng', donvi:'Phòng Đào tạo'},
+      {so:'312A/QĐ-CNTT',    ngay:'21/06/2026', nguoiKy:'Nguyễn Thị Lan — Trưởng phòng Đào tạo', file:'QD_312A-QD-CNTT.pdf',    loai:'Điều chỉnh thành viên', donvi:'Phòng Đào tạo'}
+    ],
     completedAt:'23/06/2026', completeNote:'Hội đồng đã họp và hoàn tất chấm điểm cho 5 sinh viên.', bienBanFile:'BienBan_HD-2026-013.pdf',
     createdBy:'TS. Trần Văn Bình', createdAt:'10/06/2026', note:'',
     students:[
@@ -757,6 +771,17 @@ let members    = [];
 
 /* ── Helpers ──────────────────────────────────────────────── */
 function parseDMY(s){ const [d,m,y] = s.split('/').map(Number); return new Date(y, m-1, d); }
+
+/* Lấy quyết định có ngày ban hành mới nhất trong danh sách quyết định của hội đồng */
+function allDecisions(c) {
+  if (c.qdList && c.qdList.length) return c.qdList;
+  return c.qdNum ? [{so:c.qdNum, ngay:c.qdDate, nguoiKy:c.qdSignedBy, file:c.qdFile, loai:'Thành lập hội đồng', donvi:c.donvi}] : [];
+}
+function latestDecision(c) {
+  const list = allDecisions(c);
+  if (!list.length) return null;
+  return list.reduce((a, b) => parseDMY(b.ngay) > parseDMY(a.ngay) ? b : a);
+}
 function fmtDMY(iso){ const [y,m,d] = iso.split('-'); return `${d}/${m}/${y}`; }
 function isUrl(s){ return /^https?:\/\/.+/i.test(s.trim()); }
 function isEmail(s){ return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(s.trim()); }
@@ -888,27 +913,27 @@ function render() {
   }
 
   tbody.innerHTML = list.map(c => {
-    const st = STATUS_CFG[c.status];
-    const ty = TYPE_CFG[c.type];
-    const qdCell = c.qdNum
-      ? `<span class="qd-num">📄 ${c.qdNum}</span><div style="font-size:11px;color:var(--text-3)">${c.qdDate}</div>`
+    const st = STATUS_CFG[c.status] || STATUS_CFG.draft;
+    const ty = TYPE_CFG[c.type] || TYPE_CFG.danhgia;
+    const latestQd = latestDecision(c);
+    const qdCell = latestQd
+      ? `<span class="qd-num" style="cursor:pointer;text-decoration:underline dotted" onclick="openDecisionList(${c.id})" title="Xem danh sách quyết định">${latestQd.so}</span><div style="font-size:11px;color:var(--text-3)">${latestQd.ngay}</div>`
       : `<span style="color:var(--text-3);font-size:12px">—</span>`;
 
-    let actions = `<button class="icon-btn" title="Xem chi tiết" onclick="openDetail(${c.id})">👁</button>`;
-    if (c.status === 'approved' || c.status === 'completed') {
-      actions += `<button class="icon-btn" title="Chi tiết & Chấm điểm" onclick="goToWorkspace('${c.code}')">⚖️</button>`;
-    }
-    if (c.status === 'draft') {
-      actions += `<button class="icon-btn" title="Sửa" onclick="openEdit(${c.id})">✎</button>
-        <button class="icon-btn danger" title="Xóa" onclick="confirmDelete(${c.id})">🗑</button>`;
-    } else if (c.status === 'pending') {
-      actions += `<button class="icon-btn warn-btn" title="Thu hồi yêu cầu" onclick="confirmWithdraw(${c.id})">↩</button>`;
-    } else if (c.status === 'rejected') {
-      actions += `<button class="icon-btn" title="Sửa & gửi lại" onclick="openEdit(${c.id})">✎</button>`;
-    } else if (c.status === 'approved') {
-      actions += `<button class="icon-btn success-btn" title="Đánh dấu hoàn thành" onclick="openCompleteModal(${c.id})">🏁</button>
-        <button class="icon-btn danger" title="Hủy hội đồng" onclick="openCancelModal(${c.id})">✕</button>`;
-    }
+    const canEdit      = c.status === 'draft' || c.status === 'rejected';
+    const canDelete    = c.status === 'draft';
+    const canWithdraw  = c.status === 'pending';
+    const canComplete  = c.status === 'approved';
+    const canCancel    = c.status === 'approved';
+
+    const dis = ok => ok ? '' : 'disabled';
+    let actions = `
+      <button class="icon-btn" title="Xem chi tiết & Chấm điểm" onclick="goToWorkspace('${c.code}')">👁</button>
+      <button class="icon-btn" title="${c.status === 'rejected' ? 'Sửa & gửi lại' : 'Sửa'}" ${dis(canEdit)} onclick="openDetailEdit(${c.id})">✎</button>
+      <button class="icon-btn danger" title="Xóa" ${dis(canDelete)} onclick="confirmDelete(${c.id})">🗑</button>
+      <button class="icon-btn warn-btn" title="Thu hồi yêu cầu" ${dis(canWithdraw)} onclick="confirmWithdraw(${c.id})">↩</button>
+      <button class="icon-btn success-btn" title="Đánh dấu hoàn thành" ${dis(canComplete)} onclick="openCompleteModal(${c.id})">🏁</button>
+      <button class="icon-btn danger" title="Hủy hội đồng" ${dis(canCancel)} onclick="openCancelModal(${c.id})">✕</button>`;
 
     const rowCls = (c.status === 'cancelled') ? ' class="row-disabled"' : '';
 
@@ -916,7 +941,7 @@ function render() {
       <td style="text-align:center"><input type="checkbox" class="row-chk" data-id="${c.id}" style="width:15px;height:15px;cursor:pointer;accent-color:var(--primary)"></td>
       <td style="font-family:monospace;font-size:12px;color:var(--text-2);white-space:nowrap">${c.code}</td>
       <td style="max-width:0"><a class="name-cell" href="#" title="${c.name}" onclick="openDetail(${c.id});return false">${c.name}</a></td>
-      <td><span class="hd-type ${ty.cls}">${ty.label.replace('Hội đồng ','')}</span></td>
+      <td><span class="hd-type ${ty.cls}">${ty.label}</span></td>
       <td style="font-size:12px;color:var(--text-2)">${c.donvi}</td>
       <td style="font-size:12px;color:var(--text-2)">${c.dot}</td>
       <td style="font-size:12px;white-space:nowrap">${c.date}<br><span style="color:var(--text-3)">${c.time}</span></td>
@@ -944,12 +969,14 @@ function updateCodePreview() {
 
 /* ── Meeting form toggle ──────────────────────────────────── */
 function setMeetForm(form) {
-  document.getElementById('mf-offline').classList.toggle('active', form === 'offline');
-  document.getElementById('mf-online').classList.toggle('active', form === 'online');
-  document.getElementById('fi-room').style.display = form === 'offline' ? '' : 'none';
-  document.getElementById('fi-link').style.display = form === 'online'  ? '' : 'none';
+  document.getElementById('cr-meetform').value = form;
+  document.getElementById('cr-room').style.display = form === 'offline' ? '' : 'none';
+  document.getElementById('cr-link').style.display = form === 'online'  ? '' : 'none';
+  document.getElementById('fi-room-label').innerHTML = form === 'offline'
+    ? 'Địa điểm <span class="req">*</span>'
+    : 'Link họp trực tuyến <span class="req">*</span>';
 }
-function getMeetForm() { return document.getElementById('mf-online').classList.contains('active') ? 'online' : 'offline'; }
+function getMeetForm() { return document.getElementById('cr-meetform').value; }
 
 /* ── Create / Edit ────────────────────────────────────────── */
 function openCreate() {
@@ -966,6 +993,15 @@ function openCreate() {
   document.getElementById('cr-time').value = '08:00';
   setMeetForm('offline');
   openModal('modal-create');
+}
+
+function openDetailEdit(id) {
+  const c = COUNCILS.find(x => x.id === id);
+  if (c.status === 'draft' || c.status === 'rejected') {
+    window.location.href = `MH-KCM-09_CouncilStudentAssignment.html?mode=edit&code=${encodeURIComponent(c.code)}`;
+  } else {
+    goToWorkspace(c.code);
+  }
 }
 
 function openEdit(id) {
@@ -1156,6 +1192,39 @@ function submitComplete() {
   showToast('🏁 Đã đánh dấu hội đồng hoàn thành.', 'ok');
 }
 
+/* ── DS quyết định ────────────────────────────────────────── */
+function openDecisionList(id) {
+  const c = COUNCILS.find(x => x.id === id);
+  const rows = c.qdNum
+    ? `<tr>
+        <td><span style="font-family:monospace;font-weight:700;color:var(--primary)">${c.qdNum}</span></td>
+        <td><span class="hd-type hd-danhgia">Thành lập hội đồng</span></td>
+        <td style="font-size:12px">${c.qdDate || '—'}</td>
+        <td style="font-size:12px">${c.donvi || '—'}</td>
+      </tr>`
+    : `<tr><td colspan="4" class="tbl-empty">Chưa có quyết định nào được ban hành</td></tr>`;
+
+  document.getElementById('qdl-body').innerHTML = `
+    <div class="tbl-wrap">
+      <table class="tbl" style="width:100%">
+        <thead>
+          <tr>
+            <th style="width:130px">Số quyết định</th>
+            <th style="width:190px">Loại</th>
+            <th style="width:100px">Ngày ban hành</th>
+            <th>Đơn vị ban hành</th>
+          </tr>
+        </thead>
+        <tbody>${rows}</tbody>
+      </table>
+    </div>`;
+
+  document.getElementById('qdl-footer').innerHTML = `<button class="btn btn-default" data-close="modal-qdlist">Đóng</button>` +
+    (c.qdNum ? `<button class="btn btn-primary" onclick="downloadDecision(${c.id})">Xuất quyết định</button>` : '');
+
+  openModal('modal-qdlist');
+}
+
 /* ── Decision file (mock) ─────────────────────────────────── */
 function downloadDecision(id) {
   const c = COUNCILS.find(x => x.id === id);
@@ -1170,9 +1239,9 @@ function downloadBienBan(id) {
 function openDetail(id) {
   const c = COUNCILS.find(x => x.id === id);
   currentId = id;
-  const ty = TYPE_CFG[c.type];
+  const ty = TYPE_CFG[c.type] || TYPE_CFG.danhgia;
 
-  document.getElementById('dt-title').textContent   = `Chi tiết — ${c.code}`;
+  document.getElementById('dt-title').textContent   = `Chi tiết hội đồng`;
   document.getElementById('dt-code').textContent    = c.code;
   document.getElementById('dt-name').textContent    = c.name;
   document.getElementById('dt-donvi').textContent   = c.donvi;
@@ -1218,72 +1287,9 @@ function openDetail(id) {
     : '<tr><td colspan="6" class="tbl-empty">Chưa có thành viên.</td></tr>';
   clearMemberSelectionDt();
 
-  /* Kết quả chấm điểm theo SV — chỉ hiện khi hội đồng đã có dữ liệu (xem/sửa chi tiết tại MH-KCM-09) */
-  const students = c.students || [];
-  const dtStudentsSection = document.getElementById('dt-students-section');
-  if (students.length) {
-    dtStudentsSection.innerHTML = `
-      <div class="section-hd">Kết quả chấm điểm (${students.length} sinh viên)</div>
-      <table class="mem-tbl" style="margin-bottom:14px">
-        <thead>
-          <tr>
-            <th>Mã SV</th><th>Họ và tên</th>
-            <th style="width:90px;text-align:center">Điểm</th>
-            <th style="width:170px;text-align:center">Kết luận hội đồng</th>
-            <th style="width:110px;text-align:center">Đồng bộ điểm</th>
-          </tr>
-        </thead>
-        <tbody>
-          ${students.map(s => {
-            const cl = s.conclusion
-              ? `<span class="conclusion-tag ${CONCLUSION_CFG[s.conclusion].cls}">${CONCLUSION_CFG[s.conclusion].label}</span>`
-              : `<span class="conclusion-tag cl-empty">Chưa kết luận</span>`;
-            const sync = s.dongBoDiem === 'Đã đồng bộ'
-              ? `<span class="sync-tag sync-dong">Đã đồng bộ</span>`
-              : `<span class="sync-tag sync-chua">Chưa đồng bộ</span>`;
-            return `<tr>
-              <td style="font-family:monospace;font-size:12px">${s.maSV}</td>
-              <td style="font-size:13px;font-weight:600">${s.tenSV}</td>
-              <td style="text-align:center;font-weight:700;color:var(--primary)">${s.diem != null ? s.diem.toFixed(1) : '—'}</td>
-              <td style="text-align:center">${cl}</td>
-              <td style="text-align:center">${sync}</td>
-            </tr>`;
-          }).join('')}
-        </tbody>
-      </table>
-      <div class="f-hint" style="margin-bottom:14px">Xem chi tiết điểm thành phần và chỉnh sửa kết luận tại <a href="#" onclick="closeModal('modal-detail');goToWorkspace('${c.code}');return false">Chi tiết &amp; Chấm điểm</a>.</div>`;
-  } else {
-    dtStudentsSection.innerHTML = '';
-  }
-
-  /* Lịch sử xét duyệt — dạng timeline, mới nhất ở trên */
-  const histEvents = buildHistory(c);
-  document.getElementById('dt-decision-section').innerHTML = !histEvents.length
-    ? '<div class="hist-sub">Chưa gửi yêu cầu xét duyệt.</div>'
-    : histEvents.map(h => `<div class="hist-item">
-      <span class="hist-dot" style="background:${h.color}"></span>
-      <div>
-        <div class="hist-title">${h.title}</div>
-        ${h.sub  ? `<div class="hist-sub">${h.sub}</div>`   : ''}
-        ${h.time ? `<div class="hist-time">${h.time}</div>` : ''}
-      </div>
-    </div>`).join('');
-
   /* Footer actions */
   const footer = document.getElementById('dt-footer');
-  let btns = `<button class="btn btn-default" data-close="modal-detail">Đóng</button><div style="flex:1"></div>`;
-  if (c.status === 'draft') {
-    btns += `<button class="btn btn-danger" onclick="closeModal('modal-detail');confirmDelete(${c.id})">🗑 Xóa</button>
-      <button class="btn btn-primary" onclick="closeModal('modal-detail');openEdit(${c.id})">✎ Sửa</button>`;
-  } else if (c.status === 'pending') {
-    btns += `<button class="btn btn-default" onclick="closeModal('modal-detail');confirmWithdraw(${c.id})">↩ Thu hồi</button>`;
-  } else if (c.status === 'rejected') {
-    btns += `<button class="btn btn-primary" onclick="closeModal('modal-detail');openEdit(${c.id})">✎ Sửa &amp; Gửi lại</button>`;
-  } else if (c.status === 'approved') {
-    btns += `<button class="btn btn-danger" onclick="closeModal('modal-detail');openCancelModal(${c.id})">✕ Hủy</button>
-      <button class="btn btn-primary" onclick="closeModal('modal-detail');openCompleteModal(${c.id})">🏁 Đánh dấu hoàn thành</button>`;
-  }
-  footer.innerHTML = btns;
+  footer.innerHTML = `<button class="btn btn-default" data-close="modal-detail">Đóng</button>`;
 
   openModal('modal-detail');
 }
@@ -1499,7 +1505,35 @@ document.getElementById('cc-reason').addEventListener('input', function() {
   document.getElementById(id).addEventListener('change', render));
 document.getElementById('q').addEventListener('input', render);
 
+/* ── Hội đồng tạo mới từ MH-KCM-09 (localStorage — không có backend dùng chung giữa các trang) ── */
+function goToCreateCouncil() {
+  window.location.href = 'MH-KCM-09_CouncilStudentAssignment.html?mode=create';
+}
+function mergeNewCouncilsFromStorage() {
+  let stored = [];
+  let deleted = [];
+  try {
+    stored = JSON.parse(localStorage.getItem('newCouncils') || '[]');
+    deleted = JSON.parse(localStorage.getItem('deletedCouncils') || '[]');
+  } catch (e) {
+    localStorage.removeItem('newCouncils');
+    localStorage.removeItem('deletedCouncils');
+    return;
+  }
+  deleted.forEach(code => {
+    const idx = COUNCILS.findIndex(x => x.code === code);
+    if (idx !== -1) COUNCILS.splice(idx, 1);
+  });
+  stored.forEach(c => {
+    if (deleted.includes(c.code)) return;
+    const idx = COUNCILS.findIndex(x => x.code === c.code);
+    if (idx !== -1) COUNCILS[idx] = { ...COUNCILS[idx], ...c };
+    else COUNCILS.unshift(c);
+  });
+}
+
 /* ── Init ─────────────────────────────────────────────────── */
+mergeNewCouncilsFromStorage();
 render();
 </script>
 </body>

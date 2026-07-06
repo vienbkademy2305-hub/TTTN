@@ -1452,7 +1452,7 @@ let students = [
       {loai:'Xin gia hạn nộp báo cáo', noiDung:'Em xin gia hạn nộp báo cáo thêm 3 ngày do gặp sự cố kỹ thuật khi triển khai sản phẩm demo.', ngayGui:'12/06/2026', trangThai:'Đã duyệt'},
       {loai:'Xin đổi lịch bảo vệ', noiDung:'Em xin đổi lịch bảo vệ do trùng lịch thi môn học khác.', ngayGui:'18/06/2026', trangThai:'Từ chối'},
     ],
-    decuong:{trangThai:'Đã duyệt', noiDung:'Xây dựng hệ thống gợi ý sản phẩm dựa trên ML.', file:'DeCuong_B22DCCN071_v1.docx', ngayNop:'10/04/2026', lanNop:1, ketQua:'Hợp lệ', nguoiDuyet:'TS. Nguyễn Minh Tuấn', ngayDuyet:'14/04/2026', huongNghienCuu:'Xây dựng mô hình Machine Learning gợi ý sản phẩm dựa trên hành vi người dùng',
+    decuong:{trangThai:'Đã duyệt', noiDung:'Xây dựng hệ thống gợi ý sản phẩm dựa trên ML.', file:'DeCuong_B22DCCN071_v1.docx', ngayNop:'10/04/2026', lanNop:1, ketQua:'Hợp lệ', nguoiDuyet:'TS. Nguyễn Minh Tuấn', ngayDuyet:'14/04/2026', huongNghienCuu:'Xây dựng mô hình Machine Learning gợi ý sản phẩm dựa trên hành vi người dùng', tgFrom:'2026-04-15', tgTo:'2026-06-20',
       kePlan:[
         {tuan:1, nhiemVu:'Khảo sát yêu cầu, thu thập dữ liệu hành vi người dùng', ketQua:'Bộ dữ liệu thô + tài liệu yêu cầu', ghiChu:'', trangThai:'Đã duyệt'},
         {tuan:2, nhiemVu:'Tiền xử lý dữ liệu, xây dựng mô hình baseline', ketQua:'Mô hình baseline + báo cáo đánh giá', ghiChu:'', trangThai:'Đã duyệt'},
@@ -2939,6 +2939,11 @@ function planTrangThaiPill(trangThai){
   if (trangThai === 'Từ chối') return '<span class="tag tag-error">⛔ Từ chối</span>';
   return '<span class="tag tag-warning">⏳ Chờ duyệt</span>';
 }
+function fmtDateVN(iso){
+  if (!iso) return '';
+  const [y,m,d] = iso.split('-');
+  return `${d}/${m}/${y}`;
+}
 function openDeCuongInfo(id){
   const s = students.find(x => x.id === id);
   if (!s || !s.topic) return;
@@ -2958,6 +2963,7 @@ function openDeCuongInfo(id){
     ['Tên đề tài', s.topic.name],
     ['Số lượng sinh viên', `${slDaDuyet} / ${s.topic.qty}`],
     ['Phân công nhiệm vụ', huongNghienCuuCell],
+    ['Thời gian thực hiện', (dc.tgFrom && dc.tgTo) ? `${fmtDateVN(dc.tgFrom)} — ${fmtDateVN(dc.tgTo)}` : '<span style="color:var(--text-3)">—</span>'],
     ['File đề cương', dc.file ? `<a href="#" onclick="return false" title="Xem/tải file đề cương">📎 ${dc.file}</a>` : '<span style="color:var(--text-3)">Chưa nộp</span>'],
   ];
   document.getElementById('dci-topic-body').innerHTML = topicRows.map(([l,v]) => `<tr><th style="width:170px">${l}</th><td>${v}</td></tr>`).join('');

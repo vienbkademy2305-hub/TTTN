@@ -1041,6 +1041,16 @@
           <td><textarea class="fc" id="dc-phancong" rows="3" readonly placeholder="GVHD chưa phân công nhiệm vụ cụ thể." style="background:#fafafa;cursor:default;resize:none"></textarea></td>
         </tr>
         <tr>
+          <th>Thời gian thực hiện <span class="req">*</span></th>
+          <td>
+            <div style="display:flex;align-items:center;gap:8px">
+              <input class="fc" type="date" id="dc-tg-from" style="max-width:170px">
+              <span class="text-muted">đến</span>
+              <input class="fc" type="date" id="dc-tg-to" style="max-width:170px">
+            </div>
+          </td>
+        </tr>
+        <tr>
           <th>File đề cương</th>
           <td>
             <div style="display:flex;align-items:center;gap:8px">
@@ -2217,9 +2227,9 @@ function renderDaklTable() {
       : `<span class="cell-na">—</span>`;
 
     const ketLuanCell = d.conclusion
-      ? `<span class="conclusion-tag ${CONCLUSION_CFG[d.conclusion].cls}" style="cursor:pointer" onclick="openDaklDiem('${d.maDot}')">${CONCLUSION_CFG[d.conclusion].label}</span>`
+      ? `<span class="conclusion-tag ${CONCLUSION_CFG[d.conclusion].cls}">${CONCLUSION_CFG[d.conclusion].label}</span>`
       : (d.baoCao
-          ? `<span class="ketluan-pill wait" onclick="openDaklDiem('${d.maDot}')">— Chưa kết luận —</span>`
+          ? `<span class="ketluan-pill wait">— Chưa kết luận —</span>`
           : `<span class="cell-na">—</span>`);
 
     const ghiChuCell = d.ghiChu
@@ -2326,6 +2336,11 @@ function openDaklDeCuongView(maDot) {
   document.getElementById('dc-tentopic').textContent = d.topic ? d.topic.ten : '—';
   document.getElementById('dc-soluong').textContent = d.topic ? `${(d.topic.daDangKy||1)}/${d.topic.soLuong||1}` : '—';
   document.getElementById('dc-phancong').value = dc.phanCong || '';
+
+  document.getElementById('dc-tg-from').value = dc.tgFrom || '';
+  document.getElementById('dc-tg-to').value = dc.tgTo || '';
+  document.getElementById('dc-tg-from').disabled = !editable;
+  document.getElementById('dc-tg-to').disabled = !editable;
 
   document.getElementById('dc-filename').textContent = dc.file || 'Chưa có file';
   document.getElementById('dc-file-clear').disabled = !(editable && dc.file);
@@ -2444,6 +2459,8 @@ function saveDaklDeCuong() {
   if (dcPendingFile) dc.file = dcPendingFile.name;
 
   if (editable) {
+    dc.tgFrom = document.getElementById('dc-tg-from').value;
+    dc.tgTo = document.getElementById('dc-tg-to').value;
     dc.plan = readDaklDcPlanFromForm(true);
   } else {
     const ketQuaList = readDaklDcKetQuaFromForm();
@@ -2457,6 +2474,10 @@ function saveDaklDeCuong() {
 
 /* ---- Nộp / Nộp lại đề cương ---- */
 function confirmDaklSubmitDeCuong() {
+  const tgFrom = document.getElementById('dc-tg-from').value;
+  const tgTo = document.getElementById('dc-tg-to').value;
+  if (!tgFrom || !tgTo) { toast('Vui lòng nhập Thời gian thực hiện', 'error'); return; }
+  if (tgFrom > tgTo) { toast('Ngày bắt đầu phải trước ngày kết thúc', 'error'); return; }
   if (!dcPendingFile && !(getDaklByMaDot(curDaklMaDot).decuong || {}).file) { toast('Vui lòng chọn file đề cương', 'error'); return; }
   document.getElementById('modal-dakl-confirm-dc').classList.remove('hidden');
 }
@@ -2467,8 +2488,10 @@ function submitDaklDeCuong() {
     const dc = d.decuong;
     const soLanNop = (dc.soLanNop || 0) + 1;
     const plan = readDaklDcPlanFromForm(true);
+    const tgFrom = document.getElementById('dc-tg-from').value;
+    const tgTo = document.getElementById('dc-tg-to').value;
     d.decuong = { trangThai:'Chờ duyệt', file:dcPendingFile ? dcPendingFile.name : dc.file,
-      ngayNop:new Date().toLocaleDateString('vi-VN'), soLanNop, plan };
+      ngayNop:new Date().toLocaleDateString('vi-VN'), soLanNop, plan, tgFrom, tgTo };
     d.ghiChu = '';
     dcPendingFile = null;
     renderDaklTable();

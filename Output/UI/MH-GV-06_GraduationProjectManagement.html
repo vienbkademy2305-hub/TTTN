@@ -721,6 +721,8 @@ let students = [
     baoCao:{file:'BC_DATN_B22DCCN071.pdf', ngayNop:'15/06/2026 16:40', dungHan:true, sourceUrl:'github.com/vuthanhlong/datn-2026'},
     hoiDong:COUNCIL_CATALOG[1], conclusion:'dat',
     decuong:{trangThai:'Đã duyệt', file:'DeCuong_B22DCCN071_v1.docx', ngayNop:'10/04/2026',
+      huongNghienCuu:'Tập trung xây dựng mô hình gợi ý sản phẩm dựa trên hành vi người dùng, triển khai API phục vụ tích hợp vào hệ thống thương mại điện tử.',
+      tgFrom:'2026-04-15', tgTo:'2026-06-20',
       kePlan:[
         {tuan:1, nhiemVu:'Khảo sát yêu cầu, thu thập dữ liệu hành vi người dùng', ketQua:'Bộ dữ liệu thô + tài liệu yêu cầu', ghiChu:'', trangThai:'Đã duyệt'},
         {tuan:2, nhiemVu:'Tiền xử lý dữ liệu, xây dựng mô hình baseline', ketQua:'Mô hình baseline + báo cáo đánh giá', ghiChu:'', trangThai:'Đã duyệt'},
@@ -735,6 +737,8 @@ let students = [
   {id:13, maSV:'B22DCCN093', tenSV:'Lý Thị Thu Hương', lop:'INT3110_2', ctdt:'KTPM', dotId:'DA-HK1-2025-2026', loaiHinh:'Đồ án tốt nghiệp',
     topic:TOPIC_CATALOG[0], gvhd:'TS. Nguyễn Minh Tuấn', gvpb:null, baoCao:null,
     decuong:{trangThai:'Đã duyệt', file:'DeCuong_B22DCCN093_v1.docx', ngayNop:'12/04/2026',
+      huongNghienCuu:'Thiết kế giao diện & trải nghiệm người dùng (UI/UX) cho hệ thống gợi ý học phần, phối hợp khảo sát nhu cầu sinh viên.',
+      tgFrom:'2026-04-18', tgTo:'2026-06-25',
       kePlan:[
         {tuan:1, nhiemVu:'Khảo sát UX hiện trạng cổng đăng ký học phần', ketQua:'Báo cáo khảo sát UX', ghiChu:'', trangThai:'Đã duyệt'},
         {tuan:2, nhiemVu:'Thiết kế wireframe & prototype giao diện gợi ý học phần', ketQua:'', ghiChu:'', trangThai:'Chờ duyệt'},
@@ -746,6 +750,8 @@ let students = [
     baoCao:{file:'BC_DATN_B22DCCN104.pdf', ngayNop:'18/06/2026 23:55', dungHan:false, sourceUrl:'github.com/truonggiabao/datn-nlp-2026'},
     hoiDong:COUNCIL_CATALOG[0], conclusion:'dat',
     decuong:{trangThai:'Đã duyệt', file:'DeCuong_B22DCCN104_v1.docx', ngayNop:'08/04/2026',
+      huongNghienCuu:'So sánh và cải tiến mô hình học sâu cho bài toán phân loại văn bản tiếng Việt, thử nghiệm trên nhiều bộ dữ liệu thực tế.',
+      tgFrom:'2026-04-12', tgTo:'2026-06-15',
       kePlan:[
         {tuan:1, nhiemVu:'Khảo sát & thu thập bộ dữ liệu văn bản tiếng Việt', ketQua:'Bộ dữ liệu thô + tài liệu khảo sát', ghiChu:'', trangThai:'Đã duyệt'},
         {tuan:2, nhiemVu:'Xây dựng mô hình baseline & tiền xử lý dữ liệu', ketQua:'Mô hình baseline + báo cáo đánh giá', ghiChu:'', trangThai:'Đã duyệt'},
@@ -1093,18 +1099,24 @@ function planTrangThaiPill(tt){
   if (tt === 'Từ chối') return '<span class="tag tag-error">✗ Từ chối</span>';
   return '<span class="tag tag-warning">⏳ Chờ duyệt</span>';
 }
+function fmtDateVN(iso){
+  if (!iso) return '';
+  const [y,m,d] = iso.split('-');
+  return `${d}/${m}/${y}`;
+}
 function buildTopicRows(s, editable){
   const dc = s.decuong || {};
   const slDaDuyet = countSvDaDuyetCungDeTai(s);
   const canHuongNghienCuu = slDaDuyet >= 2;
-  const huongNghienCuuCell = editable
+  const daKhoaChinhSua = dc.trangThai === 'Đã duyệt' || dc.trangThai === 'Yêu cầu chỉnh sửa';
+  const huongNghienCuuCell = (editable && !daKhoaChinhSua)
     ? `<textarea class="fc" id="dca-huongnghiencuu" rows="2" placeholder="${canHuongNghienCuu ? '⚠️ Bắt buộc nhập — đề tài có từ 2 SV được duyệt trong đợt' : 'Nhập phân công nhiệm vụ cho sinh viên, đặc biệt khi nhiều sinh viên cùng thực hiện chung một đề tài trong đợt...'}" onchange="saveHuongNghienCuu()">${dc.huongNghienCuu || ''}</textarea>`
     : dc.huongNghienCuu
       ? dc.huongNghienCuu
       : canHuongNghienCuu
         ? '<span class="tag tag-error">⚠️ Bắt buộc nhập — đề tài có từ 2 SV được duyệt trong đợt</span>'
         : '<span style="color:var(--text-3)">—</span>';
-  const khoaFile = dc.trangThai === 'Đã duyệt' || dc.trangThai === 'Yêu cầu chỉnh sửa';
+  const khoaFile = daKhoaChinhSua;
   const fileCell = editable
     ? `<div style="display:flex;align-items:center;gap:8px">
          <input type="file" id="dca-file-input" accept=".doc,.docx,.pdf" style="display:none" onchange="onDcaFileSelect(this)" ${khoaFile ? 'disabled' : ''}>
@@ -1113,14 +1125,30 @@ function buildTopicRows(s, editable){
          <button type="button" class="btn btn-default btn-sm" onclick="document.getElementById('dca-file-input').click()" ${khoaFile ? 'disabled' : ''}>📎 Upload</button>
        </div>`
     : (dc.file ? `<a href="#" onclick="return false" title="Xem/tải file đề cương">📎 ${dc.file}</a>` : '<span style="color:var(--text-3)">Chưa nộp</span>');
+  const tgThucHienCell = (editable && !daKhoaChinhSua)
+    ? `<div style="display:flex;align-items:center;gap:8px">
+         <input class="fc" type="date" id="dca-tg-from" style="max-width:170px" value="${dc.tgFrom || ''}" onchange="saveTgThucHien()">
+         <span class="text-muted">đến</span>
+         <input class="fc" type="date" id="dca-tg-to" style="max-width:170px" value="${dc.tgTo || ''}" onchange="saveTgThucHien()">
+       </div>`
+    : (dc.tgFrom && dc.tgTo ? `${fmtDateVN(dc.tgFrom)} — ${fmtDateVN(dc.tgTo)}` : '<span style="color:var(--text-3)">—</span>');
   return [
     ['Mã đợt', s.dotId],
     ['Mã đề tài', `<span class="code-prev">${s.topic.code}</span>`],
     ['Tên đề tài', s.topic.name],
     ['Số lượng sinh viên', `${slDaDuyet} / ${s.topic.qty}`],
     ['Phân công nhiệm vụ', huongNghienCuuCell],
+    ['Thời gian thực hiện', tgThucHienCell],
     ['File đề cương', fileCell],
   ];
+}
+function saveTgThucHien(){
+  const tgFrom = document.getElementById('dca-tg-from').value;
+  const tgTo = document.getElementById('dca-tg-to').value;
+  students = students.map(s => s.id !== _dcaTargetId ? s : { ...s, decuong: { ...s.decuong, tgFrom, tgTo } });
+  const s = students.find(x => x.id === _dcaTargetId);
+  renderDcaFooter(s);
+  showToast('Đã lưu thời gian thực hiện');
 }
 function saveHuongNghienCuu(){
   const val = document.getElementById('dca-huongnghiencuu').value.trim();

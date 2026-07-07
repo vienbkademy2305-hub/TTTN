@@ -1,0 +1,223 @@
+{
+  "version": "1.0",
+  "generatedAt": "2026-06-01",
+  "components": {
+    "company": {
+      "type": "form",
+      "data": {
+        "id": 1,
+        "company_name": "Công ty Cổ phần Công nghệ VinaTech",
+        "company_type": "domestic",
+        "tax_code": "0312345678",
+        "website": "https://vinatech.com.vn",
+        "size": "100-500",
+        "industry": "Công nghệ thông tin",
+        "address": "125 Nguyễn Huệ, Quận 1, TP. Hồ Chí Minh",
+        "phone": "0283456789",
+        "email": "hr@vinatech.com.vn",
+        "description": "VinaTech là công ty công nghệ hàng đầu Việt Nam, chuyên phát triển các giải pháp phần mềm doanh nghiệp, thương mại điện tử và chuyển đổi số cho các tập đoàn lớn.",
+        "logo": "assets/placeholder.png",
+        "status": "approved",
+        "contact_name": "Nguyễn Thị Thu Hà",
+        "contact_position": "Trưởng phòng Nhân sự"
+      }
+    },
+    "registerForm": {
+      "type": "form",
+      "data": {
+        "company_name": "Công ty Cổ phần Công nghệ VinaTech",
+        "company_type": "domestic",
+        "tax_code": "0312345678",
+        "email": "hr@vinatech.com.vn",
+        "phone": "0283456789",
+        "address": "125 Nguyễn Huệ, Quận 1, TP. Hồ Chí Minh",
+        "contact_name": "Nguyễn Thị Thu Hà",
+        "password": "********",
+        "confirm_password": "********"
+      }
+    },
+    "contactPersons": {
+      "type": "table",
+      "data": [
+        { "id": 1, "name": "Nguyễn Thị Thu Hà", "position": "Trưởng phòng Nhân sự", "department": "Nhân sự & Hành chính", "email": "ha.ntt@vinatech.com.vn", "phone": "0901 234 567", "note": "Đầu mối chính về tuyển dụng và hợp tác đào tạo", "is_primary": true },
+        { "id": 2, "name": "Trần Văn Minh", "position": "Giám đốc Kỹ thuật (CTO)", "department": "Công nghệ thông tin", "email": "minh.tv@vinatech.com.vn", "phone": "0902 345 678", "note": "Phụ trách xét duyệt đề tài kỹ thuật, hướng dẫn SV ngành CNTT", "is_primary": false },
+        { "id": 3, "name": "Lê Thị Lan Anh", "position": "Chuyên viên Hợp tác Đào tạo", "department": "Nhân sự & Hành chính", "email": "lan.lta@vinatech.com.vn", "phone": "0903 456 789", "note": "Phụ trách theo dõi, đánh giá sinh viên thực tập hàng ngày", "is_primary": false }
+      ]
+    },
+    "companyDetail": {
+      "type": "form",
+      "data": {
+        "trade_name": "VinaTech Corporation",
+        "industry": "Công nghệ thông tin",
+        "biz_type": "Phát triển phần mềm",
+        "size": "100–500 nhân viên",
+        "founded_year": 2012,
+        "charter_capital": "50.000.000.000 VNĐ",
+        "num_branches": 3,
+        "hotline": "1800 1234",
+        "email_public": "contact@vinatech.com.vn",
+        "website": "https://vinatech.com.vn",
+        "linkedin": "https://linkedin.com/company/vinatech",
+        "facebook": "https://facebook.com/vinatech.vn",
+        "address_hq": "125 Nguyễn Huệ, Phường Bến Nghé, Quận 1, TP. Hồ Chí Minh",
+        "address_branches": "45 Lý Thường Kiệt, Quận Hoàn Kiếm, Hà Nội · Tầng 8, Sunrise City, 27 Nguyễn Hữu Thọ, TP. Đà Nẵng",
+        "description": "VinaTech là công ty công nghệ hàng đầu Việt Nam với hơn 12 năm kinh nghiệm...",
+        "products": "ERP cho doanh nghiệp · Nền tảng TMĐT B2B · Hệ thống quản lý chuỗi cung ứng · Tư vấn chuyển đổi số",
+        "internship_orientation": "Ưu tiên SV ngành CNTT năm 3–4, được mentor 1-1 bởi senior developer, cơ hội tuyển dụng sau tốt nghiệp.",
+        "certifications": "ISO 9001:2015 · CMMI Level 3 · Top 10 DN CNTT Việt Nam 2023"
+      }
+    },
+    "employees": {
+      "type": "table",
+      "data": [
+        { "id": 1, "name": "Nguyễn Văn Hùng", "email": "hung.nv@vinatech.com.vn", "phone": "0901234567", "department": "Công nghệ thông tin", "role": "Cán bộ hướng dẫn", "status": "Hoạt động" },
+        { "id": 2, "name": "Trần Thị Mai", "email": "mai.tt@vinatech.com.vn", "phone": "0902345678", "department": "Nhân sự", "role": "Nhân viên", "status": "Hoạt động" },
+        { "id": 3, "name": "Lê Văn Tú", "email": "tu.lv@vinatech.com.vn", "phone": "0903456789", "department": "Công nghệ thông tin", "role": "Cán bộ hướng dẫn", "status": "Hoạt động" },
+        { "id": 4, "name": "Phạm Ngọc Anh", "email": "anh.pn@vinatech.com.vn", "phone": "0904567890", "department": "Marketing", "role": "Nhân viên", "status": "Tạm dừng" }
+      ]
+    },
+    "faculties": {
+      "type": "list",
+      "data": [
+        { "id": 1, "name": "Khoa Công nghệ Thông tin", "code": "CNTT", "selected": true, "note": "Cần SV có kinh nghiệm lập trình, ưu tiên Java/Python" },
+        { "id": 2, "name": "Khoa Kỹ thuật Điện tử - Viễn thông", "code": "KTDT", "selected": true, "note": "" },
+        { "id": 3, "name": "Khoa Quản trị Kinh doanh", "code": "QTKD", "selected": false, "note": "" },
+        { "id": 4, "name": "Khoa Tài chính - Ngân hàng", "code": "TCNH", "selected": false, "note": "" },
+        { "id": 5, "name": "Viện Công nghệ Sinh học", "code": "CNSV", "selected": false, "note": "" },
+        { "id": 6, "name": "Khoa Ngoại ngữ", "code": "NN", "selected": false, "note": "" },
+        { "id": 7, "name": "Khoa Xây dựng & Kiến trúc", "code": "XD", "selected": false, "note": "" }
+      ]
+    },
+    "newsPosts": {
+      "type": "table",
+      "data": [
+        { "id": 1, "title": "Tuyển dụng Intern Backend Developer (Java/Spring Boot)", "type": "Tuyển dụng", "status": "Đã đăng", "created_at": "2026-05-20", "views": 245, "thumbnail": "assets/placeholder.png" },
+        { "id": 2, "title": "Hội thảo Công nghệ AI trong Doanh nghiệp 2026", "type": "Sự kiện", "status": "Đã đăng", "created_at": "2026-05-15", "views": 189, "thumbnail": "assets/placeholder.png" },
+        { "id": 3, "title": "VinaTech ký kết hợp tác chiến lược với ĐH Bách Khoa HN", "type": "Tin tức", "status": "Đã đăng", "created_at": "2026-05-10", "views": 412, "thumbnail": "assets/placeholder.png" },
+        { "id": 4, "title": "Chương trình học bổng cho sinh viên xuất sắc năm 2026", "type": "Khác", "status": "Nháp", "created_at": "2026-06-01", "views": 0, "thumbnail": "assets/placeholder.png" },
+        { "id": 5, "title": "Tuyển dụng Intern Frontend React Developer", "type": "Tuyển dụng", "status": "Đã đăng", "created_at": "2026-04-28", "views": 331, "thumbnail": "assets/placeholder.png" }
+      ]
+    },
+    "createPost": {
+      "type": "form",
+      "data": {
+        "title": "Tuyển dụng Intern Backend Developer (Java/Spring Boot)",
+        "type": "Tuyển dụng",
+        "thumbnail": "assets/placeholder.png",
+        "summary": "VinaTech tuyển dụng intern vị trí Backend Developer, thời gian thực tập 3 tháng, có cơ hội chuyển chính thức.",
+        "content": "<p>VinaTech đang tìm kiếm các bạn sinh viên năng động, có đam mê về công nghệ để tham gia chương trình thực tập tại vị trí <strong>Backend Developer</strong>.</p><p><strong>Yêu cầu:</strong></p><ul><li>Sinh viên năm 3-4 ngành CNTT hoặc liên quan</li><li>Có kiến thức về Java, Spring Boot</li><li>Hiểu biết về RESTful API, database (MySQL/PostgreSQL)</li></ul>"
+      }
+    },
+    "ownTopics": {
+      "type": "table",
+      "data": [
+        { "id": 1, "title": "Xây dựng hệ thống quản lý đơn hàng thương mại điện tử", "type": "Kỹ thuật phần mềm", "faculty": "Khoa CNTT", "max_students": 3, "current_students": 2, "supervisor": "Nguyễn Văn Hùng", "status": "Đã duyệt", "created_at": "2026-04-01" },
+        { "id": 2, "title": "Phát triển ứng dụng mobile quản lý kho hàng (React Native)", "type": "Kỹ thuật phần mềm", "faculty": "Khoa CNTT", "max_students": 2, "current_students": 0, "supervisor": "Lê Văn Tú", "status": "Chờ phê duyệt", "created_at": "2026-05-20" },
+        { "id": 3, "title": "Phân tích dữ liệu hành vi khách hàng với Machine Learning", "type": "Khoa học dữ liệu", "faculty": "Khoa CNTT", "max_students": 2, "current_students": 1, "supervisor": "Lê Văn Tú", "status": "Đã duyệt", "created_at": "2026-03-15" },
+        { "id": 4, "title": "Thiết kế hệ thống IoT giám sát nhà máy thông minh", "type": "Kỹ thuật điện tử", "faculty": "Khoa KTDT", "max_students": 3, "current_students": 0, "supervisor": "Nguyễn Văn Hùng", "status": "Từ chối", "created_at": "2026-05-01" }
+      ]
+    },
+    "createTopic": {
+      "type": "form",
+      "data": {
+        "title": "Xây dựng hệ thống quản lý đơn hàng thương mại điện tử",
+        "type": "Kỹ thuật phần mềm",
+        "faculty": "Khoa CNTT",
+        "max_students": 3,
+        "supervisor": "Nguyễn Văn Hùng",
+        "description": "<p>Đề tài nhằm xây dựng một hệ thống quản lý đơn hàng toàn diện cho sàn thương mại điện tử, bao gồm các chức năng quản lý sản phẩm, đơn hàng, thanh toán và vận chuyển.</p>",
+        "requirements": "Sinh viên cần có kiến thức về Java/Spring Boot, MySQL, ReactJS. Ưu tiên SV đã có dự án thực tế."
+      }
+    },
+    "lecturerTopics": {
+      "type": "table",
+      "data": [
+        { "id": 1, "title": "Nghiên cứu ứng dụng Blockchain trong quản lý chuỗi cung ứng", "type": "Nghiên cứu", "faculty": "Khoa CNTT", "lecturer": "TS. Nguyễn Minh Khoa", "max_students": 4, "status": "Chờ hợp tác DN", "registered": false },
+        { "id": 2, "title": "Phát triển chatbot hỗ trợ dịch vụ khách hàng bằng NLP", "type": "Kỹ thuật phần mềm", "faculty": "Khoa CNTT", "lecturer": "TS. Trần Văn Bình", "max_students": 3, "status": "Chờ hợp tác DN", "registered": false },
+        { "id": 3, "title": "Hệ thống giám sát năng lượng thông minh sử dụng IoT", "type": "Kỹ thuật điện tử", "faculty": "Khoa KTDT", "lecturer": "PGS.TS. Lê Thị Hoa", "max_students": 2, "status": "Đã có DN hợp tác", "registered": true },
+        { "id": 4, "title": "Tối ưu hóa quy trình sản xuất với thuật toán AI", "type": "Khoa học dữ liệu", "faculty": "Khoa CNTT", "lecturer": "TS. Phạm Quốc Đạt", "max_students": 5, "status": "Chờ hợp tác DN", "registered": false },
+        { "id": 5, "title": "Nghiên cứu bảo mật mạng trong môi trường Cloud Computing", "type": "An ninh mạng", "faculty": "Khoa CNTT", "lecturer": "TS. Võ Thành Nam", "max_students": 3, "status": "Chờ hợp tác DN", "registered": false }
+      ]
+    },
+    "joinTopicForm": {
+      "type": "form",
+      "data": {
+        "topic_id": 1,
+        "topic_title": "Nghiên cứu ứng dụng Blockchain trong quản lý chuỗi cung ứng",
+        "company_supervisor": "Nguyễn Văn Hùng",
+        "contribution": "VinaTech cam kết hỗ trợ sinh viên môi trường thực tập tại phòng R&D, cung cấp dữ liệu chuỗi cung ứng thực tế từ hệ thống ERP của công ty, và bố trí cán bộ kỹ thuật hướng dẫn trực tiếp hàng tuần."
+      }
+    },
+    "studentApplications": {
+      "type": "table",
+      "data": [
+        { "id": 1, "student_id": "20110001", "name": "Nguyễn Thị Lan", "class": "CNTT20A", "topic": "Xây dựng hệ thống quản lý đơn hàng TMĐT", "registered_at": "2026-05-10", "status": "Chờ duyệt", "cv": "cv_nguyen_thi_lan.pdf" },
+        { "id": 2, "student_id": "20110045", "name": "Trần Minh Đức", "class": "CNTT20B", "topic": "Xây dựng hệ thống quản lý đơn hàng TMĐT", "registered_at": "2026-05-11", "status": "Tiếp nhận", "cv": "cv_tran_minh_duc.pdf" },
+        { "id": 3, "student_id": "20110089", "name": "Lê Thị Hương", "class": "CNTT20A", "topic": "Phân tích dữ liệu hành vi khách hàng với ML", "registered_at": "2026-05-12", "status": "Tiếp nhận", "cv": "cv_le_thi_huong.pdf" },
+        { "id": 4, "student_id": "20110112", "name": "Phạm Văn Kiên", "class": "KTDT20A", "topic": "Xây dựng hệ thống quản lý đơn hàng TMĐT", "registered_at": "2026-05-13", "status": "Từ chối", "cv": "cv_pham_van_kien.pdf" },
+        { "id": 5, "student_id": "20110156", "name": "Hoàng Ngọc Bích", "class": "CNTT20C", "topic": "Phân tích dữ liệu hành vi khách hàng với ML", "registered_at": "2026-05-14", "status": "Chờ duyệt", "cv": "cv_hoang_ngoc_bich.pdf" },
+        { "id": 6, "student_id": "20110201", "name": "Vũ Đình Long", "class": "CNTT20B", "topic": "Phân tích dữ liệu hành vi khách hàng với ML", "registered_at": "2026-05-15", "status": "Chờ duyệt", "cv": "cv_vu_dinh_long.pdf" }
+      ]
+    },
+    "acceptedStudents": {
+      "type": "table",
+      "data": [
+        { "id": 1, "student_id": "20110045", "name": "Trần Minh Đức", "class": "CNTT20B", "topic": "Xây dựng hệ thống quản lý đơn hàng TMĐT", "supervisor": "Nguyễn Văn Hùng", "start_date": "2026-06-01", "end_date": "2026-08-31", "training_plan": true, "score_status": "Chưa chấm" },
+        { "id": 2, "student_id": "20110089", "name": "Lê Thị Hương", "class": "CNTT20A", "topic": "Phân tích dữ liệu hành vi khách hàng với ML", "supervisor": "Lê Văn Tú", "start_date": "2026-06-01", "end_date": "2026-08-31", "training_plan": true, "score_status": "Đã lưu nháp" },
+        { "id": 3, "student_id": "20110178", "name": "Nguyễn Văn Phúc", "class": "CNTT20A", "topic": "Xây dựng hệ thống quản lý đơn hàng TMĐT", "supervisor": "Nguyễn Văn Hùng", "start_date": "2026-06-01", "end_date": "2026-08-31", "training_plan": false, "score_status": "Đã hoàn tất" }
+      ]
+    },
+    "gradingData": {
+      "type": "form",
+      "data": [
+        {
+          "student_id": "20110045",
+          "name": "Trần Minh Đức",
+          "class": "CNTT20B",
+          "topic": "Xây dựng hệ thống quản lý đơn hàng TMĐT",
+          "supervisor": "Nguyễn Văn Hùng",
+          "absent_days": 2,
+          "total_internship_days": 65,
+          "criteria": [
+            { "id": 1, "name": "Ý thức chấp hành nội quy, kỷ luật", "max_score": 2.0, "score": 1.8 },
+            { "id": 2, "name": "Tinh thần trách nhiệm, thái độ công việc", "max_score": 2.0, "score": 1.9 },
+            { "id": 3, "name": "Vận dụng kiến thức chuyên môn vào thực tiễn", "max_score": 2.0, "score": 1.7 },
+            { "id": 4, "name": "Kết quả hoàn thành theo đề cương chi tiết", "max_score": 4.0, "score": 3.5 }
+          ],
+          "mentor_feedback": "Sinh viên Trần Minh Đức có ý thức làm việc tốt, chủ động trong công việc và tiếp thu nhanh. Cần cải thiện kỹ năng trình bày kết quả và viết báo cáo kỹ thuật.",
+          "status": "DRAFT_SCORES"
+        },
+        {
+          "student_id": "20110089",
+          "name": "Lê Thị Hương",
+          "class": "CNTT20A",
+          "topic": "Phân tích dữ liệu hành vi khách hàng với ML",
+          "supervisor": "Lê Văn Tú",
+          "absent_days": 0,
+          "total_internship_days": 65,
+          "criteria": [
+            { "id": 1, "name": "Ý thức chấp hành nội quy, kỷ luật", "max_score": 2.0, "score": null },
+            { "id": 2, "name": "Tinh thần trách nhiệm, thái độ công việc", "max_score": 2.0, "score": null },
+            { "id": 3, "name": "Vận dụng kiến thức chuyên môn vào thực tiễn", "max_score": 2.0, "score": null },
+            { "id": 4, "name": "Kết quả hoàn thành theo đề cương chi tiết", "max_score": 4.0, "score": null }
+          ],
+          "mentor_feedback": "",
+          "status": "PENDING"
+        }
+      ]
+    },
+    "dashboard": {
+      "type": "stats",
+      "data": {
+        "total_topics": 4,
+        "approved_topics": 2,
+        "pending_topics": 1,
+        "total_students": 3,
+        "pending_applications": 3,
+        "total_posts": 5,
+        "cooperation_status": "Đã được chấp nhận",
+        "cooperated_faculties": ["Khoa Công nghệ Thông tin", "Khoa Kỹ thuật Điện tử - Viễn thông"]
+      }
+    }
+  }
+}

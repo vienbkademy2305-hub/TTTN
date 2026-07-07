@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Tạo bài đăng — Cổng Thông Tin</title>
+  <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+<div class="app-layout">
+  <div id="sidebar-placeholder"></div>
+  <div class="main-wrapper">
+    <header class="topbar">
+      <div class="topbar-breadcrumb">
+        <span class="breadcrumb-root">Tin tức</span>
+        <span class="breadcrumb-sep">/</span>
+        <a href="tin-tuc.html" class="breadcrumb-root">Danh sách bài đăng</a>
+        <span class="breadcrumb-sep">/</span>
+        <span class="breadcrumb-current">Tạo bài đăng mới</span>
+      </div>
+      <div class="topbar-actions">
+        <button class="topbar-btn" aria-label="Thông báo">🔔</button>
+        <div class="topbar-user"><div class="user-avatar">NT</div><div class="user-info"><div class="user-name">Nguyễn Thị Thu Hà</div><div class="user-role">Quản trị viên DN</div></div></div>
+      </div>
+    </header>
+    <main class="main-content">
+      <div class="page-header">
+        <div class="header-row">
+          <div>
+            <h1>Soạn thảo bài đăng mới</h1>
+            <p>Đăng tải tin tức, tuyển dụng, sự kiện lên cổng thông tin (MH-03-02)</p>
+          </div>
+          <div style="display:flex;gap:10px">
+            <button class="btn btn-outline" id="btnDraft" aria-label="Lưu nháp">💾 Lưu nháp</button>
+            <button class="btn btn-primary" id="btnPublish" aria-label="Đăng tải">📤 Đăng tải</button>
+          </div>
+        </div>
+      </div>
+
+      <div id="alertStatus" class="hidden" style="margin-bottom:16px"></div>
+
+      <div style="display:grid;grid-template-columns:2fr 1fr;gap:20px" class="editor-layout">
+        <!-- Main editor -->
+        <div>
+          <div class="card" style="margin-bottom:20px">
+            <div class="form-group" style="margin-bottom:16px">
+              <label class="form-label" for="postTitle">Tiêu đề bài đăng <span class="required">*</span></label>
+              <input id="postTitle" class="form-control" type="text"
+                value="Tuyển dụng Intern Backend Developer (Java/Spring Boot)"
+                placeholder="Nhập tiêu đề bài đăng..." required aria-label="Tiêu đề"
+                style="font-size:16px;font-weight:600;padding:12px 14px">
+              <span class="form-error hidden">⚠ Vui lòng nhập tiêu đề bài đăng</span>
+            </div>
+            <div class="form-group" style="margin-bottom:16px">
+              <label class="form-label" for="postSummary">Mô tả ngắn</label>
+              <div style="position:relative">
+                <textarea id="postSummary" class="form-control" rows="2" data-maxlength="300"
+                  placeholder="Tóm tắt ngắn về nội dung bài đăng (hiển thị ở trang danh sách)"
+                  aria-label="Mô tả ngắn">VinaTech tuyển dụng intern vị trí Backend Developer, thời gian thực tập 3 tháng, có cơ hội chuyển chính thức.</textarea>
+                <div class="char-counter" style="margin-top:4px">0/300</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Rich Text Editor -->
+          <div class="card">
+            <label class="form-label" style="margin-bottom:12px">Nội dung chi tiết <span class="required">*</span></label>
+            <div class="rte-wrapper">
+              <div class="rte-toolbar">
+                <button class="rte-btn" data-cmd="bold" title="In đậm" aria-label="In đậm"><strong>B</strong></button>
+                <button class="rte-btn" data-cmd="italic" title="In nghiêng" aria-label="In nghiêng"><em>I</em></button>
+                <button class="rte-btn" data-cmd="underline" title="Gạch chân" aria-label="Gạch chân"><u>U</u></button>
+                <div class="rte-sep"></div>
+                <button class="rte-btn" data-cmd="formatBlock" data-val="h2" title="Heading 2" aria-label="H2" style="font-size:11px">H2</button>
+                <button class="rte-btn" data-cmd="formatBlock" data-val="h3" title="Heading 3" aria-label="H3" style="font-size:11px">H3</button>
+                <button class="rte-btn" data-cmd="formatBlock" data-val="p" title="Đoạn văn" aria-label="Đoạn văn" style="font-size:11px">P</button>
+                <div class="rte-sep"></div>
+                <button class="rte-btn" data-cmd="insertUnorderedList" title="Danh sách gạch đầu dòng" aria-label="Danh sách">≡</button>
+                <button class="rte-btn" data-cmd="insertOrderedList" title="Danh sách số" aria-label="Danh sách số">1.</button>
+                <div class="rte-sep"></div>
+                <button class="rte-btn" data-cmd="justifyLeft" title="Căn trái" aria-label="Căn trái">◀</button>
+                <button class="rte-btn" data-cmd="justifyCenter" title="Căn giữa" aria-label="Căn giữa">▶◀</button>
+                <button class="rte-btn" data-cmd="justifyRight" title="Căn phải" aria-label="Căn phải">▶</button>
+                <div class="rte-sep"></div>
+                <button class="rte-btn" data-cmd="removeFormat" title="Xóa định dạng" aria-label="Xóa định dạng" style="font-size:11px">Ax</button>
+              </div>
+              <div class="rte-content" contenteditable="true" role="textbox" aria-multiline="true" aria-label="Nội dung bài đăng"
+                data-placeholder="Nhập nội dung chi tiết bài đăng...">
+                <p>VinaTech đang tìm kiếm các bạn sinh viên năng động, có đam mê về công nghệ để tham gia chương trình thực tập tại vị trí <strong>Backend Developer</strong>.</p>
+                <h2>Mô tả công việc</h2>
+                <ul>
+                  <li>Tham gia phát triển các tính năng backend cho hệ thống thương mại điện tử quy mô lớn</li>
+                  <li>Làm việc với team backend sử dụng Java/Spring Boot</li>
+                  <li>Viết unit test và tham gia code review</li>
+                </ul>
+                <h2>Yêu cầu</h2>
+                <ul>
+                  <li>Sinh viên năm 3-4 ngành CNTT hoặc liên quan</li>
+                  <li>Có kiến thức về Java, Spring Boot, MySQL/PostgreSQL</li>
+                  <li>Hiểu biết về RESTful API, Git</li>
+                  <li>Ưu tiên có kinh nghiệm dự án thực tế</li>
+                </ul>
+                <h2>Quyền lợi</h2>
+                <ul>
+                  <li>Phụ cấp 3–5 triệu/tháng</li>
+                  <li>Được mentor bởi senior developer</li>
+                  <li>Cơ hội tuyển dụng chính thức sau thực tập</li>
+                  <li>Làm việc trong môi trường chuyên nghiệp, hiện đại</li>
+                </ul>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Sidebar: settings -->
+        <div>
+          <div class="card" style="margin-bottom:16px">
+            <div class="card-title" style="margin-bottom:14px">Cài đặt bài đăng</div>
+            <div class="form-group" style="margin-bottom:14px">
+              <label class="form-label" for="postType">Loại tin <span class="required">*</span></label>
+              <select id="postType" class="form-control" required aria-label="Loại tin">
+                <option>Tuyển dụng</option>
+                <option>Sự kiện</option>
+                <option>Tin tức</option>
+                <option>Khác</option>
+              </select>
+            </div>
+            <div class="form-group" style="margin-bottom:14px">
+              <label class="form-label">Trạng thái</label>
+              <div class="badge badge-warning" style="display:inline-flex">📝 Đang soạn thảo</div>
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="postDate">Ngày đăng tải</label>
+              <input id="postDate" class="form-control" type="date" value="2026-06-01" aria-label="Ngày đăng">
+            </div>
+          </div>
+
+          <div class="card" style="margin-bottom:16px">
+            <div class="card-title" style="margin-bottom:12px">Ảnh thumbnail</div>
+            <div class="upload-zone" id="thumbZone" role="button" aria-label="Tải lên thumbnail">
+              <div class="upload-icon">🖼️</div>
+              <p>Click để tải ảnh lên<br><span class="upload-label">PNG/JPG, tối đa 5MB</span></p>
+            </div>
+            <input type="file" id="thumbFile" accept=".png,.jpg,.jpeg" class="hidden" aria-label="Chọn ảnh thumbnail">
+            <div id="thumbPreview" class="hidden" style="margin-top:10px">
+              <div class="upload-preview">
+                <img id="thumbImg" src="" alt="Preview thumbnail" style="width:64px;height:64px;object-fit:cover;border-radius:var(--radius-sm)">
+                <div class="file-info">
+                  <div class="file-name" id="thumbName">—</div>
+                  <div class="file-size" id="thumbSize">—</div>
+                  <button class="btn btn-ghost btn-sm" style="padding:2px 6px;margin-top:4px" onclick="removeThumb()" aria-label="Xóa ảnh">✕ Xóa</button>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="card">
+            <div class="card-title" style="margin-bottom:10px">Xem trước</div>
+            <div style="border:1px solid var(--color-border);border-radius:var(--radius);padding:14px;font-size:13px">
+              <div style="font-weight:700;margin-bottom:4px" id="prevTitle">Tuyển dụng Intern Backend Developer...</div>
+              <div style="color:var(--color-text-muted);font-size:12px;margin-bottom:6px" id="prevType"><span class="badge badge-danger">Tuyển dụng</span></div>
+              <div style="color:var(--color-text-muted);font-size:12px;line-height:1.5" id="prevSummary">VinaTech tuyển dụng intern vị trí Backend Developer...</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </main>
+  </div>
+</div>
+
+<script src="js/sidebar.js"></script>
+<script src="js/main.js"></script>
+<script>
+function initPage(data) {
+  const post = data.components.createPost.data;
+  document.getElementById('postType').value = post.type;
+}
+
+document.getElementById('thumbZone').addEventListener('click', () => document.getElementById('thumbFile').click());
+document.getElementById('thumbFile').addEventListener('change', e => {
+  const file = e.target.files[0];
+  if (!file) return;
+  if (file.size > 5 * 1024 * 1024) { showToast('File vượt quá 5MB','error'); return; }
+  const reader = new FileReader();
+  reader.onload = ev => {
+    document.getElementById('thumbImg').src = ev.target.result;
+    document.getElementById('thumbName').textContent = file.name;
+    document.getElementById('thumbSize').textContent = (file.size/1024).toFixed(1) + ' KB';
+    document.getElementById('thumbZone').classList.add('hidden');
+    document.getElementById('thumbPreview').classList.remove('hidden');
+  };
+  reader.readAsDataURL(file);
+});
+
+function removeThumb() {
+  document.getElementById('thumbZone').classList.remove('hidden');
+  document.getElementById('thumbPreview').classList.add('hidden');
+  document.getElementById('thumbFile').value = '';
+}
+
+document.getElementById('postTitle').addEventListener('input', e => {
+  document.getElementById('prevTitle').textContent = e.target.value.slice(0,50) + (e.target.value.length > 50 ? '…' : '');
+});
+
+const typeMap = { 'Tuyển dụng':'badge-danger','Sự kiện':'badge-warning','Tin tức':'badge-info','Khác':'badge-gray' };
+document.getElementById('postType').addEventListener('change', e => {
+  const type = e.target.value;
+  document.getElementById('prevType').innerHTML = `<span class="badge ${typeMap[type]||'badge-gray'}">${type}</span>`;
+});
+
+document.getElementById('postSummary').addEventListener('input', e => {
+  document.getElementById('prevSummary').textContent = e.target.value.slice(0,80) + (e.target.value.length > 80 ? '…' : '');
+});
+
+document.getElementById('btnDraft').addEventListener('click', () => {
+  const title = document.getElementById('postTitle').value.trim();
+  if (!title) { showToast('Vui lòng nhập tiêu đề trước khi lưu nháp','warning'); return; }
+  const alert = document.getElementById('alertStatus');
+  alert.className = 'alert alert-warning';
+  alert.innerHTML = '<span class="alert-icon">💾</span><div><strong>Đã lưu nháp!</strong> Bài đăng đã được lưu dưới dạng nháp. Bạn có thể tiếp tục chỉnh sửa.</div>';
+  alert.classList.remove('hidden');
+  showToast('Đã lưu nháp thành công','warning');
+});
+
+document.getElementById('btnPublish').addEventListener('click', () => {
+  const title = document.getElementById('postTitle').value.trim();
+  if (!title) { document.getElementById('postTitle').classList.add('error'); document.getElementById('postTitle').nextElementSibling.classList.remove('hidden'); return; }
+  const alert = document.getElementById('alertStatus');
+  alert.className = 'alert alert-success';
+  alert.innerHTML = '<span class="alert-icon">✅</span><div><strong>Đã đăng tải thành công!</strong> Bài đăng của bạn đã được hiển thị trên cổng thông tin. <a href="tin-tuc.html">Xem danh sách bài đăng →</a></div>';
+  alert.classList.remove('hidden');
+  showToast('Bài đăng đã được đăng tải','success');
+  document.getElementById('btnPublish').disabled = true;
+});
+</script>
+<style>@media(max-width:900px){.editor-layout{grid-template-columns:1fr!important}}</style>
+</body>
+</html>

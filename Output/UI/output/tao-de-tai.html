@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Tạo đề tài mới — Cổng Thông Tin</title>
+  <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+<div class="app-layout">
+  <div id="sidebar-placeholder"></div>
+  <div class="main-wrapper">
+    <header class="topbar">
+      <div class="topbar-breadcrumb">
+        <span class="breadcrumb-root">Đề tài</span>
+        <span class="breadcrumb-sep">/</span>
+        <a href="de-tai.html" class="breadcrumb-root">Đề tài của tôi</a>
+        <span class="breadcrumb-sep">/</span>
+        <span class="breadcrumb-current">Tạo đề tài mới</span>
+      </div>
+      <div class="topbar-actions">
+        <button class="topbar-btn" aria-label="Thông báo">🔔</button>
+        <div class="topbar-user"><div class="user-avatar">NT</div><div class="user-info"><div class="user-name">Nguyễn Thị Thu Hà</div><div class="user-role">Quản trị viên DN</div></div></div>
+      </div>
+    </header>
+    <main class="main-content">
+      <div class="page-header">
+        <div class="header-row">
+          <div>
+            <h1>Tạo đề tài Thực tập mới</h1>
+            <p>Đề xuất đề tài để Khoa thẩm định và hiển thị cho sinh viên (MH-04-02)</p>
+          </div>
+          <div style="display:flex;gap:10px">
+            <a href="de-tai.html" class="btn btn-outline">← Quay lại</a>
+            <button class="btn btn-primary" id="btnSubmitTopic" aria-label="Gửi đề tài">📤 Gửi đề xuất</button>
+          </div>
+        </div>
+      </div>
+
+      <div id="alertTopicStatus" class="hidden" style="margin-bottom:16px"></div>
+
+      <div class="status-steps" style="margin-bottom:24px">
+        <div class="step current"><div class="step-dot">1</div><span class="step-label">Soạn đề tài</span></div>
+        <div class="step-line"></div>
+        <div class="step pending"><div class="step-dot">2</div><span class="step-label">Chờ phê duyệt</span></div>
+        <div class="step-line"></div>
+        <div class="step pending"><div class="step-dot">3</div><span class="step-label">Hiển thị cho SV</span></div>
+      </div>
+
+      <form id="topicForm" novalidate>
+        <div style="display:grid;grid-template-columns:2fr 1fr;gap:20px" class="topic-layout">
+          <div>
+            <div class="card" style="margin-bottom:20px">
+              <div class="card-section-title">Thông tin cơ bản</div>
+              <div class="form-grid" style="gap:16px">
+                <div class="form-group span-2">
+                  <label class="form-label" for="topicTitle">Tên đề tài <span class="required">*</span></label>
+                  <input id="topicTitle" class="form-control" type="text"
+                    value="Xây dựng hệ thống quản lý đơn hàng thương mại điện tử"
+                    placeholder="Nhập tên đề tài..." required aria-label="Tên đề tài"
+                    style="font-size:15px;font-weight:600">
+                  <span class="form-error hidden">⚠ Vui lòng nhập tên đề tài</span>
+                </div>
+                <div class="form-group">
+                  <label class="form-label" for="topicType">Loại đề tài <span class="required">*</span></label>
+                  <select id="topicType" class="form-control" required aria-label="Loại đề tài">
+                    <option>Kỹ thuật phần mềm</option>
+                    <option>Khoa học dữ liệu</option>
+                    <option>Kỹ thuật điện tử</option>
+                    <option>An ninh mạng</option>
+                    <option>Nghiên cứu</option>
+                    <option>Khác</option>
+                  </select>
+                </div>
+                <div class="form-group">
+                  <label class="form-label" for="topicFaculty">Khoa thẩm định <span class="required">*</span></label>
+                  <select id="topicFaculty" class="form-control" required aria-label="Khoa thẩm định">
+                    <option>Khoa Công nghệ Thông tin</option>
+                    <option>Khoa Kỹ thuật Điện tử - Viễn thông</option>
+                  </select>
+                  <span class="form-hint">Chỉ hiển thị các Khoa đã hợp tác với doanh nghiệp</span>
+                </div>
+                <div class="form-group">
+                  <label class="form-label" for="topicMax">Số lượng SV tối đa <span class="required">*</span></label>
+                  <input id="topicMax" class="form-control" type="number" min="1" max="10" value="3" required aria-label="Số SV tối đa">
+                  <span class="form-error hidden">⚠ Số lượng phải từ 1 đến 10</span>
+                </div>
+                <div class="form-group">
+                  <label class="form-label" for="topicSupervisor">Cán bộ DN hướng dẫn <span class="required">*</span></label>
+                  <select id="topicSupervisor" class="form-control" required aria-label="Cán bộ hướng dẫn">
+                    <option>Nguyễn Văn Hùng</option>
+                    <option>Lê Văn Tú</option>
+                  </select>
+                  <span class="form-hint">Chỉ hiển thị nhân viên có vai trò "Cán bộ hướng dẫn"</span>
+                </div>
+              </div>
+            </div>
+
+            <div class="card" style="margin-bottom:20px">
+              <div class="card-section-title">Mô tả chi tiết đề tài</div>
+              <div class="rte-wrapper">
+                <div class="rte-toolbar">
+                  <button class="rte-btn" data-cmd="bold" aria-label="In đậm"><strong>B</strong></button>
+                  <button class="rte-btn" data-cmd="italic" aria-label="In nghiêng"><em>I</em></button>
+                  <button class="rte-btn" data-cmd="underline" aria-label="Gạch chân"><u>U</u></button>
+                  <div class="rte-sep"></div>
+                  <button class="rte-btn" data-cmd="formatBlock" data-val="h2" style="font-size:11px" aria-label="Heading 2">H2</button>
+                  <button class="rte-btn" data-cmd="formatBlock" data-val="p" style="font-size:11px" aria-label="Đoạn văn">P</button>
+                  <div class="rte-sep"></div>
+                  <button class="rte-btn" data-cmd="insertUnorderedList" aria-label="Danh sách">≡</button>
+                  <button class="rte-btn" data-cmd="insertOrderedList" aria-label="Danh sách số">1.</button>
+                </div>
+                <div class="rte-content" contenteditable="true" role="textbox" aria-multiline="true" aria-label="Mô tả đề tài"
+                  data-placeholder="Mô tả chi tiết nội dung, mục tiêu và công việc thực tập...">
+                  <p>Đề tài nhằm xây dựng một hệ thống quản lý đơn hàng toàn diện cho sàn thương mại điện tử, bao gồm các chức năng quản lý sản phẩm, đơn hàng, thanh toán và vận chuyển.</p>
+                  <h2>Mục tiêu đề tài</h2>
+                  <ul>
+                    <li>Xây dựng RESTful API backend bằng Java/Spring Boot</li>
+                    <li>Phát triển giao diện quản trị với ReactJS</li>
+                    <li>Tích hợp hệ thống thanh toán và thông báo email</li>
+                    <li>Triển khai CI/CD và unit testing</li>
+                  </ul>
+                  <h2>Công nghệ sử dụng</h2>
+                  <ul>
+                    <li>Backend: Java 17, Spring Boot 3.x, MySQL</li>
+                    <li>Frontend: ReactJS, TailwindCSS</li>
+                    <li>DevOps: Docker, Jenkins, AWS</li>
+                  </ul>
+                </div>
+              </div>
+            </div>
+
+            <div class="card">
+              <div class="card-section-title">Yêu cầu đối với sinh viên</div>
+              <div class="form-group">
+                <label class="form-label" for="topicReqs">Yêu cầu kỹ năng và kinh nghiệm</label>
+                <div style="position:relative">
+                  <textarea id="topicReqs" class="form-control" rows="4" data-maxlength="500"
+                    placeholder="VD: Sinh viên cần có kiến thức về Java, SQL, ưu tiên có dự án thực tế..."
+                    aria-label="Yêu cầu sinh viên">Sinh viên cần có kiến thức về Java/Spring Boot, MySQL, ReactJS. Ưu tiên SV đã có dự án thực tế. Có khả năng làm việc nhóm và chịu áp lực tốt.</textarea>
+                  <div class="char-counter" style="margin-top:4px">0/500</div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Right sidebar: preview -->
+          <div>
+            <div class="card" style="margin-bottom:16px">
+              <div class="card-title" style="margin-bottom:12px">Xem trước (góc nhìn SV)</div>
+              <div style="border:1px solid var(--color-border);border-radius:var(--radius);overflow:hidden">
+                <div style="background:var(--color-primary);padding:14px 16px">
+                  <div style="font-weight:700;color:#fff;font-size:14px" id="prevTopicTitle">Xây dựng hệ thống quản lý đơn hàng...</div>
+                  <div style="font-size:12px;color:rgba(255,255,255,0.7);margin-top:4px">Công ty CP VinaTech</div>
+                </div>
+                <div style="padding:14px 16px">
+                  <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:10px">
+                    <span class="badge badge-gray" id="prevTopicType">Kỹ thuật phần mềm</span>
+                    <span class="badge badge-info" id="prevTopicFaculty">Khoa CNTT</span>
+                    <span class="badge badge-warning">Chờ phê duyệt</span>
+                  </div>
+                  <div class="info-row"><span class="info-label">Số SV tối đa:</span><span class="info-value" id="prevMaxSv">3</span></div>
+                  <div class="info-row"><span class="info-label">Cán bộ HD:</span><span class="info-value" id="prevSupervisor">Nguyễn Văn Hùng</span></div>
+                </div>
+              </div>
+            </div>
+
+            <div class="card">
+              <div class="card-title" style="margin-bottom:10px">Lưu ý</div>
+              <ul style="display:flex;flex-direction:column;gap:8px">
+                <li class="text-sm text-muted">📌 Đề tài sẽ được gửi đến Khoa để thẩm định</li>
+                <li class="text-sm text-muted">📌 Thời gian thẩm định: 3–5 ngày làm việc</li>
+                <li class="text-sm text-muted">📌 Sau khi duyệt, SV sẽ thấy đề tài và có thể nộp hồ sơ</li>
+                <li class="text-sm text-muted">📌 Chỉ DN đã hợp tác mới được tạo đề tài</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </form>
+    </main>
+  </div>
+</div>
+
+<script src="js/sidebar.js"></script>
+<script src="js/main.js"></script>
+<script>
+function initPage(data) {}
+
+document.getElementById('topicTitle').addEventListener('input', e => {
+  document.getElementById('prevTopicTitle').textContent = (e.target.value || '').slice(0,50) + ((e.target.value||'').length > 50 ? '…' : '');
+});
+document.getElementById('topicType').addEventListener('change', e => {
+  document.getElementById('prevTopicType').textContent = e.target.value;
+});
+document.getElementById('topicFaculty').addEventListener('change', e => {
+  const code = e.target.value.includes('KTDT') ? 'Khoa KTDT' : 'Khoa CNTT';
+  document.getElementById('prevTopicFaculty').textContent = code;
+});
+document.getElementById('topicMax').addEventListener('input', e => {
+  document.getElementById('prevMaxSv').textContent = e.target.value;
+});
+document.getElementById('topicSupervisor').addEventListener('change', e => {
+  document.getElementById('prevSupervisor').textContent = e.target.value;
+});
+
+document.getElementById('btnSubmitTopic').addEventListener('click', () => {
+  const title = document.getElementById('topicTitle').value.trim();
+  const max = parseInt(document.getElementById('topicMax').value);
+  let valid = true;
+
+  if (!title) {
+    document.getElementById('topicTitle').classList.add('error');
+    document.getElementById('topicTitle').nextElementSibling.classList.remove('hidden');
+    valid = false;
+  } else {
+    document.getElementById('topicTitle').classList.remove('error');
+    document.getElementById('topicTitle').nextElementSibling.classList.add('hidden');
+  }
+  if (!max || max < 1 || max > 10) {
+    document.getElementById('topicMax').classList.add('error');
+    document.getElementById('topicMax').nextElementSibling.classList.remove('hidden');
+    valid = false;
+  } else {
+    document.getElementById('topicMax').classList.remove('error');
+    document.getElementById('topicMax').nextElementSibling.classList.add('hidden');
+  }
+  if (!valid) return;
+
+  const alertEl = document.getElementById('alertTopicStatus');
+  alertEl.className = 'alert alert-success';
+  alertEl.innerHTML = `<span class="alert-icon">✅</span><div><strong>Đề tài đã được gửi thành công!</strong> Trạng thái: <span class="badge badge-warning">Chờ phê duyệt</span>. Khoa sẽ xem xét trong 3–5 ngày làm việc. <a href="de-tai.html">Xem danh sách đề tài →</a></div>`;
+  alertEl.classList.remove('hidden');
+  alertEl.scrollIntoView({ behavior: 'smooth' });
+  showToast('Đề tài đã được gửi thành công', 'success');
+  document.getElementById('btnSubmitTopic').disabled = true;
+
+  // Update step indicator
+  document.querySelectorAll('.step')[0].classList.remove('current'); document.querySelectorAll('.step')[0].classList.add('done');
+  document.querySelectorAll('.step')[1].classList.remove('pending'); document.querySelectorAll('.step')[1].classList.add('current');
+  document.querySelectorAll('.step-line')[0].classList.add('done');
+});
+</script>
+<style>@media(max-width:900px){.topic-layout{grid-template-columns:1fr!important}}</style>
+</body>
+</html>

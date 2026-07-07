@@ -150,7 +150,7 @@
           <select class="fc" style="width:150px" id="f-type">
             <option value="">Tất cả loại</option>
           </select>
-          <select class="fc" style="width:155px" id="f-status">
+          <select class="fc" style="width:155px;display:none" id="f-status">
             <option value="">Tất cả tình trạng</option>
             <option value="open">Còn chỗ đăng ký</option>
             <option value="full">Đã đủ chỗ</option>
@@ -430,7 +430,7 @@ function renderTable(list) {
           <div style="font-size:12px;font-weight:600;color:var(--text-1)">${t.dvql}</div>
           <div style="font-size:11px;color:var(--text-3)">${DVQL_MAP[t.dvql]||t.dvql}</div>
         </td>
-        <td style="font-size:13px">${t.taken}/${t.maxQty}</td>
+        <td style="font-size:13px;text-align:center">${t.maxQty}</td>
         <td style="text-align:center">
           <button class="btn btn-default btn-sm"
             onclick="event.stopPropagation();openDetail(${t.id})">Xem</button>

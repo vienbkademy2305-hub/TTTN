@@ -1,0 +1,589 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Hợp tác Khoa/Viện — Cổng Thông Tin</title>
+  <link rel="stylesheet" href="css/styles.css">
+  <style>
+    .coop-timeline{display:flex;flex-direction:column;gap:0}
+    .coop-timeline-item{display:flex;gap:12px;padding:10px 0;border-bottom:1px solid var(--color-border)}
+    .coop-timeline-item:last-child{border-bottom:none}
+    .timeline-dot{width:10px;height:10px;border-radius:50%;flex-shrink:0;margin-top:4px}
+    .detail-row{display:flex;gap:6px;font-size:13px;margin-bottom:6px}
+    .detail-row .dl{color:var(--color-text-muted);min-width:160px;flex-shrink:0}
+    .detail-row .dv{color:var(--color-text);font-weight:500}
+  </style>
+</head>
+<body>
+<div class="app-layout">
+  <div id="sidebar-placeholder"></div>
+  <div class="main-wrapper">
+    <header class="topbar">
+      <div class="topbar-breadcrumb">
+        <span class="breadcrumb-root">Doanh nghiệp</span>
+        <span class="breadcrumb-sep">/</span>
+        <span class="breadcrumb-current">Hợp tác Khoa/Viện</span>
+      </div>
+      <div class="topbar-actions">
+        <button class="topbar-btn" aria-label="Thông báo">🔔</button>
+        <div class="topbar-user">
+          <div class="user-avatar">NT</div>
+          <div class="user-info">
+            <div class="user-name">Nguyễn Thị Thu Hà</div>
+            <div class="user-role">Quản trị viên DN</div>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <main class="main-content">
+      <div class="page-header">
+        <div class="header-row">
+          <div>
+            <h1>Hợp tác Khoa / Viện</h1>
+            <p>Quản lý tất cả đề xuất và hợp tác giữa doanh nghiệp với các đơn vị đào tạo (MH-02-02)</p>
+          </div>
+          <button class="btn btn-primary" id="btnRegisterCoop" aria-label="Đăng ký hợp tác mới">
+            ➕ Đăng ký hợp tác mới
+          </button>
+        </div>
+      </div>
+
+      <!-- Stat cards -->
+      <div class="stats-grid" style="grid-template-columns:repeat(4,1fr);margin-bottom:20px">
+        <div class="stat-card">
+          <div class="stat-icon green">🤝</div>
+          <div><div class="stat-value" id="stActive">2</div><div class="stat-label">Đang hợp tác</div></div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon orange">⏳</div>
+          <div><div class="stat-value" id="stPending">1</div><div class="stat-label">Chờ xét duyệt</div></div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon" style="background:#ede9fe">❌</div>
+          <div><div class="stat-value" id="stRejected">1</div><div class="stat-label">Từ chối</div></div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon blue">📋</div>
+          <div><div class="stat-value" id="stTotal">4</div><div class="stat-label">Tổng đề xuất</div></div>
+        </div>
+      </div>
+
+      <!-- Main table card -->
+      <div class="card">
+        <div class="table-toolbar">
+          <div class="search-input-wrap flex-1">
+            <span class="search-icon">🔍</span>
+            <input type="search" class="form-control" id="searchCoop"
+              placeholder="Tìm theo tên Khoa/Viện..." aria-label="Tìm kiếm">
+          </div>
+          <select class="form-control" id="filterStatus" style="width:180px" aria-label="Lọc trạng thái">
+            <option value="">Tất cả trạng thái</option>
+            <option>Đã chấp nhận</option>
+            <option>Chờ xét duyệt</option>
+            <option>Từ chối</option>
+            <option>Đã gia hạn</option>
+          </select>
+          <select class="form-control" id="filterType" style="width:200px" aria-label="Lọc loại hợp tác">
+            <option value="">Tất cả loại hợp tác</option>
+            <option>Thực tập & Tuyển dụng</option>
+            <option>Đồng hướng dẫn đề tài</option>
+            <option>Nghiên cứu ứng dụng</option>
+            <option>Tài trợ học bổng</option>
+          </select>
+          <span class="table-count" id="coopCount">4 hợp tác</span>
+        </div>
+
+        <div class="table-wrapper">
+          <table>
+            <thead>
+              <tr>
+                <th style="width:36px">#</th>
+                <th>Đơn vị hợp tác</th>
+                <th>Loại hợp tác</th>
+                <th>Người liên hệ nhà trường</th>
+                <th>Ngày gửi</th>
+                <th>Ngày xét duyệt</th>
+                <th>Hiệu lực đến</th>
+                <th>Trạng thái</th>
+                <th style="text-align:center">Hành động</th>
+              </tr>
+            </thead>
+            <tbody id="coopBody">
+              <tr><td colspan="9" class="table-empty">Đang tải...</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </main>
+  </div>
+</div>
+
+<!-- ===== MODAL: Đăng ký hợp tác mới ===== -->
+<div class="modal-overlay" id="modalRegister" role="dialog" aria-modal="true" aria-labelledby="modalRegTitle">
+  <div class="modal modal-lg">
+    <div class="modal-header">
+      <div>
+        <div class="modal-title" id="modalRegTitle">🤝 Đăng ký hợp tác mới</div>
+        <div class="text-sm text-muted" style="margin-top:2px">Điền thông tin để gửi đề xuất đến Khoa/Viện</div>
+      </div>
+      <button class="modal-close" data-modal-close aria-label="Đóng">✕</button>
+    </div>
+    <div class="modal-body">
+      <form id="registerForm" novalidate>
+        <div class="form-grid" style="gap:14px">
+
+          <div class="form-group span-2">
+            <label class="form-label" for="reg_faculty">Khoa / Viện <span class="required">*</span></label>
+            <select id="reg_faculty" class="form-control" required aria-label="Khoa Viện">
+              <option value="">— Chọn Khoa/Viện —</option>
+              <option value="QTKD">Khoa Quản trị Kinh doanh (QTKD)</option>
+              <option value="TCNH">Khoa Tài chính - Ngân hàng (TCNH)</option>
+              <option value="NN">Khoa Ngoại ngữ (NN)</option>
+              <option value="XD">Khoa Xây dựng & Kiến trúc (XD)</option>
+              <option value="CNSV">Viện Công nghệ Sinh học (CNSV)</option>
+            </select>
+            <span class="form-hint">Chỉ hiển thị Khoa/Viện chưa có đề xuất hợp tác</span>
+            <span class="form-error hidden">⚠ Vui lòng chọn Khoa/Viện</span>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="reg_type">Loại hợp tác <span class="required">*</span></label>
+            <select id="reg_type" class="form-control" required aria-label="Loại hợp tác">
+              <option value="">— Chọn loại —</option>
+              <option>Thực tập & Tuyển dụng</option>
+              <option>Đồng hướng dẫn đề tài</option>
+              <option>Nghiên cứu ứng dụng</option>
+              <option>Tài trợ học bổng</option>
+              <option>Kết hợp nhiều loại</option>
+            </select>
+            <span class="form-error hidden">⚠ Vui lòng chọn loại hợp tác</span>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="reg_start">Ngày mong muốn bắt đầu</label>
+            <input id="reg_start" class="form-control" type="date"
+              aria-label="Ngày bắt đầu">
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="reg_duration">Thời hạn hợp tác</label>
+            <select id="reg_duration" class="form-control" aria-label="Thời hạn">
+              <option>1 năm</option>
+              <option selected>2 năm</option>
+              <option>3 năm</option>
+              <option>Không xác định</option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="reg_contact_dn">Người liên hệ từ DN <span class="required">*</span></label>
+            <select id="reg_contact_dn" class="form-control" required aria-label="Người liên hệ DN">
+              <option>Nguyễn Thị Thu Hà — Trưởng phòng Nhân sự</option>
+              <option>Trần Văn Minh — CTO</option>
+              <option>Lê Thị Lan Anh — Chuyên viên Hợp tác ĐT</option>
+            </select>
+          </div>
+
+          <div class="form-group span-2">
+            <label class="form-label" for="reg_note">Nội dung đề xuất / Lý do muốn hợp tác <span class="required">*</span></label>
+            <div style="position:relative">
+              <textarea id="reg_note" class="form-control" rows="4"
+                data-maxlength="1000" required
+                placeholder="Mô tả mục tiêu, kỳ vọng và cam kết của doanh nghiệp khi hợp tác với Khoa/Viện..."
+                aria-label="Nội dung đề xuất"></textarea>
+              <div class="char-counter" style="margin-top:3px">0/1000</div>
+            </div>
+            <span class="form-error hidden">⚠ Vui lòng nhập nội dung đề xuất</span>
+          </div>
+
+          <div class="form-group span-2">
+            <label class="form-label" for="reg_commitment">Cam kết từ doanh nghiệp</label>
+            <div style="position:relative">
+              <textarea id="reg_commitment" class="form-control" rows="3"
+                data-maxlength="500"
+                placeholder="VD: Cung cấp môi trường thực tập, hỗ trợ thiết bị, học bổng cho SV xuất sắc..."
+                aria-label="Cam kết DN"></textarea>
+              <div class="char-counter" style="margin-top:3px">0/500</div>
+            </div>
+          </div>
+
+          <div class="form-group span-2">
+            <label class="form-label" for="reg_file">Tài liệu đính kèm</label>
+            <div class="upload-zone" id="regUploadZone" role="button" aria-label="Đính kèm tài liệu" style="padding:16px;text-align:left;display:flex;align-items:center;gap:12px">
+              <span style="font-size:24px">📎</span>
+              <div>
+                <div style="font-size:13px;font-weight:600">Đính kèm hồ sơ năng lực / giấy tờ liên quan</div>
+                <div style="font-size:12px;color:var(--color-text-muted)">PDF, DOCX · tối đa 10MB</div>
+              </div>
+            </div>
+            <input type="file" id="reg_file" accept=".pdf,.docx,.doc" class="hidden" aria-label="Chọn file đính kèm">
+            <div id="regFilePreview" class="hidden" style="margin-top:8px">
+              <div class="upload-preview">
+                <span style="font-size:24px">📄</span>
+                <div class="file-info">
+                  <div class="file-name" id="regFileName">—</div>
+                  <div class="file-size" id="regFileSize">—</div>
+                </div>
+                <button class="btn btn-ghost btn-sm" style="margin-left:auto" onclick="clearFile()" aria-label="Xóa file">✕</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </form>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-outline" data-modal-close>Hủy</button>
+      <button class="btn btn-primary" id="btnSubmitCoop">📤 Gửi đề xuất hợp tác</button>
+    </div>
+  </div>
+</div>
+
+<!-- ===== MODAL: Xem chi tiết hợp tác ===== -->
+<div class="modal-overlay" id="modalDetail" role="dialog" aria-modal="true" aria-labelledby="modalDetailTitle">
+  <div class="modal modal-lg">
+    <div class="modal-header">
+      <div>
+        <div class="modal-title" id="modalDetailTitle">Chi tiết hợp tác</div>
+        <div id="modalDetailStatus" style="margin-top:4px"></div>
+      </div>
+      <button class="modal-close" data-modal-close aria-label="Đóng">✕</button>
+    </div>
+    <div class="modal-body" id="modalDetailBody"></div>
+    <div class="modal-footer" id="modalDetailFooter">
+      <button class="btn btn-outline" data-modal-close>Đóng</button>
+    </div>
+  </div>
+</div>
+
+<script src="js/sidebar.js"></script>
+<script src="js/main.js"></script>
+<script>
+/* ===== MOCK DATA ===== */
+let coopList = [
+  {
+    id: 1,
+    faculty_name: 'Khoa Công nghệ Thông tin',
+    faculty_code: 'CNTT',
+    type: 'Thực tập & Tuyển dụng',
+    contact_school: 'TS. Nguyễn Minh Khoa — Trưởng Khoa',
+    contact_dn: 'Nguyễn Thị Thu Hà — Trưởng phòng NS',
+    sent_date: '2024-01-15',
+    approved_date: '2024-01-22',
+    expiry_date: '2026-01-22',
+    status: 'Đã chấp nhận',
+    note: 'VinaTech cam kết cung cấp tối thiểu 10 vị trí thực tập mỗi kỳ, hỗ trợ học bổng cho sinh viên xuất sắc và tham gia hội thảo hướng nghiệp hàng năm.',
+    commitment: 'Cung cấp 10+ vị trí thực tập/kỳ · Học bổng 5 triệu/SV giỏi · Seminar kỹ năng hàng quý',
+    history: [
+      { date: '2024-01-15', action: 'Gửi đề xuất hợp tác', by: 'Nguyễn Thị Thu Hà' },
+      { date: '2024-01-18', action: 'Khoa tiếp nhận hồ sơ và chuyển Ban Hợp tác', by: 'Văn phòng Khoa CNTT' },
+      { date: '2024-01-22', action: 'Phê duyệt hợp tác chính thức', by: 'TS. Nguyễn Minh Khoa' },
+    ]
+  },
+  {
+    id: 2,
+    faculty_name: 'Khoa Kỹ thuật Điện tử - Viễn thông',
+    faculty_code: 'KTDT',
+    type: 'Thực tập & Tuyển dụng',
+    contact_school: 'PGS.TS. Lê Thị Hoa — Trưởng Khoa',
+    contact_dn: 'Trần Văn Minh — CTO',
+    sent_date: '2024-01-15',
+    approved_date: '2024-01-25',
+    expiry_date: '2026-01-25',
+    status: 'Đã chấp nhận',
+    note: 'Hợp tác tập trung vào mảng IoT, hệ thống nhúng và tự động hóa. VinaTech sẽ cung cấp dữ liệu thực tế từ các dự án IoT công nghiệp.',
+    commitment: 'Cung cấp 5+ vị trí thực tập IoT/kỳ · Chia sẻ dữ liệu dự án thực tế · Hội thảo IoT hàng năm',
+    history: [
+      { date: '2024-01-15', action: 'Gửi đề xuất hợp tác', by: 'Nguyễn Thị Thu Hà' },
+      { date: '2024-01-20', action: 'Khoa tiếp nhận hồ sơ', by: 'Văn phòng Khoa KTDT' },
+      { date: '2024-01-25', action: 'Phê duyệt hợp tác chính thức', by: 'PGS.TS. Lê Thị Hoa' },
+    ]
+  },
+  {
+    id: 3,
+    faculty_name: 'Khoa Quản trị Kinh doanh',
+    faculty_code: 'QTKD',
+    type: 'Đồng hướng dẫn đề tài',
+    contact_school: '—',
+    contact_dn: 'Lê Thị Lan Anh — Chuyên viên HT ĐT',
+    sent_date: '2024-05-10',
+    approved_date: null,
+    expiry_date: null,
+    status: 'Chờ xét duyệt',
+    note: 'VinaTech mong muốn tham gia đồng hướng dẫn các đề tài về chuyển đổi số doanh nghiệp và quản trị chuỗi cung ứng.',
+    commitment: 'Cử cán bộ tham gia hội đồng phản biện · Hỗ trợ dữ liệu thực tế cho nghiên cứu',
+    history: [
+      { date: '2024-05-10', action: 'Gửi đề xuất hợp tác', by: 'Lê Thị Lan Anh' },
+      { date: '2024-05-12', action: 'Khoa tiếp nhận và đang xem xét', by: 'Văn phòng Khoa QTKD' },
+    ]
+  },
+  {
+    id: 4,
+    faculty_name: 'Khoa Tài chính - Ngân hàng',
+    faculty_code: 'TCNH',
+    type: 'Nghiên cứu ứng dụng',
+    contact_school: 'TS. Phạm Văn Hải',
+    contact_dn: 'Nguyễn Thị Thu Hà — Trưởng phòng NS',
+    sent_date: '2023-12-10',
+    approved_date: '2024-01-05',
+    expiry_date: null,
+    status: 'Từ chối',
+    note: 'Đề xuất hợp tác nghiên cứu về ứng dụng Blockchain trong thanh toán doanh nghiệp.',
+    commitment: '',
+    reject_reason: 'Đề xuất không phù hợp định hướng nghiên cứu hiện tại của Khoa. Vui lòng liên hệ lại vào năm học 2025–2026.',
+    history: [
+      { date: '2023-12-10', action: 'Gửi đề xuất hợp tác', by: 'Nguyễn Thị Thu Hà' },
+      { date: '2023-12-20', action: 'Khoa tiếp nhận hồ sơ', by: 'Văn phòng Khoa TCNH' },
+      { date: '2024-01-05', action: 'Từ chối đề xuất', by: 'TS. Phạm Văn Hải' },
+    ]
+  },
+];
+
+/* ===== RENDER ===== */
+function updateStats() {
+  document.getElementById('stActive').textContent   = coopList.filter(c => c.status === 'Đã chấp nhận').length;
+  document.getElementById('stPending').textContent  = coopList.filter(c => c.status === 'Chờ xét duyệt').length;
+  document.getElementById('stRejected').textContent = coopList.filter(c => c.status === 'Từ chối').length;
+  document.getElementById('stTotal').textContent    = coopList.length;
+}
+
+function renderCoopList() {
+  const search = document.getElementById('searchCoop').value.toLowerCase();
+  const status = document.getElementById('filterStatus').value;
+  const type   = document.getElementById('filterType').value;
+
+  const filtered = coopList.filter(c =>
+    (!search || c.faculty_name.toLowerCase().includes(search) || c.faculty_code.toLowerCase().includes(search)) &&
+    (!status || c.status === status) &&
+    (!type   || c.type === type)
+  );
+
+  document.getElementById('coopCount').textContent = `${filtered.length} hợp tác`;
+  const tbody = document.getElementById('coopBody');
+
+  if (!filtered.length) {
+    tbody.innerHTML = `<tr><td colspan="9" class="table-empty"><div class="empty-icon">🤝</div>Không tìm thấy kết quả phù hợp</td></tr>`;
+    return;
+  }
+
+  tbody.innerHTML = filtered.map((c, idx) => {
+    const typeChip = `<span class="badge badge-secondary" style="font-size:11px">${c.type}</span>`;
+
+    const expiryDisplay = c.expiry_date
+      ? (() => {
+          const diff = Math.ceil((new Date(c.expiry_date) - new Date()) / 86400000);
+          const color = diff < 90 ? 'var(--color-warning)' : 'var(--color-text-muted)';
+          return `<span style="color:${color};font-size:12px">${formatDate(c.expiry_date)}</span>`;
+        })()
+      : '<span style="color:var(--color-text-light);font-size:12px">—</span>';
+
+    const actions = (() => {
+      if (c.status === 'Đã chấp nhận') return `
+        <button class="btn btn-outline-primary btn-sm" onclick="showDetail(${c.id})" aria-label="Xem chi tiết">👁 Chi tiết</button>
+        <button class="btn btn-ghost btn-sm" style="font-size:12px" onclick="showToast('Đã gửi yêu cầu gia hạn hợp tác','success')" aria-label="Gia hạn">🔄 Gia hạn</button>`;
+      if (c.status === 'Chờ xét duyệt') return `
+        <button class="btn btn-outline-primary btn-sm" onclick="showDetail(${c.id})" aria-label="Xem chi tiết">👁 Chi tiết</button>
+        <button class="btn btn-ghost btn-sm" style="font-size:12px;color:var(--color-danger)" onclick="cancelCoop(${c.id})" aria-label="Rút lại">✕ Rút lại</button>`;
+      if (c.status === 'Từ chối') return `
+        <button class="btn btn-outline-primary btn-sm" onclick="showDetail(${c.id})" aria-label="Xem lý do">👁 Lý do</button>
+        <button class="btn btn-primary btn-sm" onclick="resendCoop(${c.id})" aria-label="Gửi lại">↩ Gửi lại</button>`;
+      return '';
+    })();
+
+    return `
+    <tr>
+      <td style="text-align:center;color:var(--color-text-muted);font-size:12px">${idx + 1}</td>
+      <td>
+        <div style="font-weight:700">${c.faculty_name}</div>
+        <div style="font-size:11px;color:var(--color-text-muted);margin-top:1px;font-family:monospace">${c.faculty_code}</div>
+      </td>
+      <td>${typeChip}</td>
+      <td style="font-size:12px;color:var(--color-text-muted)">${c.contact_school}</td>
+      <td style="font-size:12px;white-space:nowrap">${formatDate(c.sent_date)}</td>
+      <td style="font-size:12px;white-space:nowrap">${c.approved_date ? formatDate(c.approved_date) : '<span style="color:var(--color-text-light)">—</span>'}</td>
+      <td>${expiryDisplay}</td>
+      <td>${getStatusBadge(c.status)}</td>
+      <td style="text-align:right;white-space:nowrap">${actions}</td>
+    </tr>`;
+  }).join('');
+}
+
+/* ===== DETAIL MODAL ===== */
+function showDetail(id) {
+  const c = coopList.find(x => x.id === id);
+  if (!c) return;
+
+  document.getElementById('modalDetailTitle').textContent = c.faculty_name;
+  document.getElementById('modalDetailStatus').innerHTML = `${getStatusBadge(c.status)} <span class="badge badge-secondary" style="font-size:11px;margin-left:4px">${c.type}</span>`;
+
+  const rejBlock = c.status === 'Từ chối' && c.reject_reason ? `
+    <div class="alert alert-danger" style="margin-top:14px">
+      <span class="alert-icon">❌</span>
+      <div><strong>Lý do từ chối:</strong> ${c.reject_reason}</div>
+    </div>` : '';
+
+  const commitBlock = c.commitment ? `
+    <div class="detail-row" style="flex-direction:column">
+      <span class="dl">Cam kết từ DN</span>
+      <span class="dv" style="margin-top:3px">${c.commitment}</span>
+    </div>` : '';
+
+  const histHtml = c.history.map((h, i) => `
+    <div class="coop-timeline-item">
+      <div class="timeline-dot" style="background:${i===c.history.length-1?'var(--color-primary)':'var(--color-border-dark)'}"></div>
+      <div style="flex:1">
+        <div style="font-size:13px;font-weight:600">${h.action}</div>
+        <div style="font-size:12px;color:var(--color-text-muted);margin-top:2px">${formatDate(h.date)} · ${h.by}</div>
+      </div>
+    </div>`).join('');
+
+  document.getElementById('modalDetailBody').innerHTML = `
+    <div style="display:flex;flex-direction:column;gap:6px;margin-bottom:16px">
+      <div class="detail-row"><span class="dl">Khoa/Viện</span><span class="dv font-bold">${c.faculty_name} (${c.faculty_code})</span></div>
+      <div class="detail-row"><span class="dl">Loại hợp tác</span><span class="dv">${c.type}</span></div>
+      <div class="detail-row"><span class="dl">Người LH nhà trường</span><span class="dv">${c.contact_school}</span></div>
+      <div class="detail-row"><span class="dl">Người LH doanh nghiệp</span><span class="dv">${c.contact_dn}</span></div>
+      <div class="detail-row"><span class="dl">Ngày gửi đề xuất</span><span class="dv">${formatDate(c.sent_date)}</span></div>
+      ${c.approved_date ? `<div class="detail-row"><span class="dl">Ngày xét duyệt</span><span class="dv">${formatDate(c.approved_date)}</span></div>` : ''}
+      ${c.expiry_date ? `<div class="detail-row"><span class="dl">Hiệu lực đến</span><span class="dv">${formatDate(c.expiry_date)}</span></div>` : ''}
+    </div>
+    <div class="divider"></div>
+    <div style="margin-bottom:14px">
+      <div style="font-size:12px;font-weight:700;color:var(--color-text-muted);text-transform:uppercase;letter-spacing:.05em;margin-bottom:8px">Nội dung đề xuất</div>
+      <p style="font-size:13px;line-height:1.7;color:var(--color-text)">${c.note}</p>
+    </div>
+    ${commitBlock}
+    ${rejBlock}
+    <div class="divider"></div>
+    <div>
+      <div style="font-size:12px;font-weight:700;color:var(--color-text-muted);text-transform:uppercase;letter-spacing:.05em;margin-bottom:8px">Lịch sử xử lý</div>
+      <div class="coop-timeline">${histHtml}</div>
+    </div>`;
+
+  const footer = document.getElementById('modalDetailFooter');
+  if (c.status === 'Từ chối') {
+    footer.innerHTML = `
+      <button class="btn btn-outline" data-modal-close>Đóng</button>
+      <button class="btn btn-primary" onclick="closeModal('modalDetail');resendCoop(${c.id})">↩ Gửi lại đề xuất</button>`;
+  } else if (c.status === 'Đã chấp nhận') {
+    footer.innerHTML = `
+      <button class="btn btn-outline" data-modal-close>Đóng</button>
+      <button class="btn btn-primary" onclick="showToast('Đã gửi yêu cầu gia hạn','success');closeModal('modalDetail')">🔄 Yêu cầu gia hạn</button>`;
+  } else {
+    footer.innerHTML = `<button class="btn btn-outline" data-modal-close>Đóng</button>`;
+  }
+
+  openModal('modalDetail');
+}
+
+function cancelCoop(id) {
+  const c = coopList.find(x => x.id === id);
+  if (!c) return;
+  coopList = coopList.filter(x => x.id !== id);
+  updateStats(); renderCoopList();
+  showToast(`Đã rút lại đề xuất với ${c.faculty_name}`, 'warning');
+}
+
+function resendCoop(id) {
+  const c = coopList.find(x => x.id === id);
+  if (!c) return;
+  document.getElementById('reg_faculty').innerHTML = `<option value="${c.faculty_code}">${c.faculty_name} (${c.faculty_code})</option>`;
+  document.getElementById('reg_type').value = '';
+  document.getElementById('reg_note').value = c.note;
+  openModal('modalRegister');
+}
+
+/* ===== REGISTER FORM ===== */
+document.getElementById('btnRegisterCoop').addEventListener('click', () => {
+  document.getElementById('registerForm').reset();
+  document.getElementById('reg_faculty').innerHTML = `
+    <option value="">— Chọn Khoa/Viện —</option>
+    <option value="QTKD">Khoa Quản trị Kinh doanh (QTKD)</option>
+    <option value="NN">Khoa Ngoại ngữ (NN)</option>
+    <option value="XD">Khoa Xây dựng & Kiến trúc (XD)</option>
+    <option value="CNSV">Viện Công nghệ Sinh học (CNSV)</option>`;
+  document.querySelectorAll('#registerForm .error').forEach(el => el.classList.remove('error'));
+  document.querySelectorAll('#registerForm .form-error').forEach(el => el.classList.add('hidden'));
+  document.getElementById('regFilePreview').classList.add('hidden');
+  openModal('modalRegister');
+});
+
+document.getElementById('btnSubmitCoop').addEventListener('click', () => {
+  const faculty = document.getElementById('reg_faculty').value;
+  const type    = document.getElementById('reg_type').value;
+  const note    = document.getElementById('reg_note').value.trim();
+  let valid = true;
+
+  [['reg_faculty', faculty], ['reg_type', type]].forEach(([id, val]) => {
+    const el = document.getElementById(id);
+    const err = el.nextElementSibling?.classList.contains('form-error') ? el.nextElementSibling : el.parentElement.querySelector('.form-error');
+    if (!val) { el.classList.add('error'); err?.classList.remove('hidden'); valid = false; }
+    else { el.classList.remove('error'); err?.classList.add('hidden'); }
+  });
+
+  const noteEl = document.getElementById('reg_note');
+  const noteErr = noteEl.parentElement.nextElementSibling;
+  if (!note) { noteEl.classList.add('error'); noteErr?.classList.remove('hidden'); valid = false; }
+  else { noteEl.classList.remove('error'); noteErr?.classList.add('hidden'); }
+
+  if (!valid) return;
+
+  const facultyName = document.getElementById('reg_faculty').options[document.getElementById('reg_faculty').selectedIndex].text.split(' (')[0];
+  const newId = Math.max(...coopList.map(c => c.id)) + 1;
+  const today = new Date().toISOString().split('T')[0];
+
+  coopList.push({
+    id: newId,
+    faculty_name: facultyName,
+    faculty_code: faculty,
+    type: document.getElementById('reg_type').value,
+    contact_school: '—',
+    contact_dn: document.getElementById('reg_contact_dn').options[document.getElementById('reg_contact_dn').selectedIndex].text,
+    sent_date: today,
+    approved_date: null,
+    expiry_date: null,
+    status: 'Chờ xét duyệt',
+    note: note,
+    commitment: document.getElementById('reg_commitment').value.trim(),
+    history: [{ date: today, action: 'Gửi đề xuất hợp tác', by: 'Nguyễn Thị Thu Hà' }]
+  });
+
+  closeModal('modalRegister');
+  updateStats(); renderCoopList();
+  showToast(`Đã gửi đề xuất hợp tác đến ${facultyName} thành công!`, 'success');
+});
+
+/* ===== File upload ===== */
+document.getElementById('regUploadZone').addEventListener('click', () => document.getElementById('reg_file').click());
+document.getElementById('reg_file').addEventListener('change', e => {
+  const file = e.target.files[0];
+  if (!file) return;
+  if (file.size > 10 * 1024 * 1024) { showToast('File vượt quá 10MB', 'error'); return; }
+  document.getElementById('regFileName').textContent = file.name;
+  document.getElementById('regFileSize').textContent = (file.size / 1024).toFixed(1) + ' KB';
+  document.getElementById('regUploadZone').classList.add('hidden');
+  document.getElementById('regFilePreview').classList.remove('hidden');
+});
+function clearFile() {
+  document.getElementById('reg_file').value = '';
+  document.getElementById('regUploadZone').classList.remove('hidden');
+  document.getElementById('regFilePreview').classList.add('hidden');
+}
+
+/* ===== Filters ===== */
+['searchCoop','filterStatus','filterType'].forEach(id => {
+  const el = document.getElementById(id);
+  el.addEventListener('input', renderCoopList);
+  el.addEventListener('change', renderCoopList);
+});
+
+/* ===== Init ===== */
+function initPage() { updateStats(); renderCoopList(); }
+document.addEventListener('DOMContentLoaded', () => {
+  if (typeof loadMockData === 'function') loadMockData().then(() => initPage());
+  else initPage();
+});
+</script>
+</body>
+</html>

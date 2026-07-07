@@ -1,0 +1,755 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Hồ sơ Doanh nghiệp — Cổng Thông Tin</title>
+  <link rel="stylesheet" href="css/styles.css">
+  <style>
+    @media(max-width:960px){.profile-layout{grid-template-columns:1fr!important}}
+    .progress-bar{height:6px;background:var(--color-border);border-radius:99px;overflow:hidden}
+    .progress-bar .fill{height:100%;border-radius:99px;transition:width .5s ease}
+    .field-group-title{
+      font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;
+      color:var(--color-primary);margin:18px 0 12px;
+      display:flex;align-items:center;gap:8px;
+    }
+    .field-group-title::after{content:'';flex:1;height:1px;background:var(--color-primary-border)}
+    .form-control[disabled]{
+      background:var(--color-bg);color:var(--color-text-muted);
+      border-color:var(--color-border);cursor:not-allowed;
+    }
+    .disabled-hint{
+      font-size:11px;color:var(--color-text-light);
+      display:flex;align-items:center;gap:3px;margin-top:2px;
+    }
+    .person-primary{
+      display:inline-flex;align-items:center;gap:3px;
+      font-size:11px;font-weight:700;
+      color:var(--color-primary);background:var(--color-primary-bg);
+      border-radius:99px;padding:2px 8px;
+    }
+    .type-chip{
+      display:inline-flex;align-items:center;gap:4px;
+      padding:3px 9px;border-radius:99px;
+      font-size:11px;font-weight:700;white-space:nowrap;
+    }
+    .type-contact{background:#ede9fe;color:#7c3aed}
+    .type-supervisor{background:var(--color-info-bg);color:var(--color-info)}
+    .type-employee{background:var(--color-gray-bg);color:var(--color-gray)}
+  </style>
+</head>
+<body>
+<div class="app-layout">
+  <div id="sidebar-placeholder"></div>
+  <div class="main-wrapper">
+    <header class="topbar">
+      <div class="topbar-breadcrumb">
+        <span class="breadcrumb-root">Doanh nghiệp</span>
+        <span class="breadcrumb-sep">/</span>
+        <span class="breadcrumb-current">Thông tin & Nhân viên</span>
+      </div>
+      <div class="topbar-actions">
+        <button class="topbar-btn" aria-label="Thông báo">🔔</button>
+        <div class="topbar-user">
+          <div class="user-avatar">NT</div>
+          <div class="user-info">
+            <div class="user-name">Nguyễn Thị Thu Hà</div>
+            <div class="user-role">Quản trị viên DN</div>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <main class="main-content">
+      <div class="page-header">
+        <div class="header-row">
+          <div>
+            <h1>Hồ sơ Doanh nghiệp</h1>
+            <p>Hoàn thiện thông tin để tăng mức độ tin cậy với nhà trường (MH-02-01)</p>
+          </div>
+          <button class="btn btn-primary" id="btnSaveProfile" aria-label="Lưu hồ sơ">💾 Lưu thay đổi</button>
+        </div>
+      </div>
+
+      <div id="alertSaved" class="alert alert-success hidden">
+        <span class="alert-icon">✅</span>
+        <strong>Hồ sơ đã được lưu thành công!</strong> Thông tin đang được cập nhật.
+      </div>
+
+      <div style="display:grid;grid-template-columns:252px 1fr;gap:20px" class="profile-layout">
+
+        <!-- ===== CỘT TRÁI ===== -->
+        <div style="display:flex;flex-direction:column;gap:16px">
+
+          <!-- Logo -->
+          <div class="card" style="text-align:center">
+            <div id="logoDisplay" style="width:84px;height:84px;margin:0 auto 12px;border-radius:var(--radius-lg);background:var(--color-primary-bg);border:2px solid var(--color-primary-border);display:flex;align-items:center;justify-content:center;font-size:32px;overflow:hidden">
+              🏢
+            </div>
+            <div style="font-size:13px;font-weight:700;margin-bottom:2px">Công ty CP VinaTech</div>
+            <div style="margin-bottom:14px"><span class="badge badge-success">✅ Đã xác minh</span></div>
+            <div class="upload-zone" id="logoUploadZone" role="button" aria-label="Tải lên logo" style="padding:14px">
+              <div style="font-size:22px;margin-bottom:4px">📷</div>
+              <p style="font-size:12px">Thay đổi logo<br><span class="upload-label">PNG/JPG · tối đa 5MB</span></p>
+            </div>
+            <input type="file" id="logoFile" accept=".png,.jpg,.jpeg" class="hidden" aria-label="Chọn logo">
+          </div>
+
+          <!-- Completeness -->
+          <div class="card">
+            <div class="card-title" style="font-size:13px;margin-bottom:14px">Mức độ hoàn thiện</div>
+            <div style="display:flex;flex-direction:column;gap:11px">
+              <div>
+                <div style="display:flex;justify-content:space-between;font-size:12px;margin-bottom:4px">
+                  <span>Thông tin cơ bản</span><span class="font-bold" style="color:var(--color-success)">100%</span>
+                </div>
+                <div class="progress-bar"><div class="fill" style="width:100%;background:var(--color-success)"></div></div>
+              </div>
+              <div>
+                <div style="display:flex;justify-content:space-between;font-size:12px;margin-bottom:4px">
+                  <span>Liên lạc & Mạng xã hội</span><span class="font-bold" style="color:var(--color-primary)">80%</span>
+                </div>
+                <div class="progress-bar"><div class="fill" style="width:80%;background:var(--color-primary)"></div></div>
+              </div>
+              <div>
+                <div style="display:flex;justify-content:space-between;font-size:12px;margin-bottom:4px">
+                  <span>Giới thiệu công ty</span><span class="font-bold" style="color:var(--color-warning)">60%</span>
+                </div>
+                <div class="progress-bar"><div class="fill" style="width:60%;background:var(--color-warning)"></div></div>
+              </div>
+              <div>
+                <div style="display:flex;justify-content:space-between;font-size:12px;margin-bottom:4px">
+                  <span>Người liên lạc</span><span class="font-bold" style="color:var(--color-success)">100%</span>
+                </div>
+                <div class="progress-bar"><div class="fill" style="width:100%;background:var(--color-success)"></div></div>
+              </div>
+            </div>
+            <div class="divider"></div>
+            <div style="text-align:center">
+              <div style="font-size:26px;font-weight:800;color:var(--color-primary)">85%</div>
+              <div style="font-size:12px;color:var(--color-text-muted)">Tổng mức hoàn thiện</div>
+            </div>
+          </div>
+
+          <!-- Quick facts -->
+          <div class="card">
+            <div class="card-title" style="font-size:13px;margin-bottom:12px">Tóm tắt</div>
+            <div style="display:flex;flex-direction:column;gap:8px">
+              <div class="info-row" style="margin-bottom:0"><span class="info-label" style="min-width:90px">Loại hình</span><span class="info-value">Trong nước</span></div>
+              <div class="info-row" style="margin-bottom:0"><span class="info-label" style="min-width:90px">Mã thuế</span><span class="info-value" style="font-family:monospace;font-size:12px">0312345678</span></div>
+              <div class="info-row" style="margin-bottom:0"><span class="info-label" style="min-width:90px">Thành lập</span><span class="info-value">2012</span></div>
+              <div class="info-row" style="margin-bottom:0"><span class="info-label" style="min-width:90px">Quy mô</span><span class="info-value">100–500 NV</span></div>
+              <div class="info-row" style="margin-bottom:0"><span class="info-label" style="min-width:90px">Chi nhánh</span><span class="info-value">3 văn phòng</span></div>
+              <div class="info-row" style="margin-bottom:0"><span class="info-label" style="min-width:90px">Hợp tác</span><span class="info-value" style="color:var(--color-success)">✅ 2 Khoa</span></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ===== CỘT PHẢI ===== -->
+        <div style="display:flex;flex-direction:column;gap:16px">
+
+          <!-- ▌CARD 1: THÔNG TIN CHI TIẾT DOANH NGHIỆP ▌ -->
+          <div class="card">
+            <div class="card-header" style="margin-bottom:4px">
+              <div class="card-title">Thông tin chi tiết Doanh nghiệp</div>
+              <div style="display:flex;align-items:center;gap:6px;font-size:12px;color:var(--color-text-muted)">
+                <span>🔒</span><span>Trường xám = thông tin đăng ký, không thể sửa trực tiếp</span>
+              </div>
+            </div>
+
+            <form id="profileForm" novalidate>
+
+              <!-- Nhóm 1: Thông tin đăng ký (disabled) -->
+              <div class="field-group-title">🔒 Thông tin đăng ký</div>
+              <div class="form-grid" style="gap:13px">
+                <div class="form-group span-2">
+                  <label class="form-label" for="company_name">Tên doanh nghiệp</label>
+                  <input id="company_name" class="form-control" type="text"
+                    value="Công ty Cổ phần Công nghệ VinaTech" disabled aria-label="Tên doanh nghiệp">
+                  <span class="disabled-hint">🔒 Thông tin từ lúc đăng ký</span>
+                </div>
+                <div class="form-group">
+                  <label class="form-label" for="company_type">Loại hình doanh nghiệp</label>
+                  <input id="company_type" class="form-control" type="text"
+                    value="Doanh nghiệp trong nước · Cổ phần" disabled aria-label="Loại hình">
+                  <span class="disabled-hint">🔒 Thông tin từ lúc đăng ký</span>
+                </div>
+                <div class="form-group">
+                  <label class="form-label" for="tax_code">Mã số thuế</label>
+                  <input id="tax_code" class="form-control" type="text"
+                    value="0312345678" disabled aria-label="Mã số thuế"
+                    style="font-family:monospace;letter-spacing:.04em">
+                  <span class="disabled-hint">🔒 Thông tin từ lúc đăng ký</span>
+                </div>
+                <div class="form-group">
+                  <label class="form-label" for="reg_email">Email đăng nhập</label>
+                  <input id="reg_email" class="form-control" type="email"
+                    value="hr@vinatech.com.vn" disabled aria-label="Email đăng nhập">
+                  <span class="disabled-hint">🔒 Thông tin từ lúc đăng ký</span>
+                </div>
+                <div class="form-group">
+                  <label class="form-label" for="reg_phone">Số điện thoại đăng ký</label>
+                  <input id="reg_phone" class="form-control" type="tel"
+                    value="0283 456 789" disabled aria-label="SĐT đăng ký">
+                  <span class="disabled-hint">🔒 Thông tin từ lúc đăng ký</span>
+                </div>
+                <div class="form-group">
+                  <label class="form-label" for="reg_date">Ngày đăng ký</label>
+                  <input id="reg_date" class="form-control" type="text"
+                    value="15/03/2024" disabled aria-label="Ngày đăng ký">
+                  <span class="disabled-hint">🔒 Thông tin từ lúc đăng ký</span>
+                </div>
+              </div>
+              <p class="text-sm text-muted" style="margin-top:8px;padding:8px 10px;background:var(--color-bg);border-radius:var(--radius);border:1px solid var(--color-border)">
+                Để thay đổi thông tin đăng ký, vui lòng liên hệ <a href="#">Ban quản trị hệ thống</a>.
+              </p>
+
+              <!-- Nhóm 2: Thông tin bổ sung (editable) -->
+              <div class="field-group-title">📝 Thông tin bổ sung</div>
+              <div class="form-grid" style="gap:13px">
+                <div class="form-group span-2">
+                  <label class="form-label" for="trade_name">Tên giao dịch quốc tế</label>
+                  <input id="trade_name" class="form-control" type="text"
+                    value="VinaTech Corporation"
+                    placeholder="Tên tiếng Anh hoặc tên viết tắt (nếu có)"
+                    aria-label="Tên giao dịch quốc tế">
+                </div>
+                <div class="form-group">
+                  <label class="form-label" for="industry">Lĩnh vực hoạt động <span class="required">*</span></label>
+                  <select id="industry" class="form-control" required aria-label="Lĩnh vực">
+                    <option selected>Công nghệ thông tin</option>
+                    <option>Tài chính - Ngân hàng</option>
+                    <option>Thương mại điện tử</option>
+                    <option>Sản xuất</option>
+                    <option>Y tế</option>
+                    <option>Giáo dục - Đào tạo</option>
+                    <option>Logistics</option>
+                    <option>Khác</option>
+                  </select>
+                </div>
+                <div class="form-group">
+                  <label class="form-label" for="biz_type">Loại hình hoạt động</label>
+                  <select id="biz_type" class="form-control" aria-label="Loại hình hoạt động">
+                    <option selected>Phát triển phần mềm</option>
+                    <option>Dịch vụ CNTT</option>
+                    <option>Thương mại điện tử</option>
+                    <option>Tư vấn giải pháp</option>
+                    <option>Sản xuất thiết bị</option>
+                  </select>
+                </div>
+                <div class="form-group">
+                  <label class="form-label" for="size">Quy mô nhân sự <span class="required">*</span></label>
+                  <select id="size" class="form-control" required aria-label="Quy mô">
+                    <option>Dưới 50 nhân viên</option>
+                    <option selected>100–500 nhân viên</option>
+                    <option>500–1.000 nhân viên</option>
+                    <option>Trên 1.000 nhân viên</option>
+                  </select>
+                </div>
+                <div class="form-group">
+                  <label class="form-label" for="founded_year">Năm thành lập</label>
+                  <input id="founded_year" class="form-control" type="number"
+                    min="1900" max="2026" value="2012"
+                    placeholder="VD: 2010" aria-label="Năm thành lập">
+                </div>
+                <div class="form-group">
+                  <label class="form-label" for="charter_capital">Vốn điều lệ</label>
+                  <input id="charter_capital" class="form-control" type="text"
+                    value="50.000.000.000 VNĐ"
+                    placeholder="VD: 10 tỷ VNĐ" aria-label="Vốn điều lệ">
+                </div>
+                <div class="form-group">
+                  <label class="form-label" for="num_branches">Số văn phòng / chi nhánh</label>
+                  <input id="num_branches" class="form-control" type="number"
+                    min="1" value="3" aria-label="Số chi nhánh">
+                </div>
+                <div class="form-group span-2">
+                  <label class="form-label" for="certifications">Chứng chỉ / Giải thưởng</label>
+                  <input id="certifications" class="form-control" type="text"
+                    value="ISO 9001:2015 · CMMI Level 3 · Top 10 DN CNTT Việt Nam 2023"
+                    placeholder="Phân cách bằng dấu ·" aria-label="Chứng chỉ">
+                </div>
+              </div>
+
+              <!-- Nhóm 3: Liên lạc công khai -->
+              <div class="field-group-title">📞 Thông tin liên lạc</div>
+              <div class="form-grid" style="gap:13px">
+                <div class="form-group">
+                  <label class="form-label" for="hotline">Hotline / Tổng đài</label>
+                  <input id="hotline" class="form-control" type="tel"
+                    value="1800 1234" placeholder="VD: 1800 xxxx" aria-label="Hotline">
+                </div>
+                <div class="form-group">
+                  <label class="form-label" for="email_public">Email liên hệ chung</label>
+                  <input id="email_public" class="form-control" type="email"
+                    value="contact@vinatech.com.vn" placeholder="email@congty.com" aria-label="Email liên hệ">
+                </div>
+                <div class="form-group">
+                  <label class="form-label" for="website">Website</label>
+                  <input id="website" class="form-control" type="url"
+                    value="https://vinatech.com.vn" placeholder="https://..." aria-label="Website">
+                </div>
+                <div class="form-group">
+                  <label class="form-label" for="linkedin">LinkedIn</label>
+                  <input id="linkedin" class="form-control" type="url"
+                    value="https://linkedin.com/company/vinatech"
+                    placeholder="https://linkedin.com/company/..." aria-label="LinkedIn">
+                </div>
+                <div class="form-group">
+                  <label class="form-label" for="facebook">Facebook / Fanpage</label>
+                  <input id="facebook" class="form-control" type="url"
+                    value="https://facebook.com/vinatech.vn" aria-label="Facebook">
+                </div>
+                <div class="form-group">
+                  <label class="form-label" for="youtube">YouTube / Media</label>
+                  <input id="youtube" class="form-control" type="url"
+                    placeholder="https://youtube.com/..." aria-label="YouTube">
+                </div>
+                <div class="form-group span-2">
+                  <label class="form-label" for="address_hq">Địa chỉ trụ sở chính <span class="required">*</span></label>
+                  <input id="address_hq" class="form-control" type="text"
+                    value="125 Nguyễn Huệ, Phường Bến Nghé, Quận 1, TP. Hồ Chí Minh"
+                    required aria-label="Địa chỉ trụ sở">
+                </div>
+                <div class="form-group span-2">
+                  <label class="form-label" for="address_branches">Chi nhánh khác</label>
+                  <input id="address_branches" class="form-control" type="text"
+                    value="45 Lý Thường Kiệt, Quận Hoàn Kiếm, Hà Nội · Tầng 8, Sunrise City, TP. Đà Nẵng"
+                    placeholder="Phân cách bằng dấu ·" aria-label="Chi nhánh khác">
+                </div>
+              </div>
+
+              <!-- Nhóm 4: Giới thiệu -->
+              <div class="field-group-title">📄 Giới thiệu & Định hướng</div>
+              <div style="display:flex;flex-direction:column;gap:13px">
+                <div class="form-group">
+                  <label class="form-label" for="description">Giới thiệu tổng quan</label>
+                  <div style="position:relative">
+                    <textarea id="description" class="form-control" rows="4"
+                      data-maxlength="1000" aria-label="Giới thiệu">VinaTech là công ty công nghệ hàng đầu Việt Nam với hơn 12 năm kinh nghiệm, chuyên phát triển giải pháp phần mềm doanh nghiệp, thương mại điện tử và chuyển đổi số. Đến nay đã triển khai hơn 200 dự án tại Việt Nam, Nhật Bản và Singapore.</textarea>
+                    <div class="char-counter" style="margin-top:3px">0/1000</div>
+                  </div>
+                </div>
+                <div class="form-group">
+                  <label class="form-label" for="products">Sản phẩm / Dịch vụ chủ lực</label>
+                  <div style="position:relative">
+                    <textarea id="products" class="form-control" rows="2"
+                      data-maxlength="500" placeholder="Mô tả sản phẩm, dịch vụ chính..." aria-label="Sản phẩm dịch vụ">ERP cho DN vừa và lớn · Nền tảng TMĐT B2B · Quản lý chuỗi cung ứng · Tư vấn chuyển đổi số · Mobile App</textarea>
+                    <div class="char-counter" style="margin-top:3px">0/500</div>
+                  </div>
+                </div>
+                <div class="form-group">
+                  <label class="form-label" for="internship_orientation">Định hướng tiếp nhận sinh viên thực tập</label>
+                  <div style="position:relative">
+                    <textarea id="internship_orientation" class="form-control" rows="2"
+                      data-maxlength="500" placeholder="Vị trí thực tập, yêu cầu, quyền lợi SV..." aria-label="Định hướng thực tập">Ưu tiên SV ngành CNTT năm 3–4. SV được làm việc thực tế trong team dự án, mentor 1-1 bởi senior developer, cơ hội tuyển dụng chính thức sau tốt nghiệp.</textarea>
+                    <div class="char-counter" style="margin-top:3px">0/500</div>
+                  </div>
+                </div>
+              </div>
+            </form>
+          </div>
+
+          <!-- ▌CARD 2: THÔNG TIN NGƯỜI LIÊN LẠC ▌ -->
+          <div class="card">
+            <div class="card-header">
+              <div>
+                <div class="card-title">Thông tin người liên lạc</div>
+                <div class="card-subtitle" id="personCount">7 người liên lạc</div>
+              </div>
+              <button class="btn btn-primary btn-sm" id="btnAddPerson" aria-label="Thêm người">
+                ➕ Thêm người liên lạc
+              </button>
+            </div>
+
+            <div class="alert alert-info" style="margin-bottom:14px;padding:10px 12px">
+              <span class="alert-icon">ℹ️</span>
+              <div class="text-sm">
+                Danh sách gồm <strong>Người liên hệ</strong> (đầu mối với nhà trường) và <strong>Cán bộ / Nhân viên</strong> (tài khoản hệ thống). Cần ít nhất 1 <strong>người liên hệ chính</strong>.
+              </div>
+            </div>
+
+            <!-- Filter tabs -->
+            <div style="display:flex;align-items:center;gap:10px;margin-bottom:14px;flex-wrap:wrap">
+              <div style="display:flex;gap:4px;background:var(--color-bg);padding:3px;border-radius:var(--radius);border:1px solid var(--color-border)">
+                <button class="subnav-tab active" id="filterAll" onclick="filterPersons('all')" aria-label="Tất cả">Tất cả <span id="cntAll" class="tab-badge">7</span></button>
+                <button class="subnav-tab" id="filterContact" onclick="filterPersons('contact')" aria-label="Người liên hệ">Người liên hệ <span id="cntContact" class="tab-badge" style="background:#7c3aed">3</span></button>
+                <button class="subnav-tab" id="filterEmployee" onclick="filterPersons('employee')" aria-label="Nhân viên">Nhân viên <span id="cntEmployee" class="tab-badge" style="background:var(--color-gray)">4</span></button>
+              </div>
+              <div class="search-input-wrap" style="flex:1;min-width:180px">
+                <span class="search-icon">🔍</span>
+                <input type="search" class="form-control" id="searchPerson"
+                  placeholder="Tìm theo tên, email..." aria-label="Tìm kiếm">
+              </div>
+            </div>
+
+            <div class="table-wrapper">
+              <table>
+                <thead>
+                  <tr>
+                    <th style="width:30px">#</th>
+                    <th>Họ và tên</th>
+                    <th>Chức vụ / Vai trò</th>
+                    <th>Phòng ban</th>
+                    <th>Email</th>
+                    <th>Điện thoại</th>
+                    <th>Loại</th>
+                    <th style="text-align:center">Liên hệ chính</th>
+                    <th>Trạng thái</th>
+                    <th style="text-align:center">Hành động</th>
+                  </tr>
+                </thead>
+                <tbody id="personBody">
+                  <tr><td colspan="10" class="table-empty">Đang tải...</td></tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+        </div><!-- end cột phải -->
+      </div><!-- end profile-layout -->
+    </main>
+  </div>
+</div>
+
+<!-- ===== MODAL: Thêm / Sửa người liên lạc ===== -->
+<div class="modal-overlay" id="modalPerson" role="dialog" aria-modal="true" aria-labelledby="modalPersonTitle">
+  <div class="modal">
+    <div class="modal-header">
+      <div class="modal-title" id="modalPersonTitle">➕ Thêm người liên lạc</div>
+      <button class="modal-close" data-modal-close aria-label="Đóng">✕</button>
+    </div>
+    <div class="modal-body">
+      <form id="personForm" novalidate>
+
+        <!-- Loại -->
+        <div class="form-group" style="margin-bottom:14px">
+          <label class="form-label" for="p_type">Loại <span class="required">*</span></label>
+          <select id="p_type" class="form-control" aria-label="Loại người liên lạc">
+            <option value="contact">👤 Người liên hệ (đầu mối với nhà trường)</option>
+            <option value="supervisor">🎓 Cán bộ hướng dẫn (có tài khoản hệ thống)</option>
+            <option value="employee">👥 Nhân viên (có tài khoản hệ thống)</option>
+          </select>
+        </div>
+
+        <div class="form-grid" style="gap:13px">
+          <div class="form-group span-2">
+            <label class="form-label" for="p_name">Họ và tên <span class="required">*</span></label>
+            <input id="p_name" class="form-control" type="text"
+              placeholder="Nhập họ và tên đầy đủ" required aria-label="Tên">
+            <span class="form-error hidden">⚠ Vui lòng nhập tên</span>
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="p_position">Chức vụ <span class="required">*</span></label>
+            <input id="p_position" class="form-control" type="text"
+              placeholder="VD: Trưởng phòng Nhân sự" required aria-label="Chức vụ">
+            <span class="form-error hidden">⚠ Vui lòng nhập chức vụ</span>
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="p_dept">Phòng ban</label>
+            <input id="p_dept" class="form-control" type="text"
+              placeholder="VD: Nhân sự, Kỹ thuật..." aria-label="Phòng ban">
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="p_email">Email <span class="required">*</span></label>
+            <input id="p_email" class="form-control" type="email"
+              placeholder="email@congty.com" required aria-label="Email">
+            <span class="form-error hidden">⚠ Email không hợp lệ</span>
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="p_phone">Điện thoại <span class="required">*</span></label>
+            <input id="p_phone" class="form-control" type="tel"
+              placeholder="09xxxxxxxx" required aria-label="Điện thoại">
+            <span class="form-error hidden">⚠ Số điện thoại không hợp lệ</span>
+          </div>
+        </div>
+
+        <!-- Chỉ hiện cho Người liên hệ -->
+        <div id="contactFields" style="margin-top:12px">
+          <div class="form-group" style="margin-bottom:10px">
+            <label class="form-label" for="p_note">Ghi chú phụ trách</label>
+            <input id="p_note" class="form-control" type="text"
+              placeholder="VD: Phụ trách liên hệ về đề tài CNTT"
+              aria-label="Ghi chú">
+          </div>
+          <div class="form-group">
+            <label style="display:flex;align-items:center;gap:8px;cursor:pointer;font-weight:600;font-size:13px">
+              <input type="checkbox" id="p_primary"
+                style="accent-color:var(--color-primary);width:16px;height:16px"
+                aria-label="Đặt làm liên hệ chính">
+              Đặt làm <span style="color:var(--color-primary)">Người liên hệ chính</span>
+            </label>
+            <span class="form-hint">Người liên hệ chính nhận thông báo từ nhà trường.</span>
+          </div>
+        </div>
+
+        <!-- Chỉ hiện cho Nhân viên / Cán bộ -->
+        <div id="employeeFields" class="hidden" style="margin-top:12px">
+          <div class="divider" style="margin:12px 0"></div>
+          <div class="form-grid" style="gap:12px">
+            <div class="form-group">
+              <label class="form-label" for="p_pw">Mật khẩu <span class="required">*</span></label>
+              <input id="p_pw" class="form-control" type="password"
+                placeholder="Tối thiểu 8 ký tự" aria-label="Mật khẩu">
+              <span class="form-hint" style="font-size:11px">Chữ hoa, thường, số, ký tự đặc biệt</span>
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="p_cpw">Xác nhận mật khẩu <span class="required">*</span></label>
+              <input id="p_cpw" class="form-control" type="password"
+                placeholder="Nhập lại mật khẩu" aria-label="Xác nhận mật khẩu">
+            </div>
+          </div>
+        </div>
+      </form>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-outline" data-modal-close>Hủy</button>
+      <button class="btn btn-primary" id="btnSavePerson">💾 Lưu</button>
+    </div>
+  </div>
+</div>
+
+<script src="js/sidebar.js"></script>
+<script src="js/main.js"></script>
+<script>
+/* ===== UNIFIED MOCK DATA ===== */
+let allPersons = [
+  /* --- Người liên hệ --- */
+  { id:1, type:'contact', name:'Nguyễn Thị Thu Hà',    position:'Trưởng phòng Nhân sự',         department:'Nhân sự & Hành chính', email:'ha.ntt@vinatech.com.vn',  phone:'0901 234 567', note:'Đầu mối chính về tuyển dụng và hợp tác đào tạo', is_primary:true,  status:'Hoạt động' },
+  { id:2, type:'contact', name:'Trần Văn Minh',         position:'Giám đốc Kỹ thuật (CTO)',       department:'Công nghệ thông tin',   email:'minh.tv@vinatech.com.vn', phone:'0902 345 678', note:'Phụ trách xét duyệt đề tài kỹ thuật',              is_primary:false, status:'Hoạt động' },
+  { id:3, type:'contact', name:'Lê Thị Lan Anh',        position:'Chuyên viên Hợp tác Đào tạo', department:'Nhân sự & Hành chính', email:'lan.lta@vinatech.com.vn', phone:'0903 456 789', note:'Theo dõi đánh giá sinh viên thực tập hàng ngày',  is_primary:false, status:'Hoạt động' },
+  /* --- Cán bộ hướng dẫn / Nhân viên --- */
+  { id:4, type:'supervisor', name:'Nguyễn Văn Hùng',   position:'Senior Backend Developer',      department:'Công nghệ thông tin',   email:'hung.nv@vinatech.com.vn', phone:'0904 567 890', note:'', is_primary:false, status:'Hoạt động' },
+  { id:5, type:'supervisor', name:'Lê Văn Tú',          position:'Data Engineer',                 department:'Công nghệ thông tin',   email:'tu.lv@vinatech.com.vn',   phone:'0905 678 901', note:'', is_primary:false, status:'Hoạt động' },
+  { id:6, type:'employee',   name:'Trần Thị Mai',        position:'Chuyên viên Nhân sự',           department:'Nhân sự & Hành chính', email:'mai.tt@vinatech.com.vn',  phone:'0906 789 012', note:'', is_primary:false, status:'Hoạt động' },
+  { id:7, type:'employee',   name:'Phạm Ngọc Anh',       position:'Marketing Executive',           department:'Marketing',             email:'anh.pn@vinatech.com.vn',  phone:'0907 890 123', note:'', is_primary:false, status:'Tạm dừng'  },
+];
+
+let currentFilter = 'all';
+let editPersonId = null;
+
+/* ===== RENDER TABLE ===== */
+function getTypeName(type) {
+  return { contact:'Người liên hệ', supervisor:'Cán bộ HD', employee:'Nhân viên' }[type] || type;
+}
+function getTypeClass(type) {
+  return { contact:'type-contact', supervisor:'type-supervisor', employee:'type-employee' }[type] || 'type-employee';
+}
+
+function renderPersons() {
+  const search = document.getElementById('searchPerson').value.toLowerCase();
+  let filtered = allPersons.filter(p =>
+    (currentFilter === 'all' || (currentFilter === 'contact' ? p.type === 'contact' : p.type !== 'contact')) &&
+    (!search || p.name.toLowerCase().includes(search) || p.email.toLowerCase().includes(search))
+  );
+
+  const contacts = allPersons.filter(p => p.type === 'contact');
+  const employees = allPersons.filter(p => p.type !== 'contact');
+
+  document.getElementById('personCount').textContent = `${allPersons.length} người liên lạc`;
+  document.getElementById('cntAll').textContent = allPersons.length;
+  document.getElementById('cntContact').textContent = contacts.length;
+  document.getElementById('cntEmployee').textContent = employees.length;
+
+  const tbody = document.getElementById('personBody');
+  if (!filtered.length) {
+    tbody.innerHTML = `<tr><td colspan="10" class="table-empty"><div class="empty-icon">👤</div>Không tìm thấy người nào</td></tr>`;
+    return;
+  }
+
+  let idx = 0;
+  tbody.innerHTML = filtered.map(p => {
+    idx++;
+    const canDelete = !(p.type === 'contact' && p.is_primary);
+    return `
+    <tr>
+      <td style="color:var(--color-text-muted);font-size:12px;text-align:center">${idx}</td>
+      <td>
+        <div style="font-weight:700">${p.name}</div>
+        ${p.note ? `<div style="font-size:11px;color:var(--color-text-muted);margin-top:1px">${p.note}</div>` : ''}
+      </td>
+      <td style="font-size:12px">${p.position}</td>
+      <td><span class="badge badge-secondary" style="font-size:11px">${p.department}</span></td>
+      <td><a href="mailto:${p.email}" style="font-size:12px">${p.email}</a></td>
+      <td style="white-space:nowrap;font-size:12px">${p.phone}</td>
+      <td><span class="type-chip ${getTypeClass(p.type)}">${getTypeName(p.type)}</span></td>
+      <td style="text-align:center">
+        ${p.type === 'contact'
+          ? (p.is_primary
+            ? '<span class="person-primary">⭐ Chính</span>'
+            : `<button class="btn btn-ghost btn-sm" style="font-size:11px;padding:3px 8px" onclick="setPrimary(${p.id})" aria-label="Đặt chính">Đặt chính</button>`)
+          : '<span style="color:var(--color-text-light);font-size:12px">—</span>'}
+      </td>
+      <td>${getStatusBadge(p.status)}</td>
+      <td style="text-align:center;white-space:nowrap">
+        <button class="btn btn-ghost btn-icon btn-sm" title="Chỉnh sửa" aria-label="Sửa" onclick="openEditPerson(${p.id})">✏️</button>
+        <button class="btn btn-ghost btn-icon btn-sm" title="Xóa" aria-label="Xóa"
+          onclick="deletePerson(${p.id})" ${!canDelete ? 'disabled title="Không thể xóa người liên hệ chính"' : ''}>🗑️</button>
+      </td>
+    </tr>`;
+  }).join('');
+}
+
+function filterPersons(type) {
+  currentFilter = type;
+  ['filterAll','filterContact','filterEmployee'].forEach(id => {
+    document.getElementById(id).classList.remove('active');
+  });
+  const map = { all:'filterAll', contact:'filterContact', employee:'filterEmployee' };
+  document.getElementById(map[type]).classList.add('active');
+  renderPersons();
+}
+
+function setPrimary(id) {
+  allPersons.forEach(p => { if (p.type === 'contact') p.is_primary = (p.id === id); });
+  renderPersons();
+  showToast('Đã cập nhật người liên hệ chính', 'success');
+}
+
+function deletePerson(id) {
+  const p = allPersons.find(x => x.id === id);
+  if (!p) return;
+  if (p.type === 'contact' && p.is_primary) { showToast('Không thể xóa người liên hệ chính', 'warning'); return; }
+  allPersons = allPersons.filter(x => x.id !== id);
+  renderPersons();
+  showToast(`Đã xóa ${p.name}`, 'error');
+}
+
+/* ===== MODAL: open/edit ===== */
+function openEditPerson(id) {
+  const p = allPersons.find(x => x.id === id);
+  if (!p) return;
+  editPersonId = id;
+  document.getElementById('modalPersonTitle').textContent = '✏️ Chỉnh sửa người liên lạc';
+  document.getElementById('p_type').value = p.type;
+  document.getElementById('p_name').value = p.name;
+  document.getElementById('p_position').value = p.position;
+  document.getElementById('p_dept').value = p.department;
+  document.getElementById('p_email').value = p.email;
+  document.getElementById('p_phone').value = p.phone;
+  document.getElementById('p_note').value = p.note || '';
+  document.getElementById('p_primary').checked = p.is_primary;
+  togglePersonTypeFields(p.type);
+  openModal('modalPerson');
+}
+
+document.getElementById('btnAddPerson').addEventListener('click', () => {
+  editPersonId = null;
+  document.getElementById('modalPersonTitle').textContent = '➕ Thêm người liên lạc';
+  document.getElementById('personForm').reset();
+  document.querySelectorAll('#personForm .error').forEach(el => el.classList.remove('error'));
+  document.querySelectorAll('#personForm .form-error').forEach(el => el.classList.add('hidden'));
+  togglePersonTypeFields('contact');
+  openModal('modalPerson');
+});
+
+function togglePersonTypeFields(type) {
+  const isEmployee = type === 'supervisor' || type === 'employee';
+  document.getElementById('contactFields').classList.toggle('hidden', isEmployee);
+  document.getElementById('employeeFields').classList.toggle('hidden', !isEmployee);
+}
+
+document.getElementById('p_type').addEventListener('change', e => togglePersonTypeFields(e.target.value));
+
+/* ===== MODAL: save ===== */
+document.getElementById('btnSavePerson').addEventListener('click', () => {
+  const type = document.getElementById('p_type').value;
+  const name = document.getElementById('p_name').value.trim();
+  const position = document.getElementById('p_position').value.trim();
+  const email = document.getElementById('p_email').value.trim();
+  const phone = document.getElementById('p_phone').value.trim();
+  let valid = true;
+
+  [['p_name', name], ['p_position', position]].forEach(([id, val]) => {
+    const el = document.getElementById(id);
+    const err = el.nextElementSibling;
+    if (!val) { el.classList.add('error'); err?.classList.remove('hidden'); valid = false; }
+    else { el.classList.remove('error'); err?.classList.add('hidden'); }
+  });
+
+  const emailEl = document.getElementById('p_email');
+  if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+    emailEl.classList.add('error'); emailEl.nextElementSibling?.classList.remove('hidden'); valid = false;
+  } else { emailEl.classList.remove('error'); emailEl.nextElementSibling?.classList.add('hidden'); }
+
+  const phoneEl = document.getElementById('p_phone');
+  if (!phone || !/^[0-9 ]{9,13}$/.test(phone.replace(/\s/g,''))) {
+    phoneEl.classList.add('error'); phoneEl.nextElementSibling?.classList.remove('hidden'); valid = false;
+  } else { phoneEl.classList.remove('error'); phoneEl.nextElementSibling?.classList.add('hidden'); }
+
+  if (!valid) return;
+
+  const isPrimary = type === 'contact' && document.getElementById('p_primary').checked;
+  if (isPrimary) allPersons.forEach(p => { if (p.type === 'contact') p.is_primary = false; });
+
+  const personData = {
+    type,
+    name,
+    position,
+    department: document.getElementById('p_dept').value.trim() || '—',
+    email,
+    phone,
+    note: type === 'contact' ? document.getElementById('p_note').value.trim() : '',
+    is_primary: isPrimary,
+    status: 'Hoạt động',
+  };
+
+  if (editPersonId) {
+    const idx = allPersons.findIndex(p => p.id === editPersonId);
+    if (idx !== -1) {
+      allPersons[idx] = { ...allPersons[idx], ...personData };
+      if (allPersons[idx].type === 'contact' && !allPersons.some(p => p.type === 'contact' && p.is_primary)) {
+        allPersons[idx].is_primary = true;
+      }
+    }
+    showToast('Đã cập nhật thông tin', 'success');
+  } else {
+    const newId = Math.max(0, ...allPersons.map(p => p.id)) + 1;
+    allPersons.push({ id: newId, ...personData });
+    showToast('Đã thêm người liên lạc', 'success');
+  }
+
+  closeModal('modalPerson');
+  renderPersons();
+});
+
+/* ===== Logo upload ===== */
+document.getElementById('logoUploadZone').addEventListener('click', () => document.getElementById('logoFile').click());
+document.getElementById('logoFile').addEventListener('change', e => {
+  const file = e.target.files[0];
+  if (!file) return;
+  if (file.size > 5 * 1024 * 1024) { showToast('File vượt quá 5MB', 'error'); return; }
+  const reader = new FileReader();
+  reader.onload = ev => {
+    document.getElementById('logoDisplay').innerHTML =
+      `<img src="${ev.target.result}" style="width:100%;height:100%;object-fit:cover" alt="Logo">`;
+  };
+  reader.readAsDataURL(file);
+  showToast('Logo đã được cập nhật', 'success');
+});
+
+/* ===== Save profile ===== */
+document.getElementById('btnSaveProfile').addEventListener('click', () => {
+  const alertEl = document.getElementById('alertSaved');
+  alertEl.classList.remove('hidden');
+  showToast('Hồ sơ đã được lưu thành công', 'success');
+  setTimeout(() => alertEl.classList.add('hidden'), 4000);
+});
+
+/* ===== Search ===== */
+document.getElementById('searchPerson').addEventListener('input', renderPersons);
+
+/* ===== Init ===== */
+function initPage() { renderPersons(); }
+
+document.addEventListener('DOMContentLoaded', () => {
+  if (typeof loadMockData === 'function') {
+    loadMockData().then(() => renderPersons());
+  } else {
+    renderPersons();
+  }
+});
+</script>
+</body>
+</html>

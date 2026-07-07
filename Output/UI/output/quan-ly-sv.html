@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SV đã tiếp nhận — Cổng Thông Tin</title>
+  <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+<div class="app-layout">
+  <div id="sidebar-placeholder"></div>
+  <div class="main-wrapper">
+    <header class="topbar">
+      <div class="topbar-breadcrumb">
+        <span class="breadcrumb-root">Quản lý Sinh viên</span>
+        <span class="breadcrumb-sep">/</span>
+        <span class="breadcrumb-current">SV đã tiếp nhận</span>
+      </div>
+      <div class="topbar-actions">
+        <button class="topbar-btn" aria-label="Thông báo">🔔</button>
+        <div class="topbar-user"><div class="user-avatar">NT</div><div class="user-info"><div class="user-name">Nguyễn Thị Thu Hà</div><div class="user-role">Quản trị viên DN</div></div></div>
+      </div>
+    </header>
+    <main class="main-content">
+      <div class="page-header">
+        <div class="header-row">
+          <div>
+            <h1>Sinh viên đã tiếp nhận</h1>
+            <p>Danh sách sinh viên đang thực tập, kế hoạch đào tạo và chấm điểm (MH-05-02)</p>
+          </div>
+          <a href="cham-diem.html" class="btn btn-primary" aria-label="Đến trang chấm điểm">⭐ Đến trang chấm điểm</a>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="table-toolbar">
+          <div class="search-input-wrap flex-1">
+            <span class="search-icon">🔍</span>
+            <input type="search" class="form-control" id="searchAccepted" placeholder="Tìm theo tên, mã SV, đề tài..." aria-label="Tìm kiếm">
+          </div>
+          <select class="form-control" id="filterScoreStatus" style="width:180px" aria-label="Lọc trạng thái chấm điểm">
+            <option value="">Tất cả trạng thái</option>
+            <option>Chưa chấm</option>
+            <option>Đã lưu nháp</option>
+            <option>Đã hoàn tất</option>
+          </select>
+          <div>
+            <input type="checkbox" id="chkSelected" aria-label="Chọn nhiều để chấm"> <label for="chkSelected" class="text-sm">Chọn để chấm điểm</label>
+          </div>
+        </div>
+
+        <div class="table-wrapper">
+          <table>
+            <thead>
+              <tr>
+                <th><input type="checkbox" id="checkAllAccepted" aria-label="Chọn tất cả"></th>
+                <th>Mã SV</th>
+                <th>Họ và tên</th>
+                <th>Lớp</th>
+                <th>Đề tài</th>
+                <th>Cán bộ HD</th>
+                <th>Thời gian TT</th>
+                <th>Kế hoạch ĐT</th>
+                <th>Trạng thái chấm</th>
+                <th style="text-align:center">Hành động</th>
+              </tr>
+            </thead>
+            <tbody id="acceptedBody">
+              <tr><td colspan="10" class="table-empty">Đang tải...</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-top:14px">
+          <div id="batchGradeActions" class="hidden">
+            <a href="cham-diem.html" class="btn btn-primary btn-sm">⭐ Chấm điểm đã chọn</a>
+          </div>
+        </div>
+      </div>
+
+      <!-- Training Plan Modal -->
+      <div class="modal-overlay" id="modalTrainingPlan" role="dialog" aria-modal="true" aria-labelledby="planTitle">
+        <div class="modal modal-lg">
+          <div class="modal-header">
+            <div>
+              <div class="modal-title" id="planTitle">Kế hoạch Đào tạo</div>
+              <div class="text-sm text-muted" id="planStudentName"></div>
+            </div>
+            <button class="modal-close" data-modal-close aria-label="Đóng">✕</button>
+          </div>
+          <div class="modal-body">
+            <div class="alert alert-info" style="margin-bottom:16px">
+              <span class="alert-icon">ℹ️</span>
+              <div>Kế hoạch đào tạo do Nhà trường đăng tải. Doanh nghiệp có thể xem và bổ sung ghi chú.</div>
+            </div>
+            <div id="planContent">
+              <div class="card-section-title">Tuần 1–2: Làm quen môi trường</div>
+              <ul style="font-size:13px;padding-left:16px;margin-bottom:16px;line-height:1.8">
+                <li>Onboarding, tiếp nhận tài khoản và thiết bị</li>
+                <li>Đọc tài liệu hệ thống, codebase hiện tại</li>
+                <li>Họp kickoff với team và giảng viên hướng dẫn</li>
+              </ul>
+              <div class="card-section-title">Tuần 3–6: Phát triển tính năng</div>
+              <ul style="font-size:13px;padding-left:16px;margin-bottom:16px;line-height:1.8">
+                <li>Phân tích yêu cầu và thiết kế database</li>
+                <li>Xây dựng các API endpoint</li>
+                <li>Unit testing, code review</li>
+              </ul>
+              <div class="card-section-title">Tuần 7–10: Hoàn thiện & Báo cáo</div>
+              <ul style="font-size:13px;padding-left:16px;line-height:1.8">
+                <li>Hoàn thiện sản phẩm, fix bugs</li>
+                <li>Viết báo cáo thực tập</li>
+                <li>Báo cáo kết quả với giảng viên và doanh nghiệp</li>
+              </ul>
+              <div class="divider"></div>
+              <div class="form-group">
+                <label class="form-label" for="planNote">Ghi chú bổ sung từ DN</label>
+                <textarea id="planNote" class="form-control" rows="3" placeholder="Thêm ghi chú hoặc yêu cầu bổ sung..." aria-label="Ghi chú kế hoạch"></textarea>
+              </div>
+            </div>
+          </div>
+          <div class="modal-footer">
+            <button class="btn btn-outline" data-modal-close>Đóng</button>
+            <button class="btn btn-primary" onclick="showToast('Đã lưu ghi chú kế hoạch đào tạo','success');closeModal('modalTrainingPlan')">💾 Lưu ghi chú</button>
+          </div>
+        </div>
+      </div>
+    </main>
+  </div>
+</div>
+
+<script src="js/sidebar.js"></script>
+<script src="js/main.js"></script>
+<script>
+let allAccepted = [];
+
+function renderAccepted(students) {
+  const tbody = document.getElementById('acceptedBody');
+  if (!students.length) {
+    tbody.innerHTML = `<tr><td colspan="10" class="table-empty"><div class="empty-icon">👥</div>Không tìm thấy sinh viên</td></tr>`;
+    return;
+  }
+  tbody.innerHTML = students.map(s => `
+    <tr>
+      <td><input type="checkbox" class="accepted-check" data-id="${s.id}" aria-label="Chọn ${s.name}"></td>
+      <td><code style="font-size:12px">${s.student_id}</code></td>
+      <td><strong>${s.name}</strong></td>
+      <td>${s.class}</td>
+      <td style="max-width:180px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap" title="${s.topic}">${s.topic}</td>
+      <td>${s.supervisor}</td>
+      <td style="font-size:12px;white-space:nowrap">${formatDate(s.start_date)} → ${formatDate(s.end_date)}</td>
+      <td style="text-align:center">
+        ${s.training_plan
+          ? `<button class="btn btn-outline-primary btn-sm" onclick="showPlan('${s.name}')" aria-label="Xem kế hoạch">📋 Xem</button>`
+          : `<span class="badge badge-gray">Chưa có</span>`
+        }
+      </td>
+      <td>${getStatusBadge(s.score_status)}</td>
+      <td style="text-align:center;white-space:nowrap">
+        ${s.score_status === 'Đã hoàn tất'
+          ? `<span class="btn btn-outline btn-sm" style="cursor:default">🔒 Đã khóa</span>`
+          : `<a href="cham-diem.html" class="btn btn-primary btn-sm" aria-label="Chấm điểm">⭐ Chấm điểm</a>`
+        }
+      </td>
+    </tr>`).join('');
+
+  document.querySelectorAll('.accepted-check').forEach(cb => cb.addEventListener('change', handleAcceptedCheck));
+}
+
+function showPlan(name) {
+  document.getElementById('planStudentName').textContent = `Sinh viên: ${name}`;
+  openModal('modalTrainingPlan');
+}
+
+function handleAcceptedCheck() {
+  const checked = document.querySelectorAll('.accepted-check:checked').length;
+  document.getElementById('batchGradeActions').classList.toggle('hidden', !checked);
+  document.getElementById('batchGradeActions').style.display = checked ? 'block' : 'none';
+}
+
+document.getElementById('checkAllAccepted').addEventListener('change', e => {
+  document.querySelectorAll('.accepted-check').forEach(cb => cb.checked = e.target.checked);
+  handleAcceptedCheck();
+});
+
+function filterAccepted() {
+  const search = document.getElementById('searchAccepted').value.toLowerCase();
+  const scoreStatus = document.getElementById('filterScoreStatus').value;
+  return allAccepted.filter(s =>
+    (!search || s.name.toLowerCase().includes(search) || s.student_id.includes(search) || s.topic.toLowerCase().includes(search)) &&
+    (!scoreStatus || s.score_status === scoreStatus)
+  );
+}
+
+function initPage(data) {
+  allAccepted = data.components.acceptedStudents.data;
+  renderAccepted(allAccepted);
+}
+
+['searchAccepted','filterScoreStatus'].forEach(id => {
+  document.getElementById(id).addEventListener('input', () => renderAccepted(filterAccepted()));
+  document.getElementById(id).addEventListener('change', () => renderAccepted(filterAccepted()));
+});
+</script>
+</body>
+</html>

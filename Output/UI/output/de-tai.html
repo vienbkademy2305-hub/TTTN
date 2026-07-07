@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Đề tài Thực tập — Cổng Thông Tin</title>
+  <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+<div class="app-layout">
+  <div id="sidebar-placeholder"></div>
+  <div class="main-wrapper">
+    <header class="topbar">
+      <div class="topbar-breadcrumb">
+        <span class="breadcrumb-root">Đề tài Thực tập</span>
+        <span class="breadcrumb-sep">/</span>
+        <span class="breadcrumb-current">Đề tài của tôi</span>
+      </div>
+      <div class="topbar-actions">
+        <button class="topbar-btn" aria-label="Thông báo">🔔</button>
+        <div class="topbar-user"><div class="user-avatar">NT</div><div class="user-info"><div class="user-name">Nguyễn Thị Thu Hà</div><div class="user-role">Quản trị viên DN</div></div></div>
+      </div>
+    </header>
+    <main class="main-content">
+      <div class="page-header">
+        <div class="header-row">
+          <div>
+            <h1>Đề tài Thực tập của Doanh nghiệp</h1>
+            <p>Quản lý các đề tài do doanh nghiệp đề xuất — Luồng 1 (MH-04-01/02)</p>
+          </div>
+          <a href="tao-de-tai.html" class="btn btn-accent" aria-label="Tạo đề tài mới">➕ Tạo đề tài mới</a>
+        </div>
+      </div>
+
+      <div class="stats-grid" style="grid-template-columns:repeat(4,1fr);margin-bottom:20px" id="topicStats">
+        <div class="stat-card"><div class="stat-icon blue">📋</div><div><div class="stat-value" id="st-total">—</div><div class="stat-label">Tổng đề tài</div></div></div>
+        <div class="stat-card"><div class="stat-icon green">✅</div><div><div class="stat-value" id="st-approved">—</div><div class="stat-label">Đã duyệt</div></div></div>
+        <div class="stat-card"><div class="stat-icon orange">⏳</div><div><div class="stat-value" id="st-pending">—</div><div class="stat-label">Chờ phê duyệt</div></div></div>
+        <div class="stat-card"><div class="stat-icon purple">👥</div><div><div class="stat-value" id="st-students">—</div><div class="stat-label">SV đã nhận</div></div></div>
+      </div>
+
+      <div class="card">
+        <div class="table-toolbar">
+          <div class="search-input-wrap flex-1">
+            <span class="search-icon">🔍</span>
+            <input type="search" class="form-control" id="searchTopic" placeholder="Tìm theo tên đề tài..." aria-label="Tìm kiếm đề tài">
+          </div>
+          <select class="form-control" id="filterFaculty" style="width:200px" aria-label="Lọc theo Khoa">
+            <option value="">Tất cả Khoa</option>
+            <option>Khoa CNTT</option>
+            <option>Khoa KTDT</option>
+          </select>
+          <select class="form-control" id="filterTopicStatus" style="width:180px" aria-label="Lọc trạng thái">
+            <option value="">Tất cả trạng thái</option>
+            <option>Đã duyệt</option>
+            <option>Chờ phê duyệt</option>
+            <option>Từ chối</option>
+          </select>
+          <span class="table-count" id="topicCount">—</span>
+        </div>
+
+        <div class="table-wrapper">
+          <table>
+            <thead>
+              <tr>
+                <th>Tên đề tài</th>
+                <th>Loại</th>
+                <th>Khoa thẩm định</th>
+                <th>Số lượng SV</th>
+                <th>Cán bộ HD</th>
+                <th>Trạng thái</th>
+                <th>Ngày tạo</th>
+                <th style="text-align:center">Hành động</th>
+              </tr>
+            </thead>
+            <tbody id="topicBody">
+              <tr><td colspan="8" class="table-empty">Đang tải...</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="pagination" style="justify-content:flex-end;margin-top:14px">
+          <button class="page-btn active">1</button>
+          <button class="page-btn">2</button>
+        </div>
+      </div>
+    </main>
+  </div>
+</div>
+
+<!-- Modal: Xem chi tiết đề tài -->
+<div class="modal-overlay" id="modalTopicDetail" role="dialog" aria-modal="true" aria-labelledby="topicDetailTitle">
+  <div class="modal modal-lg">
+    <div class="modal-header">
+      <div class="modal-title" id="topicDetailTitle">Chi tiết đề tài</div>
+      <button class="modal-close" data-modal-close aria-label="Đóng">✕</button>
+    </div>
+    <div class="modal-body" id="topicDetailBody"></div>
+    <div class="modal-footer">
+      <button class="btn btn-outline" data-modal-close>Đóng</button>
+      <a href="tao-de-tai.html" class="btn btn-primary">✏️ Chỉnh sửa</a>
+    </div>
+  </div>
+</div>
+
+<script src="js/sidebar.js"></script>
+<script src="js/main.js"></script>
+<script>
+let allTopics = [];
+
+function renderTopics(topics) {
+  document.getElementById('topicCount').textContent = `${topics.length} đề tài`;
+  const tbody = document.getElementById('topicBody');
+  if (!topics.length) {
+    tbody.innerHTML = `<tr><td colspan="8" class="table-empty"><div class="empty-icon">📋</div>Không tìm thấy đề tài nào</td></tr>`;
+    return;
+  }
+  tbody.innerHTML = topics.map(t => `
+    <tr>
+      <td style="max-width:260px">
+        <div style="font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap" title="${t.title}">${t.title}</div>
+      </td>
+      <td><span class="badge badge-gray">${t.type}</span></td>
+      <td>${t.faculty}</td>
+      <td>
+        <span style="font-weight:700;color:var(--color-primary)">${t.current_students}</span>
+        <span style="color:var(--color-text-muted)">/${t.max_students}</span>
+        ${t.current_students >= t.max_students ? '<span class="badge badge-warning" style="margin-left:4px">Đủ SV</span>' : ''}
+      </td>
+      <td>${t.supervisor}</td>
+      <td>${getStatusBadge(t.status)}</td>
+      <td>${formatDate(t.created_at)}</td>
+      <td style="text-align:center">
+        <button class="btn btn-ghost btn-icon btn-sm" title="Xem chi tiết" aria-label="Xem chi tiết" onclick="showTopicDetail(${t.id})">👁️</button>
+        ${t.status !== 'Từ chối' ? `<a href="tao-de-tai.html" class="btn btn-ghost btn-icon btn-sm" title="Chỉnh sửa" aria-label="Chỉnh sửa">✏️</a>` : ''}
+        <button class="btn btn-ghost btn-icon btn-sm" title="Xóa" aria-label="Xóa" onclick="showToast('Đã xóa đề tài','error')">🗑️</button>
+      </td>
+    </tr>`).join('');
+}
+
+function showTopicDetail(id) {
+  const topic = allTopics.find(t => t.id === id);
+  if (!topic) return;
+  document.getElementById('topicDetailTitle').textContent = topic.title;
+  document.getElementById('topicDetailBody').innerHTML = `
+    <div class="info-row"><span class="info-label">Loại đề tài</span><span class="info-value">${topic.type}</span></div>
+    <div class="info-row"><span class="info-label">Khoa thẩm định</span><span class="info-value">${topic.faculty}</span></div>
+    <div class="info-row"><span class="info-label">Số SV tối đa</span><span class="info-value">${topic.max_students}</span></div>
+    <div class="info-row"><span class="info-label">SV đã nhận</span><span class="info-value">${topic.current_students}</span></div>
+    <div class="info-row"><span class="info-label">Cán bộ hướng dẫn</span><span class="info-value">${topic.supervisor}</span></div>
+    <div class="info-row"><span class="info-label">Trạng thái</span><span class="info-value">${getStatusBadge(topic.status)}</span></div>
+    <div class="info-row"><span class="info-label">Ngày tạo</span><span class="info-value">${formatDate(topic.created_at)}</span></div>
+    ${topic.status === 'Từ chối' ? '<div class="alert alert-danger mt-3"><span class="alert-icon">❌</span><div><strong>Lý do từ chối:</strong> Đề tài chưa phù hợp với định hướng nghiên cứu của Khoa. Vui lòng chỉnh sửa và gửi lại.</div></div>' : ''}`;
+  openModal('modalTopicDetail');
+}
+
+function filterTopics() {
+  const search = document.getElementById('searchTopic').value.toLowerCase();
+  const faculty = document.getElementById('filterFaculty').value;
+  const status = document.getElementById('filterTopicStatus').value;
+  return allTopics.filter(t =>
+    (!search || t.title.toLowerCase().includes(search)) &&
+    (!faculty || t.faculty.includes(faculty.replace('Khoa ',''))) &&
+    (!status || t.status === status)
+  );
+}
+
+function initPage(data) {
+  allTopics = data.components.ownTopics.data;
+  const approved = allTopics.filter(t => t.status === 'Đã duyệt').length;
+  const pending = allTopics.filter(t => t.status === 'Chờ phê duyệt').length;
+  const totalStudents = allTopics.reduce((s, t) => s + t.current_students, 0);
+  document.getElementById('st-total').textContent = allTopics.length;
+  document.getElementById('st-approved').textContent = approved;
+  document.getElementById('st-pending').textContent = pending;
+  document.getElementById('st-students').textContent = totalStudents;
+  renderTopics(allTopics);
+}
+
+['searchTopic','filterFaculty','filterTopicStatus'].forEach(id => {
+  document.getElementById(id).addEventListener('input', () => renderTopics(filterTopics()));
+  document.getElementById(id).addEventListener('change', () => renderTopics(filterTopics()));
+});
+</script>
+</body>
+</html>

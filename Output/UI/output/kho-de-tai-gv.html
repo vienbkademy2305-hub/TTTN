@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Kho đề tài Giảng viên — Cổng Thông Tin</title>
+  <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+<div class="app-layout">
+  <div id="sidebar-placeholder"></div>
+  <div class="main-wrapper">
+    <header class="topbar">
+      <div class="topbar-breadcrumb">
+        <span class="breadcrumb-root">Đề tài</span>
+        <span class="breadcrumb-sep">/</span>
+        <span class="breadcrumb-current">Kho đề tài Giảng viên</span>
+      </div>
+      <div class="topbar-actions">
+        <button class="topbar-btn" aria-label="Thông báo">🔔</button>
+        <div class="topbar-user"><div class="user-avatar">NT</div><div class="user-info"><div class="user-name">Nguyễn Thị Thu Hà</div><div class="user-role">Quản trị viên DN</div></div></div>
+      </div>
+    </header>
+    <main class="main-content">
+      <div class="page-header">
+        <div class="header-row">
+          <div>
+            <h1>Kho đề tài Giảng viên</h1>
+            <p>Đăng ký đồng hướng dẫn với Giảng viên — Luồng 2 (MH-04-03/04)</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="alert alert-info" style="margin-bottom:20px">
+        <span class="alert-icon">ℹ️</span>
+        <div>Sau khi đăng ký, trạng thái sẽ chuyển thành <strong>Chờ GV duyệt</strong>. Khi GV chấp nhận, tên doanh nghiệp và cán bộ hướng dẫn của bạn sẽ tự động được cập nhật trên giao diện sinh viên.</div>
+      </div>
+
+      <!-- Filters: MH-04-03 -->
+      <div class="card" style="margin-bottom:20px">
+        <div class="table-toolbar">
+          <div class="search-input-wrap flex-1">
+            <span class="search-icon">🔍</span>
+            <input type="search" class="form-control" id="searchGVTopic" placeholder="Tìm theo tên đề tài..." aria-label="Tìm kiếm">
+          </div>
+          <select class="form-control" id="filterGVType" style="width:200px" aria-label="Lọc loại">
+            <option value="">Tất cả loại đề tài</option>
+            <option>Kỹ thuật phần mềm</option>
+            <option>Khoa học dữ liệu</option>
+            <option>Kỹ thuật điện tử</option>
+            <option>An ninh mạng</option>
+            <option>Nghiên cứu</option>
+          </select>
+          <select class="form-control" id="filterGVFaculty" style="width:180px" aria-label="Lọc Khoa">
+            <option value="">Tất cả Khoa</option>
+            <option>Khoa CNTT</option>
+            <option>Khoa KTDT</option>
+          </select>
+          <span class="table-count" id="gvTopicCount">—</span>
+        </div>
+
+        <div class="table-wrapper">
+          <table>
+            <thead>
+              <tr>
+                <th>Tên đề tài</th>
+                <th>Loại</th>
+                <th>Khoa</th>
+                <th>Giảng viên</th>
+                <th>Số SV tối đa</th>
+                <th>Tình trạng</th>
+                <th style="text-align:center">Hành động</th>
+              </tr>
+            </thead>
+            <tbody id="gvTopicBody">
+              <tr><td colspan="7" class="table-empty">Đang tải...</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </main>
+  </div>
+</div>
+
+<!-- Modal: Đăng ký tham gia (MH-04-04) -->
+<div class="modal-overlay" id="modalJoinTopic" role="dialog" aria-modal="true" aria-labelledby="joinTopicTitle">
+  <div class="modal modal-lg">
+    <div class="modal-header">
+      <div>
+        <div class="modal-title" id="joinTopicTitle">Đăng ký Đồng hướng dẫn</div>
+        <div class="text-sm text-muted" id="joinTopicName" style="margin-top:2px"></div>
+      </div>
+      <button class="modal-close" data-modal-close aria-label="Đóng">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="alert alert-info" style="margin-bottom:20px">
+        <span class="alert-icon">ℹ️</span>
+        <div>Sau khi gửi đăng ký, đề xuất sẽ chờ Giảng viên phê duyệt. Bạn có thể theo dõi trạng thái trong danh sách này.</div>
+      </div>
+      <form id="joinForm" novalidate>
+        <div class="form-group" style="margin-bottom:16px">
+          <label class="form-label" for="joinSupervisor">Cán bộ DN tham gia hướng dẫn <span class="required">*</span></label>
+          <select id="joinSupervisor" class="form-control" required aria-label="Cán bộ hướng dẫn">
+            <option value="">— Chọn cán bộ —</option>
+            <option>Nguyễn Văn Hùng</option>
+            <option>Lê Văn Tú</option>
+          </select>
+          <span class="form-error hidden">⚠ Vui lòng chọn cán bộ hướng dẫn</span>
+        </div>
+        <div class="form-group">
+          <label class="form-label" for="joinContribution">Nội dung DN hỗ trợ / đóng góp <span class="required">*</span></label>
+          <div style="position:relative">
+            <textarea id="joinContribution" class="form-control" rows="5" required data-maxlength="1000"
+              placeholder="Mô tả cụ thể những gì doanh nghiệp sẽ đóng góp: môi trường thực tập, dữ liệu, tài nguyên, thời gian hướng dẫn..."
+              aria-label="Nội dung đóng góp">VinaTech cam kết hỗ trợ sinh viên môi trường thực tập tại phòng R&D, cung cấp dữ liệu thực tế từ hệ thống ERP của công ty, và bố trí cán bộ kỹ thuật hướng dẫn trực tiếp hàng tuần.</textarea>
+            <div class="char-counter" style="margin-top:4px">0/1000</div>
+          </div>
+          <span class="form-error hidden">⚠ Vui lòng mô tả nội dung hỗ trợ</span>
+        </div>
+      </form>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-outline" data-modal-close>Hủy</button>
+      <button class="btn btn-primary" id="btnSubmitJoin">📤 Gửi đăng ký</button>
+    </div>
+  </div>
+</div>
+
+<script src="js/sidebar.js"></script>
+<script src="js/main.js"></script>
+<script>
+let allGVTopics = [];
+let selectedTopicId = null;
+
+function renderGVTopics(topics) {
+  document.getElementById('gvTopicCount').textContent = `${topics.length} đề tài`;
+  const tbody = document.getElementById('gvTopicBody');
+  if (!topics.length) {
+    tbody.innerHTML = `<tr><td colspan="7" class="table-empty"><div class="empty-icon">🔬</div>Không tìm thấy đề tài nào</td></tr>`;
+    return;
+  }
+  tbody.innerHTML = topics.map(t => {
+    const isRegistered = t.registered;
+    return `
+    <tr>
+      <td style="max-width:240px">
+        <div style="font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap" title="${t.title}">${t.title}</div>
+        <div style="font-size:12px;color:var(--color-text-muted);margin-top:2px">GV: ${t.lecturer}</div>
+      </td>
+      <td><span class="badge badge-gray">${t.type}</span></td>
+      <td>${t.faculty}</td>
+      <td>${t.lecturer}</td>
+      <td>${t.max_students}</td>
+      <td>${isRegistered ? '<span class="badge badge-success">Đã đăng ký</span>' : getStatusBadge(t.status)}</td>
+      <td style="text-align:center">
+        ${isRegistered
+          ? '<button class="btn btn-outline btn-sm" disabled>✅ Đã đăng ký</button>'
+          : `<button class="btn btn-primary btn-sm" onclick="openJoinModal(${t.id})" aria-label="Đăng ký hợp tác">🤝 Đăng ký</button>`
+        }
+      </td>
+    </tr>`;
+  }).join('');
+}
+
+function openJoinModal(id) {
+  selectedTopicId = id;
+  const topic = allGVTopics.find(t => t.id === id);
+  if (!topic) return;
+  document.getElementById('joinTopicTitle').textContent = 'Đăng ký Đồng hướng dẫn';
+  document.getElementById('joinTopicName').textContent = topic.title;
+  openModal('modalJoinTopic');
+}
+
+function filterGVTopics() {
+  const search = document.getElementById('searchGVTopic').value.toLowerCase();
+  const type = document.getElementById('filterGVType').value;
+  const faculty = document.getElementById('filterGVFaculty').value;
+  return allGVTopics.filter(t =>
+    (!search || t.title.toLowerCase().includes(search) || t.lecturer.toLowerCase().includes(search)) &&
+    (!type || t.type === type) &&
+    (!faculty || t.faculty.includes(faculty.replace('Khoa ','')))
+  );
+}
+
+function initPage(data) {
+  allGVTopics = data.components.lecturerTopics.data;
+  renderGVTopics(allGVTopics);
+}
+
+['searchGVTopic','filterGVType','filterGVFaculty'].forEach(id => {
+  document.getElementById(id).addEventListener('input', () => renderGVTopics(filterGVTopics()));
+  document.getElementById(id).addEventListener('change', () => renderGVTopics(filterGVTopics()));
+});
+
+document.getElementById('btnSubmitJoin').addEventListener('click', () => {
+  const supervisor = document.getElementById('joinSupervisor').value;
+  const contribution = document.getElementById('joinContribution').value.trim();
+  let valid = true;
+
+  if (!supervisor) { document.getElementById('joinSupervisor').classList.add('error'); document.getElementById('joinSupervisor').nextElementSibling.classList.remove('hidden'); valid = false; }
+  else { document.getElementById('joinSupervisor').classList.remove('error'); document.getElementById('joinSupervisor').nextElementSibling.classList.add('hidden'); }
+
+  if (!contribution) { document.getElementById('joinContribution').classList.add('error'); valid = false; }
+  else { document.getElementById('joinContribution').classList.remove('error'); }
+
+  if (!valid) return;
+
+  const topic = allGVTopics.find(t => t.id === selectedTopicId);
+  if (topic) topic.registered = true;
+  closeModal('modalJoinTopic');
+  renderGVTopics(filterGVTopics());
+  showToast(`Đã gửi đăng ký đồng hướng dẫn. Đang chờ GV xét duyệt.`, 'success');
+  document.getElementById('joinForm').reset();
+});
+</script>
+</body>
+</html>

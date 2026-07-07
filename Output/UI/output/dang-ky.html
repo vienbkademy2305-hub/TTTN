@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Đăng ký tài khoản doanh nghiệp — Cổng Thông Tin</title>
+  <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+<div class="auth-layout">
+  <div class="auth-card" style="max-width:600px">
+    <div class="auth-header">
+      <div class="logo">CỔNG <span>DOANH NGHIỆP</span></div>
+      <p>Nền tảng kết nối Doanh nghiệp &amp; Trường Đại học</p>
+    </div>
+    <div class="auth-body">
+      <div class="auth-tabs" id="typeTab">
+        <button class="auth-tab active" data-type="domestic" aria-label="Doanh nghiệp trong nước">Doanh nghiệp Trong nước</button>
+        <button class="auth-tab" data-type="foreign" aria-label="Doanh nghiệp nước ngoài">Doanh nghiệp Nước ngoài</button>
+      </div>
+
+      <!-- MH-01-01 -->
+      <div id="step1">
+        <h2 style="font-size:17px;font-weight:700;margin-bottom:4px">Tạo tài khoản doanh nghiệp</h2>
+        <p class="text-muted text-sm" style="margin-bottom:20px">Điền thông tin cơ bản để bắt đầu đăng ký</p>
+
+        <form id="regForm" novalidate>
+          <div class="form-group" style="margin-bottom:16px">
+            <label class="form-label" for="company_name">Tên doanh nghiệp <span class="required">*</span></label>
+            <input id="company_name" name="company_name" class="form-control" type="text" placeholder="Nhập tên đầy đủ của doanh nghiệp" required aria-label="Tên doanh nghiệp" value="Công ty Cổ phần Công nghệ VinaTech">
+            <span class="form-error hidden">⚠ Vui lòng nhập tên doanh nghiệp</span>
+          </div>
+
+          <div id="taxField" class="form-group" style="margin-bottom:16px">
+            <label class="form-label" for="tax_code">Mã số thuế <span class="required">*</span></label>
+            <input id="tax_code" name="tax_code" class="form-control" type="text" placeholder="VD: 0312345678" required aria-label="Mã số thuế" value="0312345678">
+            <span class="form-hint">Bắt buộc với doanh nghiệp trong nước</span>
+            <span class="form-error hidden">⚠ Vui lòng nhập mã số thuế</span>
+          </div>
+
+          <div id="bizField" class="form-group hidden" style="margin-bottom:16px">
+            <label class="form-label" for="biz_code">Mã kinh doanh quốc tế</label>
+            <input id="biz_code" name="biz_code" class="form-control" type="text" placeholder="Tùy chọn" aria-label="Mã kinh doanh quốc tế">
+            <span class="form-hint">Không bắt buộc với doanh nghiệp nước ngoài</span>
+          </div>
+
+          <div class="form-grid" style="gap:14px;margin-bottom:16px">
+            <div class="form-group">
+              <label class="form-label" for="email">Email đăng nhập <span class="required">*</span></label>
+              <input id="email" name="email" class="form-control" type="email" placeholder="email@congty.com" required aria-label="Email" value="hr@vinatech.com.vn">
+              <span class="form-error hidden">⚠ Email không hợp lệ</span>
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="phone">Số điện thoại <span class="required">*</span></label>
+              <input id="phone" name="phone" class="form-control" type="tel" placeholder="VD: 0901234567" required aria-label="Số điện thoại" value="0283456789">
+              <span class="form-error hidden">⚠ Số điện thoại không hợp lệ</span>
+            </div>
+          </div>
+
+          <div class="form-group" style="margin-bottom:16px">
+            <label class="form-label" for="contact_name">Tên người đại diện <span class="required">*</span></label>
+            <input id="contact_name" name="contact_name" class="form-control" type="text" placeholder="Họ và tên đầy đủ" required aria-label="Người đại diện" value="Nguyễn Thị Thu Hà">
+            <span class="form-error hidden">⚠ Vui lòng nhập tên người đại diện</span>
+          </div>
+
+          <div class="form-group" style="margin-bottom:16px">
+            <label class="form-label" for="address">Địa chỉ <span class="required">*</span></label>
+            <input id="address" name="address" class="form-control" type="text" placeholder="Số nhà, đường, quận, tỉnh/thành" required aria-label="Địa chỉ" value="125 Nguyễn Huệ, Quận 1, TP. Hồ Chí Minh">
+            <span class="form-error hidden">⚠ Vui lòng nhập địa chỉ</span>
+          </div>
+
+          <div class="form-grid" style="gap:14px;margin-bottom:20px">
+            <div class="form-group">
+              <label class="form-label" for="password">Mật khẩu <span class="required">*</span></label>
+              <input id="password" name="password" class="form-control" type="password" placeholder="Tối thiểu 8 ký tự" required aria-label="Mật khẩu">
+              <span class="form-hint">Gồm chữ hoa, chữ thường, số, ký tự đặc biệt</span>
+              <span class="form-error hidden">⚠ Mật khẩu không đủ điều kiện</span>
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="confirm_password">Xác nhận mật khẩu <span class="required">*</span></label>
+              <input id="confirm_password" name="confirm_password" class="form-control" type="password" placeholder="Nhập lại mật khẩu" required aria-label="Xác nhận mật khẩu">
+              <span class="form-error hidden">⚠ Mật khẩu không khớp</span>
+            </div>
+          </div>
+
+          <button type="submit" class="btn btn-primary btn-lg w-full">
+            Tiếp tục → Điền thông tin chi tiết
+          </button>
+        </form>
+
+        <p class="text-sm text-muted" style="text-align:center;margin-top:16px">
+          Đã có tài khoản? <a href="index.html">Đăng nhập tại đây</a>
+        </p>
+      </div>
+
+      <!-- MH-01-02: Success notification -->
+      <div id="step2" class="hidden" style="text-align:center;padding:20px 0">
+        <div style="font-size:56px;margin-bottom:16px">🎉</div>
+        <h2 style="font-size:20px;font-weight:700;margin-bottom:8px">Đăng ký thành công!</h2>
+        <p class="text-muted" style="margin-bottom:24px;font-size:14px">
+          Tài khoản doanh nghiệp đã được tạo. Hệ thống đang chuyển bạn đến trang hoàn thiện hồ sơ...
+        </p>
+        <div style="background:#f0fdf4;border:1px solid #bbf7d0;border-radius:8px;padding:16px 20px;text-align:left;margin-bottom:24px">
+          <div class="info-row"><span class="info-label">Doanh nghiệp:</span><span class="info-value" id="confirmName">—</span></div>
+          <div class="info-row"><span class="info-label">Email:</span><span class="info-value" id="confirmEmail">—</span></div>
+          <div class="info-row"><span class="info-label">Trạng thái:</span><span class="info-value"><span class="badge badge-warning">Chờ xác minh</span></span></div>
+        </div>
+        <div id="countdown" style="font-size:13px;color:var(--color-text-muted);margin-bottom:16px">Tự động chuyển trang sau <strong>5</strong> giây...</div>
+        <a href="ho-so.html" class="btn btn-primary">Đến trang hoàn thiện hồ sơ →</a>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+document.querySelectorAll('.auth-tab').forEach(tab => {
+  tab.addEventListener('click', () => {
+    document.querySelectorAll('.auth-tab').forEach(t => t.classList.remove('active'));
+    tab.classList.add('active');
+    const isDomestic = tab.dataset.type === 'domestic';
+    document.getElementById('taxField').classList.toggle('hidden', !isDomestic);
+    document.getElementById('bizField').classList.toggle('hidden', isDomestic);
+    document.getElementById('tax_code').required = isDomestic;
+  });
+});
+
+function validatePassword(pw) {
+  return pw.length >= 8 && /[A-Z]/.test(pw) && /[a-z]/.test(pw) && /\d/.test(pw) && /[^A-Za-z0-9]/.test(pw);
+}
+
+function validateEmail(email) {
+  return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+}
+
+function validatePhone(phone) {
+  return /^[0-9]{9,11}$/.test(phone.replace(/\s/g, ''));
+}
+
+document.getElementById('regForm').addEventListener('submit', e => {
+  e.preventDefault();
+  let valid = true;
+  const form = e.target;
+
+  const fields = ['company_name', 'contact_name', 'address'];
+  fields.forEach(id => {
+    const el = document.getElementById(id);
+    const errEl = el.parentElement.querySelector('.form-error');
+    if (!el.value.trim()) { el.classList.add('error'); errEl?.classList.remove('hidden'); valid = false; }
+    else { el.classList.remove('error'); errEl?.classList.add('hidden'); }
+  });
+
+  const emailEl = document.getElementById('email');
+  const emailErr = emailEl.parentElement.querySelector('.form-error');
+  if (!validateEmail(emailEl.value)) { emailEl.classList.add('error'); emailErr?.classList.remove('hidden'); valid = false; }
+  else { emailEl.classList.remove('error'); emailErr?.classList.add('hidden'); }
+
+  const phoneEl = document.getElementById('phone');
+  const phoneErr = phoneEl.parentElement.querySelector('.form-error');
+  if (!validatePhone(phoneEl.value)) { phoneEl.classList.add('error'); phoneErr?.classList.remove('hidden'); valid = false; }
+  else { phoneEl.classList.remove('error'); phoneErr?.classList.add('hidden'); }
+
+  const pw = document.getElementById('password');
+  const pwErr = pw.parentElement.querySelector('.form-error');
+  if (!validatePassword(pw.value)) { pw.classList.add('error'); pwErr?.classList.remove('hidden'); valid = false; }
+  else { pw.classList.remove('error'); pwErr?.classList.add('hidden'); }
+
+  const cpw = document.getElementById('confirm_password');
+  const cpwErr = cpw.parentElement.querySelector('.form-error');
+  if (cpw.value !== pw.value) { cpw.classList.add('error'); cpwErr?.classList.remove('hidden'); valid = false; }
+  else { cpw.classList.remove('error'); cpwErr?.classList.add('hidden'); }
+
+  const isDomestic = document.querySelector('.auth-tab.active').dataset.type === 'domestic';
+  if (isDomestic) {
+    const tax = document.getElementById('tax_code');
+    const taxErr = tax.parentElement.querySelector('.form-error');
+    if (!tax.value.trim()) { tax.classList.add('error'); taxErr?.classList.remove('hidden'); valid = false; }
+    else { tax.classList.remove('error'); taxErr?.classList.add('hidden'); }
+  }
+
+  if (!valid) { form.querySelector('.error')?.scrollIntoView({ behavior: 'smooth', block: 'center' }); return; }
+
+  document.getElementById('step1').classList.add('hidden');
+  document.getElementById('step2').classList.remove('hidden');
+  document.getElementById('confirmName').textContent = document.getElementById('company_name').value;
+  document.getElementById('confirmEmail').textContent = document.getElementById('email').value;
+
+  let s = 5;
+  const cdEl = document.querySelector('#countdown strong');
+  const timer = setInterval(() => {
+    s--;
+    cdEl.textContent = s;
+    if (s <= 0) { clearInterval(timer); location.href = 'ho-so.html'; }
+  }, 1000);
+});
+</script>
+</body>
+</html>

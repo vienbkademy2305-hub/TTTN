@@ -1,0 +1,343 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Chấm điểm Thực tập — Cổng Thông Tin</title>
+  <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+<div class="app-layout">
+  <div id="sidebar-placeholder"></div>
+  <div class="main-wrapper">
+    <header class="topbar">
+      <div class="topbar-breadcrumb">
+        <span class="breadcrumb-root">Quản lý Sinh viên</span>
+        <span class="breadcrumb-sep">/</span>
+        <span class="breadcrumb-current">Chấm điểm Thực tập</span>
+      </div>
+      <div class="topbar-actions">
+        <button class="topbar-btn" aria-label="Thông báo">🔔</button>
+        <div class="topbar-user"><div class="user-avatar">NT</div><div class="user-info"><div class="user-name">Nguyễn Thị Thu Hà</div><div class="user-role">Quản trị viên DN</div></div></div>
+      </div>
+    </header>
+    <main class="main-content">
+      <div class="page-header">
+        <div class="header-row">
+          <div>
+            <h1>Chấm điểm Thực tập</h1>
+            <p>Kê khai chuyên cần, đánh giá tiêu chí và nhận xét sinh viên (MH-05-03)</p>
+          </div>
+          <a href="quan-ly-sv.html" class="btn btn-outline">← Quay lại danh sách SV</a>
+        </div>
+      </div>
+
+      <div id="globalAlert" class="hidden" style="margin-bottom:16px"></div>
+
+      <div id="gradingCards">
+        <!-- rendered by JS -->
+      </div>
+
+      <!-- Fixed bottom action bar -->
+      <div style="position:sticky;bottom:0;background:var(--color-surface);border-top:2px solid var(--color-border);padding:16px 0;margin-top:24px;z-index:10">
+        <div style="display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap">
+          <div class="text-sm text-muted" id="savingStatus">💡 Dữ liệu chưa được lưu</div>
+          <div style="display:flex;gap:12px">
+            <button class="btn btn-outline btn-lg" id="btnSaveDraft" aria-label="Lưu tạm">💾 Lưu tạm</button>
+            <button class="btn btn-primary btn-lg" id="btnSubmitFinal" aria-label="Hoàn tất và gửi kết quả">📤 Hoàn tất &amp; Gửi kết quả chính thức</button>
+          </div>
+        </div>
+      </div>
+    </main>
+  </div>
+</div>
+
+<!-- Modal: Xác nhận gửi chính thức -->
+<div class="modal-overlay" id="modalConfirmSubmit" role="dialog" aria-modal="true">
+  <div class="modal">
+    <div class="modal-header">
+      <div class="modal-title">Xác nhận gửi kết quả chính thức</div>
+      <button class="modal-close" data-modal-close aria-label="Đóng">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="alert alert-warning">
+        <span class="alert-icon">⚠️</span>
+        <div>
+          <strong>Lưu ý quan trọng:</strong>
+          <ul style="margin-top:6px;padding-left:16px;font-size:13px;line-height:1.8">
+            <li>Sau khi gửi, điểm sẽ được đẩy về Cổng Nhà trường</li>
+            <li>Sinh viên sẽ thấy điểm ngay lập tức</li>
+            <li>Bạn <strong>không thể chỉnh sửa</strong> điểm sau khi gửi</li>
+            <li>Trạng thái thực tập sẽ chuyển thành <strong>FINISHED</strong></li>
+          </ul>
+        </div>
+      </div>
+      <p class="text-sm text-muted" style="margin-top:12px">Bạn có chắc chắn muốn gửi kết quả chính thức?</p>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-outline" data-modal-close>Hủy, tiếp tục kiểm tra</button>
+      <button class="btn btn-primary" id="btnConfirmFinal">✅ Xác nhận gửi</button>
+    </div>
+  </div>
+</div>
+
+<script src="js/sidebar.js"></script>
+<script src="js/main.js"></script>
+<script>
+const CRITERIA = [
+  { id: 1, name: 'Ý thức chấp hành nội quy, kỷ luật', max: 2.0 },
+  { id: 2, name: 'Tinh thần trách nhiệm, thái độ công việc', max: 2.0 },
+  { id: 3, name: 'Vận dụng kiến thức chuyên môn vào thực tiễn', max: 2.0 },
+  { id: 4, name: 'Kết quả hoàn thành theo đề cương chi tiết', max: 4.0 },
+];
+
+let gradingItems = [];
+let isLocked = false;
+
+function calcAbsenceRate(absent, total) {
+  if (!total || total <= 0) return 0;
+  return Math.min(100, Math.round((absent / total) * 100));
+}
+
+function calcTotal(studentId) {
+  const item = gradingItems.find(g => g.student_id === studentId);
+  if (!item) return 0;
+  return item.criteria.reduce((sum, c) => sum + (parseFloat(c.score) || 0), 0);
+}
+
+function updateTotal(studentId) {
+  const total = calcTotal(studentId);
+  const el = document.getElementById(`total-${studentId}`);
+  if (el) el.textContent = total.toFixed(1);
+}
+
+function updateAbsenceRate(studentId) {
+  const item = gradingItems.find(g => g.student_id === studentId);
+  if (!item) return;
+  const absent = parseInt(document.getElementById(`absent-${studentId}`).value) || 0;
+  const total = parseInt(document.getElementById(`total-days-${studentId}`).value) || 0;
+  const rate = calcAbsenceRate(absent, total);
+  const el = document.getElementById(`rate-${studentId}`);
+  if (el) {
+    el.textContent = `${rate}% vắng mặt`;
+    el.className = `attendance-rate ${rate > 20 ? 'warn' : 'good'}`;
+  }
+  item.absent_days = absent;
+  item.total_internship_days = total;
+}
+
+function renderGradingCard(item) {
+  const isDraft = item.status === 'DRAFT_SCORES';
+  const isFinished = item.status === 'FINISHED';
+  const totalScore = item.criteria.reduce((s, c) => s + (c.score || 0), 0);
+
+  return `
+  <div class="grading-card" id="card-${item.student_id}">
+    <div class="grading-card-header">
+      <div>
+        <div class="student-name">${item.name}</div>
+        <div class="student-meta">${item.student_id} · ${item.class} · Đề tài: ${item.topic.slice(0,50)}${item.topic.length>50?'…':''}</div>
+      </div>
+      <div style="display:flex;align-items:center;gap:10px">
+        ${isDraft ? '<span class="badge badge-warning">💾 Đã lưu nháp</span>' : ''}
+        ${isFinished ? '<span class="badge badge-success">✅ Đã hoàn tất</span>' : ''}
+        <span style="color:rgba(255,255,255,0.8);font-size:13px">Người HD: ${item.supervisor}</span>
+      </div>
+    </div>
+
+    <div class="grading-card-body">
+      <!-- I. Chuyên cần -->
+      <div class="grading-block">
+        <div class="grading-block-title">I. Kê khai Chuyên cần</div>
+        <div class="attendance-row">
+          <div class="attendance-item">
+            <label for="absent-${item.student_id}">Số ngày không đến:</label>
+            <input type="number" id="absent-${item.student_id}" class="form-control"
+              min="0" value="${item.absent_days}" ${isFinished ? 'disabled' : ''}
+              style="width:80px" aria-label="Số ngày vắng"
+              oninput="updateAbsenceRate('${item.student_id}')">
+          </div>
+          <div class="attendance-item">
+            <label for="total-days-${item.student_id}">Tổng ngày thực tập:</label>
+            <input type="number" id="total-days-${item.student_id}" class="form-control"
+              min="1" value="${item.total_internship_days}" ${isFinished ? 'disabled' : ''}
+              style="width:80px" aria-label="Tổng số ngày"
+              oninput="updateAbsenceRate('${item.student_id}')">
+          </div>
+          <div id="rate-${item.student_id}" class="attendance-rate ${calcAbsenceRate(item.absent_days, item.total_internship_days) > 20 ? 'warn' : 'good'}">
+            ${calcAbsenceRate(item.absent_days, item.total_internship_days)}% vắng mặt
+          </div>
+        </div>
+      </div>
+
+      <!-- II. Tiêu chí đánh giá -->
+      <div class="grading-block">
+        <div class="grading-block-title">II. Bảng Tiêu chí Đánh giá</div>
+        <table class="criteria-table">
+          <thead>
+            <tr>
+              <th style="width:40px">TT</th>
+              <th>Tiêu chí</th>
+              <th style="width:100px;text-align:center">Điểm tối đa</th>
+              <th style="width:120px;text-align:center">Điểm nhập</th>
+            </tr>
+          </thead>
+          <tbody>
+            ${CRITERIA.map((c, i) => {
+              const cData = item.criteria.find(x => x.id === c.id);
+              const val = cData?.score != null ? cData.score : '';
+              return `
+              <tr id="row-crit-${item.student_id}-${c.id}">
+                <td style="text-align:center;color:var(--color-text-muted)">${i+1}</td>
+                <td>${c.name}</td>
+                <td style="text-align:center"><strong>${c.max.toFixed(1)}</strong></td>
+                <td style="text-align:center">
+                  <input type="number" class="form-control score-input" step="0.1" min="0" max="${c.max}"
+                    value="${val}" ${isFinished ? 'disabled' : ''}
+                    placeholder="0.0–${c.max.toFixed(1)}"
+                    aria-label="Điểm tiêu chí ${i+1}"
+                    oninput="onScoreInput(this, '${item.student_id}', ${c.id}, ${c.max})"
+                    style="text-align:right;width:100px;margin:0 auto">
+                </td>
+              </tr>`;
+            }).join('')}
+          </tbody>
+        </table>
+        <div class="total-score">
+          <span class="label">Tổng điểm:</span>
+          <span class="value" id="total-${item.student_id}">${totalScore.toFixed(1)}</span>
+          <span class="max">/ 10.0</span>
+        </div>
+      </div>
+
+      <!-- III. Feedback -->
+      <div class="grading-block">
+        <div class="grading-block-title">III. Nhận xét &amp; Đánh giá</div>
+        <div class="form-group">
+          <label class="form-label" for="feedback-${item.student_id}">
+            Nhận xét về sinh viên <span class="required">*</span>
+          </label>
+          <div style="position:relative">
+            <textarea id="feedback-${item.student_id}" class="form-control" rows="4"
+              data-maxlength="1000" ${isFinished ? 'disabled' : ''}
+              placeholder="Nhận xét tổng quan về quá trình thực tập, điểm mạnh, điểm cần cải thiện của sinh viên..."
+              aria-label="Nhận xét về sinh viên">${item.mentor_feedback}</textarea>
+            <div class="char-counter" style="margin-top:4px">0/1000</div>
+          </div>
+          <span class="form-error hidden" id="feedback-err-${item.student_id}">⚠ Vui lòng nhập nhận xét trước khi gửi</span>
+        </div>
+      </div>
+
+      ${isFinished ? '<div class="alert alert-success"><span class="alert-icon">🔒</span><strong>Điểm đã được gửi chính thức.</strong> Dữ liệu đã được khóa và đẩy về Cổng Nhà trường.</div>' : ''}
+    </div>
+  </div>`;
+}
+
+function onScoreInput(input, studentId, criteriaId, max) {
+  let val = parseFloat(input.value);
+  const row = document.getElementById(`row-crit-${studentId}-${criteriaId}`);
+
+  if (isNaN(val) || val < 0) { val = 0; input.value = ''; }
+  if (val > max) { val = max; input.value = max.toFixed(1); showToast(`Điểm tiêu chí này tối đa ${max.toFixed(1)}`, 'warning'); }
+
+  // Round to 1 decimal
+  if (!isNaN(val)) {
+    val = Math.round(val * 10) / 10;
+    input.value = val;
+    row?.classList.remove('error-row');
+    input.classList.remove('error');
+  }
+
+  const item = gradingItems.find(g => g.student_id === studentId);
+  if (item) {
+    const crit = item.criteria.find(c => c.id === criteriaId);
+    if (crit) crit.score = isNaN(val) ? null : val;
+  }
+  updateTotal(studentId);
+  document.getElementById('savingStatus').textContent = '🔴 Có thay đổi chưa lưu';
+}
+
+function validateAll() {
+  let valid = true;
+  gradingItems.forEach(item => {
+    if (item.status === 'FINISHED') return;
+
+    const absent = parseInt(document.getElementById(`absent-${item.student_id}`)?.value) || 0;
+    const total = parseInt(document.getElementById(`total-days-${item.student_id}`)?.value) || 0;
+    if (absent > total) {
+      document.getElementById(`absent-${item.student_id}`)?.classList.add('error');
+      showToast(`${item.name}: Số ngày vắng không được vượt quá tổng số ngày thực tập`, 'error');
+      document.getElementById(`absent-${item.student_id}`)?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      valid = false; return;
+    }
+
+    item.criteria.forEach(c => {
+      const input = document.querySelector(`#card-${item.student_id} input[aria-label*="tiêu chí"][aria-label*="${CRITERIA.findIndex(x=>x.id===c.id)+1}"]`);
+      if (c.score === null || c.score === undefined || c.score === '') {
+        if (input) { input.classList.add('error'); input.scrollIntoView({ behavior: 'smooth', block: 'center' }); }
+        showToast(`${item.name}: Vui lòng nhập đủ điểm cho tất cả tiêu chí`, 'error');
+        valid = false;
+      }
+    });
+
+    const feedback = document.getElementById(`feedback-${item.student_id}`)?.value.trim();
+    if (!feedback) {
+      document.getElementById(`feedback-${item.student_id}`)?.classList.add('error');
+      document.getElementById(`feedback-err-${item.student_id}`)?.classList.remove('hidden');
+      document.getElementById(`feedback-${item.student_id}`)?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      showToast(`${item.name}: Vui lòng nhập nhận xét`, 'error');
+      valid = false;
+    } else {
+      document.getElementById(`feedback-err-${item.student_id}`)?.classList.add('hidden');
+    }
+  });
+  return valid;
+}
+
+document.getElementById('btnSaveDraft').addEventListener('click', () => {
+  gradingItems.forEach(item => {
+    if (item.status !== 'FINISHED') item.status = 'DRAFT_SCORES';
+  });
+  document.getElementById('savingStatus').textContent = '💾 Đã lưu nháp lúc ' + new Date().toLocaleTimeString('vi-VN');
+  showToast('Đã lưu tạm thành công. Điểm chưa gửi nhà trường.', 'warning');
+});
+
+document.getElementById('btnSubmitFinal').addEventListener('click', () => {
+  const hasUnfinished = gradingItems.some(g => g.status !== 'FINISHED');
+  if (!hasUnfinished) { showToast('Tất cả sinh viên đã được chấm điểm xong', 'warning'); return; }
+  if (!validateAll()) return;
+  openModal('modalConfirmSubmit');
+});
+
+document.getElementById('btnConfirmFinal').addEventListener('click', () => {
+  gradingItems.forEach(item => { if (item.status !== 'FINISHED') item.status = 'FINISHED'; });
+  closeModal('modalConfirmSubmit');
+
+  document.getElementById('gradingCards').innerHTML = gradingItems.map(renderGradingCard).join('');
+  initCharCounters();
+
+  const alert = document.getElementById('globalAlert');
+  alert.className = 'alert alert-success';
+  alert.innerHTML = '<span class="alert-icon">✅</span><div><strong>Kết quả đã được gửi thành công!</strong> Điểm đã được đẩy về Cổng Nhà trường. Sinh viên đã có thể xem kết quả. Trạng thái thực tập: <span class="badge badge-success">FINISHED</span></div>';
+  alert.classList.remove('hidden');
+  alert.scrollIntoView({ behavior: 'smooth' });
+  isLocked = true;
+  document.getElementById('btnSubmitFinal').disabled = true;
+  document.getElementById('btnSaveDraft').disabled = true;
+  document.getElementById('savingStatus').textContent = '🔒 Điểm đã được gửi và khóa';
+  showToast('Kết quả chính thức đã được gửi thành công!', 'success');
+});
+
+function initPage(data) {
+  gradingItems = JSON.parse(JSON.stringify(data.components.gradingData.data));
+  document.getElementById('gradingCards').innerHTML = gradingItems.map(renderGradingCard).join('');
+  initCharCounters();
+}
+</script>
+
+<style>
+.error-row { background: #fff5f5; }
+.score-input.error { border-color: var(--color-danger) !important; background: #fff5f5; }
+</style>
+</body>
+</html>

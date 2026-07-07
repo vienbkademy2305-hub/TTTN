@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Tin tức & Bài đăng — Cổng Thông Tin</title>
+  <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+<div class="app-layout">
+  <div id="sidebar-placeholder"></div>
+  <div class="main-wrapper">
+    <header class="topbar">
+      <div class="topbar-breadcrumb">
+        <span class="breadcrumb-root">Tin tức</span>
+        <span class="breadcrumb-sep">/</span>
+        <span class="breadcrumb-current">Danh sách bài đăng</span>
+      </div>
+      <div class="topbar-actions">
+        <button class="topbar-btn" aria-label="Thông báo">🔔</button>
+        <div class="topbar-user"><div class="user-avatar">NT</div><div class="user-info"><div class="user-name">Nguyễn Thị Thu Hà</div><div class="user-role">Quản trị viên DN</div></div></div>
+      </div>
+    </header>
+    <main class="main-content">
+      <div class="page-header">
+        <div class="header-row">
+          <div>
+            <h1>Tin tức & Bài đăng</h1>
+            <p>Quản lý tất cả bài đăng của doanh nghiệp (MH-03-01)</p>
+          </div>
+          <a href="tao-tin-tuc.html" class="btn btn-accent" aria-label="Tạo bài đăng mới">✏️ Tạo bài đăng mới</a>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="table-toolbar">
+          <div class="search-input-wrap flex-1">
+            <span class="search-icon">🔍</span>
+            <input type="search" class="form-control" id="searchPost" placeholder="Tìm theo tiêu đề bài đăng..." aria-label="Tìm kiếm bài đăng">
+          </div>
+          <select class="form-control" id="filterType" style="width:180px" aria-label="Lọc theo loại">
+            <option value="">Tất cả loại tin</option>
+            <option>Tuyển dụng</option>
+            <option>Sự kiện</option>
+            <option>Tin tức</option>
+            <option>Khác</option>
+          </select>
+          <select class="form-control" id="filterStatus" style="width:160px" aria-label="Lọc theo trạng thái">
+            <option value="">Tất cả trạng thái</option>
+            <option>Đã đăng</option>
+            <option>Nháp</option>
+          </select>
+          <span class="table-count" id="postCount">5 bài đăng</span>
+        </div>
+
+        <div class="table-wrapper">
+          <table>
+            <thead>
+              <tr>
+                <th><input type="checkbox" id="checkAll" aria-label="Chọn tất cả"></th>
+                <th>Tiêu đề bài đăng</th>
+                <th>Loại tin</th>
+                <th>Trạng thái</th>
+                <th>Ngày tạo</th>
+                <th>Lượt xem</th>
+                <th style="text-align:center">Hành động</th>
+              </tr>
+            </thead>
+            <tbody id="postBody">
+              <tr><td colspan="7" class="table-empty">Đang tải...</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-top:14px;flex-wrap:wrap;gap:10px">
+          <div id="selectedActions" class="hidden">
+            <button class="btn btn-danger btn-sm" onclick="showToast('Đã xóa các bài đã chọn','error')">🗑️ Xóa đã chọn</button>
+          </div>
+          <div class="pagination">
+            <button class="page-btn active" aria-label="Trang 1">1</button>
+            <button class="page-btn" aria-label="Trang 2">2</button>
+            <button class="page-btn" aria-label="Trang tiếp theo">›</button>
+          </div>
+        </div>
+      </div>
+    </main>
+  </div>
+</div>
+
+<script src="js/sidebar.js"></script>
+<script src="js/main.js"></script>
+<script>
+let allPosts = [];
+
+function typeBadge(type) {
+  const map = { 'Tuyển dụng':'badge-danger','Sự kiện':'badge-warning','Tin tức':'badge-info','Khác':'badge-gray' };
+  return `<span class="badge ${map[type]||'badge-gray'}">${type}</span>`;
+}
+
+function renderPosts(posts) {
+  const tbody = document.getElementById('postBody');
+  document.getElementById('postCount').textContent = `${posts.length} bài đăng`;
+  if (!posts.length) {
+    tbody.innerHTML = `<tr><td colspan="7" class="table-empty"><div class="empty-icon">📰</div>Không tìm thấy bài đăng nào</td></tr>`;
+    return;
+  }
+  tbody.innerHTML = posts.map(p => `
+    <tr>
+      <td><input type="checkbox" class="row-check" data-id="${p.id}" aria-label="Chọn bài ${p.title}"></td>
+      <td>
+        <a href="tao-tin-tuc.html" style="font-weight:600;color:var(--color-primary);">${p.title}</a>
+      </td>
+      <td>${typeBadge(p.type)}</td>
+      <td>${getStatusBadge(p.status)}</td>
+      <td>${formatDate(p.created_at)}</td>
+      <td>${p.views > 0 ? formatNumber(p.views) : '—'}</td>
+      <td style="text-align:center">
+        <a href="tao-tin-tuc.html" class="btn btn-ghost btn-icon btn-sm" title="Chỉnh sửa" aria-label="Sửa">✏️</a>
+        ${p.status === 'Nháp' ? `<button class="btn btn-ghost btn-icon btn-sm" title="Đăng bài" aria-label="Đăng bài" onclick="showToast('Đã đăng bài: ${p.title.slice(0,20)}...','success')">📤</button>` : `<button class="btn btn-ghost btn-icon btn-sm" title="Gỡ bài" aria-label="Gỡ bài" onclick="showToast('Đã gỡ bài','warning')">📌</button>`}
+        <button class="btn btn-ghost btn-icon btn-sm" title="Xóa" aria-label="Xóa" onclick="showToast('Đã xóa bài đăng','error')">🗑️</button>
+      </td>
+    </tr>`).join('');
+
+  document.querySelectorAll('.row-check').forEach(cb => {
+    cb.addEventListener('change', handleCheckChange);
+  });
+}
+
+function handleCheckChange() {
+  const checked = document.querySelectorAll('.row-check:checked').length;
+  document.getElementById('selectedActions').classList.toggle('hidden', !checked);
+  const allCbs = document.querySelectorAll('.row-check');
+  document.getElementById('checkAll').indeterminate = checked > 0 && checked < allCbs.length;
+  document.getElementById('checkAll').checked = checked === allCbs.length;
+}
+
+function filterPosts() {
+  const search = document.getElementById('searchPost').value.toLowerCase();
+  const type = document.getElementById('filterType').value;
+  const status = document.getElementById('filterStatus').value;
+  return allPosts.filter(p =>
+    (!search || p.title.toLowerCase().includes(search)) &&
+    (!type || p.type === type) &&
+    (!status || p.status === status)
+  );
+}
+
+function initPage(data) {
+  allPosts = data.components.newsPosts.data;
+  renderPosts(allPosts);
+}
+
+document.getElementById('checkAll').addEventListener('change', e => {
+  document.querySelectorAll('.row-check').forEach(cb => { cb.checked = e.target.checked; });
+  handleCheckChange();
+});
+
+['searchPost','filterType','filterStatus'].forEach(id => {
+  document.getElementById(id).addEventListener('input', () => renderPosts(filterPosts()));
+  document.getElementById(id).addEventListener('change', () => renderPosts(filterPosts()));
+});
+</script>
+</body>
+</html>

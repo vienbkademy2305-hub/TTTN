@@ -1,0 +1,264 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Duyệt hồ sơ Sinh viên — Cổng Thông Tin</title>
+  <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+<div class="app-layout">
+  <div id="sidebar-placeholder"></div>
+  <div class="main-wrapper">
+    <header class="topbar">
+      <div class="topbar-breadcrumb">
+        <span class="breadcrumb-root">Quản lý Sinh viên</span>
+        <span class="breadcrumb-sep">/</span>
+        <span class="breadcrumb-current">Duyệt hồ sơ ứng tuyển</span>
+      </div>
+      <div class="topbar-actions">
+        <button class="topbar-btn" aria-label="Thông báo">🔔<span class="notif-dot"></span></button>
+        <div class="topbar-user"><div class="user-avatar">NT</div><div class="user-info"><div class="user-name">Nguyễn Thị Thu Hà</div><div class="user-role">Quản trị viên DN</div></div></div>
+      </div>
+    </header>
+    <main class="main-content">
+      <div class="page-header">
+        <div class="header-row">
+          <div>
+            <h1>Duyệt hồ sơ Sinh viên</h1>
+            <p>Xem xét và phê duyệt hồ sơ ứng tuyển thực tập (MH-05-01)</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="stats-grid" style="grid-template-columns:repeat(4,1fr);margin-bottom:20px">
+        <div class="stat-card"><div class="stat-icon orange">⏳</div><div><div class="stat-value" id="st-pending">—</div><div class="stat-label">Chờ duyệt</div></div></div>
+        <div class="stat-card"><div class="stat-icon green">✅</div><div><div class="stat-value" id="st-accepted">—</div><div class="stat-label">Đã tiếp nhận</div></div></div>
+        <div class="stat-card"><div class="stat-icon">❌</div><div><div class="stat-value" id="st-rejected">—</div><div class="stat-label">Từ chối</div></div></div>
+        <div class="stat-card"><div class="stat-icon blue">📋</div><div><div class="stat-value" id="st-total">—</div><div class="stat-label">Tổng hồ sơ</div></div></div>
+      </div>
+
+      <div class="card">
+        <div class="table-toolbar">
+          <div class="search-input-wrap flex-1">
+            <span class="search-icon">🔍</span>
+            <input type="search" class="form-control" id="searchSV" placeholder="Tìm theo tên, mã SV, đề tài..." aria-label="Tìm kiếm sinh viên">
+          </div>
+          <select class="form-control" id="filterSVStatus" style="width:180px" aria-label="Lọc trạng thái">
+            <option value="">Tất cả trạng thái</option>
+            <option>Chờ duyệt</option>
+            <option>Tiếp nhận</option>
+            <option>Từ chối</option>
+          </select>
+          <select class="form-control" id="filterSVTopic" style="width:220px" aria-label="Lọc đề tài">
+            <option value="">Tất cả đề tài</option>
+            <option>Xây dựng hệ thống quản lý đơn hàng TMĐT</option>
+            <option>Phân tích dữ liệu hành vi khách hàng với ML</option>
+          </select>
+          <span class="table-count" id="svCount">—</span>
+        </div>
+
+        <div class="table-wrapper">
+          <table>
+            <thead>
+              <tr>
+                <th><input type="checkbox" id="checkAllSV" aria-label="Chọn tất cả"></th>
+                <th>Mã SV</th>
+                <th>Họ và tên</th>
+                <th>Lớp</th>
+                <th>Đề tài đăng ký</th>
+                <th>CV</th>
+                <th>Ngày nộp</th>
+                <th>Trạng thái</th>
+                <th style="text-align:center">Hành động</th>
+              </tr>
+            </thead>
+            <tbody id="svBody">
+              <tr><td colspan="9" class="table-empty">Đang tải...</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-top:14px;flex-wrap:wrap;gap:10px">
+          <div id="batchActions" class="hidden" style="display:flex;gap:8px">
+            <button class="btn btn-success btn-sm" onclick="batchAccept()" aria-label="Tiếp nhận đã chọn">✅ Tiếp nhận đã chọn</button>
+            <button class="btn btn-danger btn-sm" onclick="openModal('modalRejectBatch')" aria-label="Từ chối đã chọn">❌ Từ chối đã chọn</button>
+          </div>
+          <div class="pagination">
+            <button class="page-btn active">1</button>
+          </div>
+        </div>
+      </div>
+    </main>
+  </div>
+</div>
+
+<!-- Modal: Từ chối (đơn lẻ) -->
+<div class="modal-overlay" id="modalReject" role="dialog" aria-modal="true" aria-labelledby="rejectTitle">
+  <div class="modal">
+    <div class="modal-header">
+      <div class="modal-title" id="rejectTitle">Từ chối hồ sơ sinh viên</div>
+      <button class="modal-close" data-modal-close aria-label="Đóng">✕</button>
+    </div>
+    <div class="modal-body">
+      <p class="text-sm text-muted" style="margin-bottom:14px">Sinh viên sẽ nhận được thông báo về lý do từ chối. Vui lòng ghi rõ để hỗ trợ sinh viên cải thiện.</p>
+      <div class="form-group">
+        <label class="form-label" for="rejectReason">Lý do từ chối <span class="required">*</span></label>
+        <div style="position:relative">
+          <textarea id="rejectReason" class="form-control" rows="4" data-maxlength="500"
+            placeholder="VD: Hồ sơ chưa đáp ứng yêu cầu kỹ năng lập trình. Đề nghị sinh viên bổ sung kinh nghiệm về Java/Spring Boot trước khi ứng tuyển lại."
+            aria-label="Lý do từ chối"></textarea>
+          <div class="char-counter" style="margin-top:4px">0/500</div>
+        </div>
+        <span class="form-error hidden" id="rejectReasonErr">⚠ Vui lòng nhập lý do từ chối</span>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-outline" data-modal-close>Hủy</button>
+      <button class="btn btn-danger" id="btnConfirmReject">❌ Xác nhận từ chối</button>
+    </div>
+  </div>
+</div>
+
+<!-- Modal: Từ chối batch -->
+<div class="modal-overlay" id="modalRejectBatch" role="dialog" aria-modal="true">
+  <div class="modal">
+    <div class="modal-header">
+      <div class="modal-title">Từ chối nhiều hồ sơ</div>
+      <button class="modal-close" data-modal-close aria-label="Đóng">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="form-group">
+        <label class="form-label" for="rejectBatchReason">Lý do từ chối (áp dụng cho tất cả) <span class="required">*</span></label>
+        <div style="position:relative">
+          <textarea id="rejectBatchReason" class="form-control" rows="3" data-maxlength="500" placeholder="Nhập lý do..." aria-label="Lý do từ chối"></textarea>
+          <div class="char-counter" style="margin-top:4px">0/500</div>
+        </div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-outline" data-modal-close>Hủy</button>
+      <button class="btn btn-danger" onclick="batchReject()">❌ Xác nhận từ chối</button>
+    </div>
+  </div>
+</div>
+
+<script src="js/sidebar.js"></script>
+<script src="js/main.js"></script>
+<script>
+let allSVApps = [];
+let rejectTargetId = null;
+
+function renderSVApps(apps) {
+  document.getElementById('svCount').textContent = `${apps.length} hồ sơ`;
+  const tbody = document.getElementById('svBody');
+  if (!apps.length) {
+    tbody.innerHTML = `<tr><td colspan="9" class="table-empty"><div class="empty-icon">📭</div>Không có hồ sơ nào</td></tr>`;
+    return;
+  }
+  tbody.innerHTML = apps.map(s => `
+    <tr>
+      <td><input type="checkbox" class="sv-check" data-id="${s.id}" ${s.status !== 'Chờ duyệt' ? 'disabled' : ''} aria-label="Chọn ${s.name}"></td>
+      <td><code style="font-size:12px">${s.student_id}</code></td>
+      <td><strong>${s.name}</strong></td>
+      <td>${s.class}</td>
+      <td style="max-width:200px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap" title="${s.topic}">${s.topic}</td>
+      <td><a href="#" class="btn btn-ghost btn-sm" style="font-size:12px" onclick="showToast('Đang tải CV: ${s.cv}','success');return false" aria-label="Tải CV">📎 Tải CV</a></td>
+      <td>${formatDate(s.registered_at)}</td>
+      <td>${getStatusBadge(s.status)}</td>
+      <td style="text-align:center;white-space:nowrap">
+        ${s.status === 'Chờ duyệt' ? `
+          <button class="btn btn-success btn-sm" onclick="acceptApp(${s.id})" aria-label="Tiếp nhận">✅ Tiếp nhận</button>
+          <button class="btn btn-danger btn-sm" style="margin-left:4px" onclick="openRejectModal(${s.id})" aria-label="Từ chối">❌ Từ chối</button>` :
+          s.status === 'Tiếp nhận' ? '<span class="text-sm text-success">✅ Đã tiếp nhận</span>' :
+          '<span class="text-sm text-muted">❌ Đã từ chối</span>'
+        }
+      </td>
+    </tr>`).join('');
+
+  document.querySelectorAll('.sv-check').forEach(cb => cb.addEventListener('change', handleSVCheck));
+}
+
+function handleSVCheck() {
+  const checked = document.querySelectorAll('.sv-check:checked').length;
+  document.getElementById('batchActions').classList.toggle('hidden', !checked);
+  document.getElementById('batchActions').style.display = checked ? 'flex' : 'none';
+  const all = document.querySelectorAll('.sv-check:not([disabled])');
+  document.getElementById('checkAllSV').indeterminate = checked > 0 && checked < all.length;
+  document.getElementById('checkAllSV').checked = checked > 0 && checked === all.length;
+}
+
+function acceptApp(id) {
+  const app = allSVApps.find(s => s.id === id);
+  if (!app) return;
+  app.status = 'Tiếp nhận';
+  renderSVApps(filterSVApps());
+  updateStats();
+  showToast(`Đã tiếp nhận sinh viên ${app.name}`, 'success');
+}
+
+function openRejectModal(id) {
+  rejectTargetId = id;
+  document.getElementById('rejectReason').value = '';
+  openModal('modalReject');
+}
+
+function batchAccept() {
+  const ids = [...document.querySelectorAll('.sv-check:checked')].map(cb => parseInt(cb.dataset.id));
+  ids.forEach(id => { const app = allSVApps.find(s => s.id === id); if (app && app.status === 'Chờ duyệt') app.status = 'Tiếp nhận'; });
+  renderSVApps(filterSVApps()); updateStats(); showToast(`Đã tiếp nhận ${ids.length} sinh viên`, 'success');
+}
+
+function batchReject() {
+  const reason = document.getElementById('rejectBatchReason').value.trim();
+  if (!reason) { showToast('Vui lòng nhập lý do từ chối', 'warning'); return; }
+  const ids = [...document.querySelectorAll('.sv-check:checked')].map(cb => parseInt(cb.dataset.id));
+  ids.forEach(id => { const app = allSVApps.find(s => s.id === id); if (app && app.status === 'Chờ duyệt') app.status = 'Từ chối'; });
+  closeModal('modalRejectBatch'); renderSVApps(filterSVApps()); updateStats();
+  showToast(`Đã từ chối ${ids.length} hồ sơ`, 'error');
+}
+
+document.getElementById('btnConfirmReject').addEventListener('click', () => {
+  const reason = document.getElementById('rejectReason').value.trim();
+  if (!reason) { document.getElementById('rejectReason').classList.add('error'); document.getElementById('rejectReasonErr').classList.remove('hidden'); return; }
+  const app = allSVApps.find(s => s.id === rejectTargetId);
+  if (app) { app.status = 'Từ chối'; }
+  closeModal('modalReject'); renderSVApps(filterSVApps()); updateStats();
+  showToast(`Đã từ chối hồ sơ sinh viên ${app?.name || ''}`, 'error');
+});
+
+document.getElementById('checkAllSV').addEventListener('change', e => {
+  document.querySelectorAll('.sv-check:not([disabled])').forEach(cb => cb.checked = e.target.checked);
+  handleSVCheck();
+});
+
+function filterSVApps() {
+  const search = document.getElementById('searchSV').value.toLowerCase();
+  const status = document.getElementById('filterSVStatus').value;
+  const topic = document.getElementById('filterSVTopic').value;
+  return allSVApps.filter(s =>
+    (!search || s.name.toLowerCase().includes(search) || s.student_id.includes(search) || s.topic.toLowerCase().includes(search)) &&
+    (!status || s.status === status) &&
+    (!topic || s.topic.includes(topic.slice(0,20)))
+  );
+}
+
+function updateStats() {
+  document.getElementById('st-pending').textContent = allSVApps.filter(s => s.status === 'Chờ duyệt').length;
+  document.getElementById('st-accepted').textContent = allSVApps.filter(s => s.status === 'Tiếp nhận').length;
+  document.getElementById('st-rejected').textContent = allSVApps.filter(s => s.status === 'Từ chối').length;
+  document.getElementById('st-total').textContent = allSVApps.length;
+}
+
+function initPage(data) {
+  allSVApps = data.components.studentApplications.data;
+  updateStats(); renderSVApps(allSVApps);
+}
+
+['searchSV','filterSVStatus','filterSVTopic'].forEach(id => {
+  document.getElementById(id).addEventListener('input', () => renderSVApps(filterSVApps()));
+  document.getElementById(id).addEventListener('change', () => renderSVApps(filterSVApps()));
+});
+</script>
+</body>
+</html>

@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Chi tiết Hội đồng & Chấm điểm | Khoa CNTT</title>
+  <title>Chi tiết Hội đồng & Chấm điểm | Giảng viên | HTQT Đại học</title>
   <link rel="stylesheet" href="_styles.css">
   <style>
     .info-tbl{width:100%;border-collapse:collapse;font-size:13px;margin-bottom:4px}
@@ -67,43 +67,38 @@
   <nav class="sidebar">
     <div class="sb-logo">
       <div class="sb-logo-icon">🎓</div>
-      <div><div class="sb-logo-text">HTQT Đại học</div><div class="text-muted text-sm">Khoa CNTT</div></div>
+      <div><div class="sb-logo-text">HTQT Đại học</div><div class="text-muted text-sm">Giảng viên</div></div>
     </div>
     <div class="sb-user">
-      <div class="av">KC</div>
+      <div class="av">GV</div>
       <div>
-        <div style="font-size:13px;font-weight:600">TS. Trần Văn Bình</div>
-        <div style="font-size:11px;color:var(--text-3)">Giáo vụ Khoa</div>
+        <div style="font-size:13px;font-weight:600">TS. Nguyễn Minh Tuấn</div>
+        <div style="font-size:11px;color:var(--text-3)">Khoa CNTT</div>
       </div>
     </div>
     <ul class="sb-menu">
       <li><a href="#">🏠&nbsp; Trang chủ</a></li>
       <li>
-        <span class="mn-group">📅&nbsp; Quản lý đợt &nbsp;▾</span>
-        <ul class="sb-sub open">
-          <li><a href="#">Danh sách đợt</a></li>
-          <li><a href="MH-KCM-04_StudentEligibility.html">DS Xét điều kiện</a></li>
-        </ul>
-      </li>
-      <li>
         <span class="mn-group">📋&nbsp; Đề tài &nbsp;▾</span>
         <ul class="sb-sub open">
-          <li><a href="MH-KCM-06_StudentTopicApproval.html">DS nguyện vọng đề tài</a></li>
-          <li><a href="MH-KCM-03_TopicApproval.html">Xét duyệt đề tài</a></li>
-        </ul>
-      </li>
-      <li class="active">
-        <span class="mn-group">⚖️&nbsp; Hội đồng &nbsp;▾</span>
-        <ul class="sb-sub open">
-          <li><a href="MH-KCM-08_CouncilManagement.html">Quản lý hội đồng</a></li>
-          <li class="active"><a href="MH-KCM-09_CouncilStudentAssignment.html">Chi tiết &amp; Chấm điểm</a></li>
+          <li><a href="MH-GV-04_MyTopics.html">DS đề tài của tôi</a></li>
+          <li><a href="MH-GV-05_TopicWishes.html">DS nguyện vọng đề tài</a></li>
         </ul>
       </li>
       <li>
         <span class="mn-group">👨‍🏫&nbsp; Hướng dẫn &nbsp;▾</span>
         <ul class="sb-sub open">
-          <li><a href="MH-KCM-07_GraduationProjectManagement.html">Quản lý ĐATN &amp; KLTN</a></li>
           <li><a href="MH-GV-01_InternshipTracking.html">QL DS thực tập</a></li>
+          <li><a href="MH-GV-06_GraduationProjectManagement.html">Quản lý ĐATN &amp; KLTN</a></li>
+          <li><a href="#">Thạc sĩ</a></li>
+          <li><a href="#">Tiến sĩ</a></li>
+          <li><a href="MH-GV-02_ChangeRequestApproval.html">QL yêu cầu thay đổi</a></li>
+        </ul>
+      </li>
+      <li class="active">
+        <span class="mn-group">⚖️&nbsp; Hội đồng &nbsp;▾</span>
+        <ul class="sb-sub open">
+          <li class="active"><a href="MH-GV-07_MyCouncils.html">Hội đồng của tôi</a></li>
         </ul>
       </li>
     </ul>
@@ -115,7 +110,7 @@
       <span class="h-breadcrumb">⚖️ Hội đồng &gt; <strong>Chi tiết Hội đồng &amp; Chấm điểm</strong></span>
       <div class="h-right">
         <div class="bw"><button class="btn btn-link" style="font-size:18px">🔔</button><span class="bc">2</span></div>
-        <div class="av">KC</div>
+        <div class="av">GV</div>
       </div>
     </header>
 
@@ -171,100 +166,6 @@
         </table>
       </div>
 
-      <!-- Section A: Thông tin hội đồng (chế độ tạo mới) -->
-      <div class="card" style="margin-bottom:16px;display:none" id="section-a-create">
-        <div style="display:flex;align-items:center;justify-content:space-between">
-          <div class="section-hd" style="margin-top:0">Thông tin Hội đồng</div>
-          <div id="cr-hd-actions" style="margin-bottom:8px"></div>
-        </div>
-        <table class="info-tbl">
-          <tr>
-            <td class="itl">Mã hội đồng</td>
-            <td><input type="text" class="fc readonly" id="cr-code" disabled style="max-width:220px"></td>
-          </tr>
-          <tr>
-            <td class="itl">Tên hội đồng <span class="req">*</span></td>
-            <td><input type="text" class="fc" id="cr-name" placeholder="Ví dụ: Hội đồng chấm điểm TTTN HK2 2025-2026 (Nhóm CNPM)"></td>
-          </tr>
-          <tr>
-            <td class="itl">Đơn vị <span class="req">*</span></td>
-            <td>
-              <select class="fc" id="cr-donvi" style="max-width:320px">
-                <option value="">-- Chọn đơn vị --</option>
-                <option>Bộ môn Công nghệ phần mềm</option>
-                <option>Bộ môn Hệ thống thông tin</option>
-                <option>Bộ môn Khoa học máy tính</option>
-                <option>Văn phòng Khoa</option>
-              </select>
-            </td>
-          </tr>
-          <tr>
-            <td class="itl">Ngành / Lĩnh vực <span class="req">*</span></td>
-            <td>
-              <select class="fc" id="cr-nganh" style="max-width:320px">
-                <option value="">-- Chọn ngành/lĩnh vực --</option>
-                <option value="CNTT">Công nghệ thông tin</option>
-                <option value="KTPM">Kỹ thuật phần mềm</option>
-                <option value="HTTT">Hệ thống thông tin</option>
-                <option value="KHMT">Khoa học máy tính</option>
-                <option value="KHDL">Khoa học dữ liệu</option>
-              </select>
-            </td>
-          </tr>
-          <tr>
-            <td class="itl">Phân loại <span class="req">*</span></td>
-            <td>
-              <select class="fc" id="cr-type" style="max-width:320px">
-                <option value="">-- Chọn loại --</option>
-                <option value="danhgia">Hội đồng Đánh giá</option>
-                <option value="chamdiem">Hội đồng Chấm điểm</option>
-                <option value="phanbien">Hội đồng Phản biện</option>
-              </select>
-            </td>
-          </tr>
-          <tr>
-            <td class="itl">Học kỳ <span class="req">*</span></td>
-            <td>
-              <select class="fc" id="cr-dot" style="max-width:320px">
-                <option value="">-- Chọn đợt --</option>
-                <option>HK2 2025-2026</option>
-                <option>HK1 2025-2026</option>
-                <option>HK1 2024-2025</option>
-              </select>
-            </td>
-          </tr>
-          <tr>
-            <td class="itl">Hình thức họp <span class="req">*</span></td>
-            <td>
-              <select class="fc" id="cr-meetform" onchange="setMeetForm(this.value)" style="max-width:220px">
-                <option value="offline">🏛 Trực tiếp</option>
-                <option value="online">🖥 Trực tuyến</option>
-              </select>
-            </td>
-          </tr>
-          <tr>
-            <td class="itl">Ngày &amp; giờ họp <span class="req">*</span></td>
-            <td>
-              <div style="display:flex;gap:10px">
-                <input type="date" class="fc" id="cr-date" value="2026-06-28" style="max-width:180px">
-                <input type="time" class="fc" id="cr-time" value="08:00" style="max-width:140px">
-              </div>
-            </td>
-          </tr>
-          <tr>
-            <td class="itl" id="fi-room-label">Địa điểm <span class="req">*</span></td>
-            <td>
-              <input type="text" class="fc" id="cr-room" placeholder="Ví dụ: Phòng họp A1-101" style="max-width:420px">
-              <input type="text" class="fc" id="cr-link" placeholder="https://meet.google.com/..." style="max-width:420px;display:none">
-            </td>
-          </tr>
-          <tr>
-            <td class="itl">Ghi chú</td>
-            <td><textarea class="fc" id="cr-note" rows="2" placeholder="Ghi chú thêm (nếu có)..."></textarea></td>
-          </tr>
-        </table>
-      </div>
-
       <!-- Section B: Thành viên (chế độ xem) -->
       <div class="card" style="margin-bottom:16px" id="section-b-view">
         <div class="section-hd" style="margin-top:0">Danh sách Thành viên (<span id="mem-count">0</span> người)</div>
@@ -288,121 +189,9 @@
         </table>
       </div>
 
-      <!-- Section B: Thành viên (chế độ tạo mới) -->
-      <div class="card" style="margin-bottom:16px;display:none" id="section-b-create">
-        <div class="section-hd" style="margin-top:0">Danh sách thành viên</div>
-        <div class="tbl-wrap" style="margin-bottom:10px">
-          <table class="mem-tbl">
-            <thead>
-              <tr>
-                <th style="width:36px;text-align:center">STT</th>
-                <th style="width:110px">Vai trò</th>
-                <th>Họ và tên</th>
-                <th style="width:75px">Phân loại</th>
-                <th>Đơn vị / Liên hệ</th>
-                <th style="width:64px;text-align:center">Thao tác</th>
-              </tr>
-            </thead>
-            <tbody id="cr-mem-tbody">
-              <tr><td colspan="6" class="tbl-empty">Chưa có thành viên — nhấn "+ Thêm thành viên" bên dưới.</td></tr>
-            </tbody>
-          </table>
-        </div>
-
-        <button class="btn btn-default" id="btn-add-mem" onclick="showAddForm()">+ Thêm thành viên</button>
-
-        <div class="add-mem-panel" id="add-mem-panel" style="display:none">
-          <div style="font-size:13px;font-weight:600;margin-bottom:12px" id="add-mem-title">Thêm thành viên mới</div>
-          <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px">
-            <div class="fi" style="margin:0">
-              <label style="font-size:12px">Phân loại <span class="req">*</span></label>
-              <select class="fc" id="am-type" onchange="onGvTypeChange()">
-                <option value="">-- Chọn phân loại --</option>
-                <option value="noi">Trong trường</option>
-                <option value="ngoai">Ngoài trường</option>
-              </select>
-            </div>
-            <div class="fi" style="margin:0">
-              <label style="font-size:12px">Vai trò <span class="req">*</span></label>
-              <select class="fc" id="am-role"></select>
-            </div>
-          </div>
-
-          <div id="am-noi-fields" style="display:none">
-            <div class="fi" style="margin:0">
-              <label style="font-size:12px">Chọn giảng viên <span class="req">*</span></label>
-              <select class="fc" id="am-gv-select">
-                <option value="">-- Chọn GV --</option>
-                <option>PGS.TS. Lê Văn Minh — Khoa CNTT</option>
-                <option>TS. Nguyễn Minh Tuấn — Khoa CNTT</option>
-                <option>ThS. Nguyễn Thu Hoa — Khoa CNTT</option>
-                <option>TS. Trần Văn Bình — Khoa CNTT</option>
-                <option>TS. Phạm Thu Hà — Khoa CNTT</option>
-                <option>ThS. Lê Thị Hoa — Khoa CNTT</option>
-                <option>TS. Phạm Quốc Hùng — Khoa CNTT</option>
-                <option>TS. Lê Đức Thọ — Khoa CNTT</option>
-              </select>
-            </div>
-          </div>
-
-          <div id="am-ngoai-fields" style="display:none">
-            <div style="display:grid;grid-template-columns:2fr 1fr 1fr;gap:12px;margin-bottom:10px">
-              <div class="fi" style="margin:0">
-                <label style="font-size:12px">Họ và tên <span class="req">*</span></label>
-                <input type="text" class="fc" id="am-ext-name" placeholder="Nguyễn Văn A">
-              </div>
-              <div class="fi" style="margin:0">
-                <label style="font-size:12px">Học hàm</label>
-                <select class="fc" id="am-ext-hocham">
-                  <option value="">-- Không --</option>
-                  <option value="GS.">Giáo sư (GS)</option>
-                  <option value="PGS.">Phó Giáo sư (PGS)</option>
-                </select>
-              </div>
-              <div class="fi" style="margin:0">
-                <label style="font-size:12px">Học vị <span class="req">*</span></label>
-                <select class="fc" id="am-ext-hocvi">
-                  <option value="">-- Chọn --</option>
-                  <option value="TS.">Tiến sĩ (TS)</option>
-                  <option value="ThS.">Thạc sĩ (ThS)</option>
-                  <option value="NCS.">Nghiên cứu sinh (NCS)</option>
-                  <option value="CN/KS.">Cử nhân / Kỹ sư</option>
-                  <option value="Chuyên gia">Chuyên gia</option>
-                </select>
-              </div>
-            </div>
-            <div class="fi" style="margin:0 0 10px">
-              <label style="font-size:12px">Đơn vị công tác <span class="req">*</span></label>
-              <input type="text" class="fc" id="am-ext-unit" placeholder="Ví dụ: Trường ĐH Bách Khoa TP.HCM">
-            </div>
-            <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
-              <div class="fi" style="margin:0">
-                <label style="font-size:12px">Email <span class="req">*</span></label>
-                <input type="email" class="fc" id="am-ext-email" placeholder="gv@truong.edu.vn">
-              </div>
-              <div class="fi" style="margin:0">
-                <label style="font-size:12px">Số điện thoại</label>
-                <input type="tel" class="fc" id="am-ext-phone" placeholder="0901234567">
-              </div>
-            </div>
-          </div>
-
-          <div style="display:flex;gap:8px;margin-top:14px;justify-content:flex-end">
-            <button class="btn btn-default btn-sm" onclick="hideAddForm()">Hủy</button>
-            <button class="btn btn-primary btn-sm" id="am-save-btn" onclick="confirmAddMember()">Thêm vào danh sách</button>
-          </div>
-        </div>
-
-      </div>
-
-      <!-- Persona switcher -->
+      <!-- Persona lock: luôn hiển thị vai trò của GV đang đăng nhập, không cho đổi -->
       <div class="persona-bar" id="persona-bar-wrap">
-        <span id="persona-select-wrap" style="display:contents">
-          <label>🎭 Xem &amp; chấm điểm với vai trò:</label>
-          <select class="fc" style="width:300px" id="persona-select" onchange="selectPersona(this.value)"></select>
-          <span style="font-size:12px;color:var(--text-3)">— mô phỏng đăng nhập của từng thành viên hội đồng để nhập điểm độc lập</span>
-        </span>
-        <span id="persona-lock-label" style="display:none;font-size:13px"></span>
+        <span id="persona-lock-label" style="font-size:13px"></span>
       </div>
 
       <!-- Section C: SV & chấm điểm -->
@@ -698,32 +487,6 @@
 </div>
 
 <!-- ════════════════════════════════════════
-     MODAL: HỦY HỘI ĐỒNG
-════════════════════════════════════════ -->
-<div class="overlay hidden" id="modal-cancel">
-  <div class="modal-box w480">
-    <div class="modal-hd">
-      <span class="modal-title">Hủy Hội đồng</span>
-      <button class="modal-close" data-close="modal-cancel">✕</button>
-    </div>
-    <div class="modal-bd">
-      <div class="fi" id="fi-cc-reason">
-        <label>Lý do hủy <span class="req">*</span></label>
-        <textarea class="fc" id="cc-reason" rows="4"
-          placeholder="Ví dụ: Đợt thực tập bị hủy, thay đổi kế hoạch họp..."></textarea>
-        <div class="f-hint"><span id="cc-cnt">0</span> / 500 ký tự</div>
-        <div class="fe">Vui lòng nhập lý do hủy.</div>
-      </div>
-    </div>
-    <div class="modal-ft">
-      <button class="btn btn-default" data-close="modal-cancel">Đóng</button>
-      <button class="btn btn-danger" onclick="submitCancelCouncil()">Xác nhận</button>
-    </div>
-  </div>
-</div>
-
-
-<!-- ════════════════════════════════════════
      MODAL: BÁO CÁO CUỐI KỲ
 ════════════════════════════════════════ -->
 <div class="overlay hidden" id="modal-baocao">
@@ -939,25 +702,34 @@ const COUNCILS = [
       { maSV:'B22DCCN151', tenSV:'Trịnh Văn Hiếu', svEmail:'b22dccn151@student.edu.vn', lop:'INT3110_2', ctdt:'HTTT', loaiHinh:'KLTN', maDeTai:'DT-2026-015', tenDeTai:'Ứng dụng blockchain trong quản lý chuỗi cung ứng', linhVuc:'CNPM', maxSv:1, tomTat:'Nghiên cứu ứng dụng công nghệ blockchain để minh bạch hóa chuỗi cung ứng hàng hóa.', yeuCau:'Có kiến thức về blockchain và lập trình smart contract.', sanPham:'Ứng dụng demo blockchain và báo cáo nghiên cứu.', congNghe:'Solidity, Ethereum, Node.js', gvhd:'ThS. Nguyễn Thu Hoa', baoCao:'BC_KLTN_B22DCCN151.pdf', baoCaoMeta:{ nopLuc:'19/06/2026 16:30', nopStatus:'dunghan', sourceUrl:'github.com/trinhvanhieu/supply-chain-blockchain' }, scores:{ 'TS. Nguyễn Minh Tuấn':{score:7.5, comment:'Cần bổ sung thêm thử nghiệm thực tế.'} },
         diemThanhPhan:[{ten:'Quá trình nghiên cứu', trongSo:20, diem:7.8}, {ten:'Báo cáo khóa luận', trongSo:30, diem:7.5}, {ten:'Điểm hội đồng', trongSo:50, type:'hoidong'}], conclusion:'dat' }
     ]
+  },
+  {
+    id:10, code:'HD-2026-018', name:'Hội đồng đánh giá kết quả TTTN HK2 2025-2026 (Nhóm CNPM 4)',
+    donvi:'Bộ môn Công nghệ phần mềm', nganh:'Kỹ thuật phần mềm', type:'danhgia', dot:'HK2 2025-2026',
+    meetForm:'offline', date:'01/07/2026', time:'08:00', room:'Phòng họp A1-107', link:'', status:'approved',
+    qdNum:'330/QĐ-CNTT', qdDate:'22/06/2026', qdSignedBy:'Nguyễn Thị Lan — Trưởng phòng Đào tạo', qdFile:'',
+    createdBy:'TS. Trần Văn Bình', createdAt:'21/06/2026', note:'',
+    members:[
+      { role:'ct', name:'TS. Nguyễn Minh Tuấn',  gvType:'noi', unit:'Khoa CNTT', email:'nguyenminhtuan@khoacntt.edu.vn' },
+      { role:'tk', name:'ThS. Lê Thị Hoa',         gvType:'noi', unit:'Khoa CNTT', email:'lethihoa@khoacntt.edu.vn' },
+      { role:'uv', name:'TS. Phạm Thu Hà',         gvType:'noi', unit:'Khoa CNTT', email:'phamthuha@khoacntt.edu.vn' },
+      { role:'pb', name:'TS. Phạm Quốc Hùng',      gvType:'noi', unit:'Khoa CNTT', email:'phamquochung@khoacntt.edu.vn' }
+    ],
+    students:[
+      { maSV:'B22DCCN160', tenSV:'Ngô Thị Bích Ngọc', svEmail:'b22dccn160@student.edu.vn', lop:'INT3110_1', ctdt:'KTPM', loaiHinh:'TTTN', maDeTai:'DT-2026-016', tenDeTai:'Ứng dụng học trực tuyến tương tác', linhVuc:'CNPM', maxSv:1, tomTat:'Xây dựng nền tảng học trực tuyến có tính năng tương tác thời gian thực giữa giảng viên và sinh viên.', yeuCau:'Có kiến thức về lập trình web và WebSocket.', sanPham:'Ứng dụng web học trực tuyến và tài liệu triển khai.', congNghe:'Node.js, Socket.io, ReactJS', gvhd:'TS. Nguyễn Minh Tuấn', baoCao:'BC_TTTN_B22DCCN160.pdf', baoCaoMeta:{ nopLuc:'20/06/2026 09:00', nopStatus:'dunghan', sourceUrl:'github.com/ngothibichngoc/interactive-elearning' }, scores:{},
+        diemThanhPhan:[{ten:'Chuyên cần', trongSo:10, diem:8.5}, {ten:'Báo cáo giữa kỳ', trongSo:30, diem:8.2}, {ten:'Điểm hội đồng', trongSo:60, type:'hoidong'}] },
+      { maSV:'B22DCCN161', tenSV:'Phan Văn Đức', svEmail:'b22dccn161@student.edu.vn', lop:'INT3110_2', ctdt:'KTPM', loaiHinh:'TTTN', maDeTai:'DT-2026-017', tenDeTai:'Hệ thống quản lý bãi đỗ xe thông minh', linhVuc:'CNPM', maxSv:1, tomTat:'Xây dựng hệ thống quản lý bãi đỗ xe tự động nhận diện biển số và tính phí.', yeuCau:'Có kiến thức về xử lý ảnh và lập trình nhúng.', sanPham:'Hệ thống demo quản lý bãi đỗ xe và báo cáo triển khai.', congNghe:'Python, OpenCV, Raspberry Pi', gvhd:'TS. Phạm Thu Hà', baoCao:'BC_TTTN_B22DCCN161.pdf', baoCaoMeta:{ nopLuc:'20/06/2026 14:20', nopStatus:'dunghan', sourceUrl:'github.com/phanvanduc/smart-parking-system' }, scores:{},
+        diemThanhPhan:[{ten:'Chuyên cần', trongSo:10, diem:8.0}, {ten:'Báo cáo giữa kỳ', trongSo:30, diem:7.6}, {ten:'Điểm hội đồng', trongSo:60, type:'hoidong'}] }
+    ]
   }
 ];
 
 /* ── State ────────────────────────────────────────────────── */
+const CURRENT_GV_NAME = 'TS. Nguyễn Minh Tuấn';
 let currentCouncilId = COUNCILS[0].id;
-let currentPersona   = '';
-/* GV_LOCK: khi truy cập từ màn "Hội đồng của tôi" (?gv=Tên GV), khóa cứng persona
-   theo đúng GV đăng nhập, ẩn dropdown mô phỏng và toàn bộ thao tác quản lý hội đồng */
-const GV_LOCK = new URLSearchParams(window.location.search).get('gv') || '';
+let currentPersona   = CURRENT_GV_NAME;
 let scoringSvId       = null;
-let isCreateMode      = false;
-let editingCouncilCode = null;
-let createMembers     = [];
 const TODAY  = new Date(2026, 5, 20); // 20/06/2026 — neo thời gian demo
-let SEQ = 14; // số thứ tự tiếp theo cho mã hội đồng mới
-function parseDMY(s){ const [d,m,y] = s.split('/').map(Number); return new Date(y, m-1, d); }
-function isUrl(s){ return /^https?:\/\/.+/i.test(s.trim()); }
-function isEmail(s){ return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(s.trim()); }
-function isVNPhone(s){ return s === '' || /^0\d{9}$/.test(s.trim()); }
 function setErr(id, on){ document.getElementById(id).classList.toggle('err', on); }
 
 /* Lưu lại thay đổi của hội đồng hiện tại vào localStorage (không có backend dùng chung giữa các trang) */
@@ -969,50 +741,15 @@ function persistCouncilChange(c) {
   localStorage.setItem('newCouncils', JSON.stringify(stored));
 }
 
-/* Nút hiển thị ở đầu card khi truy cập từ màn "Hội đồng của tôi" của GV (?gv=...) —
-   chỉ cho phép Đánh dấu hoàn thành, và chỉ nếu GV đó là Chủ tịch/Thư ký */
+/* Nút đầu card — Xuất (luôn được) và Đánh dấu hoàn thành (chỉ Chủ tịch/Thư ký) */
 function gvHeaderActionButtonsHtml(c) {
-  const m = c.members.find(x => x.name === GV_LOCK);
+  const m = c.members.find(x => x.name === CURRENT_GV_NAME);
   const isChair = !!m && (m.role === 'ct' || m.role === 'tk');
   const canComplete = isChair && c.status === 'approved';
   const dis = ok => ok ? '' : 'disabled';
-  return `<button class="btn btn-primary btn-sm" ${dis(canComplete)} onclick="openCompleteModal()" title="${isChair ? '' : 'Chỉ Chủ tịch/Thư ký được đánh dấu hoàn thành'}">Đánh dấu hoàn thành</button>`;
+  return `<button class="btn btn-default btn-sm" onclick="exportCouncilDetail()">📥 Xuất</button>
+    <button class="btn btn-primary btn-sm" ${dis(canComplete)} onclick="openCompleteModal()" title="${isChair ? '' : 'Chỉ Chủ tịch/Thư ký được đánh dấu hoàn thành'}">Đánh dấu hoàn thành</button>`;
 }
-
-/* Nút Sửa / Đánh dấu hoàn thành — hiển thị ở đầu card */
-function headerActionButtonsHtml(c, includeEdit) {
-  const canEdit     = c.status === 'draft' || c.status === 'rejected';
-  const canComplete = c.status === 'approved';
-  const dis = ok => ok ? '' : 'disabled';
-
-  let html = `<button class="btn btn-default btn-sm" onclick="exportCouncilDetail()">📥 Xuất</button>
-    <button class="btn btn-primary btn-sm" ${dis(canComplete)} onclick="openCompleteModal()">Đánh dấu hoàn thành</button>`;
-  if (includeEdit && canEdit) {
-    html += `<button class="btn btn-primary btn-sm" onclick="window.location.href='MH-KCM-09_CouncilStudentAssignment.html?mode=edit&code=${encodeURIComponent(c.code)}'">${c.status === 'rejected' ? 'Cập nhật & gửi lại' : 'Cập nhật'}</button>`;
-  }
-  return html;
-}
-
-/* Nút Xóa / Thu hồi / Hủy hội đồng — hiển thị ở chân trang */
-function councilActionButtonsHtml(c) {
-  const canDelete   = c.status === 'draft';
-  const canWithdraw = c.status === 'pending';
-  const canCancel   = c.status === 'approved';
-  const dis = ok => ok ? '' : 'disabled';
-
-  return `
-    <button class="btn btn-default btn-sm" ${dis(canDelete)} onclick="confirmDeleteCouncil()">Xóa</button>
-    <button class="btn btn-default btn-sm" ${dis(canWithdraw)} onclick="confirmWithdrawCouncil()">Thu hồi</button>
-    <button class="btn btn-danger btn-sm" ${dis(canCancel)} onclick="openCancelModal()">Hủy hội đồng</button>`;
-}
-
-/* Bộ nút Lưu nháp / Gửi yêu cầu — hiển thị ở chân trang, dùng ở chế độ tạo mới và sửa */
-function saveCouncilButtonsHtml() {
-  return `
-    <button class="btn btn-default btn-sm" onclick="submitCreateCouncil('draft')">Lưu nháp</button>
-    <button class="btn btn-primary btn-sm" onclick="submitCreateCouncil('submit')">Gửi yêu cầu thành lập</button>`;
-}
-const closeButtonHtml = `<button class="btn btn-default btn-sm" onclick="cancelCreateCouncil()">Đóng</button>`;
 
 /* ── Helpers ──────────────────────────────────────────────── */
 function council() { return COUNCILS.find(c => c.id === currentCouncilId); }
@@ -1043,21 +780,17 @@ function gvhdFinalScore(sv) {
 function canSeeScoreOf(names, c) {
   return canViewAllScores(c) || names.includes(currentPersona);
 }
-/* Chỉ hội đồng "Đã duyệt" mới được chấm; "Hoàn thành" chỉ xem lại điểm, không sửa được. Thư ký chỉ ghi biên bản, không chấm điểm.
-   Nếu truy cập qua GV_LOCK mà GV đó không phải thành viên hội đồng, không có quyền chấm. */
+/* Chỉ hội đồng "Đã duyệt" mới được chấm; "Hoàn thành" chỉ xem lại điểm, không sửa được.
+   Thư ký chỉ ghi biên bản, không chấm điểm. Nếu GV không phải thành viên hội đồng này, không có quyền chấm. */
 function canScoreNow(c) {
-  if (c.status !== 'approved' || !currentPersona) return false;
+  if (c.status !== 'approved') return false;
   const m = c.members.find(x => x.name === currentPersona);
-  if (GV_LOCK) return !!m && m.role !== 'tk';
-  return !m || m.role !== 'tk';
+  return !!m && m.role !== 'tk';
 }
-/* Bỏ phiếu kín: không persona (xem ở vai trò Đào tạo/Admin) hoặc persona là Chủ tịch/Thư ký mới xem được điểm của tất cả thành viên.
-   Nếu truy cập qua GV_LOCK mà GV đó không phải thành viên hội đồng, chỉ xem được điểm của mình (không ai vì tên không khớp). */
+/* Bỏ phiếu kín: chỉ Chủ tịch/Thư ký xem được điểm của tất cả thành viên, còn lại chỉ xem điểm của chính mình */
 function canViewAllScores(c) {
-  if (!currentPersona) return true;
   const m = c.members.find(x => x.name === currentPersona);
-  if (GV_LOCK) return !!m && (m.role === 'ct' || m.role === 'tk');
-  return !m || m.role === 'ct' || m.role === 'tk';
+  return !!m && (m.role === 'ct' || m.role === 'tk');
 }
 
 /* ── Gửi email thành viên ─────────────────────────────────── */
@@ -1126,32 +859,11 @@ function confirmSendEmail() {
 
 /* ── Persona picker ───────────────────────────────────────── */
 function initPersonaSelect(c) {
-  const all = c.members;
-
-  if (GV_LOCK) {
-    currentPersona = GV_LOCK;
-    const m = all.find(x => x.name === GV_LOCK);
-    document.getElementById('persona-select-wrap').style.display = 'none';
-    document.getElementById('persona-lock-label').style.display = '';
-    document.getElementById('persona-lock-label').innerHTML = m
-      ? `Bạn đang xem với vai trò: <span class="role-tag ${ROLE_CLS[m.role]}">${ROLE_LABEL[m.role]}</span> — <strong>${m.name}</strong>`
-      : `<span style="color:var(--danger)">Bạn không phải là thành viên của hội đồng này.</span>`;
-    return;
-  }
-
-  const sel = document.getElementById('persona-select');
-  if (!all.length) {
-    sel.innerHTML = '<option value="">-- Hội đồng chưa có thành viên --</option>';
-    currentPersona = '';
-    return;
-  }
-  sel.innerHTML = all.map(m => `<option value="${m.name}">${ROLE_LABEL[m.role]} — ${m.name}</option>`).join('');
-  if (!all.some(m => m.name === currentPersona)) currentPersona = all[0].name;
-  sel.value = currentPersona;
-}
-function selectPersona(name) {
-  currentPersona = name;
-  renderStudents();
+  currentPersona = CURRENT_GV_NAME;
+  const m = c.members.find(x => x.name === CURRENT_GV_NAME);
+  document.getElementById('persona-lock-label').innerHTML = m
+    ? `🎭 Bạn đang xem với vai trò: <span class="role-tag ${ROLE_CLS[m.role]}">${ROLE_LABEL[m.role]}</span> — <strong>${m.name}</strong>`
+    : `<span style="color:var(--danger)">Bạn không phải là thành viên của hội đồng này.</span>`;
 }
 
 /* ── Render: council info + members ──────────────────────── */
@@ -1180,13 +892,8 @@ function renderCouncilInfo(c) {
     ? `<a href="#" onclick="return false">📄 ${c.bienBanFile} — Tải xuống</a>`
     : '<span style="color:var(--text-3)">—</span>';
 
-  if (GV_LOCK) {
-    document.getElementById('hd-actions').innerHTML = gvHeaderActionButtonsHtml(c);
-    document.getElementById('footer-actions').innerHTML = `<button class="btn btn-default btn-sm" onclick="window.location.href='MH-GV-07_MyCouncils.html'">Quay lại</button>`;
-  } else {
-    document.getElementById('hd-actions').innerHTML = headerActionButtonsHtml(c, true);
-    document.getElementById('footer-actions').innerHTML = closeButtonHtml + councilActionButtonsHtml(c);
-  }
+  document.getElementById('hd-actions').innerHTML = gvHeaderActionButtonsHtml(c);
+  document.getElementById('footer-actions').innerHTML = `<button class="btn btn-default btn-sm" onclick="window.location.href='MH-GV-07_MyCouncils.html'">Đóng</button>`;
   document.getElementById('footer-actions-wrap').style.display = 'flex';
 
   document.getElementById('mem-bienban-note').innerHTML = '';
@@ -1682,49 +1389,6 @@ function submitComplete() {
   showToast('🏁 Đã đánh dấu hội đồng hoàn thành.', 'ok');
 }
 
-/* ── Xóa / Thu hồi / Hủy hội đồng (từ Section A) ──────────── */
-function confirmDeleteCouncil() {
-  const c = council();
-  showConfirm(`Xóa hội đồng nháp "${c.name}"?`, () => {
-    const stored = JSON.parse(localStorage.getItem('newCouncils') || '[]');
-    localStorage.setItem('newCouncils', JSON.stringify(stored.filter(x => x.code !== c.code)));
-    localStorage.setItem('deletedCouncils', JSON.stringify([...JSON.parse(localStorage.getItem('deletedCouncils') || '[]'), c.code]));
-    showToast('🗑 Đã xóa hội đồng nháp.', 'ok');
-    window.location.href = 'MH-KCM-08_CouncilManagement.html';
-  }, 'Xóa', 'btn-danger');
-}
-
-function confirmWithdrawCouncil() {
-  const c = council();
-  showConfirm(`Thu hồi yêu cầu thành lập "${c.name}" về Nháp để chỉnh sửa?`, () => {
-    c.status = 'draft';
-    persistCouncilChange(c);
-    renderAll();
-    showToast('↩ Đã thu hồi yêu cầu, hội đồng chuyển về Nháp.', 'ok');
-  }, 'Thu hồi', 'btn-primary');
-}
-
-function openCancelModal() {
-  document.getElementById('cc-reason').value = '';
-  document.getElementById('cc-cnt').textContent = '0';
-  setErr('fi-cc-reason', false);
-  openModal('modal-cancel');
-}
-function submitCancelCouncil() {
-  const reason = document.getElementById('cc-reason').value.trim();
-  if (!reason) { setErr('fi-cc-reason', true); return; }
-  setErr('fi-cc-reason', false);
-  const c = council();
-  c.status = 'cancelled';
-  c.cancelReason = reason;
-  c.cancelledAt  = '20/06/2026';
-  c.cancelledBy  = 'TS. Trần Văn Bình';
-  persistCouncilChange(c);
-  closeModal('modal-cancel');
-  renderAll();
-  showToast('❌ Đã hủy hội đồng.', 'warn');
-}
-
 /* ── Xuất danh sách sinh viên & điểm ─────────────────────── */
 function exportStudentList() {
   const c = council();
@@ -1855,17 +1519,6 @@ function renderAll() {
   renderStudents();
 }
 
-/* ── Tạo hội đồng mới ─────────────────────────────────────── */
-function setMeetForm(form) {
-  document.getElementById('cr-meetform').value = form;
-  document.getElementById('cr-room').style.display = form === 'offline' ? '' : 'none';
-  document.getElementById('cr-link').style.display = form === 'online'  ? '' : 'none';
-  document.getElementById('fi-room-label').innerHTML = form === 'offline'
-    ? 'Địa điểm <span class="req">*</span>'
-    : 'Link họp trực tuyến <span class="req">*</span>';
-}
-function getMeetForm() { return document.getElementById('cr-meetform').value; }
-
 function mergeNewCouncilsFromStorage() {
   let stored = [];
   let deleted = [];
@@ -1889,334 +1542,22 @@ function mergeNewCouncilsFromStorage() {
   });
 }
 
-function showCreateFormSections(titleHtml) {
-  document.getElementById('section-a-view').style.display = 'none';
-  document.getElementById('section-b-view').style.display = 'none';
-  document.getElementById('persona-bar-wrap').style.display = 'none';
-  document.getElementById('section-c-wrap').style.display = 'none';
-  document.getElementById('section-a-create').style.display = '';
-  document.getElementById('section-b-create').style.display = '';
-  document.getElementById('gate-note-wrap').innerHTML = '';
-  document.querySelector('.h-breadcrumb').innerHTML = titleHtml;
-
-  document.getElementById('footer-actions').innerHTML = closeButtonHtml + saveCouncilButtonsHtml();
-  document.getElementById('footer-actions-wrap').style.display = 'flex';
-}
-
-function enterCreateMode() {
-  isCreateMode = true;
-  editingCouncilCode = null;
-  createMembers = [];
-
-  showCreateFormSections('⚖️ Hội đồng &gt; <strong>Tạo Hội đồng mới</strong>');
-
-  document.getElementById('cr-code').value = `HD-2026-${String(SEQ).padStart(3,'0')}`;
-  document.getElementById('cr-name').value  = '';
-  document.getElementById('cr-donvi').value = '';
-  document.getElementById('cr-nganh').value = '';
-  document.getElementById('cr-type').value  = '';
-  document.getElementById('cr-dot').value   = '';
-  document.getElementById('cr-date').value  = '2026-06-28';
-  document.getElementById('cr-time').value  = '08:00';
-  document.getElementById('cr-room').value  = '';
-  document.getElementById('cr-link').value  = '';
-  document.getElementById('cr-note').value  = '';
-  setMeetForm('offline');
-  hideAddForm();
-  renderCreateMembers();
-}
-
-function enterEditMode(code) {
-  const c = COUNCILS.find(x => x.code === code);
-  if (!c) {
-    showToast(`Không tìm thấy hội đồng "${code}" để sửa.`, 'err');
-    enterCreateMode();
-    return;
-  }
-
-  isCreateMode = true;
-  editingCouncilCode = code;
-  createMembers = c.members.map(m => ({...m}));
-
-  showCreateFormSections(`⚖️ Hội đồng &gt; <strong>${c.status === 'rejected' ? 'Sửa & Gửi lại yêu cầu' : 'Sửa Hội đồng (Nháp)'}</strong>`);
-  document.getElementById('cr-hd-actions').innerHTML = headerActionButtonsHtml(c, false);
-  document.getElementById('footer-actions').innerHTML = closeButtonHtml + councilActionButtonsHtml(c) + saveCouncilButtonsHtml();
-
-  document.getElementById('cr-code').value  = c.code;
-  document.getElementById('cr-name').value  = c.name;
-  document.getElementById('cr-donvi').value = c.donvi;
-  document.getElementById('cr-nganh').value = c.nganh || '';
-  document.getElementById('cr-type').value  = c.type;
-  document.getElementById('cr-dot').value   = c.dot;
-  document.getElementById('cr-date').value  = c.date.split('/').reverse().join('-');
-  document.getElementById('cr-time').value  = c.time;
-  document.getElementById('cr-room').value  = c.room || '';
-  document.getElementById('cr-link').value  = c.link || '';
-  document.getElementById('cr-note').value  = c.note || '';
-  setMeetForm(c.meetForm);
-  hideAddForm();
-  renderCreateMembers();
-
-  if (c.status === 'rejected') {
-    showToast(`Lý do KCM cần điều chỉnh: ${c.rejectReason || '—'}`, 'warn');
-  }
-}
-
-function cancelCreateCouncil() {
-  window.location.href = 'MH-KCM-08_CouncilManagement.html';
-}
-
-/* ── Member form (chế độ tạo mới) ─────────────────────────── */
-let editingMemberIdx = null;
-
-function showAddForm() {
-  editingMemberIdx = null;
-  document.getElementById('add-mem-title').textContent = 'Thêm thành viên mới';
-  document.getElementById('am-save-btn').textContent    = 'Thêm vào danh sách';
-  document.getElementById('add-mem-panel').style.display = '';
-  document.getElementById('btn-add-mem').style.display   = 'none';
-  document.getElementById('am-type').value  = '';
-
-  const taken = createMembers.map(m => m.role);
-  const roleSel = document.getElementById('am-role');
-  roleSel.innerHTML = '<option value="">-- Chọn vai trò --</option>' +
-    Object.keys(ROLE_LABEL).filter(r => !((r === 'ct' || r === 'tk') && taken.includes(r)))
-      .map(r => `<option value="${r}">${ROLE_LABEL[r]}</option>`).join('');
-
-  document.getElementById('am-noi-fields').style.display   = 'none';
-  document.getElementById('am-ngoai-fields').style.display = 'none';
-  document.getElementById('am-gv-select').value = '';
-  ['am-ext-name','am-ext-unit','am-ext-email','am-ext-phone'].forEach(id => document.getElementById(id).value = '');
-  document.getElementById('am-ext-hocham').value = '';
-  document.getElementById('am-ext-hocvi').value  = '';
-}
-
-function editMember(idx) {
-  const m = createMembers[idx];
-  editingMemberIdx = idx;
-  document.getElementById('add-mem-title').textContent = 'Sửa thông tin thành viên';
-  document.getElementById('am-save-btn').textContent    = 'Lưu thay đổi';
-  document.getElementById('add-mem-panel').style.display = '';
-  document.getElementById('btn-add-mem').style.display   = 'none';
-  document.getElementById('am-type').value = m.gvType;
-  onGvTypeChange();
-
-  const taken = createMembers.filter((x, i) => i !== idx).map(x => x.role);
-  const roleSel = document.getElementById('am-role');
-  roleSel.innerHTML = '<option value="">-- Chọn vai trò --</option>' +
-    Object.keys(ROLE_LABEL).filter(r => !((r === 'ct' || r === 'tk') && taken.includes(r)))
-      .map(r => `<option value="${r}">${ROLE_LABEL[r]}</option>`).join('');
-  roleSel.value = m.role;
-
-  if (m.gvType === 'noi') {
-    document.getElementById('am-gv-select').value = `${m.name} — ${m.unit}`;
-  } else {
-    const HOCHAM_LIST = ['PGS.', 'GS.'];
-    const HOCVI_LIST  = ['TS.', 'ThS.', 'NCS.', 'CN/KS.'];
-    let hocham = '', hocvi = '', rest = m.name;
-    if (rest.startsWith('Chuyên gia ')) {
-      hocvi = 'Chuyên gia';
-      rest  = rest.slice('Chuyên gia '.length);
-    } else {
-      for (const h of HOCHAM_LIST) {
-        if (rest.startsWith(h)) { hocham = h; rest = rest.slice(h.length); break; }
-      }
-      for (const v of HOCVI_LIST) {
-        if (rest.startsWith(v)) { hocvi = v; rest = rest.slice(v.length).trim(); break; }
-      }
-    }
-    document.getElementById('am-ext-hocham').value = hocham;
-    document.getElementById('am-ext-hocvi').value  = hocvi;
-    document.getElementById('am-ext-name').value   = rest;
-    document.getElementById('am-ext-unit').value  = m.unit  || '';
-    document.getElementById('am-ext-email').value = m.email || '';
-    document.getElementById('am-ext-phone').value = m.phone || '';
-  }
-}
-
-function hideAddForm() {
-  editingMemberIdx = null;
-  document.getElementById('add-mem-panel').style.display = 'none';
-  document.getElementById('btn-add-mem').style.display   = '';
-}
-
-function onGvTypeChange() {
-  const val = document.getElementById('am-type').value;
-  document.getElementById('am-noi-fields').style.display   = val === 'noi'   ? '' : 'none';
-  document.getElementById('am-ngoai-fields').style.display = val === 'ngoai' ? '' : 'none';
-}
-
-function confirmAddMember() {
-  const gvType = document.getElementById('am-type').value;
-  const role   = document.getElementById('am-role').value;
-  if (!gvType || !role) { showToast('Vui lòng chọn phân loại và vai trò.', 'err'); return; }
-  if ((role === 'ct' || role === 'tk') &&
-      createMembers.some((m, i) => m.role === role && i !== editingMemberIdx)) {
-    showToast(`Hội đồng chỉ được có 1 ${ROLE_LABEL[role]}.`, 'err'); return;
-  }
-
-  let name = '', unit = '', email = '', phone = '';
-  if (gvType === 'noi') {
-    const sel = document.getElementById('am-gv-select').value;
-    if (!sel) { showToast('Vui lòng chọn giảng viên.', 'err'); return; }
-    const parts = sel.split(' — ');
-    name = parts[0]; unit = parts[1] || 'Khoa CNTT';
-  } else {
-    const hocham = document.getElementById('am-ext-hocham').value;
-    const hocvi  = document.getElementById('am-ext-hocvi').value;
-    const n      = document.getElementById('am-ext-name').value.trim();
-    unit  = document.getElementById('am-ext-unit').value.trim();
-    email = document.getElementById('am-ext-email').value.trim();
-    phone = document.getElementById('am-ext-phone').value.trim();
-    if (!n || !hocvi || !unit || !email) { showToast('Vui lòng nhập đủ Họ tên, Học vị, Đơn vị và Email.', 'err'); return; }
-    if (!isEmail(email)) { showToast('Email không hợp lệ.', 'err'); return; }
-    if (!isVNPhone(phone)) { showToast('Số điện thoại không hợp lệ (10 số, bắt đầu bằng 0).', 'err'); return; }
-    const title = hocvi === 'Chuyên gia' ? 'Chuyên gia' : (hocham + hocvi);
-    name = (title ? title + ' ' : '') + n;
-  }
-
-  if (createMembers.some((m, i) => m.name.toLowerCase() === name.toLowerCase() && i !== editingMemberIdx)) {
-    showToast('Giảng viên này đã có trong danh sách thành viên.', 'err'); return;
-  }
-
-  if (editingMemberIdx !== null) {
-    createMembers[editingMemberIdx] = { role, name, gvType, unit, email, phone };
-  } else {
-    createMembers.push({ role, name, gvType, unit, email, phone });
-  }
-  renderCreateMembers();
-  hideAddForm();
-}
-
-function renderCreateMembers() {
-  const tbody = document.getElementById('cr-mem-tbody');
-  if (!createMembers.length) {
-    tbody.innerHTML = '<tr><td colspan="6" class="tbl-empty">Chưa có thành viên — nhấn "+ Thêm thành viên" bên dưới.</td></tr>';
-    return;
-  }
-  tbody.innerHTML = createMembers.map((m, i) => {
-    const contact = m.gvType === 'ngoai' && (m.email || m.phone)
-      ? `<div style="font-size:11px;color:var(--text-3);margin-top:2px">${[m.email, m.phone].filter(Boolean).join(' · ')}</div>`
-      : '';
-    return `<tr>
-    <td style="text-align:center;color:var(--text-3)">${i+1}</td>
-    <td><span class="role-tag ${ROLE_CLS[m.role]}">${ROLE_LABEL[m.role]}</span></td>
-    <td style="font-size:13px;font-weight:600">${m.name}</td>
-    <td>${m.gvType==='ngoai' ? '<span class="gv-ext-badge">Ngoài trường</span>' : '<span class="gv-int-badge">Trong trường</span>'}</td>
-    <td style="font-size:12px;color:var(--text-2)">${m.unit}${contact}</td>
-    <td style="text-align:center;white-space:nowrap">
-      <button class="icon-btn" onclick="editMember(${i})" title="Sửa">✎</button>
-      <button class="icon-btn" style="color:var(--error)" onclick="removeMember(${i})" title="Xóa">🗑</button>
-    </td>
-  </tr>`;
-  }).join('');
-}
-
-function removeMember(idx) {
-  createMembers.splice(idx, 1);
-  if (editingMemberIdx !== null) hideAddForm();
-  renderCreateMembers();
-}
-
-/* ── Lưu hội đồng mới (localStorage — không có backend dùng chung giữa các trang) ── */
-function submitCreateCouncil(action) {
-  const name  = document.getElementById('cr-name').value.trim();
-  const donvi = document.getElementById('cr-donvi').value;
-  const nganh = document.getElementById('cr-nganh').value;
-  const type  = document.getElementById('cr-type').value;
-  const dot   = document.getElementById('cr-dot').value;
-  const date  = document.getElementById('cr-date').value;
-  const time  = document.getElementById('cr-time').value;
-  const room  = document.getElementById('cr-room').value.trim();
-  const link  = document.getElementById('cr-link').value.trim();
-  const note  = document.getElementById('cr-note').value.trim();
-  const meetForm = getMeetForm();
-
-  if (action === 'draft') {
-    if (!name) { showToast('Vui lòng nhập tên hội đồng để lưu nháp.', 'err'); return; }
-  } else {
-    if (!name)  { showToast('Vui lòng nhập tên hội đồng.', 'err'); return; }
-    if (!donvi) { showToast('Vui lòng chọn đơn vị.', 'err'); return; }
-    if (!nganh) { showToast('Vui lòng chọn ngành / lĩnh vực.', 'err'); return; }
-    if (!type)  { showToast('Vui lòng chọn phân loại hội đồng.', 'err'); return; }
-    if (!dot)   { showToast('Vui lòng chọn đợt / học kỳ.', 'err'); return; }
-    if (meetForm === 'offline' && !room) { showToast('Vui lòng nhập địa điểm họp.', 'err'); return; }
-    if (meetForm === 'online'  && !isUrl(link)) { showToast('Vui lòng nhập link họp trực tuyến hợp lệ (http/https).', 'err'); return; }
-    if (!date || parseDMY(fmtDMY(date)) < new Date(TODAY.getFullYear(), TODAY.getMonth(), TODAY.getDate()+3)) {
-      showToast('Ngày họp phải từ 3 ngày sau ngày hiện tại (20/06/2026) trở đi.', 'err'); return;
-    }
-    if (time < '07:00' || time > '17:00') { showToast('Giờ họp phải trong khung 07:00 – 17:00.', 'err'); return; }
-    if (!createMembers.some(m => m.role === 'ct')) { showToast('Hội đồng phải có 1 Chủ tịch.', 'err'); return; }
-    if (!createMembers.some(m => m.role === 'tk')) { showToast('Hội đồng phải có 1 Thư ký.', 'err'); return; }
-    if (createMembers.length < 3) { showToast('Hội đồng phải có tối thiểu 3 thành viên.', 'err'); return; }
-    if (type === 'phanbien' && !createMembers.some(m => m.role === 'pb')) {
-      showToast('Hội đồng Phản biện phải có ít nhất 1 thành viên giữ vai trò Phản biện.', 'err'); return;
-    }
-  }
-
-  const payload = {
-    name, donvi, nganh, type, dot, meetForm, room, link, note,
-    date: date ? fmtDMY(date) : '', time,
-    status: action === 'draft' ? 'draft' : 'pending',
-    members: createMembers.map(m => ({...m}))
-  };
-
-  const stored = JSON.parse(localStorage.getItem('newCouncils') || '[]');
-
-  if (editingCouncilCode) {
-    const existing = COUNCILS.find(c => c.code === editingCouncilCode);
-    const wasRejected = existing.status === 'rejected';
-    Object.assign(existing, payload);
-    if (action === 'submit' && wasRejected) {
-      delete existing.rejectReason; delete existing.rejectedAt; delete existing.rejectedBy;
-    }
-    const storedIdx = stored.findIndex(c => c.code === editingCouncilCode);
-    if (storedIdx !== -1) stored[storedIdx] = { ...existing };
-    else stored.push({ ...existing });
-  } else {
-    const code = `HD-2026-${String(SEQ).padStart(3,'0')}`;
-    SEQ++;
-    const newCouncil = {
-      id: Date.now(),
-      code,
-      createdBy: 'TS. Trần Văn Bình', createdAt: '20/06/2026',
-      students: [],
-      ...payload
-    };
-    stored.push(newCouncil);
-  }
-  localStorage.setItem('newCouncils', JSON.stringify(stored));
-
-  showToast(action === 'draft' ? '💾 Đã lưu nháp hội đồng.' : '📨 Đã gửi yêu cầu thành lập đến Phòng Đào tạo.', 'ok');
-  window.location.href = 'MH-KCM-08_CouncilManagement.html';
-}
-
 /* ── Init ─────────────────────────────────────────────────── */
 function initFromQuery() {
   const params = new URLSearchParams(window.location.search);
-  const mode = params.get('mode');
   const code = params.get('code');
-
-  if (mode === 'create') {
-    enterCreateMode();
-    return true;
-  }
-  if (mode === 'edit' && code) {
-    enterEditMode(code);
-    return true;
-  }
-  if (!code) return false;
+  if (!code) return;
   const match = COUNCILS.find(c => c.code === code);
   if (match) {
     currentCouncilId = match.id;
   } else {
     showToast(`Không tìm thấy hội đồng "${code}" trong dữ liệu demo — hiển thị hội đồng mặc định.`, 'warn');
   }
-  return false;
 }
 
 mergeNewCouncilsFromStorage();
-if (!initFromQuery()) renderAll();
+initFromQuery();
+renderAll();
 
 if (new URLSearchParams(window.location.search).get('action') === 'complete') {
   const c = council();

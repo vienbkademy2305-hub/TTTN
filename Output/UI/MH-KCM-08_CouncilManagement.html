@@ -188,6 +188,13 @@
           <option value="completed">Hoàn thành</option>
           <option value="cancelled">Đã hủy</option>
         </select>
+        <select class="fc" style="width:150px" id="f-meetform">
+          <option value="">Tất cả hình thức</option>
+          <option value="offline">🏛 Trực tiếp</option>
+          <option value="online">🖥 Trực tuyến</option>
+        </select>
+        <input class="fc" type="date" id="f-date-from" style="width:150px" title="Ngày họp từ">
+        <input class="fc" type="date" id="f-date-to" style="width:150px" title="Ngày họp đến">
         <div class="input-search" style="flex:1;max-width:260px">
           <input class="fc" type="text" id="q" placeholder="Tìm tên, mã hội đồng...">
         </div>
@@ -212,6 +219,7 @@
                 <th style="width:150px">Địa điểm</th>
                 <th style="width:200px">Thành viên</th>
                 <th style="width:105px">Trạng thái</th>
+                <th style="width:180px">Lý do</th>
                 <th style="width:130px">Số quyết định</th>
                 <th style="width:230px;text-align:center">Thao tác</th>
               </tr>
@@ -509,9 +517,6 @@
       <button class="modal-close" data-close="modal-cancel">✕</button>
     </div>
     <div class="modal-bd">
-      <div style="font-size:13px;color:var(--text-2);margin-bottom:12px">
-        Hội đồng: <strong id="cc-name"></strong>
-      </div>
       <div class="fi" id="fi-cc-reason">
         <label>Lý do hủy <span class="req">*</span></label>
         <textarea class="fc" id="cc-reason" rows="4"
@@ -522,7 +527,7 @@
     </div>
     <div class="modal-ft">
       <button class="btn btn-default" data-close="modal-cancel">Đóng</button>
-      <button class="btn btn-danger" onclick="submitCancel()">Xác nhận hủy</button>
+      <button class="btn btn-danger" onclick="submitCancel()">Xác nhận</button>
     </div>
   </div>
 </div>
@@ -537,9 +542,6 @@
       <button class="modal-close" data-close="modal-complete">✕</button>
     </div>
     <div class="modal-bd">
-      <div style="font-size:13px;color:var(--text-2);margin-bottom:14px">
-        Hội đồng: <strong id="cp-name"></strong>
-      </div>
       <div class="fi">
         <label>Ngày hoàn tất</label>
         <input type="date" class="fc" id="cp-date" value="2026-06-20">
@@ -561,13 +563,10 @@
           <button class="btn btn-default btn-sm" id="cp-file-clear" style="display:none;color:var(--danger)" onclick="clearCpFile()">✕</button>
         </div>
       </div>
-      <div style="background:#e6f4ff;border:1px solid #91caff;border-radius:6px;padding:10px 12px;font-size:13px">
-        🏁 Sau khi xác nhận, hội đồng chuyển sang <strong>Hoàn thành</strong> và không thể chỉnh sửa thêm.
-      </div>
     </div>
     <div class="modal-ft">
       <button class="btn btn-default" data-close="modal-complete">Hủy</button>
-      <button class="btn btn-primary" onclick="submitComplete()">Xác nhận hoàn thành</button>
+      <button class="btn btn-primary" onclick="submitComplete()">Xác nhận</button>
     </div>
   </div>
 </div>
@@ -816,8 +815,10 @@ function toggleAllRows(checked) {
 }
 
 /* ── Sang trang Chi tiết & Chấm điểm ──────────────────────── */
-function goToWorkspace(code) {
-  window.location.href = 'MH-KCM-09_CouncilStudentAssignment.html?code=' + encodeURIComponent(code);
+function goToWorkspace(code, action) {
+  let url = 'MH-KCM-09_CouncilStudentAssignment.html?code=' + encodeURIComponent(code);
+  if (action) url += '&action=' + encodeURIComponent(action);
+  window.location.href = url;
 }
 
 /* ── Chọn thành viên & gửi email (modal Chi tiết) ─────────── */
@@ -889,13 +890,19 @@ function render() {
   const fDonvi  = document.getElementById('f-donvi').value;
   const fDot    = document.getElementById('f-dot').value;
   const fStatus = document.getElementById('f-status').value;
+  const fMeetForm = document.getElementById('f-meetform').value;
+  const fDateFrom = document.getElementById('f-date-from').value;
+  const fDateTo   = document.getElementById('f-date-to').value;
 
   const list = COUNCILS.filter(c =>
     (!q       || c.name.toLowerCase().includes(q) || c.code.toLowerCase().includes(q)) &&
     (!fType   || c.type   === fType)  &&
     (!fDonvi  || c.donvi  === fDonvi) &&
     (!fDot    || c.dot    === fDot)   &&
-    (!fStatus || c.status === fStatus)
+    (!fStatus || c.status === fStatus) &&
+    (!fMeetForm || c.meetForm === fMeetForm) &&
+    (!fDateFrom || parseDMY(c.date) >= new Date(fDateFrom)) &&
+    (!fDateTo   || parseDMY(c.date) <= new Date(fDateTo))
   );
 
   document.getElementById('s-total').textContent     = COUNCILS.length;
@@ -917,7 +924,7 @@ function render() {
     const ty = TYPE_CFG[c.type] || TYPE_CFG.danhgia;
     const latestQd = latestDecision(c);
     const qdCell = latestQd
-      ? `<span class="qd-num" style="cursor:pointer;text-decoration:underline dotted" onclick="openDecisionList(${c.id})" title="Xem danh sách quyết định">${latestQd.so}</span><div style="font-size:11px;color:var(--text-3)">${latestQd.ngay}</div>`
+      ? `<span class="qd-num">${latestQd.so}</span><div style="font-size:11px;color:var(--text-3)">${latestQd.ngay}</div>`
       : `<span style="color:var(--text-3);font-size:12px">—</span>`;
 
     const canEdit      = c.status === 'draft' || c.status === 'rejected';
@@ -932,7 +939,7 @@ function render() {
       <button class="icon-btn" title="${c.status === 'rejected' ? 'Sửa & gửi lại' : 'Sửa'}" ${dis(canEdit)} onclick="openDetailEdit(${c.id})">✎</button>
       <button class="icon-btn danger" title="Xóa" ${dis(canDelete)} onclick="confirmDelete(${c.id})">🗑</button>
       <button class="icon-btn warn-btn" title="Thu hồi yêu cầu" ${dis(canWithdraw)} onclick="confirmWithdraw(${c.id})">↩</button>
-      <button class="icon-btn success-btn" title="Đánh dấu hoàn thành" ${dis(canComplete)} onclick="openCompleteModal(${c.id})">🏁</button>
+      <button class="icon-btn success-btn" title="Đánh dấu hoàn thành" ${dis(canComplete)} onclick="goToWorkspace('${c.code}', 'complete')">🏁</button>
       <button class="icon-btn danger" title="Hủy hội đồng" ${dis(canCancel)} onclick="openCancelModal(${c.id})">✕</button>`;
 
     const rowCls = (c.status === 'cancelled') ? ' class="row-disabled"' : '';
@@ -953,6 +960,7 @@ function render() {
           : '<span style="color:var(--text-3)">—</span>'
       }</td>
       <td><span class="tag ${st.cls}">${st.label}</span></td>
+      <td style="font-size:12px;color:var(--text-2);max-width:0"><span class="name-cell" style="max-width:170px" title="${c.rejectReason || c.cancelReason || ''}">${c.rejectReason || c.cancelReason || '—'}</span></td>
       <td>${qdCell}</td>
       <td class="tbl-actions" style="white-space:nowrap;text-align:center">${actions}</td>
     </tr>`;
@@ -1122,8 +1130,6 @@ function confirmWithdraw(id) {
 /* ── Cancel ───────────────────────────────────────────────── */
 function openCancelModal(id) {
   currentId = id;
-  const c = COUNCILS.find(x => x.id === id);
-  document.getElementById('cc-name').textContent = c.name;
   document.getElementById('cc-reason').value = '';
   document.getElementById('cc-cnt').textContent = '0';
   setErr('fi-cc-reason', false);
@@ -1146,8 +1152,6 @@ function submitCancel() {
 /* ── Complete ─────────────────────────────────────────────── */
 function openCompleteModal(id) {
   currentId = id;
-  const c = COUNCILS.find(x => x.id === id);
-  document.getElementById('cp-name').textContent = c.name;
   document.getElementById('cp-date').value = '2026-06-20';
   document.getElementById('cp-note').value = '';
   clearCpFile();
@@ -1453,13 +1457,19 @@ function exportCSV() {
   const fDonvi  = document.getElementById('f-donvi').value;
   const fDot    = document.getElementById('f-dot').value;
   const fStatus = document.getElementById('f-status').value;
+  const fMeetForm = document.getElementById('f-meetform').value;
+  const fDateFrom = document.getElementById('f-date-from').value;
+  const fDateTo   = document.getElementById('f-date-to').value;
 
   const list = COUNCILS.filter(c =>
     (!q       || c.name.toLowerCase().includes(q) || c.code.toLowerCase().includes(q)) &&
     (!fType   || c.type   === fType)  &&
     (!fDonvi  || c.donvi  === fDonvi) &&
     (!fDot    || c.dot    === fDot)   &&
-    (!fStatus || c.status === fStatus)
+    (!fStatus || c.status === fStatus) &&
+    (!fMeetForm || c.meetForm === fMeetForm) &&
+    (!fDateFrom || parseDMY(c.date) >= new Date(fDateFrom)) &&
+    (!fDateTo   || parseDMY(c.date) <= new Date(fDateTo))
   );
 
   if (!list.length) { showToast('Không có dữ liệu để xuất.', 'err'); return; }
@@ -1501,7 +1511,7 @@ document.getElementById('cc-reason').addEventListener('input', function() {
   document.getElementById('cc-cnt').textContent = this.value.length;
 });
 
-['f-type','f-donvi','f-dot','f-status'].forEach(id =>
+['f-type','f-donvi','f-dot','f-status','f-meetform','f-date-from','f-date-to'].forEach(id =>
   document.getElementById(id).addEventListener('change', render));
 document.getElementById('q').addEventListener('input', render);
 

@@ -1,0 +1,589 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Hội đồng của tôi | Giảng viên | HTQT Đại học</title>
+  <link rel="stylesheet" href="_styles.css">
+  <style>
+    .hd-type{font-size:11px;padding:2px 8px;border-radius:10px;border:1px solid;white-space:nowrap;display:inline-block}
+    .hd-danhgia{background:#e6f4ff;color:#1677ff;border-color:#91caff}
+    .hd-chamdiem{background:#fff7e6;color:#d46b08;border-color:#ffd591}
+    .hd-phanbien{background:#f9f0ff;color:#722ed1;border-color:#d3adf7}
+
+    .role-tag{font-size:11px;padding:2px 7px;border-radius:10px;border:1px solid;white-space:nowrap;display:inline-block}
+    .role-ct{background:#fff7e6;color:#d46b08;border-color:#ffd591}
+    .role-tk{background:#f9f0ff;color:#722ed1;border-color:#d3adf7}
+    .role-uv{background:#e6f4ff;color:#1677ff;border-color:#91caff}
+    .role-pb{background:#fff2f0;color:#cf1322;border-color:#ffa39e}
+    .role-gc{background:#e6fffb;color:#08979c;border-color:#87e8de}
+
+    .tbl-empty{text-align:center;color:var(--text-3);padding:24px;font-size:13px}
+    .name-cell{display:block;overflow:hidden;white-space:nowrap;text-overflow:ellipsis;max-width:260px}
+    .sum-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:16px}
+    .sum-card{background:#fff;border:1px solid var(--border);border-radius:8px;padding:12px 14px;display:flex;align-items:center;gap:10px}
+    .sum-ico{width:36px;height:36px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0}
+    .sum-val{font-size:20px;font-weight:700;line-height:1.2}
+    .sum-label{font-size:11px;color:var(--text-3);margin-top:2px}
+    .btn[disabled]{opacity:.4;cursor:not-allowed;pointer-events:none}
+
+    .info-tbl{width:100%;border-collapse:collapse;font-size:13px;margin-bottom:4px}
+    .info-tbl td{padding:8px 12px;border:1px solid #e8e8e8;vertical-align:top;line-height:1.5}
+    .info-tbl .itl{background:#fafafa;color:var(--text-3);font-weight:500;width:170px;white-space:nowrap}
+    .mem-tbl{width:100%;border-collapse:collapse;font-size:13px}
+    .mem-tbl th{background:#fafafa;font-weight:600;padding:7px 10px;border:1px solid #e8e8e8;font-size:12px;text-align:left}
+    .mem-tbl td{padding:7px 10px;border:1px solid #e8e8e8;vertical-align:middle}
+    .gv-ext-badge,.gv-int-badge{display:inline-block;font-size:12px;font-weight:600;padding:4px 12px;border-radius:14px;white-space:nowrap}
+    .gv-ext-badge{background:#fff7e6;color:#d46b08;border:1px solid #ffd591}
+    .gv-int-badge{background:#f6ffed;color:#389e0d;border:1px solid #b7eb8f}
+    .section-hd{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--text-3);margin:16px 0 8px;padding-bottom:6px;border-bottom:1px solid var(--border)}
+    .code-prev{font-family:monospace;font-size:13px;font-weight:700;color:var(--primary);letter-spacing:.02em}
+    .qd-num{font-family:monospace;font-size:12px;font-weight:700;color:var(--success)}
+    .sv-chip{display:inline-flex;align-items:center;gap:6px;background:#f0f7ff;border:1px solid #91caff;border-radius:14px;padding:3px 10px;font-size:12px;margin:0 6px 6px 0}
+    .w800{max-width:820px;width:96vw}
+    .w480{max-width:480px;width:92vw}
+  </style>
+</head>
+<body>
+<div class="app">
+
+  <!-- ═══ SIDEBAR ═══ -->
+  <nav class="sidebar">
+    <div class="sb-logo">
+      <div class="sb-logo-icon">🎓</div>
+      <div><div class="sb-logo-text">HTQT Đại học</div><div class="text-muted text-sm">Giảng viên</div></div>
+    </div>
+    <div class="sb-user">
+      <div class="av">GV</div>
+      <div>
+        <div style="font-size:13px;font-weight:600">TS. Nguyễn Minh Tuấn</div>
+        <div style="font-size:11px;color:var(--text-3)">Khoa CNTT</div>
+      </div>
+    </div>
+    <ul class="sb-menu">
+      <li><a href="#">🏠&nbsp; Trang chủ</a></li>
+      <li>
+        <span class="mn-group">📋&nbsp; Đề tài &nbsp;▾</span>
+        <ul class="sb-sub open">
+          <li><a href="MH-GV-04_MyTopics.html">DS đề tài của tôi</a></li>
+          <li><a href="MH-GV-05_TopicWishes.html">DS nguyện vọng đề tài</a></li>
+        </ul>
+      </li>
+      <li>
+        <span class="mn-group">👨‍🏫&nbsp; Hướng dẫn &nbsp;▾</span>
+        <ul class="sb-sub open">
+          <li><a href="MH-GV-01_InternshipTracking.html">QL DS thực tập</a></li>
+          <li><a href="MH-GV-06_GraduationProjectManagement.html">Quản lý ĐATN &amp; KLTN</a></li>
+          <li><a href="#">Thạc sĩ</a></li>
+          <li><a href="#">Tiến sĩ</a></li>
+          <li><a href="MH-GV-02_ChangeRequestApproval.html">QL yêu cầu thay đổi</a></li>
+        </ul>
+      </li>
+      <li class="active">
+        <span class="mn-group">⚖️&nbsp; Hội đồng &nbsp;▾</span>
+        <ul class="sb-sub open">
+          <li class="active"><a href="MH-GV-07_MyCouncils.html">Hội đồng của tôi</a></li>
+        </ul>
+      </li>
+    </ul>
+  </nav>
+
+  <!-- ═══ MAIN ═══ -->
+  <div class="main">
+    <header class="app-header">
+      <span class="h-breadcrumb">Hướng dẫn &gt; <strong>Hội đồng của tôi</strong></span>
+      <div class="h-right">
+        <div class="bw"><button class="btn btn-link" style="font-size:18px">🔔</button><span class="bc">2</span></div>
+        <div class="av">GV</div>
+      </div>
+    </header>
+
+    <main class="content">
+
+      <!-- Summary -->
+      <div class="sum-grid">
+        <div class="sum-card">
+          <div class="sum-ico" style="background:#f0f5ff">📊</div>
+          <div><div class="sum-val" style="color:var(--primary)" id="s-total">0</div><div class="sum-label">Tổng hội đồng được phân công</div></div>
+        </div>
+        <div class="sum-card">
+          <div class="sum-ico" style="background:#f6ffed">✅</div>
+          <div><div class="sum-val" style="color:var(--success)" id="s-approved">0</div><div class="sum-label">Đang chấm điểm (Đã duyệt)</div></div>
+        </div>
+        <div class="sum-card">
+          <div class="sum-ico" style="background:#e6f4ff">🏁</div>
+          <div><div class="sum-val" style="color:var(--blue)" id="s-completed">0</div><div class="sum-label">Đã hoàn thành</div></div>
+        </div>
+      </div>
+
+      <div class="f-hint" style="margin-bottom:14px">Chỉ hiển thị các hội đồng đã được duyệt hoặc đã hoàn thành mà bạn được phân công là thành viên. Chức năng "Đánh dấu hoàn thành" chỉ dành cho Chủ tịch/Thư ký hội đồng.</div>
+
+      <!-- Filter -->
+      <div class="filter-bar" style="margin-bottom:16px">
+        <select class="fc" style="width:170px" id="f-type">
+          <option value="">Tất cả phân loại</option>
+          <option value="danhgia">Hội đồng Đánh giá</option>
+          <option value="chamdiem">Hội đồng Chấm điểm</option>
+          <option value="phanbien">Hội đồng Phản biện</option>
+        </select>
+        <select class="fc" style="width:150px" id="f-dot">
+          <option value="">Tất cả học kỳ</option>
+          <option>HK2 2025-2026</option>
+          <option>HK1 2025-2026</option>
+          <option>HK1 2024-2025</option>
+        </select>
+        <select class="fc" style="width:150px" id="f-meetform">
+          <option value="">Tất cả hình thức</option>
+          <option value="offline">🏛 Trực tiếp</option>
+          <option value="online">🖥 Trực tuyến</option>
+        </select>
+        <input class="fc" type="date" id="f-date-from" style="width:150px" title="Ngày họp từ">
+        <input class="fc" type="date" id="f-date-to" style="width:150px" title="Ngày họp đến">
+        <div class="input-search" style="flex:1;max-width:260px">
+          <input class="fc" type="text" id="q" placeholder="Tìm tên, mã hội đồng...">
+        </div>
+      </div>
+
+      <!-- Table -->
+      <div class="card" style="padding:0">
+        <div class="tbl-wrap">
+          <table class="tbl">
+            <thead>
+              <tr>
+                <th style="width:36px;text-align:center"><input type="checkbox" id="chk-all" onchange="toggleAllRows(this.checked)" style="width:15px;height:15px;cursor:pointer;accent-color:var(--primary)"></th>
+                <th style="width:135px">Mã hội đồng</th>
+                <th>Tên hội đồng</th>
+                <th style="width:115px">Phân loại</th>
+                <th style="width:150px">Đơn vị</th>
+                <th style="width:110px">Học kỳ</th>
+                <th style="width:140px">Thời gian họp</th>
+                <th style="width:90px">Hình thức</th>
+                <th style="width:150px">Địa điểm</th>
+                <th style="width:200px">Thành viên</th>
+                <th style="width:105px">Trạng thái</th>
+                <th style="width:150px;text-align:center">Thao tác</th>
+              </tr>
+            </thead>
+            <tbody id="tbody"></tbody>
+          </table>
+        </div>
+        <div class="pagination">
+          <span class="pg-info" id="pg-info"></span>
+          <button class="pg-btn active">1</button>
+        </div>
+      </div>
+
+    </main>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════════
+     MODAL: CHI TIẾT HỘI ĐỒNG
+════════════════════════════════════════ -->
+<div class="overlay hidden" id="modal-detail">
+  <div class="modal-box w800" style="max-height:92vh">
+    <div class="modal-hd">
+      <span class="modal-title" id="dt-title">Chi tiết hội đồng</span>
+      <button class="modal-close" data-close="modal-detail">✕</button>
+    </div>
+    <div class="modal-bd">
+
+      <div class="section-hd" style="margin-top:0">Thông tin Hội đồng</div>
+      <table class="info-tbl" style="margin-bottom:14px">
+        <tr><td class="itl">Mã hội đồng</td><td><strong id="dt-code" class="code-prev"></strong></td></tr>
+        <tr><td class="itl">Tên hội đồng</td><td><strong id="dt-name"></strong></td></tr>
+        <tr><td class="itl">Đơn vị</td><td id="dt-donvi"></td></tr>
+        <tr><td class="itl">Ngành / Lĩnh vực</td><td id="dt-nganh"></td></tr>
+        <tr><td class="itl">Phân loại</td><td id="dt-type"></td></tr>
+        <tr><td class="itl">Học kỳ</td><td id="dt-dot"></td></tr>
+        <tr><td class="itl">Hình thức &amp; Thời gian họp</td><td id="dt-datetime"></td></tr>
+        <tr><td class="itl">Địa điểm / Link họp</td><td id="dt-place"></td></tr>
+        <tr><td class="itl">Người tạo</td><td id="dt-created"></td></tr>
+        <tr><td class="itl">Số quyết định</td><td id="dt-qdnum"></td></tr>
+        <tr><td class="itl">Ngày ban hành</td><td id="dt-qddate"></td></tr>
+        <tr><td class="itl">Người ký</td><td id="dt-qdsignedby"></td></tr>
+        <tr><td class="itl">File đính kèm</td><td id="dt-qdfile"></td></tr>
+        <tr id="dt-note-row" style="display:none"><td class="itl">Ghi chú</td><td id="dt-note" style="color:var(--text-2)"></td></tr>
+        <tr id="dt-bienban-row" style="display:none"><td class="itl">Biên bản họp</td><td id="dt-bienban"></td></tr>
+        <tr id="dt-completenote-row" style="display:none"><td class="itl">Ghi chú kết quả họp</td><td id="dt-completenote" style="color:var(--text-2)"></td></tr>
+      </table>
+
+      <div class="section-hd">Danh sách Thành viên (<span id="dt-mem-count">0</span> người)</div>
+      <div class="bulk-bar" id="dt-mem-bulk-bar" style="display:none">
+        <span>Đã chọn <strong id="dt-mem-bulk-count">0</strong> thành viên</span>
+        <button class="btn btn-primary btn-sm" onclick="sendBulkEmailDt()">Gửi email</button>
+      </div>
+      <table class="mem-tbl" style="margin-bottom:14px">
+        <thead>
+          <tr>
+            <th style="width:36px;text-align:center"><input type="checkbox" id="dt-mem-chk-all" onchange="toggleAllMembersDt(this.checked)" style="width:15px;height:15px;cursor:pointer;accent-color:var(--primary)"></th>
+            <th style="width:110px">Vai trò</th>
+            <th>Họ và tên</th>
+            <th style="width:130px">Phân loại</th>
+            <th>Đơn vị</th>
+            <th style="width:70px;text-align:center">Email</th>
+          </tr>
+        </thead>
+        <tbody id="dt-mem-tbody"></tbody>
+      </table>
+
+    </div>
+    <div class="modal-ft" id="dt-footer"></div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════════
+     MODAL: SOẠN EMAIL (Chi tiết hội đồng)
+════════════════════════════════════════ -->
+<div class="overlay hidden" id="modal-email">
+  <div class="modal-box w480">
+    <div class="modal-hd">
+      <span class="modal-title">📧 Soạn email</span>
+      <button class="modal-close" data-close="modal-email">✕</button>
+    </div>
+    <div class="modal-bd">
+      <div class="fi">
+        <label>Người nhận</label>
+        <div id="em-to"></div>
+      </div>
+      <div class="fi">
+        <label>Tiêu đề email <span class="req">*</span></label>
+        <input type="text" class="fc" id="em-subject">
+      </div>
+      <div class="fi">
+        <label>Nội dung email</label>
+        <textarea class="fc" id="em-body" rows="8"></textarea>
+      </div>
+      <div class="f-hint">Bấm "Gửi email" sẽ mở ứng dụng email (Gmail/Outlook...) đã đăng nhập trên máy với nội dung trên.</div>
+    </div>
+    <div class="modal-ft">
+      <button class="btn btn-default" data-close="modal-email">Hủy</button>
+      <button class="btn btn-primary" onclick="confirmSendEmailDt()">Gửi email</button>
+    </div>
+  </div>
+</div>
+
+<script src="_utils.js"></script>
+<script>
+const CURRENT_GV_NAME = 'TS. Nguyễn Minh Tuấn';
+function parseDMY(s){ const [d,m,y] = s.split('/').map(Number); return new Date(y, m-1, d); }
+
+const TYPE_CFG = {
+  danhgia : { label:'Hội đồng Đánh giá',  cls:'hd-danhgia'  },
+  chamdiem: { label:'Hội đồng Chấm điểm', cls:'hd-chamdiem' },
+  phanbien: { label:'Hội đồng Phản biện', cls:'hd-phanbien' }
+};
+const ROLE_LABEL = { ct:'Chủ tịch', tk:'Thư ký', uv:'Ủy viên', pb:'Phản biện', gc:'GV chấm' };
+const ROLE_CLS   = { ct:'role-ct', tk:'role-tk', uv:'role-uv', pb:'role-pb', gc:'role-gc' };
+const STATUS_CFG = {
+  draft    : { label:'Nháp',       cls:'tag-default' },
+  pending  : { label:'Chờ duyệt',  cls:'tag-warning' },
+  approved : { label:'Đã duyệt',   cls:'tag-success' },
+  rejected : { label:'Từ chối',    cls:'tag-error'   },
+  completed: { label:'Hoàn thành', cls:'tag-blue'    },
+  cancelled: { label:'Đã hủy',     cls:'tag-default' }
+};
+
+/* ── Mock data — đồng bộ chính xác id/code/tên/trạng thái với MH-KCM-09_CouncilStudentAssignment.html ── */
+const COUNCILS = [
+  {
+    id:2, code:'HD-2026-012', name:'Hội đồng chấm điểm TTTN HK2 2025-2026 (Nhóm 1)',
+    donvi:'Bộ môn Công nghệ phần mềm', nganh:'Kỹ thuật phần mềm', type:'chamdiem', dot:'HK2 2025-2026',
+    meetForm:'offline', date:'30/06/2026', time:'08:00', room:'Phòng họp A1-102', link:'', status:'pending',
+    members:[
+      { role:'ct', name:'PGS.TS. Lê Văn Minh',  gvType:'noi', unit:'Khoa CNTT', email:'levanminh@khoacntt.edu.vn' },
+      { role:'tk', name:'ThS. Nguyễn Thu Hoa',   gvType:'noi', unit:'Khoa CNTT', email:'nguyenthuhoa@khoacntt.edu.vn' },
+      { role:'uv', name:'TS. Trần Văn Bình',     gvType:'noi', unit:'Khoa CNTT', email:'tranvanbinh@khoacntt.edu.vn' },
+      { role:'uv', name:'TS. Nguyễn Minh Tuấn',  gvType:'noi', unit:'Khoa CNTT', email:'nguyenminhtuan@khoacntt.edu.vn' },
+      { role:'pb', name:'TS. Phạm Quốc Hùng',    gvType:'noi', unit:'Khoa CNTT', email:'phamquochung@khoacntt.edu.vn' }
+    ]
+  },
+  {
+    id:4, code:'HD-2026-014', name:'Hội đồng phản biện Khóa luận tốt nghiệp HK2 2025-2026',
+    donvi:'Bộ môn Khoa học máy tính', nganh:'Khoa học máy tính', type:'phanbien', dot:'HK2 2025-2026',
+    meetForm:'online', date:'26/06/2026', time:'13:30', room:'', link:'https://meet.google.com/abc-defg-hij', status:'approved',
+    qdNum:'305/QĐ-CNTT',
+    members:[
+      { role:'ct', name:'TS. Phạm Thu Hà',  gvType:'noi', unit:'Khoa CNTT', email:'phamthuha@khoacntt.edu.vn' },
+      { role:'tk', name:'ThS. Lê Thị Hoa',   gvType:'noi', unit:'Khoa CNTT', email:'lethihoa@khoacntt.edu.vn' },
+      { role:'pb', name:'TS. Lê Đức Thọ',    gvType:'noi', unit:'Khoa CNTT', email:'leductho@khoacntt.edu.vn' },
+      { role:'pb', name:'PGS.TS. Võ Thanh Tùng', gvType:'ngoai', unit:'Trường ĐH Bách Khoa', email:'vttung@hcmut.edu.vn' },
+      { role:'gc', name:'TS. Nguyễn Minh Tuấn', gvType:'noi', unit:'Khoa CNTT', email:'nguyenminhtuan@khoacntt.edu.vn' }
+    ]
+  },
+  {
+    id:3, code:'HD-2026-013', name:'Hội đồng chấm điểm TTTN HK2 2025-2026 (Nhóm HTTT)',
+    donvi:'Bộ môn Hệ thống thông tin', nganh:'Hệ thống thông tin', type:'chamdiem', dot:'HK2 2025-2026',
+    meetForm:'offline', date:'22/06/2026', time:'08:00', room:'Phòng họp A1-103', link:'', status:'completed',
+    qdNum:'312/QĐ-CNTT', completedAt:'23/06/2026',
+    members:[
+      { role:'ct', name:'TS. Nguyễn Minh Tuấn', gvType:'noi', unit:'Khoa CNTT', email:'nguyenminhtuan@khoacntt.edu.vn' },
+      { role:'tk', name:'ThS. Lê Thị Hoa',        gvType:'noi', unit:'Khoa CNTT', email:'lethihoa@khoacntt.edu.vn' },
+      { role:'uv', name:'TS. Phạm Thu Hà',        gvType:'noi', unit:'Khoa CNTT', email:'phamthuha@khoacntt.edu.vn' },
+      { role:'gc', name:'ThS. Nguyễn Thu Hoa',     gvType:'noi', unit:'Khoa CNTT', email:'nguyenthuhoa@khoacntt.edu.vn' },
+      { role:'pb', name:'TS. Lê Đức Thọ',         gvType:'noi', unit:'Khoa CNTT', email:'leductho@khoacntt.edu.vn' }
+    ]
+  },
+  {
+    id:1, code:'HD-2026-011', name:'Hội đồng đánh giá kết quả TTTN HK2 2025-2026 (Đợt 1 - Nhóm CNPM)',
+    donvi:'Bộ môn Công nghệ phần mềm', nganh:'Kỹ thuật phần mềm', type:'danhgia', dot:'HK2 2025-2026',
+    meetForm:'offline', date:'28/06/2026', time:'08:00', room:'Phòng họp A1-101', link:'', status:'draft',
+    members:[]
+  },
+  {
+    id:7, code:'HD-2026-010', name:'Hội đồng đánh giá kết quả TTTN HK2 2025-2026 (Nhóm HTTT)',
+    donvi:'Bộ môn Hệ thống thông tin', nganh:'Hệ thống thông tin', type:'danhgia', dot:'HK2 2025-2026',
+    meetForm:'offline', date:'24/06/2026', time:'08:00', room:'Phòng họp A1-103', link:'', status:'approved',
+    members:[
+      { role:'ct', name:'TS. Phạm Quốc Hùng', gvType:'noi', unit:'Khoa CNTT', email:'phamquochung@khoacntt.edu.vn' },
+      { role:'tk', name:'ThS. Nguyễn Thu Hoa', gvType:'noi', unit:'Khoa CNTT', email:'nguyenthuhoa@khoacntt.edu.vn' },
+      { role:'uv', name:'TS. Lê Đức Thọ',       gvType:'noi', unit:'Khoa CNTT', email:'leductho@khoacntt.edu.vn' },
+      { role:'uv', name:'TS. Nguyễn Minh Tuấn',  gvType:'noi', unit:'Khoa CNTT', email:'nguyenminhtuan@khoacntt.edu.vn' }
+    ]
+  },
+  {
+    id:8, code:'HD-2026-016', name:'Hội đồng chấm điểm TTTN HK2 2025-2026 (Nhóm CNPM 3)',
+    donvi:'Bộ môn Công nghệ phần mềm', nganh:'Kỹ thuật phần mềm', type:'chamdiem', dot:'HK2 2025-2026',
+    meetForm:'offline', date:'27/06/2026', time:'08:00', room:'Phòng họp A1-105', link:'', status:'approved',
+    qdNum:'320/QĐ-CNTT',
+    members:[
+      { role:'ct', name:'TS. Trần Văn Bình',     gvType:'noi', unit:'Khoa CNTT', email:'tranvanbinh@khoacntt.edu.vn' },
+      { role:'tk', name:'TS. Nguyễn Minh Tuấn',   gvType:'noi', unit:'Khoa CNTT', email:'nguyenminhtuan@khoacntt.edu.vn' },
+      { role:'uv', name:'TS. Phạm Quốc Hùng',     gvType:'noi', unit:'Khoa CNTT', email:'phamquochung@khoacntt.edu.vn' },
+      { role:'pb', name:'TS. Lê Đức Thọ',          gvType:'noi', unit:'Khoa CNTT', email:'leductho@khoacntt.edu.vn' }
+    ]
+  },
+  {
+    id:9, code:'HD-2026-017', name:'Hội đồng phản biện Khóa luận tốt nghiệp HK2 2025-2026 (Đợt 2)',
+    donvi:'Bộ môn Hệ thống thông tin', nganh:'Hệ thống thông tin', type:'phanbien', dot:'HK2 2025-2026',
+    meetForm:'offline', date:'29/06/2026', time:'09:00', room:'Phòng họp A1-106', link:'', status:'completed',
+    qdNum:'325/QĐ-CNTT', completedAt:'30/06/2026',
+    members:[
+      { role:'ct', name:'TS. Phạm Thu Hà',        gvType:'noi', unit:'Khoa CNTT', email:'phamthuha@khoacntt.edu.vn' },
+      { role:'tk', name:'ThS. Nguyễn Thu Hoa',      gvType:'noi', unit:'Khoa CNTT', email:'nguyenthuhoa@khoacntt.edu.vn' },
+      { role:'pb', name:'TS. Nguyễn Minh Tuấn',      gvType:'noi', unit:'Khoa CNTT', email:'nguyenminhtuan@khoacntt.edu.vn' },
+      { role:'pb', name:'PGS.TS. Võ Thanh Tùng', gvType:'ngoai', unit:'Trường ĐH Bách Khoa', email:'vttung@hcmut.edu.vn' }
+    ]
+  },
+  {
+    id:10, code:'HD-2026-018', name:'Hội đồng đánh giá kết quả TTTN HK2 2025-2026 (Nhóm CNPM 4)',
+    donvi:'Bộ môn Công nghệ phần mềm', nganh:'Kỹ thuật phần mềm', type:'danhgia', dot:'HK2 2025-2026',
+    meetForm:'offline', date:'01/07/2026', time:'08:00', room:'Phòng họp A1-107', link:'', status:'approved',
+    qdNum:'330/QĐ-CNTT',
+    members:[
+      { role:'ct', name:'TS. Nguyễn Minh Tuấn',  gvType:'noi', unit:'Khoa CNTT', email:'nguyenminhtuan@khoacntt.edu.vn' },
+      { role:'tk', name:'ThS. Lê Thị Hoa',         gvType:'noi', unit:'Khoa CNTT', email:'lethihoa@khoacntt.edu.vn' },
+      { role:'uv', name:'TS. Phạm Thu Hà',         gvType:'noi', unit:'Khoa CNTT', email:'phamthuha@khoacntt.edu.vn' },
+      { role:'pb', name:'TS. Phạm Quốc Hùng',      gvType:'noi', unit:'Khoa CNTT', email:'phamquochung@khoacntt.edu.vn' }
+    ]
+  }
+];
+
+/* ── Lọc chỉ các hội đồng có mặt GV hiện tại ─────────────────── */
+function myRoleIn(c) {
+  const m = c.members.find(x => x.name === CURRENT_GV_NAME);
+  return m ? m.role : null;
+}
+const MY_COUNCILS = COUNCILS.filter(c => myRoleIn(c) !== null && (c.status === 'approved' || c.status === 'completed'));
+
+function render() {
+  document.getElementById('s-total').textContent     = MY_COUNCILS.length;
+  document.getElementById('s-approved').textContent  = MY_COUNCILS.filter(c => c.status === 'approved').length;
+  document.getElementById('s-completed').textContent = MY_COUNCILS.filter(c => c.status === 'completed').length;
+
+  const q          = document.getElementById('q').value.toLowerCase();
+  const fType      = document.getElementById('f-type').value;
+  const fDot       = document.getElementById('f-dot').value;
+  const fMeetForm  = document.getElementById('f-meetform').value;
+  const fDateFrom  = document.getElementById('f-date-from').value;
+  const fDateTo    = document.getElementById('f-date-to').value;
+
+  const list = MY_COUNCILS.filter(c =>
+    (!q         || c.name.toLowerCase().includes(q) || c.code.toLowerCase().includes(q)) &&
+    (!fType     || c.type === fType) &&
+    (!fDot      || c.dot === fDot) &&
+    (!fMeetForm || c.meetForm === fMeetForm) &&
+    (!fDateFrom || parseDMY(c.date) >= new Date(fDateFrom)) &&
+    (!fDateTo   || parseDMY(c.date) <= new Date(fDateTo))
+  );
+
+  const tbody = document.getElementById('tbody');
+  if (!list.length) {
+    tbody.innerHTML = '<tr><td colspan="12" class="tbl-empty">Không tìm thấy hội đồng phù hợp.</td></tr>';
+    document.getElementById('pg-info').textContent = '0 hội đồng';
+    return;
+  }
+
+  tbody.innerHTML = list.map(c => {
+    const st   = STATUS_CFG[c.status] || STATUS_CFG.draft;
+    const ty   = TYPE_CFG[c.type] || TYPE_CFG.danhgia;
+    const role = myRoleIn(c);
+    const isChair = role === 'ct' || role === 'tk';
+    const canComplete = isChair && c.status === 'approved';
+    const dis = ok => ok ? '' : 'disabled';
+
+    return `<tr>
+      <td style="text-align:center"><input type="checkbox" class="row-chk" data-id="${c.id}" style="width:15px;height:15px;cursor:pointer;accent-color:var(--primary)"></td>
+      <td style="font-family:monospace;font-size:12px;color:var(--text-2);white-space:nowrap">${c.code}</td>
+      <td style="max-width:0"><a class="name-cell" href="#" title="${c.name}" onclick="openDetail('${c.code}');return false">${c.name}</a></td>
+      <td><span class="hd-type ${ty.cls}">${ty.label}</span></td>
+      <td style="font-size:12px;color:var(--text-2)">${c.donvi}</td>
+      <td style="font-size:12px;color:var(--text-2)">${c.dot}</td>
+      <td style="font-size:12px;white-space:nowrap">${c.date}<br><span style="color:var(--text-3)">${c.time}</span></td>
+      <td style="font-size:12px;white-space:nowrap">${c.meetForm==='online'?'🖥 Trực tuyến':'🏛 Trực tiếp'}</td>
+      <td style="font-size:12px;color:var(--text-2);max-width:0"><span class="name-cell" style="max-width:150px" title="${c.meetForm==='online'?c.link:c.room}">${c.meetForm==='online'?(c.link||'—'):(c.room||'—')}</span></td>
+      <td style="font-size:12px;color:var(--text-2)">${
+        c.members.length
+          ? c.members.map((m, i) => `<div>${i+1}. ${m.name}</div>`).join('')
+          : '<span style="color:var(--text-3)">—</span>'
+      }</td>
+      <td><span class="tag ${st.cls}">${st.label}</span></td>
+      <td class="tbl-actions" style="white-space:nowrap;text-align:center">
+        <button class="icon-btn" title="Xem chi tiết &amp; Chấm điểm" onclick="goToWorkspace('${c.code}')">👁</button>
+        <button class="icon-btn success-btn" title="${isChair ? 'Đánh dấu hoàn thành' : 'Chỉ Chủ tịch/Thư ký được đánh dấu hoàn thành'}" ${dis(canComplete)} onclick="goToWorkspace('${c.code}', 'complete')">🏁</button>
+      </td>
+    </tr>`;
+  }).join('');
+
+  document.getElementById('pg-info').textContent = `${list.length} hội đồng`;
+}
+
+function toggleAllRows(checked) {
+  document.querySelectorAll('.row-chk').forEach(chk => { chk.checked = checked; });
+}
+
+function goToWorkspace(code, action) {
+  let url = 'MH-GV-08_CouncilDetail.html?code=' + encodeURIComponent(code);
+  if (action) url += '&action=' + encodeURIComponent(action);
+  window.location.href = url;
+}
+
+let currentId = null;
+
+function openDetail(code) {
+  const c = COUNCILS.find(x => x.code === code);
+  if (!c) return;
+  currentId = c.id;
+  const ty = TYPE_CFG[c.type] || TYPE_CFG.danhgia;
+
+  document.getElementById('dt-title').textContent   = `Chi tiết hội đồng`;
+  document.getElementById('dt-code').textContent    = c.code;
+  document.getElementById('dt-name').textContent    = c.name;
+  document.getElementById('dt-donvi').textContent   = c.donvi;
+  document.getElementById('dt-nganh').textContent   = c.nganh || '—';
+  document.getElementById('dt-type').innerHTML      = `<span class="hd-type ${ty.cls}">${ty.label}</span>`;
+  document.getElementById('dt-dot').textContent     = c.dot;
+  document.getElementById('dt-datetime').textContent = `${c.meetForm === 'online' ? '🖥 Trực tuyến' : '🏛 Trực tiếp'} — ${c.date} ${c.time}`;
+  document.getElementById('dt-place').textContent   = c.meetForm === 'online' ? (c.link || '—') : (c.room || '—');
+  document.getElementById('dt-created').textContent = c.createdBy ? `${c.createdBy} · ${c.createdAt}` : '—';
+
+  const blank = '<span style="color:var(--text-3)">—</span>';
+  document.getElementById('dt-qdnum').innerHTML       = c.qdNum ? `<span class="qd-num" style="font-size:14px">${c.qdNum}</span>` : blank;
+  document.getElementById('dt-qddate').innerHTML      = c.qdDate || blank;
+  document.getElementById('dt-qdsignedby').innerHTML  = c.qdSignedBy || blank;
+  document.getElementById('dt-qdfile').innerHTML      = c.qdFile ? `<a href="#" onclick="return false">📄 ${c.qdFile} — Tải xuống</a>` : blank;
+
+  const noteRow = document.getElementById('dt-note-row');
+  if (c.note) { document.getElementById('dt-note').textContent = c.note; noteRow.style.display = ''; }
+  else { noteRow.style.display = 'none'; }
+
+  const bienBanRow = document.getElementById('dt-bienban-row');
+  if (c.bienBanFile) {
+    document.getElementById('dt-bienban').innerHTML = `<a href="#" onclick="return false">📄 ${c.bienBanFile} — Tải xuống</a>`;
+    bienBanRow.style.display = '';
+  } else { bienBanRow.style.display = 'none'; }
+
+  const completeNoteRow = document.getElementById('dt-completenote-row');
+  if (c.completeNote) { document.getElementById('dt-completenote').textContent = c.completeNote; completeNoteRow.style.display = ''; }
+  else { completeNoteRow.style.display = 'none'; }
+
+  document.getElementById('dt-mem-count').textContent = c.members.length;
+  document.getElementById('dt-mem-tbody').innerHTML = c.members.length
+    ? c.members.map(m => `<tr>
+        <td style="text-align:center"><input type="checkbox" class="dt-mem-chk" data-name="${m.name}" onchange="onMemberCheckDt(this)" style="width:15px;height:15px;cursor:pointer;accent-color:var(--primary)"></td>
+        <td><span class="role-tag ${ROLE_CLS[m.role]}">${ROLE_LABEL[m.role]}</span></td>
+        <td style="font-weight:600;font-size:13px">${m.name}</td>
+        <td>${m.gvType==='ngoai' ? '<span class="gv-ext-badge">Ngoài trường</span>' : '<span class="gv-int-badge">Trong trường</span>'}</td>
+        <td style="font-size:12px;color:var(--text-2)">${m.unit}</td>
+        <td style="text-align:center">${m.email ? `<button class="icon-btn" title="Gửi email" onclick="sendMemberEmailDt('${m.name}')">📧</button>` : '<span style="color:var(--text-3)">—</span>'}</td>
+      </tr>`).join('')
+    : '<tr><td colspan="6" class="tbl-empty">Chưa có thành viên.</td></tr>';
+  clearMemberSelectionDt();
+
+  const footer = document.getElementById('dt-footer');
+  footer.innerHTML = `<button class="btn btn-default" data-close="modal-detail">Đóng</button>
+    <button class="btn btn-primary" onclick="goToWorkspace('${c.code}')">Xem chi tiết &amp; Chấm điểm</button>`;
+
+  openModal('modal-detail');
+}
+
+/* ── Chọn thành viên & gửi email (modal Chi tiết) ─────────── */
+let selectedMembersDt = new Set();
+
+function toggleAllMembersDt(checked) {
+  document.querySelectorAll('.dt-mem-chk').forEach(chk => {
+    chk.checked = checked;
+    if (checked) selectedMembersDt.add(chk.dataset.name); else selectedMembersDt.delete(chk.dataset.name);
+  });
+  updateMemberBulkBarDt();
+}
+function onMemberCheckDt(chk) {
+  if (chk.checked) selectedMembersDt.add(chk.dataset.name); else selectedMembersDt.delete(chk.dataset.name);
+  updateMemberBulkBarDt();
+}
+function clearMemberSelectionDt() {
+  selectedMembersDt.clear();
+  document.querySelectorAll('.dt-mem-chk').forEach(chk => chk.checked = false);
+  const all = document.getElementById('dt-mem-chk-all');
+  if (all) all.checked = false;
+  updateMemberBulkBarDt();
+}
+function updateMemberBulkBarDt() {
+  document.getElementById('dt-mem-bulk-count').textContent = selectedMembersDt.size;
+  document.getElementById('dt-mem-bulk-bar').style.display = selectedMembersDt.size ? 'flex' : 'none';
+}
+function sendMemberEmailDt(name) {
+  const c = COUNCILS.find(x => x.id === currentId);
+  const m = c.members.find(x => x.name === name);
+  if (!m || !m.email) { showToast('Thành viên này chưa có email.', 'err'); return; }
+  openEmailModalDt([m]);
+}
+function sendBulkEmailDt() {
+  const c = COUNCILS.find(x => x.id === currentId);
+  const ms = c.members.filter(m => selectedMembersDt.has(m.name) && m.email);
+  if (!ms.length) { showToast('Vui lòng chọn ít nhất 1 thành viên có email.', 'err'); return; }
+  openEmailModalDt(ms);
+}
+function openEmailModalDt(members) {
+  const c = COUNCILS.find(x => x.id === currentId);
+  document.getElementById('em-to').innerHTML = members.map(m => `<span class="sv-chip">${m.name} — ${m.email}</span>`).join('');
+  document.getElementById('em-subject').value = `Thông báo từ ${c.name}`;
+  document.getElementById('em-body').value =
+`Kính gửi ${members.map(m => m.name).join(', ')},
+
+Hội đồng: ${c.name} (${c.code})
+Thời gian họp: ${c.date} ${c.time}${c.room ? ' — ' + c.room : ''}${c.link ? ' — ' + c.link : ''}
+
+Trân trọng,
+${CURRENT_GV_NAME}`;
+  document.getElementById('modal-email').dataset.emails = JSON.stringify(members.map(m => m.email));
+  openModal('modal-email');
+}
+function confirmSendEmailDt() {
+  const subject = document.getElementById('em-subject').value.trim();
+  if (!subject) { showToast('Vui lòng nhập tiêu đề email.', 'err'); return; }
+  const body = document.getElementById('em-body').value;
+  const emails = JSON.parse(document.getElementById('modal-email').dataset.emails || '[]');
+  window.location.href = `mailto:${emails.join(',')}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+  closeModal('modal-email');
+  showToast(`📧 Đã mở ứng dụng email gửi đến ${emails.length} người nhận.`, 'ok');
+}
+
+['f-type','f-dot','f-meetform','f-date-from','f-date-to'].forEach(id =>
+  document.getElementById(id).addEventListener('change', render));
+document.getElementById('q').addEventListener('input', render);
+
+render();
+</script>
+</body>
+</html>

@@ -66,6 +66,8 @@ a:hover{color:var(--primary-h)}
 .btn-default:hover{color:var(--primary);border-color:var(--primary)}
 .btn-danger{background:#fff;color:var(--error);border-color:var(--error)}
 .btn-danger:hover{background:var(--error);color:#fff}
+.btn-success{background:#fff;color:var(--success);border-color:var(--success)}
+.btn-success:hover{background:var(--success);color:#fff}
 .btn:disabled{opacity:.55;cursor:not-allowed;pointer-events:none;filter:grayscale(.4)}
 .btn-link{background:transparent;border-color:transparent;color:var(--primary);padding:0 4px}
 .btn-link:hover{color:var(--primary-h)}

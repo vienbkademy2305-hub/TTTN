@@ -189,9 +189,17 @@
           <option value="completed">Hoàn thành</option>
           <option value="cancelled">Đã hủy</option>
         </select>
+        <select class="fc" style="width:150px" id="f-meetform">
+          <option value="">Tất cả hình thức</option>
+          <option value="offline">🏛 Trực tiếp</option>
+          <option value="online">🖥 Trực tuyến</option>
+        </select>
+        <input class="fc" type="date" id="f-date-from" style="width:150px" title="Ngày họp từ">
+        <input class="fc" type="date" id="f-date-to" style="width:150px" title="Ngày họp đến">
         <div class="input-search" style="flex:1;max-width:260px">
           <input class="fc" type="text" id="q" placeholder="Tìm tên, mã hội đồng...">
         </div>
+        <button class="btn btn-default" onclick="exportCouncilList()">📥 Xuất danh sách</button>
         <button class="btn btn-primary" id="btn-create" style="display:none" onclick="goToCreateCouncil()">+ Tạo hội đồng</button>
       </div>
 
@@ -199,7 +207,7 @@
       <div class="card" style="padding:0">
         <div class="bulk-bar" id="row-bulk-bar" style="display:none;margin:16px 16px 0">
           <span>Đã chọn <strong id="row-bulk-count">0</strong> hội đồng</span>
-          <button class="btn btn-primary btn-sm" id="row-bulk-issue-btn" onclick="openIssueDecisionBulk()">Nhập quyết định hàng loạt</button>
+          <button class="btn btn-primary btn-sm" id="row-bulk-issue-btn" style="display:none" onclick="openIssueDecisionBulk()">Nhập quyết định hàng loạt</button>
         </div>
         <div class="tbl-wrap">
           <table class="tbl">
@@ -216,6 +224,7 @@
                 <th style="width:150px">Địa điểm</th>
                 <th style="width:200px">Thành viên</th>
                 <th style="width:105px">Trạng thái</th>
+                <th style="width:180px">Lý do</th>
                 <th style="width:130px">Số quyết định</th>
                 <th style="width:230px;text-align:center">Thao tác</th>
               </tr>
@@ -616,9 +625,6 @@
       <button class="modal-close" data-close="modal-cancel">✕</button>
     </div>
     <div class="modal-bd">
-      <div style="font-size:13px;color:var(--text-2);margin-bottom:12px">
-        Hội đồng: <strong id="cc-name"></strong>
-      </div>
       <div class="fi" id="fi-cc-reason">
         <label>Lý do hủy <span class="req">*</span></label>
         <textarea class="fc" id="cc-reason" rows="4"
@@ -629,7 +635,7 @@
     </div>
     <div class="modal-ft">
       <button class="btn btn-default" data-close="modal-cancel">Đóng</button>
-      <button class="btn btn-danger" onclick="submitCancel()">Xác nhận hủy</button>
+      <button class="btn btn-danger" onclick="submitCancel()">Xác nhận</button>
     </div>
   </div>
 </div>
@@ -918,6 +924,7 @@ function setRole(role) {
 
 /* ── Bulk select (main table) ────────────────────────────── */
 let selectedRows = new Set();
+let currentListView = [];
 
 function toggleAllRows(checked) {
   document.querySelectorAll('.row-chk').forEach(chk => {
@@ -941,8 +948,7 @@ function clearRowSelection() {
 function updateRowBulkBar() {
   document.getElementById('row-bulk-count').textContent = selectedRows.size;
   document.getElementById('row-bulk-bar').style.display = selectedRows.size ? 'flex' : 'none';
-  document.getElementById('row-bulk-issue-btn').style.display =
-    currentRole === 'pdt' && COUNCILS.some(c => selectedRows.has(c.id) && c.status === 'approved' && !c.qdNum) ? '' : 'none';
+  document.getElementById('row-bulk-issue-btn').style.display = 'none';
 }
 
 /* ── Sang trang Chi tiết & Chấm điểm ──────────────────────── */
@@ -1020,6 +1026,9 @@ function render() {
   const fDonvi  = document.getElementById('f-donvi').value;
   const fDot    = document.getElementById('f-dot').value;
   const fStatus = document.getElementById('f-status').value;
+  const fMeetForm = document.getElementById('f-meetform').value;
+  const fDateFrom = document.getElementById('f-date-from').value;
+  const fDateTo   = document.getElementById('f-date-to').value;
 
   const isPDT = currentRole === 'pdt';
   const scope = isPDT ? COUNCILS.filter(c => c.status !== 'draft') : COUNCILS;
@@ -1029,7 +1038,10 @@ function render() {
     (!fType   || c.type   === fType)  &&
     (!fDonvi  || c.donvi  === fDonvi) &&
     (!fDot    || c.dot    === fDot)   &&
-    (!fStatus || c.status === fStatus)
+    (!fStatus || c.status === fStatus) &&
+    (!fMeetForm || c.meetForm === fMeetForm) &&
+    (!fDateFrom || parseDMY(c.date) >= new Date(fDateFrom)) &&
+    (!fDateTo   || parseDMY(c.date) <= new Date(fDateTo))
   );
 
   document.getElementById('s-total').textContent     = scope.length;
@@ -1040,6 +1052,8 @@ function render() {
   const draftCard = document.getElementById('s-draft-card');
   if (draftCard) draftCard.style.display = isPDT ? 'none' : '';
   if (!isPDT) document.getElementById('s-draft').textContent = scope.filter(c=>c.status==='draft').length;
+
+  currentListView = list;
 
   const tbody = document.getElementById('tbody');
   if (!list.length) {
@@ -1053,11 +1067,12 @@ function render() {
     const st = STATUS_CFG[c.status] || STATUS_CFG.draft;
     const ty = TYPE_CFG[c.type] || TYPE_CFG.danhgia;
     const qdCell = c.qdNum
-      ? `<span class="qd-num" style="cursor:pointer;text-decoration:underline dotted" onclick="openDecisionList(${c.id})" title="Xem danh sách quyết định">${c.qdNum}</span><div style="font-size:11px;color:var(--text-3)">${c.qdDate}</div>`
+      ? `<span class="qd-num">${c.qdNum}</span><div style="font-size:11px;color:var(--text-3)">${c.qdDate}</div>`
       : `<span style="color:var(--text-3);font-size:12px">—</span>`;
 
     const dis = ok => ok ? '' : 'disabled';
-    let actions = `<button class="icon-btn" title="Xem chi tiết & Chấm điểm" onclick="goToWorkspace('${c.code}')">👁</button>`;
+    let actions = `<button class="icon-btn" title="Xem chi tiết & Chấm điểm" onclick="goToWorkspace('${c.code}')">👁</button>
+        <button class="icon-btn" title="Xuất thông tin chi tiết hội đồng" onclick="exportCouncilDetail(${c.id})">📥</button>`;
     if (currentRole === 'kcm') {
       const canEdit      = c.status === 'draft' || c.status === 'rejected';
       const canDelete    = c.status === 'draft';
@@ -1068,12 +1083,8 @@ function render() {
         <button class="icon-btn warn-btn" title="Thu hồi yêu cầu" ${dis(canWithdraw)} onclick="confirmWithdraw(${c.id})">↩</button>`;
     } else { // pdt
       const canApproveReject = c.status === 'pending';
-      const canIssueDecision = c.status === 'approved' && !c.qdNum;
       actions += `
-        <button class="icon-btn" title="Chi tiết hội đồng" onclick="openDetail(${c.id})">ℹ️</button>
-        <button class="icon-btn success-btn" title="Duyệt yêu cầu" ${dis(canApproveReject)} onclick="approveCouncil(${c.id})">✓</button>
-        <button class="icon-btn danger" title="Từ chối" ${dis(canApproveReject)} onclick="openRejectModal(${c.id})">✗</button>
-        <button class="icon-btn" title="Nhập quyết định thành lập" ${dis(canIssueDecision)} onclick="openIssueDecision(${c.id})">📄</button>`;
+        <button class="icon-btn success-btn" title="Duyệt" ${dis(canApproveReject)} onclick="goToWorkspace('${c.code}')">📝</button>`;
     }
 
     const rowCls = (c.status === 'cancelled') ? ' class="row-disabled"' : '';
@@ -1094,6 +1105,7 @@ function render() {
           : '<span style="color:var(--text-3)">—</span>'
       }</td>
       <td><span class="tag ${st.cls}">${st.label}</span></td>
+      <td style="font-size:12px;color:var(--text-2);max-width:0"><span class="name-cell" style="max-width:170px" title="${c.rejectReason || ''}">${c.rejectReason || '—'}</span></td>
       <td>${qdCell}</td>
       <td class="tbl-actions" style="white-space:nowrap;text-align:center">${actions}</td>
     </tr>`;
@@ -1402,8 +1414,6 @@ function submitIssueDecision() {
 /* ── Hủy hội đồng ─────────────────────────────────────────── */
 function openCancelModal(id) {
   currentId = id;
-  const c = COUNCILS.find(x => x.id === id);
-  document.getElementById('cc-name').textContent = c.name;
   document.getElementById('cc-reason').value = '';
   document.getElementById('cc-cnt').textContent = '0';
   setErr('fi-cc-reason', false);
@@ -1515,6 +1525,114 @@ function downloadBienBan(id) {
   showToast(`📄 Đã tải xuống Biên bản họp ${c.bienBanFile} (mô phỏng).`, 'ok');
 }
 
+/* ── Xuất thông tin chi tiết hội đồng ──────────────────────── */
+function exportCouncilDetail(id) {
+  const c = COUNCILS.find(x => x.id === id);
+  const st = STATUS_CFG[c.status] || STATUS_CFG.draft;
+  const ty = TYPE_CFG[c.type] || TYPE_CFG.danhgia;
+
+  const namesByRole = role => c.members.filter(m => m.role === role).map(m => `${m.name} - ${m.unit}`).join('; ') || '—';
+
+  const headers = [
+    'Mã hội đồng','Tên hội đồng','Đơn vị','Ngành / Lĩnh vực','Phân loại','Trạng thái','Học kỳ',
+    'Hình thức họp','Thời gian họp','Địa điểm / Link họp',
+    'Chủ tịch','Thư ký','Ủy viên','Phản biện','GV chấm',
+    'Số quyết định','Ngày ban hành','Người ký','Ghi chú',
+    'Ngày hoàn tất','Ghi chú kết quả họp','Biên bản họp'
+  ];
+
+  const row = [
+    c.code,
+    c.name,
+    c.donvi,
+    c.nganh,
+    ty.label,
+    st.label,
+    c.dot,
+    c.meetForm === 'online' ? 'Trực tuyến' : 'Trực tiếp',
+    `${c.date} ${c.time}`,
+    c.meetForm === 'online' ? (c.link || '—') : (c.room || '—'),
+    namesByRole('ct'),
+    namesByRole('tk'),
+    namesByRole('uv'),
+    namesByRole('pb'),
+    namesByRole('gc'),
+    c.qdNum || '—',
+    c.qdDate || '—',
+    c.qdSignedBy || '—',
+    c.note || '',
+    c.completedAt || '—',
+    c.completeNote || '',
+    c.bienBanFile || '—'
+  ];
+
+  const csvLines = [headers, row].map(r =>
+    r.map(cell => `"${String(cell).replace(/"/g,'""')}"`).join(',')
+  );
+  const bom = '﻿';
+  const csv = bom + csvLines.join('\r\n');
+
+  const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+  const url  = URL.createObjectURL(blob);
+  const a    = document.createElement('a');
+  a.href     = url;
+  a.download = `ChiTiet_HoiDong_${c.code.replace(/\//g,'-')}.csv`;
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+
+  showToast(`📥 Đã xuất thông tin chi tiết hội đồng — ${a.download}`, 'ok');
+}
+
+/* ── Xuất danh sách hội đồng (theo bộ lọc đang hiển thị) ──── */
+function exportCouncilList() {
+  if (!currentListView.length) { showToast('Không có hội đồng để xuất.', 'err'); return; }
+
+  const headers = ['Mã hội đồng','Tên hội đồng','Phân loại','Đơn vị','Học kỳ','Ngày họp','Giờ họp','Hình thức','Địa điểm / Link họp','Thành viên','Trạng thái','Lý do từ chối','Số quyết định','Ngày ban hành'];
+
+  const rows = currentListView.map(c => {
+    const st = STATUS_CFG[c.status] || STATUS_CFG.draft;
+    const ty = TYPE_CFG[c.type] || TYPE_CFG.danhgia;
+    const memberNames = c.members.map(m => m.name).join('; ') || '—';
+
+    return [
+      c.code,
+      c.name,
+      ty.label,
+      c.donvi,
+      c.dot,
+      c.date,
+      c.time,
+      c.meetForm === 'online' ? 'Trực tuyến' : 'Trực tiếp',
+      c.meetForm === 'online' ? (c.link || '—') : (c.room || '—'),
+      memberNames,
+      st.label,
+      c.rejectReason || '',
+      c.qdNum || '—',
+      c.qdDate || '—'
+    ];
+  });
+
+  const csvLines = [headers, ...rows].map(r =>
+    r.map(cell => `"${String(cell).replace(/"/g,'""')}"`).join(',')
+  );
+  const bom = '﻿';
+  const csv = bom + csvLines.join('\r\n');
+
+  const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+  const url  = URL.createObjectURL(blob);
+  const a    = document.createElement('a');
+  a.href     = url;
+  a.download = `DanhSach_HoiDong_${todayIso()}.csv`;
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+
+  showToast(`📥 Đã xuất ${currentListView.length} hội đồng — ${a.download}`, 'ok');
+}
+
 /* ── Detail modal ─────────────────────────────────────────── */
 function openDetail(id) {
   const c = COUNCILS.find(x => x.id === id);
@@ -1573,23 +1691,15 @@ function openDetail(id) {
   /* Footer actions — phụ thuộc vai trò hiện tại, giống cột Thao tác */
   const footer = document.getElementById('dt-footer');
   const dis = ok => ok ? '' : 'disabled';
-  let btns = `<button class="btn btn-default" data-close="modal-detail">Đóng</button><div style="flex:1"></div>
-    <button class="btn btn-default" onclick="closeModal('modal-detail');goToWorkspace('${c.code}')">Xem chi tiết &amp; Chấm điểm</button>`;
+  let btns = `<button class="btn btn-default" data-close="modal-detail">Đóng</button><div style="flex:1"></div>`;
   if (currentRole === 'kcm') {
     const canEdit     = c.status === 'draft' || c.status === 'rejected';
     const canDelete   = c.status === 'draft';
     const canWithdraw = c.status === 'pending';
-    btns += `
+    btns += `<button class="btn btn-default" onclick="closeModal('modal-detail');goToWorkspace('${c.code}')">Xem chi tiết &amp; Chấm điểm</button>
       <button class="btn btn-primary" ${dis(canEdit)} onclick="closeModal('modal-detail');openDetailEdit(${c.id})">${c.status === 'rejected' ? 'Sửa & gửi lại' : 'Sửa'}</button>
       <button class="btn btn-danger" ${dis(canDelete)} onclick="closeModal('modal-detail');confirmDelete(${c.id})">Xóa</button>
       <button class="btn btn-default" ${dis(canWithdraw)} onclick="closeModal('modal-detail');confirmWithdraw(${c.id})">Thu hồi</button>`;
-  } else { // pdt
-    const canApproveReject = c.status === 'pending';
-    const canIssueDecision = c.status === 'approved' && !c.qdNum;
-    btns += `
-      <button class="btn btn-success" ${dis(canApproveReject)} onclick="closeModal('modal-detail');approveCouncil(${c.id})">Duyệt yêu cầu</button>
-      <button class="btn btn-danger" ${dis(canApproveReject)} onclick="closeModal('modal-detail');openRejectModal(${c.id})">Từ chối</button>
-      <button class="btn btn-primary" ${dis(canIssueDecision)} onclick="closeModal('modal-detail');openIssueDecision(${c.id})">Nhập quyết định</button>`;
   }
   footer.innerHTML = btns;
 
@@ -1756,7 +1866,7 @@ document.getElementById('cc-reason').addEventListener('input', function() {
   document.getElementById('cc-cnt').textContent = this.value.length;
 });
 
-['f-type','f-donvi','f-dot','f-status'].forEach(id =>
+['f-type','f-donvi','f-dot','f-status','f-meetform','f-date-from','f-date-to'].forEach(id =>
   document.getElementById(id).addEventListener('change', render));
 document.getElementById('q').addEventListener('input', render);
 

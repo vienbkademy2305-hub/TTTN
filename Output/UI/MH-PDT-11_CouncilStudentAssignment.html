@@ -987,7 +987,7 @@ function councilActionButtonsHtml(c) {
   const dis = ok => ok ? '' : 'disabled';
 
   return `
-    <button class="btn btn-default btn-sm" onclick="exportCouncilDetail()" title="Xuất thông tin chi tiết hội đồng ra Excel">📥 Xuất</button>
+    <button class="btn btn-default btn-sm" onclick="exportCouncilDetail()" title="Xuất thông tin chi tiết hội đồng ra Excel">📥 Xuất chi tiết</button>
     <button class="btn btn-primary btn-sm" ${dis(canIssueDecision)} onclick="openIssueDecisionFromDetail()">Nhập quyết định</button>
     <button class="btn btn-default btn-sm" ${dis(canEdit)} onclick="window.location.href='MH-PDT-11_CouncilStudentAssignment.html?mode=edit&code=${encodeURIComponent(c.code)}'">Sửa</button>`;
 }
@@ -1745,7 +1745,7 @@ function exportStudentList() {
   showToast(`📥 Đã xuất ${c.students.length} sinh viên — ${a.download}`, 'ok');
 }
 
-/* ── Xuất thông tin chi tiết hội đồng ──────────────────────── */
+/* ── Xuất thông tin chi tiết hội đồng (mỗi sinh viên 1 dòng) ── */
 function exportCouncilDetail() {
   const c = council();
   const st = STATUS_CFG[c.status] || STATUS_CFG.draft;
@@ -1754,15 +1754,15 @@ function exportCouncilDetail() {
   const namesByRole = role => c.members.filter(m => m.role === role).map(m => `${m.name} - ${m.unit}`).join('; ') || '—';
 
   const headers = [
+    'STT','Mã sinh viên','Họ và tên','Lớp HC','Lớp HP','Ngành / Chuyên ngành','CTĐT','Tên đề tài',
     'Mã hội đồng','Tên hội đồng','Đơn vị','Ngành / Lĩnh vực','Phân loại','Trạng thái','Học kỳ',
     'Hình thức họp','Thời gian họp','Địa điểm / Link họp',
     'Chủ tịch','Thư ký','Ủy viên','Phản biện','GV chấm',
-    'Số lượng sinh viên',
     'Số quyết định','Ngày ban hành','Người ký','Ghi chú',
     'Ngày hoàn tất','Ghi chú kết quả họp','Biên bản họp'
   ];
 
-  const row = [
+  const councilCols = [
     c.code,
     c.name,
     c.donvi,
@@ -1778,7 +1778,6 @@ function exportCouncilDetail() {
     namesByRole('uv'),
     namesByRole('pb'),
     namesByRole('gc'),
-    c.students.length,
     c.qdNum || '—',
     c.qdDate || '—',
     c.qdSignedBy || '—',
@@ -1788,7 +1787,21 @@ function exportCouncilDetail() {
     c.bienBanFile || '—'
   ];
 
-  const csvLines = [headers, row].map(r =>
+  const students = c.students.length ? c.students : [null];
+
+  const rows = students.map((sv, i) => [
+    sv ? i + 1 : '—',
+    sv ? sv.maSV : '—',
+    sv ? sv.tenSV : '—',
+    sv ? (sv.lopHC || '—') : '—',
+    sv ? sv.lop : '—',
+    sv ? (CTDT_LABEL[sv.ctdt] || sv.ctdt) : '—',
+    sv ? sv.ctdt : '—',
+    sv ? sv.tenDeTai : '—',
+    ...councilCols
+  ]);
+
+  const csvLines = [headers, ...rows].map(r =>
     r.map(cell => `"${String(cell).replace(/"/g,'""')}"`).join(',')
   );
   const bom = '﻿';

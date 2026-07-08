@@ -985,7 +985,7 @@ function headerActionButtonsHtml(c, includeEdit) {
   const canComplete = c.status === 'approved';
   const dis = ok => ok ? '' : 'disabled';
 
-  let html = `<button class="btn btn-default btn-sm" onclick="exportCouncilDetail()">📥 Xuất</button>
+  let html = `<button class="btn btn-default btn-sm" onclick="exportCouncilDetail()">📥 Xuất chi tiết</button>
     <button class="btn btn-primary btn-sm" ${dis(canComplete)} onclick="openCompleteModal()">Đánh dấu hoàn thành</button>`;
   if (includeEdit && canEdit) {
     html += `<button class="btn btn-primary btn-sm" onclick="window.location.href='MH-KCM-09_CouncilStudentAssignment.html?mode=edit&code=${encodeURIComponent(c.code)}'">${c.status === 'rejected' ? 'Cập nhật & gửi lại' : 'Cập nhật'}</button>`;
@@ -1205,13 +1205,7 @@ function renderCouncilInfo(c) {
   clearMemberSelection();
 
   const gateWrap = document.getElementById('gate-note-wrap');
-  gateWrap.innerHTML = (c.status === 'draft' || c.status === 'pending')
-    ? `<div class="gate-note">⚠️ Hội đồng đang ở trạng thái "${st.label}" — chưa thể chấm điểm. Chỉ chấm điểm khi hội đồng đã <strong>Đã duyệt</strong>.</div>`
-    : (c.status === 'rejected' || c.status === 'cancelled')
-      ? `<div class="gate-note">⚠️ Hội đồng đã "${st.label}" — không thể chấm điểm.</div>`
-      : c.status === 'completed'
-        ? `<div class="gate-note">ℹ️ Hội đồng đã <strong>Hoàn thành</strong> — chỉ xem lại điểm đã chấm, không thể chấm hoặc sửa thêm.</div>`
-        : '';
+  gateWrap.innerHTML = '';
 }
 
 /* ── Render: students & scores ────────────────────────────── */
@@ -1794,15 +1788,15 @@ function exportCouncilDetail() {
   const namesByRole = role => c.members.filter(m => m.role === role).map(m => `${m.name} - ${m.unit}`).join('; ') || '—';
 
   const headers = [
+    'STT','Mã sinh viên','Họ và tên','Lớp HC','Lớp HP','Ngành / Chuyên ngành','CTĐT','Tên đề tài',
     'Mã hội đồng','Tên hội đồng','Đơn vị','Ngành / Lĩnh vực','Phân loại','Trạng thái','Học kỳ',
     'Hình thức họp','Thời gian họp','Địa điểm / Link họp',
     'Chủ tịch','Thư ký','Ủy viên','Phản biện','GV chấm',
-    'Số lượng sinh viên',
     'Số quyết định','Ngày ban hành','Người ký','Ghi chú',
     'Ngày hoàn tất','Ghi chú kết quả họp','Biên bản họp'
   ];
 
-  const row = [
+  const councilCols = [
     c.code,
     c.name,
     c.donvi,
@@ -1818,7 +1812,6 @@ function exportCouncilDetail() {
     namesByRole('uv'),
     namesByRole('pb'),
     namesByRole('gc'),
-    c.students.length,
     c.qdNum || '—',
     c.qdDate || '—',
     c.qdSignedBy || '—',
@@ -1828,7 +1821,21 @@ function exportCouncilDetail() {
     c.bienBanFile || '—'
   ];
 
-  const csvLines = [headers, row].map(r =>
+  const students = c.students.length ? c.students : [null];
+
+  const rows = students.map((sv, i) => [
+    sv ? i + 1 : '—',
+    sv ? sv.maSV : '—',
+    sv ? sv.tenSV : '—',
+    sv ? (sv.lopHC || '—') : '—',
+    sv ? sv.lop : '—',
+    sv ? (CTDT_LABEL[sv.ctdt] || sv.ctdt) : '—',
+    sv ? sv.ctdt : '—',
+    sv ? sv.tenDeTai : '—',
+    ...councilCols
+  ]);
+
+  const csvLines = [headers, ...rows].map(r =>
     r.map(cell => `"${String(cell).replace(/"/g,'""')}"`).join(',')
   );
   const bom = '﻿';

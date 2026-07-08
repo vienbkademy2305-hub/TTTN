@@ -142,6 +142,8 @@
         <div class="input-search" style="flex:1;max-width:260px">
           <input class="fc" type="text" id="q" placeholder="Tìm tên, mã hội đồng...">
         </div>
+        <button class="btn btn-default" onclick="exportCouncilList()">📥 Xuất DS</button>
+        <button class="btn btn-default" id="btn-export-selected" onclick="exportSelectedCouncilDetails()" title="Chọn hội đồng ở bảng bên dưới để xuất chi tiết">📥 Xuất chi tiết</button>
       </div>
 
       <!-- Table -->
@@ -296,6 +298,10 @@ const COUNCILS = [
       { role:'uv', name:'TS. Trần Văn Bình',     gvType:'noi', unit:'Khoa CNTT', email:'tranvanbinh@khoacntt.edu.vn' },
       { role:'uv', name:'TS. Nguyễn Minh Tuấn',  gvType:'noi', unit:'Khoa CNTT', email:'nguyenminhtuan@khoacntt.edu.vn' },
       { role:'pb', name:'TS. Phạm Quốc Hùng',    gvType:'noi', unit:'Khoa CNTT', email:'phamquochung@khoacntt.edu.vn' }
+    ],
+    students:[
+      { maSV:'B22DCCN001', tenSV:'Nguyễn Văn An', lop:'INT3110_1', ctdt:'KTPM', tenDeTai:'Xây dựng hệ thống quản lý thực tập sinh viên' },
+      { maSV:'B22DCCN022', tenSV:'Phạm Minh Khoa', lop:'INT3110_2', ctdt:'KTPM', tenDeTai:'Ứng dụng AI trong chấm điểm tự động' }
     ]
   },
   {
@@ -309,6 +315,10 @@ const COUNCILS = [
       { role:'pb', name:'TS. Lê Đức Thọ',    gvType:'noi', unit:'Khoa CNTT', email:'leductho@khoacntt.edu.vn' },
       { role:'pb', name:'PGS.TS. Võ Thanh Tùng', gvType:'ngoai', unit:'Trường ĐH Bách Khoa', email:'vttung@hcmut.edu.vn' },
       { role:'gc', name:'TS. Nguyễn Minh Tuấn', gvType:'noi', unit:'Khoa CNTT', email:'nguyenminhtuan@khoacntt.edu.vn' }
+    ],
+    students:[
+      { maSV:'B22DCCN033', tenSV:'Lê Quốc Cường',  lop:'INT3110_2', ctdt:'KHMT', tenDeTai:'Mô hình học sâu nhận diện khuôn mặt' },
+      { maSV:'B22DCCN125', tenSV:'Trương Thị Yến', lop:'INT3110_2', ctdt:'KHMT', tenDeTai:'Xử lý ngôn ngữ tự nhiên tiếng Việt' }
     ]
   },
   {
@@ -322,13 +332,20 @@ const COUNCILS = [
       { role:'uv', name:'TS. Phạm Thu Hà',        gvType:'noi', unit:'Khoa CNTT', email:'phamthuha@khoacntt.edu.vn' },
       { role:'gc', name:'ThS. Nguyễn Thu Hoa',     gvType:'noi', unit:'Khoa CNTT', email:'nguyenthuhoa@khoacntt.edu.vn' },
       { role:'pb', name:'TS. Lê Đức Thọ',         gvType:'noi', unit:'Khoa CNTT', email:'leductho@khoacntt.edu.vn' }
+    ],
+    students:[
+      { maSV:'B22DCCN058', tenSV:'Hoàng Minh Đức', lop:'INT3110_1', ctdt:'HTTT', tenDeTai:'Hệ thống quản trị quan hệ khách hàng' },
+      { maSV:'B22DCCN047', tenSV:'Ngô Thị Hà',     lop:'INT3110_2', ctdt:'HTTT', tenDeTai:'Hệ thống cảnh báo gian lận giao dịch' },
+      { maSV:'B22DCCN048', tenSV:'Phạm Văn Đạt',   lop:'INT3110_1', ctdt:'HTTT', tenDeTai:'Ứng dụng chatbot hỗ trợ khách hàng' },
+      { maSV:'B22DCCN077', tenSV:'Hoàng Thị Mai',  lop:'INT3110_2', ctdt:'HTTT', tenDeTai:'Hệ thống quản lý đặt lịch trực tuyến' },
+      { maSV:'B22DCCN090', tenSV:'Đỗ Văn Khôi',    lop:'INT3110_1', ctdt:'HTTT', tenDeTai:'Ứng dụng theo dõi sức khỏe cá nhân' }
     ]
   },
   {
     id:1, code:'HD-2026-011', name:'Hội đồng đánh giá kết quả TTTN HK2 2025-2026 (Đợt 1 - Nhóm CNPM)',
     donvi:'Bộ môn Công nghệ phần mềm', nganh:'Kỹ thuật phần mềm', type:'danhgia', dot:'HK2 2025-2026',
     meetForm:'offline', date:'28/06/2026', time:'08:00', room:'Phòng họp A1-101', link:'', status:'draft',
-    members:[]
+    members:[], students:[]
   },
   {
     id:7, code:'HD-2026-010', name:'Hội đồng đánh giá kết quả TTTN HK2 2025-2026 (Nhóm HTTT)',
@@ -339,6 +356,10 @@ const COUNCILS = [
       { role:'tk', name:'ThS. Nguyễn Thu Hoa', gvType:'noi', unit:'Khoa CNTT', email:'nguyenthuhoa@khoacntt.edu.vn' },
       { role:'uv', name:'TS. Lê Đức Thọ',       gvType:'noi', unit:'Khoa CNTT', email:'leductho@khoacntt.edu.vn' },
       { role:'uv', name:'TS. Nguyễn Minh Tuấn',  gvType:'noi', unit:'Khoa CNTT', email:'nguyenminhtuan@khoacntt.edu.vn' }
+    ],
+    students:[
+      { maSV:'B22DCCN110', tenSV:'Lý Gia Bảo',   lop:'INT3110_1', ctdt:'HTTT', tenDeTai:'Hệ thống ERP cho doanh nghiệp nhỏ' },
+      { maSV:'B22DCCN102', tenSV:'Bùi Văn Phúc', lop:'INT3110_2', ctdt:'HTTT', tenDeTai:'Hệ thống giám sát an ninh mạng nội bộ' }
     ]
   },
   {
@@ -351,6 +372,10 @@ const COUNCILS = [
       { role:'tk', name:'TS. Nguyễn Minh Tuấn',   gvType:'noi', unit:'Khoa CNTT', email:'nguyenminhtuan@khoacntt.edu.vn' },
       { role:'uv', name:'TS. Phạm Quốc Hùng',     gvType:'noi', unit:'Khoa CNTT', email:'phamquochung@khoacntt.edu.vn' },
       { role:'pb', name:'TS. Lê Đức Thọ',          gvType:'noi', unit:'Khoa CNTT', email:'leductho@khoacntt.edu.vn' }
+    ],
+    students:[
+      { maSV:'B22DCCN140', tenSV:'Vũ Thị Ngọc',    lop:'INT3110_1', ctdt:'KTPM', tenDeTai:'Ứng dụng quản lý kho hàng thông minh' },
+      { maSV:'B22DCCN141', tenSV:'Đặng Văn Long', lop:'INT3110_2', ctdt:'KTPM', tenDeTai:'Hệ thống đặt vé xem phim trực tuyến' }
     ]
   },
   {
@@ -363,6 +388,10 @@ const COUNCILS = [
       { role:'tk', name:'ThS. Nguyễn Thu Hoa',      gvType:'noi', unit:'Khoa CNTT', email:'nguyenthuhoa@khoacntt.edu.vn' },
       { role:'pb', name:'TS. Nguyễn Minh Tuấn',      gvType:'noi', unit:'Khoa CNTT', email:'nguyenminhtuan@khoacntt.edu.vn' },
       { role:'pb', name:'PGS.TS. Võ Thanh Tùng', gvType:'ngoai', unit:'Trường ĐH Bách Khoa', email:'vttung@hcmut.edu.vn' }
+    ],
+    students:[
+      { maSV:'B22DCCN150', tenSV:'Hồ Thị Kim Anh', lop:'INT3110_1', ctdt:'HTTT', tenDeTai:'Hệ thống dự đoán rủi ro tín dụng' },
+      { maSV:'B22DCCN151', tenSV:'Trịnh Văn Hiếu', lop:'INT3110_2', ctdt:'HTTT', tenDeTai:'Ứng dụng blockchain trong quản lý chuỗi cung ứng' }
     ]
   },
   {
@@ -375,9 +404,15 @@ const COUNCILS = [
       { role:'tk', name:'ThS. Lê Thị Hoa',         gvType:'noi', unit:'Khoa CNTT', email:'lethihoa@khoacntt.edu.vn' },
       { role:'uv', name:'TS. Phạm Thu Hà',         gvType:'noi', unit:'Khoa CNTT', email:'phamthuha@khoacntt.edu.vn' },
       { role:'pb', name:'TS. Phạm Quốc Hùng',      gvType:'noi', unit:'Khoa CNTT', email:'phamquochung@khoacntt.edu.vn' }
+    ],
+    students:[
+      { maSV:'B22DCCN160', tenSV:'Ngô Thị Bích Ngọc', lop:'INT3110_1', ctdt:'KTPM', tenDeTai:'Ứng dụng học trực tuyến tương tác' },
+      { maSV:'B22DCCN161', tenSV:'Phan Văn Đức',       lop:'INT3110_2', ctdt:'KTPM', tenDeTai:'Hệ thống quản lý bãi đỗ xe thông minh' }
     ]
   }
 ];
+
+const CTDT_LABEL = { KTPM:'Kỹ thuật phần mềm', HTTT:'Hệ thống thông tin', KHMT:'Khoa học máy tính', CNTT:'Công nghệ thông tin' };
 
 /* ── Lọc chỉ các hội đồng có mặt GV hiện tại ─────────────────── */
 function myRoleIn(c) {
@@ -411,6 +446,7 @@ function render() {
   if (!list.length) {
     tbody.innerHTML = '<tr><td colspan="12" class="tbl-empty">Không tìm thấy hội đồng phù hợp.</td></tr>';
     document.getElementById('pg-info').textContent = '0 hội đồng';
+    clearRowSelection();
     return;
   }
 
@@ -423,7 +459,7 @@ function render() {
     const dis = ok => ok ? '' : 'disabled';
 
     return `<tr>
-      <td style="text-align:center"><input type="checkbox" class="row-chk" data-id="${c.id}" style="width:15px;height:15px;cursor:pointer;accent-color:var(--primary)"></td>
+      <td style="text-align:center"><input type="checkbox" class="row-chk" data-id="${c.id}" onchange="onRowCheck(this)" style="width:15px;height:15px;cursor:pointer;accent-color:var(--primary)"></td>
       <td style="font-family:monospace;font-size:12px;color:var(--text-2);white-space:nowrap">${c.code}</td>
       <td style="max-width:0"><a class="name-cell" href="#" title="${c.name}" onclick="openDetail('${c.code}');return false">${c.name}</a></td>
       <td><span class="hd-type ${ty.cls}">${ty.label}</span></td>
@@ -446,10 +482,25 @@ function render() {
   }).join('');
 
   document.getElementById('pg-info').textContent = `${list.length} hội đồng`;
+  clearRowSelection();
 }
 
+let selectedRows = new Set();
 function toggleAllRows(checked) {
-  document.querySelectorAll('.row-chk').forEach(chk => { chk.checked = checked; });
+  document.querySelectorAll('.row-chk').forEach(chk => {
+    chk.checked = checked;
+    if (checked) selectedRows.add(Number(chk.dataset.id)); else selectedRows.delete(Number(chk.dataset.id));
+  });
+}
+function onRowCheck(chk) {
+  const id = Number(chk.dataset.id);
+  if (chk.checked) selectedRows.add(id); else selectedRows.delete(id);
+}
+function clearRowSelection() {
+  selectedRows.clear();
+  document.querySelectorAll('.row-chk').forEach(chk => chk.checked = false);
+  const all = document.getElementById('chk-all');
+  if (all) all.checked = false;
 }
 
 function goToWorkspace(code, action) {
@@ -457,6 +508,146 @@ function goToWorkspace(code, action) {
   if (action) url += '&action=' + encodeURIComponent(action);
   window.location.href = url;
 }
+
+const COUNCIL_DETAIL_HEADERS = [
+  'STT','Mã sinh viên','Họ và tên','Lớp HC','Lớp HP','Ngành / Chuyên ngành','CTĐT','Tên đề tài',
+  'Mã hội đồng','Tên hội đồng','Đơn vị','Ngành / Lĩnh vực','Phân loại','Trạng thái','Học kỳ',
+  'Hình thức họp','Thời gian họp','Địa điểm / Link họp',
+  'Chủ tịch','Thư ký','Ủy viên','Phản biện','GV chấm',
+  'Số quyết định','Ngày ban hành','Người ký','Ghi chú',
+  'Ngày hoàn tất','Ghi chú kết quả họp','Biên bản họp'
+];
+
+function councilDetailRows(c) {
+  const st = STATUS_CFG[c.status] || STATUS_CFG.draft;
+  const ty = TYPE_CFG[c.type] || TYPE_CFG.danhgia;
+  const namesByRole = role => c.members.filter(m => m.role === role).map(m => `${m.name} - ${m.unit}`).join('; ') || '—';
+
+  const councilCols = [
+    c.code,
+    c.name,
+    c.donvi,
+    c.nganh,
+    ty.label,
+    st.label,
+    c.dot,
+    c.meetForm === 'online' ? 'Trực tuyến' : 'Trực tiếp',
+    `${c.date} ${c.time}`,
+    c.meetForm === 'online' ? (c.link || '—') : (c.room || '—'),
+    namesByRole('ct'),
+    namesByRole('tk'),
+    namesByRole('uv'),
+    namesByRole('pb'),
+    namesByRole('gc'),
+    c.qdNum || '—',
+    c.qdDate || '—',
+    c.qdSignedBy || '—',
+    c.note || '',
+    c.completedAt || '—',
+    c.completeNote || '',
+    c.bienBanFile || '—'
+  ];
+
+  const students = c.students && c.students.length ? c.students : [null];
+
+  return students.map((sv, i) => [
+    sv ? i + 1 : '—',
+    sv ? sv.maSV : '—',
+    sv ? sv.tenSV : '—',
+    sv ? (sv.lopHC || '—') : '—',
+    sv ? sv.lop : '—',
+    sv ? (CTDT_LABEL[sv.ctdt] || sv.ctdt) : '—',
+    sv ? sv.ctdt : '—',
+    sv ? sv.tenDeTai : '—',
+    ...councilCols
+  ]);
+}
+
+function downloadCouncilDetailCsv(rows, filename) {
+  const csvLines = [COUNCIL_DETAIL_HEADERS, ...rows].map(r =>
+    r.map(cell => `"${String(cell).replace(/"/g,'""')}"`).join(',')
+  );
+  const bom = '﻿';
+  const csv = bom + csvLines.join('\r\n');
+
+  const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+  const url  = URL.createObjectURL(blob);
+  const a    = document.createElement('a');
+  a.href     = url;
+  a.download = filename;
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+}
+
+function exportCouncilDetail(id) {
+  const c = COUNCILS.find(x => x.id === id);
+  downloadCouncilDetailCsv(councilDetailRows(c), `ChiTiet_HoiDong_${c.code.replace(/\//g,'-')}.csv`);
+  showToast(`📥 Đã xuất thông tin chi tiết hội đồng — ChiTiet_HoiDong_${c.code.replace(/\//g,'-')}.csv`, 'ok');
+}
+
+function exportSelectedCouncilDetails() {
+  if (!selectedRows.size) {
+    showToast('Vui lòng chọn ít nhất 1 hội đồng để xuất.', 'warn');
+    return;
+  }
+  const list = COUNCILS.filter(c => selectedRows.has(c.id));
+  const rows = list.flatMap(councilDetailRows);
+  const filename = list.length === 1
+    ? `ChiTiet_HoiDong_${list[0].code.replace(/\//g,'-')}.csv`
+    : `ChiTiet_HoiDong_${list.length}HoiDong.csv`;
+  downloadCouncilDetailCsv(rows, filename);
+  showToast(`📥 Đã xuất thông tin chi tiết ${list.length} hội đồng — ${filename}`, 'ok');
+}
+
+function exportCouncilList() {
+  if (!selectedRows.size) { showToast('Vui lòng chọn ít nhất 1 hội đồng để xuất.', 'warn'); return; }
+
+  const headers = ['Mã hội đồng','Tên hội đồng','Phân loại','Đơn vị','Học kỳ','Ngày họp','Giờ họp','Hình thức','Địa điểm / Link họp','Thành viên','Trạng thái','Số quyết định','Ngày ban hành'];
+
+  const rows = COUNCILS.filter(c => selectedRows.has(c.id)).map(c => {
+    const st = STATUS_CFG[c.status] || STATUS_CFG.draft;
+    const ty = TYPE_CFG[c.type] || TYPE_CFG.danhgia;
+    const memberNames = c.members.map(m => m.name).join('; ') || '—';
+
+    return [
+      c.code,
+      c.name,
+      ty.label,
+      c.donvi,
+      c.dot,
+      c.date,
+      c.time,
+      c.meetForm === 'online' ? 'Trực tuyến' : 'Trực tiếp',
+      c.meetForm === 'online' ? (c.link || '—') : (c.room || '—'),
+      memberNames,
+      st.label,
+      c.qdNum || '—',
+      c.qdDate || '—'
+    ];
+  });
+
+  const csvLines = [headers, ...rows].map(r =>
+    r.map(cell => `"${String(cell).replace(/"/g,'""')}"`).join(',')
+  );
+  const bom = '﻿';
+  const csv = bom + csvLines.join('\r\n');
+
+  const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+  const url  = URL.createObjectURL(blob);
+  const a    = document.createElement('a');
+  a.href     = url;
+  a.download = `DanhSach_HoiDong_${todayIso()}.csv`;
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+
+  showToast(`📥 Đã xuất ${rows.length} hội đồng — ${a.download}`, 'ok');
+}
+
+function todayIso() { return new Date().toISOString().slice(0,10); }
 
 let currentId = null;
 

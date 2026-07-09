@@ -7,7 +7,11 @@
   <link rel="stylesheet" href="_styles.css">
   <style>
     /* ── Xét duyệt styles ── */
-    .sum-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:16px}
+    .icon-btn{display:inline-flex;align-items:center;justify-content:center;width:30px;height:30px;
+      border-radius:6px;border:1px solid var(--border);background:#fff;cursor:pointer;font-size:14px;
+      transition:background .15s,border-color .15s;margin:0 2px}
+    .icon-btn:hover{background:#f0f0f0;border-color:#bbb}
+    .sum-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:16px}
     .sum-card{background:#fff;border:1px solid var(--border);border-radius:8px;padding:14px 18px;display:flex;align-items:center;gap:12px}
     .sum-ico{width:40px;height:40px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0}
     .sum-val{font-size:22px;font-weight:700;line-height:1.2}
@@ -107,7 +111,7 @@
         <span class="mn-group">📋&nbsp; Đề tài &nbsp;▾</span>
         <ul class="sb-sub open">
           <li><a href="#">DS đề tài của tôi</a></li>
-          <li class="active"><a href="MH-KCM-03_TopicApproval.html">Xét duyệt đề tài</a></li>
+          <li class="active"><a href="MH-KCM-03_TopicApproval.html">Xét duyệt đề tài GV</a></li>
           <li><a href="MH-KCM-06_StudentTopicApproval.html">DS nguyện vọng đề tài</a></li>
           <li style="display:none"><a href="MH-KCM-05_AdvisorWishApproval.html">Phê duyệt phân công GVHD</a></li>
         </ul>
@@ -143,6 +147,10 @@
       <div id="opane-xd">
 
         <div class="sum-grid">
+          <div class="sum-card">
+            <div class="sum-ico" style="background:#e6f4ff">📋</div>
+            <div><div class="sum-val" style="color:var(--primary)">7</div><div class="sum-label">Tất cả đề tài</div></div>
+          </div>
           <div class="sum-card">
             <div class="sum-ico" style="background:#fff7e6">⏳</div>
             <div><div class="sum-val" style="color:var(--warning)">4</div><div class="sum-label">Chờ xét duyệt</div></div>
@@ -217,7 +225,7 @@
                       <td style="font-size:12px;color:var(--text-2)">CNPM</td>
                       <td style="font-size:12px;color:var(--text-3)">03/06/2026</td>
                       <td><span class="tag tag-warning">Chờ duyệt</span></td>
-                      <td style="text-align:center"><button class="btn btn-primary btn-sm" onclick="openReview(1)">Xét duyệt</button></td>
+                      <td style="text-align:center"><button class="icon-btn" onclick="openReview(1)" title="Xét duyệt">👁️</button><button class="icon-btn" onclick="quickApprove(1)" title="Phê duyệt" style="color:var(--success)">✔️</button></td>
                     </tr>
                     <tr>
                       <td style="text-align:center"><input type="checkbox" class="chk-p"></td>
@@ -230,7 +238,7 @@
                       <td style="font-size:12px;color:var(--text-2)">Trí tuệ nhân tạo</td>
                       <td style="font-size:12px;color:var(--text-3)">04/06/2026</td>
                       <td><span class="tag tag-warning">Chờ duyệt</span></td>
-                      <td style="text-align:center"><button class="btn btn-primary btn-sm" onclick="openReview(2)">Xét duyệt</button></td>
+                      <td style="text-align:center"><button class="icon-btn" onclick="openReview(2)" title="Xét duyệt">👁️</button><button class="icon-btn" onclick="quickApprove(2)" title="Phê duyệt" style="color:var(--success)">✔️</button></td>
                     </tr>
                     <tr>
                       <td style="text-align:center"><input type="checkbox" class="chk-p"></td>
@@ -243,7 +251,7 @@
                       <td style="font-size:12px;color:var(--text-2)">CNPM</td>
                       <td style="font-size:12px;color:var(--text-3)">05/06/2026</td>
                       <td><span class="tag tag-warning">Chờ duyệt</span></td>
-                      <td style="text-align:center"><button class="btn btn-primary btn-sm" onclick="openReview(3)">Xét duyệt</button></td>
+                      <td style="text-align:center"><button class="icon-btn" onclick="openReview(3)" title="Xét duyệt">👁️</button><button class="icon-btn" onclick="quickApprove(3)" title="Phê duyệt" style="color:var(--success)">✔️</button></td>
                     </tr>
                     <tr>
                       <td style="text-align:center"><input type="checkbox" class="chk-p"></td>
@@ -256,7 +264,7 @@
                       <td style="font-size:12px;color:var(--text-2)">Mạng &amp; ATTT</td>
                       <td style="font-size:12px;color:var(--text-3)">06/06/2026</td>
                       <td><span class="tag tag-warning">Chờ duyệt</span></td>
-                      <td style="text-align:center"><button class="btn btn-primary btn-sm" onclick="openReview(4)">Xét duyệt</button></td>
+                      <td style="text-align:center"><button class="icon-btn" onclick="openReview(4)" title="Xét duyệt">👁️</button><button class="icon-btn" onclick="quickApprove(4)" title="Phê duyệt" style="color:var(--success)">✔️</button></td>
                     </tr>
                   </tbody>
                 </table>
@@ -352,7 +360,7 @@
                       <td style="text-align:center;font-size:13px;color:var(--text-2)">3</td>
                       <td style="font-size:12px;color:var(--text-3)">03/06/2026</td>
                       <td><span class="tag tag-warning">Chờ duyệt</span></td>
-                      <td style="text-align:center"><button class="btn btn-primary btn-sm" onclick="openReview(1)">Xét duyệt</button></td>
+                      <td style="text-align:center"><button class="icon-btn" onclick="openReview(1)" title="Xét duyệt">👁️</button><button class="icon-btn" onclick="quickApprove(1)" title="Phê duyệt" style="color:var(--success)">✔️</button></td>
                     </tr>
                     <tr>
                       <td style="text-align:center"><input type="checkbox" class="chk-a"></td>
@@ -364,7 +372,7 @@
                       <td style="text-align:center;font-size:13px;color:var(--text-2)">1</td>
                       <td style="font-size:12px;color:var(--text-3)">04/06/2026</td>
                       <td><span class="tag tag-warning">Chờ duyệt</span></td>
-                      <td style="text-align:center"><button class="btn btn-primary btn-sm" onclick="openReview(2)">Xét duyệt</button></td>
+                      <td style="text-align:center"><button class="icon-btn" onclick="openReview(2)" title="Xét duyệt">👁️</button><button class="icon-btn" onclick="quickApprove(2)" title="Phê duyệt" style="color:var(--success)">✔️</button></td>
                     </tr>
                     <tr>
                       <td style="text-align:center"><input type="checkbox" class="chk-a"></td>
@@ -376,7 +384,7 @@
                       <td style="text-align:center;font-size:13px;color:var(--text-2)">2</td>
                       <td style="font-size:12px;color:var(--text-3)">05/06/2026</td>
                       <td><span class="tag tag-warning">Chờ duyệt</span></td>
-                      <td style="text-align:center"><button class="btn btn-primary btn-sm" onclick="openReview(3)">Xét duyệt</button></td>
+                      <td style="text-align:center"><button class="icon-btn" onclick="openReview(3)" title="Xét duyệt">👁️</button><button class="icon-btn" onclick="quickApprove(3)" title="Phê duyệt" style="color:var(--success)">✔️</button></td>
                     </tr>
                     <tr>
                       <td style="text-align:center"><input type="checkbox" class="chk-a"></td>
@@ -388,7 +396,7 @@
                       <td style="text-align:center;font-size:13px;color:var(--text-2)">2</td>
                       <td style="font-size:12px;color:var(--text-3)">06/06/2026</td>
                       <td><span class="tag tag-warning">Chờ duyệt</span></td>
-                      <td style="text-align:center"><button class="btn btn-primary btn-sm" onclick="openReview(4)">Xét duyệt</button></td>
+                      <td style="text-align:center"><button class="icon-btn" onclick="openReview(4)" title="Xét duyệt">👁️</button><button class="icon-btn" onclick="quickApprove(4)" title="Phê duyệt" style="color:var(--success)">✔️</button></td>
                     </tr>
                   </tbody>
                 </table>
@@ -750,6 +758,13 @@ function openReject() {
 function confirmApprove() {
   showConfirm('Xác nhận phê duyệt đề tài này?',
     () => { closeModal('modal-review'); showToast('Đã phê duyệt đề tài. Giảng viên sẽ nhận được thông báo.', 'ok'); },
+    'Phê duyệt', 'btn-primary');
+}
+
+function quickApprove(id) {
+  currentId = id;
+  showConfirm('Xác nhận phê duyệt đề tài này?',
+    () => { showToast('Đã phê duyệt đề tài. Giảng viên sẽ nhận được thông báo.', 'ok'); },
     'Phê duyệt', 'btn-primary');
 }
 

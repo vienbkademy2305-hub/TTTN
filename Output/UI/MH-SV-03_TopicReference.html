@@ -163,9 +163,10 @@
             <table class="tbl" style="width:100%">
               <thead>
                 <tr>
+                  <th style="width:56px;text-align:center">STT</th>
                   <th style="width:128px">Mã đề tài</th>
                   <th>Tên đề tài</th>
-                  <th style="width:170px">Giảng viên HD</th>
+                  <th style="width:170px">Giảng viên</th>
                   <th style="width:75px;text-align:center">Loại</th>
                   <th style="width:120px">CTĐT</th>
                   <th style="width:170px">Đơn vị quản lý</th>
@@ -175,6 +176,10 @@
               </thead>
               <tbody id="topic-tbody"><!-- JS --></tbody>
             </table>
+          </div>
+          <div class="pagination">
+            <span class="pg-info" id="topic-pg-info"></span>
+            <button class="pg-btn active">1</button>
           </div>
         </div>
 
@@ -399,10 +404,11 @@ function filtered() {
 
 function renderTable(list) {
   document.getElementById('cnt-gv').textContent = list.length;
+  document.getElementById('topic-pg-info').textContent = `${list.length} đề tài`;
   const tbody = document.getElementById('topic-tbody');
   if (!list.length) {
     tbody.innerHTML = `
-      <tr><td colspan="8">
+      <tr><td colspan="9">
         <div class="topic-empty">
           <div class="te-ico">🔍</div>
           <p>Không tìm thấy đề tài phù hợp với bộ lọc hiện tại.</p>
@@ -410,10 +416,11 @@ function renderTable(list) {
       </td></tr>`;
     return;
   }
-  tbody.innerHTML = list.map(t => {
+  tbody.innerHTML = list.map((t, i) => {
     const full = isFull(t);
     return `
       <tr onclick="openDetail(${t.id})" ${full?'style="opacity:.72"':''}>
+        <td style="text-align:center;color:var(--text-3)">${i + 1}</td>
         <td><div class="topic-code">${t.code}</div></td>
         <td><span style="font-size:13px;font-weight:500">${t.name}</span></td>
         <td style="font-size:13px;color:var(--text-2)">${t.gv}</td>
@@ -465,7 +472,7 @@ function openDetail(topicId) {
         <td style="font-weight:600;font-size:14px;line-height:1.5">${t.name}</td>
       </tr>
       <tr>
-        <th>Giảng viên HD</th>
+        <th>Giảng viên</th>
         <td>${t.gv}</td>
       </tr>
       <tr>

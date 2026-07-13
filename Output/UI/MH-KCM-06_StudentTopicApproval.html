@@ -361,6 +361,29 @@
   </div>
 </div>
 
+<!-- ═══════════════════════════════════════════
+     MODAL: TỪ CHỐI NGUYỆN VỌNG (QUICK)
+════════════════════════════════════════════ -->
+<div class="overlay hidden" id="m-reject">
+  <div class="modal-box">
+    <div class="modal-hd">
+      <h4 class="modal-title">Từ chối nguyện vọng</h4>
+      <button class="modal-close" data-close="m-reject">✕</button>
+    </div>
+    <div class="modal-bd">
+      <div class="fi">
+        <label>Lý do từ chối <span class="req">*</span></label>
+        <textarea class="fc" id="qr-reason" rows="4" placeholder="Nhập lý do từ chối nguyện vọng này..."></textarea>
+        <div class="fe" id="qr-err" style="display:none">Vui lòng nhập lý do từ chối</div>
+      </div>
+    </div>
+    <div class="modal-ft">
+      <button class="btn btn-default" data-close="m-reject">Huỷ</button>
+      <button class="btn btn-danger" onclick="submitReject()">Xác nhận</button>
+    </div>
+  </div>
+</div>
+
 <script src="_utils.js"></script>
 <script>
 const CTDT_MAP = {
@@ -532,6 +555,7 @@ let wishes = [
 
 let _rvId = null;
 let _rvRejectMode = false;
+let _qrId = null;
 
 /* ── GV capacity helpers ──
    Chỉ tính SV ở trạng thái 'Đã duyệt': với đề tài SV tự đề xuất, hệ thống chỉ ghi nhận
@@ -589,8 +613,8 @@ function render() {
          <div style="font-size:12px;color:var(--text-2);margin-top:3px;line-height:1.4">${w.topicName||''}</div>`;
 
     const actions = w.status === 'Chờ Khoa duyệt'
-      ? `<button class="icon-btn" title="Xét duyệt & Phê duyệt" onclick="openReview(${w.id})" style="color:var(--success);font-size:17px">✅</button>
-         <button class="icon-btn" title="Xét duyệt & Từ chối" onclick="openReview(${w.id},true)" style="color:var(--error);font-size:17px">❌</button>`
+      ? `<button class="icon-btn" title="Duyệt" onclick="quickApprove(${w.id})" style="color:var(--success);font-size:17px">✅</button>
+         <button class="icon-btn" title="Từ chối" onclick="quickReject(${w.id})" style="color:var(--error);font-size:17px">❌</button>`
       : '';
 
     const nvNum   = w.thuTuNV || 1;
@@ -874,7 +898,50 @@ function openGVDetail(wishId) {
   openModal('m-gvhd');
 }
 
-/* ── Modal: Xét duyệt (Chờ Khoa duyệt) ── */
+/* ── Quick: Duyệt / Từ chối nguyện vọng ── */
+function quickApprove(id) {
+  const w   = wishes.find(x => x.id === id);
+  const cap = _gvCapacity(w.gvChinh, w.dot);
+  if (cap && cap.used >= cap.max) {
+    showToast(`GV ${w.gvChinh} đã đạt giới hạn ${cap.max} SV trong đợt ${w.dot||'này'}. Không thể phê duyệt thêm.`, 'warn');
+    return;
+  }
+  const lastSlotNote = cap && cap.used === cap.max - 1
+    ? `\n⚠️ Đây là chỗ cuối cùng của ${w.gvChinh} trong đợt này (${cap.used+1}/${cap.max}).`
+    : '';
+  showConfirm(`Duyệt nguyện vọng của ${w.tenSV}?${lastSlotNote}`, () => {
+    const today = new Date().toLocaleDateString('vi');
+    wishes = wishes.map(x => x.id !== id ? x : {
+      ...x, status:'Đã duyệt', ngayKhoaDuyet:today,
+      history:[...(x.history||[]),{action:'Khoa phê duyệt',date:today,result:'Đề tài được chấp thuận — SV chính thức được phân công cho GV, chỉ tiêu hướng dẫn được cập nhật',dot:'ok'}],
+    });
+    showToast('Đã phê duyệt — SV được phân công cho GV, chỉ tiêu GV đã cập nhật ✅');
+    render();
+  }, 'Duyệt', 'btn-primary');
+}
+
+function quickReject(id) {
+  _qrId = id;
+  document.getElementById('qr-reason').value = '';
+  document.getElementById('qr-err').style.display = 'none';
+  openModal('m-reject');
+}
+
+function submitReject() {
+  const reason = document.getElementById('qr-reason').value.trim();
+  if (!reason) { document.getElementById('qr-err').style.display = ''; return; }
+  document.getElementById('qr-err').style.display = 'none';
+  const today = new Date().toLocaleDateString('vi');
+  wishes = wishes.map(w => w.id !== _qrId ? w : {
+    ...w, status:'Từ chối', lyDoTuChoi:reason, ngayKhoaDuyet:today,
+    history:[...(w.history||[]),{action:'Khoa từ chối',date:today,result:reason,dot:'err'}],
+  });
+  closeModal('m-reject');
+  showToast('Đã từ chối nguyện vọng', 'warn');
+  render();
+}
+
+/* ── Modal: Xét duyệt (Chờ Khoa duyệt) — chi tiết, xem qua các đường dẫn khác ── */
 function openReview(id, rejectMode) {
   _rvId = id;
   _rvRejectMode = !!rejectMode;

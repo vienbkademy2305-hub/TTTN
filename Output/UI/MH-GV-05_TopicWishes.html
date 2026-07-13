@@ -187,43 +187,25 @@
 </div>
 
 <!-- ═══════════════════════════════════════════
-     MODAL: CHI TIẾT NGUYỆN VỌNG SV
+     MODAL: TỪ CHỐI NGUYỆN VỌNG (QUICK)
 ════════════════════════════════════════════ -->
-<div class="overlay hidden" id="m-nv">
-  <div class="modal-box w700">
+<div class="overlay hidden" id="m-reject">
+  <div class="modal-box">
     <div class="modal-hd">
-      <h4 class="modal-title" id="nv-modal-title">Chi tiết Nguyện vọng</h4>
-      <button class="modal-close" data-close="m-nv">✕</button>
+      <h4 class="modal-title">Từ chối nguyện vọng</h4>
+      <button class="modal-close" data-close="m-reject">✕</button>
     </div>
     <div class="modal-bd">
-
-      <!-- Thông tin SV -->
-      <div style="background:#f9f9f9;border:1px solid var(--border);border-radius:8px;padding:14px 16px;margin-bottom:16px;display:flex;gap:28px;flex-wrap:wrap">
-        <div><div style="font-size:11px;color:var(--text-3);margin-bottom:3px">Mã sinh viên</div><div style="font-weight:700;font-size:13px" id="nv-masv"></div></div>
-        <div><div style="font-size:11px;color:var(--text-3);margin-bottom:3px">Họ và tên</div><div style="font-weight:600;font-size:13px" id="nv-tensv"></div></div>
-        <div><div style="font-size:11px;color:var(--text-3);margin-bottom:3px">Lớp</div><div style="font-size:13px" id="nv-lop"></div></div>
-        <div><div style="font-size:11px;color:var(--text-3);margin-bottom:3px">GPA</div><div style="font-size:14px;font-weight:700" id="nv-gpa"></div></div>
-        <div><div style="font-size:11px;color:var(--text-3);margin-bottom:3px">CTĐT</div><div style="font-size:13px" id="nv-ctdt"></div></div>
-      </div>
-
-      <!-- Chi tiết nguyện vọng -->
-      <table class="desc-tbl"><tbody id="nv-vw-body"></tbody></table>
-
-      <!-- Lịch sử xử lý -->
-      <div style="margin-top:18px">
-        <div style="font-weight:600;font-size:13px;margin-bottom:10px;color:var(--text-2)">📜 Lịch sử xử lý</div>
-        <ul class="history-list" id="nv-history"></ul>
-      </div>
-
-      <!-- Nhập lý do từ chối -->
-      <div class="fi" id="nv-reject-fi" style="display:none;margin-top:14px">
+      <div class="fi">
         <label>Lý do từ chối <span class="req">*</span></label>
-        <textarea class="fc" id="nv-reject-reason" rows="3" placeholder="Nhập lý do từ chối nguyện vọng này..."></textarea>
-        <div class="fe" id="nv-reject-err" style="display:none">Vui lòng nhập lý do từ chối</div>
+        <textarea class="fc" id="qr-reason" rows="4" placeholder="Nhập lý do từ chối nguyện vọng này..."></textarea>
+        <div class="fe" id="qr-err" style="display:none">Vui lòng nhập lý do từ chối</div>
       </div>
-
     </div>
-    <div class="modal-ft" id="nv-modal-ft"></div>
+    <div class="modal-ft">
+      <button class="btn btn-default" data-close="m-reject">Huỷ</button>
+      <button class="btn btn-danger" onclick="submitQuickReject()">Xác nhận</button>
+    </div>
   </div>
 </div>
 
@@ -538,8 +520,7 @@ let wishes = [
   },
 ];
 
-let _nvId = null;
-let _nvRejectMode = false;
+let _qrId = null;
 
 /* ── Render table ── */
 function render() {
@@ -583,7 +564,7 @@ function render() {
 
     const actions = w.status === 'Chờ GV duyệt'
       ? `<button class="icon-btn" title="Duyệt" onclick="quickApproveWish(${w.id})" style="color:var(--success)">✅</button>
-         <button class="icon-btn" title="Từ chối" onclick="openNVModal(${w.id},true)" style="color:var(--error)">❌</button>`
+         <button class="icon-btn" title="Từ chối" onclick="quickRejectWish(${w.id})" style="color:var(--error)">❌</button>`
       : ``;
 
     const gvDongList = (w.gvDong||[]).map(g=>typeof g==='string'?{ten:g,trongSo:0}:g);
@@ -727,98 +708,27 @@ function quickApproveWish(id) {
   showConfirm(msg, () => approveWish(id), full ? 'Vẫn duyệt' : 'Duyệt', 'btn-primary');
 }
 
-/* ── Approve từ modal (có kiểm tra capacity) ── */
-function approveFromModal(id) {
-  const w    = wishes.find(x => x.id === id);
-  const max  = dotCapacity[w.dot];
-  const used = getUsed(w.dot);
-  if (max !== undefined && used >= max) {
-    showConfirm(
-      `⚠️ Đợt ${w.dot} đã đủ hạn mức (${used}/${max} SV).\nVẫn muốn duyệt nguyện vọng của ${w.tenSV}?`,
-      () => approveWish(id),
-      'Vẫn duyệt', 'btn-primary'
-    );
-  } else {
-    approveWish(id);
-  }
+/* ── Quick reject (từ bảng) ── */
+function quickRejectWish(id) {
+  _qrId = id;
+  document.getElementById('qr-reason').value = '';
+  document.getElementById('qr-err').style.display = 'none';
+  openModal('m-reject');
 }
 
-/* ── Modal: Chi tiết nguyện vọng ── */
-function openNVModal(id, rejectMode) {
-  _nvId = id;
-  _nvRejectMode = !!rejectMode;
-  const w = wishes.find(x => x.id === id);
-
-  document.getElementById('nv-modal-title').textContent = `Nguyện vọng — ${w.tenSV}`;
-  document.getElementById('nv-masv').textContent  = w.maSV;
-  document.getElementById('nv-tensv').textContent = w.tenSV;
-  document.getElementById('nv-lop').textContent   = w.lop;
-  document.getElementById('nv-gpa').textContent   = w.gpa.toFixed(1);
-  document.getElementById('nv-gpa').style.color   = w.gpa >= 3.0 ? 'var(--success)' : w.gpa >= 2.5 ? 'var(--text-1)' : 'var(--error)';
-  document.getElementById('nv-ctdt').textContent  = w.ctdt;
-
-  const loaiBadge = w.loai === 'Có sẵn'
-    ? '<span class="tag tag-default">Chọn đề tài GV có sẵn</span>'
-    : '<span class="tag tag-warning">Đề xuất đề tài mới</span>';
-  const linkedTopic  = w.topicId ? topics.find(x => x.id === w.topicId) : null;
-  const topicDisplay = linkedTopic
-    ? `<strong>${linkedTopic.name}</strong> <span style="font-size:11px;color:var(--text-3)">(${linkedTopic.code})</span>`
-    : `<strong>${w.topicName || '—'}</strong>`;
-
-  const nvNum   = w.thuTuNV || 1;
-  const nvClass = nvNum === 1 ? 'nv1' : nvNum === 2 ? 'nv2' : 'nv3';
-  const nvBadge = `<span class="nv-order-badge ${nvClass}" style="cursor:default">&nbsp;NV&nbsp;${nvNum}&nbsp;</span>
-    &nbsp;<a href="#" style="font-size:12px;color:var(--primary)" onclick="event.preventDefault();closeModal('m-nv');openNVOrder(${w.id})">Xem DS ưu tiên ↗</a>`;
-
-  document.getElementById('nv-vw-body').innerHTML = `
-    <tr><th>Loại nguyện vọng</th><td>${loaiBadge}</td></tr>
-    <tr><th>Đợt thực tập</th><td>${w.dot}</td></tr>
-    <tr><th>Thứ tự nguyện vọng</th><td>${nvBadge}</td></tr>
-    <tr><th>${w.loai === 'Có sẵn' ? 'Đề tài đăng ký' : 'Đề tài đề xuất'}</th><td>${topicDisplay}</td></tr>
-    ${w.moTa ? `<tr><th>Mô tả đề xuất</th><td style="white-space:pre-wrap;line-height:1.6;font-size:13px">${w.moTa}</td></tr>` : ''}
-    <tr><th>Lý do đăng ký</th><td style="font-size:13px;line-height:1.6;font-style:italic;color:var(--text-2)">${w.lydo}</td></tr>
-    <tr><th>Ngày đăng ký</th><td>${w.ngayDK}</td></tr>
-    <tr><th>Trạng thái</th><td><span class="tag ${NV_CLR[w.status]}">${w.status}</span></td></tr>
-    ${w.tuChoiLydo ? `<tr><th>Lý do từ chối</th><td style="color:var(--error);font-size:13px">${w.tuChoiLydo}</td></tr>` : ''}`;
-
-  document.getElementById('nv-history').innerHTML = (w.history || []).length
-    ? [...w.history].reverse().map(h => `
-        <li>
-          <div class="h-dot ${h.dot}"></div>
-          <div>
-            <div style="font-weight:500">${h.action}</div>
-            ${h.result ? `<div class="h-meta">${h.result}</div>` : ''}
-            <div class="h-meta">${h.date}</div>
-          </div>
-        </li>`).join('')
-    : '<li style="color:var(--text-3);font-size:13px">Chưa có lịch sử</li>';
-
-  document.getElementById('nv-reject-fi').style.display = _nvRejectMode ? '' : 'none';
-  document.getElementById('nv-reject-reason').value = '';
-  document.getElementById('nv-reject-err').style.display = 'none';
-
-  _refreshNVFooter(w);
-  openModal('m-nv');
-}
-
-function _refreshNVFooter(w) {
-  let btns = `<button class="btn btn-default" data-close="m-nv">Đóng</button>`;
-  if (w.status === 'Chờ GV duyệt') {
-    if (_nvRejectMode) {
-      btns += `<button class="btn btn-default" onclick="_cancelRejectMode()">← Quay lại</button>
-               <button class="btn btn-danger" onclick="confirmRejectWish(${w.id})">❌ Xác nhận từ chối</button>`;
-    } else {
-      btns += `<button class="btn btn-default" onclick="openNVModal(${w.id},true)">❌ Từ chối</button>
-               <button class="btn btn-primary" onclick="approveFromModal(${w.id})">✅ Duyệt nguyện vọng</button>`;
-    }
-  }
-  document.getElementById('nv-modal-ft').innerHTML = btns;
-}
-
-function _cancelRejectMode() {
-  _nvRejectMode = false;
-  document.getElementById('nv-reject-fi').style.display = 'none';
-  _refreshNVFooter(wishes.find(x => x.id === _nvId));
+function submitQuickReject() {
+  const reason = document.getElementById('qr-reason').value.trim();
+  if (!reason) { document.getElementById('qr-err').style.display = ''; return; }
+  document.getElementById('qr-err').style.display = 'none';
+  wishes = wishes.map(x => x.id === _qrId ? {
+    ...x, status: 'Từ chối', tuChoiLydo: reason,
+    history: [...(x.history || []), {
+      action: 'GV từ chối', date: new Date().toLocaleString('vi'), result: reason, dot: 'err',
+    }],
+  } : x);
+  closeModal('m-reject');
+  showToast('Đã từ chối nguyện vọng', 'warn');
+  render();
 }
 
 /* ── Duyệt nguyện vọng ── */
@@ -836,26 +746,9 @@ function approveWish(id) {
       dot     : 'ok',
     }],
   } : x);
-  closeModal('m-nv');
   showToast(newStatus === 'Chờ Khoa duyệt'
     ? 'Đã duyệt — đề tài mới chuyển Khoa xét duyệt 🏫'
     : 'Đã duyệt nguyện vọng — SV được phân công đề tài ✅');
-  render();
-}
-
-/* ── Từ chối nguyện vọng ── */
-function confirmRejectWish(id) {
-  const reason = document.getElementById('nv-reject-reason').value.trim();
-  if (!reason) { document.getElementById('nv-reject-err').style.display = ''; return; }
-  document.getElementById('nv-reject-err').style.display = 'none';
-  wishes = wishes.map(x => x.id === id ? {
-    ...x, status: 'Từ chối', tuChoiLydo: reason,
-    history: [...(x.history || []), {
-      action: 'GV từ chối', date: new Date().toLocaleString('vi'), result: reason, dot: 'err',
-    }],
-  } : x);
-  closeModal('m-nv');
-  showToast('Đã từ chối nguyện vọng', 'warn');
   render();
 }
 

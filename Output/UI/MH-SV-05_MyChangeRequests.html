@@ -71,7 +71,7 @@
     </header>
 
     <main class="content">
-      <!-- Summary stats -->
+      <!-- Summary stats (động theo tab đang mở) -->
       <div style="display:flex;gap:12px;margin-bottom:20px">
         <div class="stat-card" style="background:#fff;border:1px solid var(--border);border-radius:8px;padding:14px 20px;display:flex;align-items:center;gap:12px;flex:1;cursor:pointer" onclick="filterByStatus('')">
           <span style="font-size:28px">📊</span>
@@ -91,51 +91,103 @@
         </div>
       </div>
 
-      <!-- Filter -->
-      <div class="filter-bar">
-        <select class="fc" id="f-dot" style="width:200px" onchange="renderTable()">
-          <option value="">Tất cả đợt</option>
-          <option value="TTTN HK1 2025-2026">TTTN HK1 2025-2026</option>
-        </select>
-        <select class="fc" id="f-type" style="width:175px" onchange="renderTable()">
-          <option value="">Tất cả loại yêu cầu</option>
-          <option value="change">Đổi doanh nghiệp</option>
-          <option value="extend">Gia hạn TT</option>
-          <option value="extend_dt">Gia hạn ĐA/KLTN</option>
-          <option value="change_dt">Đổi đề tài</option>
-        </select>
-        <select class="fc" id="f-status" style="width:150px" onchange="renderTable()">
-          <option value="">Tất cả trạng thái</option>
-          <option value="pending">Chờ duyệt</option>
-          <option value="approved">Đã duyệt</option>
-          <option value="rejected">Từ chối</option>
-        </select>
+      <!-- Tabs -->
+      <div class="tabs-nav">
+        <button class="tab-btn active" id="tabbtn-tt" onclick="switchTab('tt')">Thực tập tốt nghiệp</button>
+        <button class="tab-btn" id="tabbtn-dt" onclick="switchTab('dt')">ĐA/KL tốt nghiệp</button>
       </div>
 
-      <!-- Table -->
-      <div class="card" style="padding:0">
-        <div class="tbl-wrap">
-          <table class="tbl">
-            <thead>
-              <tr>
-                <th style="width:44px;text-align:center">STT</th>
-                <th>Đợt</th>
-                <th>CTĐT</th>
-                <th>Lớp Học phần</th>
-                <th style="min-width:130px">Thời gian học</th>
-                <th>Loại yêu cầu</th>
-                <th>Ngày gửi</th>
-                <th style="min-width:200px">Nội dung tóm tắt</th>
-                <th>Tài liệu</th>
-                <th>Trạng thái</th>
-                <th style="min-width:200px">Lý do (GV/Khoa từ chối)</th>
-                <th style="text-align:center">Thao tác</th>
-              </tr>
-            </thead>
-            <tbody id="req-tbody"><!-- rendered by JS --></tbody>
-          </table>
+      <!-- ===== TAB: THỰC TẬP TỐT NGHIỆP ===== -->
+      <div class="tab-pane active" id="tabpane-tt">
+        <div class="filter-bar">
+          <select class="fc" id="f-dot-tt" style="width:200px" onchange="renderTable('tt')">
+            <option value="">Tất cả đợt</option>
+            <option value="TTTN HK1 2025-2026">TTTN HK1 2025-2026</option>
+          </select>
+          <select class="fc" id="f-type-tt" style="width:175px" onchange="renderTable('tt')">
+            <option value="">Tất cả loại yêu cầu</option>
+            <option value="change">Đổi doanh nghiệp</option>
+            <option value="extend">Gia hạn TT</option>
+          </select>
+          <select class="fc" id="f-status-tt" style="width:150px" onchange="renderTable('tt')">
+            <option value="">Tất cả trạng thái</option>
+            <option value="pending">Chờ duyệt</option>
+            <option value="approved">Đã duyệt</option>
+            <option value="rejected">Từ chối</option>
+          </select>
+        </div>
+
+        <div class="card" style="padding:0">
+          <div class="tbl-wrap">
+            <table class="tbl">
+              <thead>
+                <tr>
+                  <th style="width:44px;text-align:center">STT</th>
+                  <th>Đợt</th>
+                  <th>CTĐT</th>
+                  <th>Lớp Học phần</th>
+                  <th style="min-width:130px">Thời gian học</th>
+                  <th>Loại yêu cầu</th>
+                  <th>Ngày gửi</th>
+                  <th style="min-width:200px">Nội dung tóm tắt</th>
+                  <th>Tài liệu</th>
+                  <th>Trạng thái</th>
+                  <th style="min-width:200px">Lý do</th>
+                  <th style="text-align:center">Thao tác</th>
+                </tr>
+              </thead>
+              <tbody id="req-tbody-tt"><!-- rendered by JS --></tbody>
+            </table>
+          </div>
         </div>
       </div>
+      <!-- /TAB: THỰC TẬP TỐT NGHIỆP -->
+
+      <!-- ===== TAB: ĐA/KL TỐT NGHIỆP ===== -->
+      <div class="tab-pane" id="tabpane-dt">
+        <div class="filter-bar">
+          <select class="fc" id="f-dot-dt" style="width:200px" onchange="renderTable('dt')">
+            <option value="">Tất cả đợt</option>
+            <option value="TTTN HK1 2025-2026">TTTN HK1 2025-2026</option>
+          </select>
+          <select class="fc" id="f-type-dt" style="width:175px" onchange="renderTable('dt')">
+            <option value="">Tất cả loại yêu cầu</option>
+            <option value="extend_dt">Gia hạn ĐA/KLTN</option>
+            <option value="change_dt">Đổi đề tài</option>
+          </select>
+          <select class="fc" id="f-status-dt" style="width:150px" onchange="renderTable('dt')">
+            <option value="">Tất cả trạng thái</option>
+            <option value="pending">Chờ duyệt</option>
+            <option value="approved">Đã duyệt</option>
+            <option value="rejected">Từ chối</option>
+          </select>
+        </div>
+
+        <div class="card" style="padding:0">
+          <div class="tbl-wrap">
+            <table class="tbl">
+              <thead>
+                <tr>
+                  <th style="width:44px;text-align:center">STT</th>
+                  <th>Đợt</th>
+                  <th>CTĐT</th>
+                  <th>Lớp Học phần</th>
+                  <th style="min-width:130px">Thời gian học</th>
+                  <th>Loại yêu cầu</th>
+                  <th>Ngày gửi</th>
+                  <th style="min-width:200px">Nội dung tóm tắt</th>
+                  <th>Tài liệu</th>
+                  <th>Trạng thái</th>
+                  <th style="min-width:200px">Lý do</th>
+                  <th style="text-align:center">Thao tác</th>
+                </tr>
+              </thead>
+              <tbody id="req-tbody-dt"><!-- rendered by JS --></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+      <!-- /TAB: ĐA/KL TỐT NGHIỆP -->
     </main>
   </div>
 </div>
@@ -482,28 +534,52 @@ const STATUS_MAP = {
   rejected: { icon:'❌', text:'Từ chối',   tagClass:'tag-error' },
 };
 
-function filterByStatus(status) {
-  document.getElementById('f-status').value = status;
-  renderTable();
+/* Nhóm loại yêu cầu theo tab: tt = Thực tập tốt nghiệp, dt = ĐA/KL tốt nghiệp */
+const TAB_TYPES = {
+  tt: ['change', 'extend'],
+  dt: ['extend_dt', 'change_dt'],
+};
+
+let currentTab = 'tt';
+
+function switchTab(tab) {
+  currentTab = tab;
+  document.getElementById('tabbtn-tt').classList.toggle('active', tab === 'tt');
+  document.getElementById('tabbtn-dt').classList.toggle('active', tab === 'dt');
+  document.getElementById('tabpane-tt').classList.toggle('active', tab === 'tt');
+  document.getElementById('tabpane-dt').classList.toggle('active', tab === 'dt');
+  renderStats();
 }
 
-function renderTable() {
-  const fDot    = document.getElementById('f-dot').value;
-  const fType   = document.getElementById('f-type').value;
-  const fStatus = document.getElementById('f-status').value;
+function renderStats() {
+  const groupRequests = REQUESTS.filter(r => TAB_TYPES[currentTab].includes(r.type));
+  document.getElementById('stat-all').textContent      = groupRequests.length;
+  document.getElementById('stat-pending').textContent  = groupRequests.filter(r=>r.status==='pending').length;
+  document.getElementById('stat-approved').textContent = groupRequests.filter(r=>r.status==='approved').length;
+  document.getElementById('stat-rejected').textContent = groupRequests.filter(r=>r.status==='rejected').length;
+}
 
-  const filtered = REQUESTS.filter(r =>
+function filterByStatus(status) {
+  document.getElementById('f-status-' + currentTab).value = status;
+  renderTable(currentTab);
+}
+
+function renderTable(tab) {
+  const groupRequests = REQUESTS.filter(r => TAB_TYPES[tab].includes(r.type));
+
+  const fDot    = document.getElementById('f-dot-' + tab).value;
+  const fType   = document.getElementById('f-type-' + tab).value;
+  const fStatus = document.getElementById('f-status-' + tab).value;
+
+  const filtered = groupRequests.filter(r =>
     (!fDot || r.dot === fDot) &&
     (!fType || r.type === fType) &&
     (!fStatus || r.status === fStatus)
   );
 
-  document.getElementById('stat-all').textContent      = REQUESTS.length;
-  document.getElementById('stat-pending').textContent  = REQUESTS.filter(r=>r.status==='pending').length;
-  document.getElementById('stat-approved').textContent = REQUESTS.filter(r=>r.status==='approved').length;
-  document.getElementById('stat-rejected').textContent = REQUESTS.filter(r=>r.status==='rejected').length;
+  if (tab === currentTab) renderStats();
 
-  const tbody = document.getElementById('req-tbody');
+  const tbody = document.getElementById('req-tbody-' + tab);
   if (filtered.length === 0) {
     tbody.innerHTML = `<tr><td colspan="12" style="text-align:center;padding:32px;color:var(--text-3)">Không có yêu cầu nào phù hợp bộ lọc.</td></tr>`;
     return;
@@ -685,7 +761,8 @@ function toast(msg,type='success'){
   setTimeout(()=>t.remove(),3500);
 }
 
-renderTable();
+renderTable('tt');
+renderTable('dt');
 </script>
 </body>
 </html>

@@ -487,8 +487,8 @@
 
       <div id="sc-self-form"></div>
 
-      <div style="background:#f6ffed;border:1px solid #b7eb8f;border-radius:6px;padding:10px 14px;font-size:13px;margin-top:6px">
-        Điểm trung bình hiện tại: <strong id="sc-avg" class="score-avg ok">—</strong>
+      <div id="sc-avg-wrap" style="background:#f6ffed;border:1px solid #b7eb8f;border-radius:6px;padding:10px 14px;font-size:13px;margin-top:6px">
+        <span id="sc-avg-label">Điểm trung bình hiện tại:</span> <strong id="sc-avg" class="score-avg ok">—</strong>
       </div>
     </div>
     <div class="modal-ft">
@@ -806,20 +806,20 @@ const COUNCILS = [
   {
     id:2, code:'HD-2026-012', name:'Hội đồng chấm điểm TTTN HK2 2025-2026 (Nhóm 1)',
     donvi:'Bộ môn Công nghệ phần mềm', nganh:'Kỹ thuật phần mềm', type:'chamdiem', dot:'HK2 2025-2026',
-    meetForm:'offline', date:'30/06/2026', time:'08:00', room:'Phòng họp A1-102', link:'', status:'pending',
+    meetForm:'offline', date:'30/06/2026', time:'08:00', room:'Phòng họp A1-102', link:'', status:'approved',
     createdBy:'TS. Trần Văn Bình', createdAt:'17/06/2026', note:'',
     members:[
       { role:'ct', name:'PGS.TS. Lê Văn Minh',  gvType:'noi', unit:'Khoa CNTT', email:'levanminh@khoacntt.edu.vn' },
       { role:'tk', name:'ThS. Nguyễn Thu Hoa',   gvType:'noi', unit:'Khoa CNTT', email:'nguyenthuhoa@khoacntt.edu.vn' },
       { role:'uv', name:'TS. Trần Văn Bình',     gvType:'noi', unit:'Khoa CNTT', email:'tranvanbinh@khoacntt.edu.vn' },
-      { role:'uv', name:'TS. Nguyễn Minh Tuấn',  gvType:'noi', unit:'Khoa CNTT', email:'nguyenminhtuan@khoacntt.edu.vn' },
-      { role:'pb', name:'TS. Phạm Quốc Hùng',    gvType:'noi', unit:'Khoa CNTT', email:'phamquochung@khoacntt.edu.vn' }
+      { role:'gc', name:'TS. Nguyễn Minh Tuấn',  gvType:'noi', unit:'Khoa CNTT', email:'nguyenminhtuan@khoacntt.edu.vn' },
+      { role:'gc', name:'TS. Phạm Quốc Hùng',    gvType:'noi', unit:'Khoa CNTT', email:'phamquochung@khoacntt.edu.vn' }
     ],
     students:[
       { maSV:'B22DCCN001', tenSV:'Nguyễn Văn An', svEmail:'b22dccn001@student.edu.vn', lop:'INT3110_1', ctdt:'KTPM', loaiHinh:'TTTN', maDeTai:'DT-2026-001', tenDeTai:'Xây dựng hệ thống quản lý thực tập sinh viên', linhVuc:'CNPM', maxSv:1, tomTat:'Xây dựng hệ thống web hỗ trợ Khoa quản lý đợt thực tập, đăng ký nguyện vọng và theo dõi tiến độ sinh viên.', yeuCau:'Có kiến thức cơ bản về lập trình web và cơ sở dữ liệu quan hệ.', sanPham:'Ứng dụng web hoàn chỉnh, báo cáo thống kê và tài liệu hướng dẫn sử dụng.', congNghe:'ReactJS, Node.js, MySQL', gvhd:'PGS.TS. Lê Văn Minh', gvDong:[{ten:'TS. Trần Văn Bình', trongSo:30}], baoCao:null, scores:{},
-        diemThanhPhan:[{ten:'Chuyên cần', trongSo:10, diem:9.0}, {ten:'Báo cáo giữa kỳ', trongSo:30, diem:8.0}, {ten:'Điểm hội đồng', trongSo:60, type:'hoidong'}] },
+        diemThanhPhan:[{ten:'Chuyên cần', trongSo:10, diem:9.0}, {ten:'Báo cáo giữa kỳ', trongSo:30, diem:8.0}, {ten:'Điểm GV chấm — TS. Nguyễn Minh Tuấn', trongSo:30, type:'hoidong_gc', gvKey:'TS. Nguyễn Minh Tuấn'}, {ten:'Điểm GV chấm — TS. Phạm Quốc Hùng', trongSo:30, type:'hoidong_gc', gvKey:'TS. Phạm Quốc Hùng'}] },
       { maSV:'B22DCCN022', tenSV:'Phạm Minh Khoa', svEmail:'b22dccn022@student.edu.vn', lop:'INT3110_2', ctdt:'KTPM', loaiHinh:'TTTN', maDeTai:'DT-2026-002', tenDeTai:'Ứng dụng AI trong chấm điểm tự động',        linhVuc:'AI', maxSv:1, tomTat:'Nghiên cứu ứng dụng mô hình học máy để hỗ trợ chấm điểm tự động báo cáo thực tập.', yeuCau:'Có kiến thức cơ bản về Machine Learning và Python.', sanPham:'Mô hình chấm điểm thử nghiệm và báo cáo đánh giá độ chính xác.', congNghe:'Python, scikit-learn, Flask', gvhd:'TS. Trần Văn Bình',    baoCao:null, scores:{},
-        diemThanhPhan:[{ten:'Nhật ký thực tập', trongSo:20, diem:8.0}, {ten:'Sản phẩm demo', trongSo:40, diem:7.5}, {ten:'Điểm hội đồng', trongSo:40, type:'hoidong'}] }
+        diemThanhPhan:[{ten:'Nhật ký thực tập', trongSo:20, diem:8.0}, {ten:'Sản phẩm demo', trongSo:40, diem:7.5}, {ten:'Điểm GV chấm — TS. Nguyễn Minh Tuấn', trongSo:20, type:'hoidong_gc', gvKey:'TS. Nguyễn Minh Tuấn'}, {ten:'Điểm GV chấm — TS. Phạm Quốc Hùng', trongSo:20, type:'hoidong_gc', gvKey:'TS. Phạm Quốc Hùng'}] }
     ]
   },
   {
@@ -836,9 +836,9 @@ const COUNCILS = [
       { role:'gc', name:'TS. Nguyễn Minh Tuấn', gvType:'noi', unit:'Khoa CNTT', email:'nguyenminhtuan@khoacntt.edu.vn' }
     ],
     students:[
-      { maSV:'B22DCCN033', tenSV:'Lê Quốc Cường',  svEmail:'b22dccn033@student.edu.vn', lop:'INT3110_2', ctdt:'KHMT', loaiHinh:'KLTN', maDeTai:'DT-2026-003', tenDeTai:'Mô hình học sâu nhận diện khuôn mặt',       linhVuc:'AI', maxSv:1, tomTat:'Xây dựng mô hình học sâu (CNN) nhận diện khuôn mặt phục vụ điểm danh tự động.', yeuCau:'Có kiến thức về Deep Learning và xử lý ảnh.', sanPham:'Mô hình nhận diện khuôn mặt và ứng dụng demo điểm danh.', congNghe:'Python, TensorFlow, OpenCV', gvhd:'TS. Phạm Thu Hà', baoCao:'BC_KLTN_B22DCCN033.pdf', baoCaoMeta:{ nopLuc:'10/06/2026 08:45', nopStatus:'dunghan', sourceUrl:'github.com/lequoccuong/kltn-face-recognition' }, scores:{ 'TS. Phạm Thu Hà':{score:8.5, comment:'Trình bày rõ ràng, đề tài có tính ứng dụng.'} },
+      { maSV:'B22DCCN033', tenSV:'Lê Quốc Cường',  svEmail:'b22dccn033@student.edu.vn', lop:'INT3110_2', ctdt:'KHMT', loaiHinh:'KLTN', maDeTai:'DT-2026-003', tenDeTai:'Mô hình học sâu nhận diện khuôn mặt',       linhVuc:'AI', maxSv:1, tomTat:'Xây dựng mô hình học sâu (CNN) nhận diện khuôn mặt phục vụ điểm danh tự động.', yeuCau:'Có kiến thức về Deep Learning và xử lý ảnh.', sanPham:'Mô hình nhận diện khuôn mặt và ứng dụng demo điểm danh.', congNghe:'Python, TensorFlow, OpenCV', gvhd:'TS. Phạm Thu Hà', baoCao:'BC_KLTN_B22DCCN033.pdf', baoCaoMeta:{ nopLuc:'10/06/2026 08:45', nopStatus:'dunghan', sourceUrl:'github.com/lequoccuong/kltn-face-recognition' }, scores:{ 'TS. Phạm Thu Hà':{score:8.5, comment:'Trình bày rõ ràng, đề tài có tính ứng dụng.'}, 'TS. Lê Đức Thọ':{score:8.0, comment:'Phản biện tốt, cần bổ sung thêm dữ liệu kiểm thử.'}, 'PGS.TS. Võ Thanh Tùng':{score:8.3, comment:'Đề tài có tính ứng dụng thực tiễn cao.'} },
         diemThanhPhan:[{ten:'Quá trình nghiên cứu', trongSo:20, diem:8.5, minhChung:'NhatKy_B22DCCN033.pdf', ghiChu:'Tham gia đầy đủ các buổi báo cáo tiến độ.'}, {ten:'Báo cáo khóa luận', trongSo:30, diem:8.0, minhChung:'BC_KLTN_B22DCCN033.pdf', ghiChu:'Trình bày rõ ràng, đề tài có tính ứng dụng.'}, {ten:'Điểm hội đồng', trongSo:50, type:'hoidong'}] },
-      { maSV:'B22DCCN125', tenSV:'Trương Thị Yến', svEmail:'b22dccn125@student.edu.vn', lop:'INT3110_2', ctdt:'KHMT', loaiHinh:'KLTN', maDeTai:'DT-2026-004', tenDeTai:'Xử lý ngôn ngữ tự nhiên tiếng Việt',         linhVuc:'AI', maxSv:1, tomTat:'Nghiên cứu các kỹ thuật xử lý ngôn ngữ tự nhiên áp dụng cho văn bản tiếng Việt.', yeuCau:'Có kiến thức về NLP và lập trình Python.', sanPham:'Mô hình xử lý NLP và báo cáo đánh giá kết quả.', congNghe:'Python, PyTorch, Hugging Face', gvhd:'TS. Lê Đức Thọ',  baoCao:'BC_KLTN_B22DCCN125.pdf', baoCaoMeta:{ nopLuc:'12/06/2026 15:20', nopStatus:'dunghan', sourceUrl:'github.com/truongthiyen/kltn-vietnamese-nlp' }, scores:{},
+      { maSV:'B22DCCN125', tenSV:'Trương Thị Yến', svEmail:'b22dccn125@student.edu.vn', lop:'INT3110_2', ctdt:'KHMT', loaiHinh:'KLTN', maDeTai:'DT-2026-004', tenDeTai:'Xử lý ngôn ngữ tự nhiên tiếng Việt',         linhVuc:'AI', maxSv:1, tomTat:'Nghiên cứu các kỹ thuật xử lý ngôn ngữ tự nhiên áp dụng cho văn bản tiếng Việt.', yeuCau:'Có kiến thức về NLP và lập trình Python.', sanPham:'Mô hình xử lý NLP và báo cáo đánh giá kết quả.', congNghe:'Python, PyTorch, Hugging Face', gvhd:'TS. Lê Đức Thọ',  baoCao:'BC_KLTN_B22DCCN125.pdf', baoCaoMeta:{ nopLuc:'12/06/2026 15:20', nopStatus:'dunghan', sourceUrl:'github.com/truongthiyen/kltn-vietnamese-nlp' }, scores:{ 'TS. Phạm Thu Hà':{score:7.6, comment:'Đề tài khá, còn thiếu thực nghiệm trên bộ dữ liệu lớn.'} },
         diemThanhPhan:[{ten:'Quá trình nghiên cứu', trongSo:20, diem:7.5}, {ten:'Báo cáo khóa luận', trongSo:30, diem:7.8}, {ten:'Điểm hội đồng', trongSo:50, type:'hoidong'}] }
     ]
   },
@@ -852,28 +852,28 @@ const COUNCILS = [
     members:[
       { role:'ct', name:'TS. Nguyễn Minh Tuấn', gvType:'noi', unit:'Khoa CNTT', email:'nguyenminhtuan@khoacntt.edu.vn' },
       { role:'tk', name:'ThS. Lê Thị Hoa',        gvType:'noi', unit:'Khoa CNTT', email:'lethihoa@khoacntt.edu.vn' },
-      { role:'uv', name:'TS. Phạm Thu Hà',        gvType:'noi', unit:'Khoa CNTT', email:'phamthuha@khoacntt.edu.vn' },
+      { role:'uv', name:'TS. Lê Đức Thọ',         gvType:'noi', unit:'Khoa CNTT', email:'leductho@khoacntt.edu.vn' },
       { role:'gc', name:'ThS. Nguyễn Thu Hoa',     gvType:'noi', unit:'Khoa CNTT', email:'nguyenthuhoa@khoacntt.edu.vn' },
-      { role:'pb', name:'TS. Lê Đức Thọ',         gvType:'noi', unit:'Khoa CNTT', email:'leductho@khoacntt.edu.vn' }
+      { role:'gc', name:'TS. Phạm Thu Hà',        gvType:'noi', unit:'Khoa CNTT', email:'phamthuha@khoacntt.edu.vn' }
     ],
     students:[
       { maSV:'B22DCCN058', tenSV:'Hoàng Minh Đức', svEmail:'b22dccn058@student.edu.vn', lop:'INT3110_1', ctdt:'HTTT', loaiHinh:'TTTN', maDeTai:'DT-2026-005', tenDeTai:'Hệ thống quản trị quan hệ khách hàng', linhVuc:'CNPM', maxSv:1, tomTat:'Xây dựng hệ thống CRM giúp doanh nghiệp quản lý thông tin và chăm sóc khách hàng.', yeuCau:'Có kiến thức cơ bản về lập trình web và CSDL.', sanPham:'Ứng dụng CRM hoàn chỉnh và tài liệu hướng dẫn sử dụng.', congNghe:'Java Spring Boot, MySQL, ReactJS', gvhd:'TS. Nguyễn Minh Tuấn', gvDong:[{ten:'TS. Phạm Thu Hà', trongSo:25}], baoCao:'BC_TTTN_B22DCCN058.pdf', baoCaoMeta:{ nopLuc:'14/06/2026 10:05', nopStatus:'dunghan', sourceUrl:'github.com/hoangminhduc/crm-system-tttn' },
         scores:{ 'TS. Nguyễn Minh Tuấn':{score:8.0,comment:'Đạt yêu cầu.'}, 'TS. Phạm Thu Hà':{score:8.5,comment:'Tốt.'}, 'ThS. Nguyễn Thu Hoa':{score:8.2,comment:'Khá tốt.'}, 'TS. Lê Đức Thọ':{score:7.8,comment:'Cần bổ sung kiểm thử.'} },
-        diemThanhPhan:[{ten:'Ý thức, kỷ luật', trongSo:10, diem:9.0}, {ten:'Kỹ năng chuyên môn', trongSo:20, diem:8.0}, {ten:'Báo cáo thực tập', trongSo:30, diem:8.0}, {ten:'Điểm hội đồng', trongSo:40, type:'hoidong'}], conclusion:'dat' },
+        diemThanhPhan:[{ten:'Ý thức, kỷ luật', trongSo:10, diem:9.0}, {ten:'Kỹ năng chuyên môn', trongSo:20, diem:8.0}, {ten:'Điểm GV chấm — ThS. Nguyễn Thu Hoa', trongSo:20, type:'hoidong_gc', gvKey:'ThS. Nguyễn Thu Hoa'}, {ten:'Điểm GV chấm — TS. Phạm Thu Hà', trongSo:20, type:'hoidong_gc', gvKey:'TS. Phạm Thu Hà'}], conclusion:'dat' },
       { maSV:'B22DCCN047', tenSV:'Ngô Thị Hà',     svEmail:'b22dccn047@student.edu.vn', lop:'INT3110_2', ctdt:'HTTT', loaiHinh:'TTTN', maDeTai:'DT-2026-006', tenDeTai:'Hệ thống cảnh báo gian lận giao dịch', linhVuc:'ATTT', maxSv:1, tomTat:'Xây dựng module phát hiện và cảnh báo các giao dịch bất thường, nghi ngờ gian lận theo thời gian thực.', yeuCau:'Có kiến thức về an toàn thông tin và lập trình backend.', sanPham:'Module phát hiện gian lận và báo cáo đánh giá hiệu quả.', congNghe:'Python, Kafka, PostgreSQL', gvhd:'TS. Nguyễn Minh Tuấn', baoCao:'BC_TTTN_B22DCCN047.pdf', baoCaoMeta:{ nopLuc:'13/06/2026 09:30', nopStatus:'dunghan', sourceUrl:'github.com/ngothiha/fraud-detection-system' },
         scores:{ 'TS. Nguyễn Minh Tuấn':{score:9.0,comment:'Xuất sắc.'}, 'TS. Phạm Thu Hà':{score:8.8,comment:'Rất tốt.'}, 'ThS. Nguyễn Thu Hoa':{score:9.0,comment:'Xuất sắc.'}, 'TS. Lê Đức Thọ':{score:8.5,comment:'Tốt.'} },
-        diemThanhPhan:[{ten:'Ý thức, kỷ luật', trongSo:10, diem:9.5}, {ten:'Kỹ năng chuyên môn', trongSo:20, diem:9.0}, {ten:'Báo cáo thực tập', trongSo:30, diem:8.8}, {ten:'Điểm hội đồng', trongSo:40, type:'hoidong'}], conclusion:'dat' },
+        diemThanhPhan:[{ten:'Ý thức, kỷ luật', trongSo:10, diem:9.5}, {ten:'Kỹ năng chuyên môn', trongSo:20, diem:9.0}, {ten:'Điểm GV chấm — ThS. Nguyễn Thu Hoa', trongSo:20, type:'hoidong_gc', gvKey:'ThS. Nguyễn Thu Hoa'}, {ten:'Điểm GV chấm — TS. Phạm Thu Hà', trongSo:20, type:'hoidong_gc', gvKey:'TS. Phạm Thu Hà'}], conclusion:'dat' },
       { maSV:'B22DCCN048', tenSV:'Phạm Văn Đạt', svEmail:'b22dccn048@student.edu.vn', lop:'INT3110_1', ctdt:'HTTT', loaiHinh:'TTTN', maDeTai:'DT-2026-009', tenDeTai:'Ứng dụng chatbot hỗ trợ khách hàng', linhVuc:'AI', maxSv:1, tomTat:'Xây dựng chatbot thông minh hỗ trợ giải đáp thắc mắc và tư vấn sản phẩm cho khách hàng trực tuyến.', yeuCau:'Có kiến thức cơ bản về NLP và lập trình web.', sanPham:'Chatbot hoạt động và tài liệu hướng dẫn tích hợp.', congNghe:'Python, Rasa, ReactJS', gvhd:'TS. Phạm Thu Hà', baoCao:'BC_TTTN_B22DCCN048.pdf', baoCaoMeta:{ nopLuc:'14/06/2026 11:30', nopStatus:'dunghan', sourceUrl:'github.com/phamvandat/chatbot-customer' },
         scores:{ 'TS. Nguyễn Minh Tuấn':{score:5.0,comment:'Chưa đáp ứng yêu cầu.'}, 'TS. Phạm Thu Hà':{score:5.5,comment:'Cần chỉnh sửa nhiều.'}, 'ThS. Nguyễn Thu Hoa':{score:5.2,comment:'Cần bổ sung tính năng.'}, 'TS. Lê Đức Thọ':{score:5.1,comment:'Thiếu kiểm thử.'} },
         conclusion:'canchinh',
-        diemThanhPhan:[{ten:'Ý thức, kỷ luật', trongSo:10, diem:7.0}, {ten:'Kỹ năng chuyên môn', trongSo:20, diem:5.0}, {ten:'Báo cáo thực tập', trongSo:30, diem:5.5}, {ten:'Điểm hội đồng', trongSo:40, type:'hoidong'}] },
+        diemThanhPhan:[{ten:'Ý thức, kỷ luật', trongSo:10, diem:7.0}, {ten:'Kỹ năng chuyên môn', trongSo:20, diem:5.0}, {ten:'Điểm GV chấm — ThS. Nguyễn Thu Hoa', trongSo:20, type:'hoidong_gc', gvKey:'ThS. Nguyễn Thu Hoa'}, {ten:'Điểm GV chấm — TS. Phạm Thu Hà', trongSo:20, type:'hoidong_gc', gvKey:'TS. Phạm Thu Hà'}] },
       { maSV:'B22DCCN077', tenSV:'Hoàng Thị Mai', svEmail:'b22dccn077@student.edu.vn', lop:'INT3110_2', ctdt:'HTTT', loaiHinh:'TTTN', maDeTai:'DT-2026-010', tenDeTai:'Hệ thống quản lý đặt lịch trực tuyến', linhVuc:'CNPM', maxSv:1, tomTat:'Xây dựng nền tảng đặt lịch hẹn trực tuyến cho các cơ sở dịch vụ như phòng khám, spa, salon.', yeuCau:'Có kiến thức về lập trình web và cơ sở dữ liệu.', sanPham:'Ứng dụng web đặt lịch và tài liệu hệ thống.', congNghe:'Laravel, MySQL, VueJS', gvhd:'TS. Phạm Thu Hà', baoCao:null, baoCaoMeta:null,
         scores:{}, conclusion:'hoanbaove',
-        diemThanhPhan:[{ten:'Ý thức, kỷ luật', trongSo:10, diem:6.0}, {ten:'Kỹ năng chuyên môn', trongSo:20, diem:null}, {ten:'Báo cáo thực tập', trongSo:30, diem:null}, {ten:'Điểm hội đồng', trongSo:40, type:'hoidong'}] },
+        diemThanhPhan:[{ten:'Ý thức, kỷ luật', trongSo:10, diem:6.0}, {ten:'Kỹ năng chuyên môn', trongSo:20, diem:null}, {ten:'Điểm GV chấm — ThS. Nguyễn Thu Hoa', trongSo:20, type:'hoidong_gc', gvKey:'ThS. Nguyễn Thu Hoa'}, {ten:'Điểm GV chấm — TS. Phạm Thu Hà', trongSo:20, type:'hoidong_gc', gvKey:'TS. Phạm Thu Hà'}] },
       { maSV:'B22DCCN090', tenSV:'Đỗ Văn Khôi', svEmail:'b22dccn090@student.edu.vn', lop:'INT3110_1', ctdt:'HTTT', loaiHinh:'TTTN', maDeTai:'DT-2026-011', tenDeTai:'Ứng dụng theo dõi sức khỏe cá nhân', linhVuc:'CNPM', maxSv:1, tomTat:'Phát triển ứng dụng di động theo dõi sức khỏe, quản lý chế độ ăn uống và lịch luyện tập.', yeuCau:'Có kiến thức về lập trình mobile và REST API.', sanPham:'Ứng dụng mobile hoàn chỉnh và báo cáo thực tập.', congNghe:'React Native, Node.js, MongoDB', gvhd:'TS. Nguyễn Minh Tuấn', baoCao:'BC_TTTN_B22DCCN090.pdf', baoCaoMeta:{ nopLuc:'16/06/2026 08:20', nopStatus:'trehan', sourceUrl:'github.com/dovankhoI/health-tracker' },
         scores:{ 'TS. Nguyễn Minh Tuấn':{score:3.8,comment:'Không đạt yêu cầu tối thiểu.'}, 'TS. Phạm Thu Hà':{score:3.8,comment:'Sản phẩm chưa hoàn thiện.'}, 'ThS. Nguyễn Thu Hoa':{score:3.8,comment:'Thiếu nhiều tính năng cơ bản.'}, 'TS. Lê Đức Thọ':{score:3.8,comment:'Không đạt.'} },
         conclusion:'khongdat',
-        diemThanhPhan:[{ten:'Ý thức, kỷ luật', trongSo:10, diem:5.0}, {ten:'Kỹ năng chuyên môn', trongSo:20, diem:3.5}, {ten:'Báo cáo thực tập', trongSo:30, diem:3.8}, {ten:'Điểm hội đồng', trongSo:40, type:'hoidong'}] }
+        diemThanhPhan:[{ten:'Ý thức, kỷ luật', trongSo:10, diem:5.0}, {ten:'Kỹ năng chuyên môn', trongSo:20, diem:3.5}, {ten:'Điểm GV chấm — ThS. Nguyễn Thu Hoa', trongSo:20, type:'hoidong_gc', gvKey:'ThS. Nguyễn Thu Hoa'}, {ten:'Điểm GV chấm — TS. Phạm Thu Hà', trongSo:20, type:'hoidong_gc', gvKey:'TS. Phạm Thu Hà'}] }
     ]
   },
   {
@@ -895,9 +895,9 @@ const COUNCILS = [
       { role:'uv', name:'TS. Nguyễn Minh Tuấn',  gvType:'noi', unit:'Khoa CNTT', email:'nguyenminhtuan@khoacntt.edu.vn' }
     ],
     students:[
-      { maSV:'B22DCCN110', tenSV:'Lý Gia Bảo',     svEmail:'b22dccn110@student.edu.vn', lop:'INT3110_1', ctdt:'HTTT', loaiHinh:'TTTN', maDeTai:'DT-2026-007', tenDeTai:'Hệ thống ERP cho doanh nghiệp nhỏ', linhVuc:'CNPM', maxSv:2, tomTat:'Xây dựng phân hệ ERP cơ bản (kho, bán hàng, kế toán) phù hợp doanh nghiệp quy mô nhỏ.', yeuCau:'Có kiến thức về phân tích thiết kế hệ thống và lập trình web.', sanPham:'Phân hệ ERP hoàn chỉnh và tài liệu phân tích thiết kế.', congNghe:'C#, .NET, SQL Server', gvhd:'TS. Phạm Quốc Hùng', baoCao:'BC_TTTN_B22DCCN110.pdf', baoCaoMeta:{ nopLuc:'16/06/2026 23:52', nopStatus:'trehan', sourceUrl:'github.com/lygiabao/erp-small-business' }, scores:{},
+      { maSV:'B22DCCN110', tenSV:'Lý Gia Bảo',     svEmail:'b22dccn110@student.edu.vn', lop:'INT3110_1', ctdt:'HTTT', loaiHinh:'TTTN', maDeTai:'DT-2026-007', tenDeTai:'Hệ thống ERP cho doanh nghiệp nhỏ', linhVuc:'CNPM', maxSv:2, tomTat:'Xây dựng phân hệ ERP cơ bản (kho, bán hàng, kế toán) phù hợp doanh nghiệp quy mô nhỏ.', yeuCau:'Có kiến thức về phân tích thiết kế hệ thống và lập trình web.', sanPham:'Phân hệ ERP hoàn chỉnh và tài liệu phân tích thiết kế.', congNghe:'C#, .NET, SQL Server', gvhd:'TS. Phạm Quốc Hùng', baoCao:'BC_TTTN_B22DCCN110.pdf', baoCaoMeta:{ nopLuc:'16/06/2026 23:52', nopStatus:'trehan', sourceUrl:'github.com/lygiabao/erp-small-business' }, scores:{ 'TS. Phạm Quốc Hùng':{score:8.0, comment:'Sản phẩm hoàn thiện, trình bày rõ ràng.'}, 'TS. Lê Đức Thọ':{score:7.8, comment:'Cần bổ sung thêm tài liệu triển khai.'} },
         diemThanhPhan:[{ten:'Chuyên cần', trongSo:10, diem:8.0}, {ten:'Báo cáo giữa kỳ', trongSo:30, diem:7.5}, {ten:'Điểm hội đồng', trongSo:60, type:'hoidong'}] },
-      { maSV:'B22DCCN102', tenSV:'Bùi Văn Phúc',   svEmail:'b22dccn102@student.edu.vn', lop:'INT3110_2', ctdt:'HTTT', loaiHinh:'TTTN', maDeTai:'DT-2026-008', tenDeTai:'Hệ thống giám sát an ninh mạng nội bộ', linhVuc:'ATTT', maxSv:1, tomTat:'Xây dựng công cụ giám sát lưu lượng mạng nội bộ, phát hiện truy cập bất thường.', yeuCau:'Có kiến thức về mạng máy tính và an toàn thông tin.', sanPham:'Công cụ giám sát mạng và báo cáo phân tích lưu lượng.', congNghe:'Python, Wireshark API, Elasticsearch', gvhd:'TS. Lê Đức Thọ',   baoCao:'BC_TTTN_B22DCCN102.pdf', baoCaoMeta:{ nopLuc:'14/06/2026 22:15', nopStatus:'trehan', sourceUrl:'' }, scores:{},
+      { maSV:'B22DCCN102', tenSV:'Bùi Văn Phúc',   svEmail:'b22dccn102@student.edu.vn', lop:'INT3110_2', ctdt:'HTTT', loaiHinh:'TTTN', maDeTai:'DT-2026-008', tenDeTai:'Hệ thống giám sát an ninh mạng nội bộ', linhVuc:'ATTT', maxSv:1, tomTat:'Xây dựng công cụ giám sát lưu lượng mạng nội bộ, phát hiện truy cập bất thường.', yeuCau:'Có kiến thức về mạng máy tính và an toàn thông tin.', sanPham:'Công cụ giám sát mạng và báo cáo phân tích lưu lượng.', congNghe:'Python, Wireshark API, Elasticsearch', gvhd:'TS. Lê Đức Thọ',   baoCao:'BC_TTTN_B22DCCN102.pdf', baoCaoMeta:{ nopLuc:'14/06/2026 22:15', nopStatus:'trehan', sourceUrl:'' }, scores:{ 'TS. Phạm Quốc Hùng':{score:7.5, comment:'Ý tưởng tốt, cần tối ưu hiệu năng xử lý.'} },
         diemThanhPhan:[{ten:'Chuyên cần', trongSo:10, diem:8.5}, {ten:'Báo cáo giữa kỳ', trongSo:30, diem:8.0}, {ten:'Điểm hội đồng', trongSo:60, type:'hoidong'}] }
     ]
   },
@@ -910,14 +910,14 @@ const COUNCILS = [
     members:[
       { role:'ct', name:'TS. Trần Văn Bình',     gvType:'noi', unit:'Khoa CNTT', email:'tranvanbinh@khoacntt.edu.vn' },
       { role:'tk', name:'TS. Nguyễn Minh Tuấn',   gvType:'noi', unit:'Khoa CNTT', email:'nguyenminhtuan@khoacntt.edu.vn' },
-      { role:'uv', name:'TS. Phạm Quốc Hùng',     gvType:'noi', unit:'Khoa CNTT', email:'phamquochung@khoacntt.edu.vn' },
-      { role:'pb', name:'TS. Lê Đức Thọ',          gvType:'noi', unit:'Khoa CNTT', email:'leductho@khoacntt.edu.vn' }
+      { role:'gc', name:'TS. Phạm Quốc Hùng',     gvType:'noi', unit:'Khoa CNTT', email:'phamquochung@khoacntt.edu.vn' },
+      { role:'gc', name:'TS. Lê Đức Thọ',          gvType:'noi', unit:'Khoa CNTT', email:'leductho@khoacntt.edu.vn' }
     ],
     students:[
-      { maSV:'B22DCCN140', tenSV:'Vũ Thị Ngọc', svEmail:'b22dccn140@student.edu.vn', lop:'INT3110_1', ctdt:'KTPM', loaiHinh:'TTTN', maDeTai:'DT-2026-012', tenDeTai:'Ứng dụng quản lý kho hàng thông minh', linhVuc:'CNPM', maxSv:1, tomTat:'Xây dựng hệ thống quản lý kho hàng có tích hợp mã vạch và cảnh báo tồn kho.', yeuCau:'Có kiến thức về lập trình web và CSDL.', sanPham:'Ứng dụng web quản lý kho và tài liệu hướng dẫn sử dụng.', congNghe:'ASP.NET Core, SQL Server, ReactJS', gvhd:'TS. Trần Văn Bình', baoCao:'BC_TTTN_B22DCCN140.pdf', baoCaoMeta:{ nopLuc:'15/06/2026 09:10', nopStatus:'dunghan', sourceUrl:'github.com/vuthingoc/warehouse-management' }, scores:{},
-        diemThanhPhan:[{ten:'Chuyên cần', trongSo:10, diem:8.5}, {ten:'Báo cáo giữa kỳ', trongSo:30, diem:8.0}, {ten:'Điểm hội đồng', trongSo:60, type:'hoidong'}] },
+      { maSV:'B22DCCN140', tenSV:'Vũ Thị Ngọc', svEmail:'b22dccn140@student.edu.vn', lop:'INT3110_1', ctdt:'KTPM', loaiHinh:'TTTN', maDeTai:'DT-2026-012', tenDeTai:'Ứng dụng quản lý kho hàng thông minh', linhVuc:'CNPM', maxSv:1, tomTat:'Xây dựng hệ thống quản lý kho hàng có tích hợp mã vạch và cảnh báo tồn kho.', yeuCau:'Có kiến thức về lập trình web và CSDL.', sanPham:'Ứng dụng web quản lý kho và tài liệu hướng dẫn sử dụng.', congNghe:'ASP.NET Core, SQL Server, ReactJS', gvhd:'TS. Trần Văn Bình', baoCao:'BC_TTTN_B22DCCN140.pdf', baoCaoMeta:{ nopLuc:'15/06/2026 09:10', nopStatus:'dunghan', sourceUrl:'github.com/vuthingoc/warehouse-management' }, scores:{ 'TS. Phạm Quốc Hùng':{score:8.2,comment:'Đạt yêu cầu.'} },
+        diemThanhPhan:[{ten:'Chuyên cần', trongSo:10, diem:8.5}, {ten:'Báo cáo giữa kỳ', trongSo:30, diem:8.0}, {ten:'Điểm GV chấm — TS. Phạm Quốc Hùng', trongSo:30, type:'hoidong_gc', gvKey:'TS. Phạm Quốc Hùng'}, {ten:'Điểm GV chấm — TS. Lê Đức Thọ', trongSo:30, type:'hoidong_gc', gvKey:'TS. Lê Đức Thọ'}] },
       { maSV:'B22DCCN141', tenSV:'Đặng Văn Long', svEmail:'b22dccn141@student.edu.vn', lop:'INT3110_2', ctdt:'KTPM', loaiHinh:'TTTN', maDeTai:'DT-2026-013', tenDeTai:'Hệ thống đặt vé xem phim trực tuyến', linhVuc:'CNPM', maxSv:1, tomTat:'Xây dựng nền tảng đặt vé xem phim trực tuyến kèm chọn ghế và thanh toán online.', yeuCau:'Có kiến thức về lập trình web và tích hợp thanh toán.', sanPham:'Ứng dụng web đặt vé hoàn chỉnh và tài liệu triển khai.', congNghe:'Laravel, MySQL, VueJS', gvhd:'TS. Phạm Quốc Hùng', baoCao:'BC_TTTN_B22DCCN141.pdf', baoCaoMeta:{ nopLuc:'16/06/2026 14:40', nopStatus:'dunghan', sourceUrl:'github.com/dangvanlong/movie-ticket-booking' }, scores:{},
-        diemThanhPhan:[{ten:'Chuyên cần', trongSo:10, diem:7.5}, {ten:'Báo cáo giữa kỳ', trongSo:30, diem:7.8}, {ten:'Điểm hội đồng', trongSo:60, type:'hoidong'}] }
+        diemThanhPhan:[{ten:'Chuyên cần', trongSo:10, diem:7.5}, {ten:'Báo cáo giữa kỳ', trongSo:30, diem:7.8}, {ten:'Điểm GV chấm — TS. Phạm Quốc Hùng', trongSo:30, type:'hoidong_gc', gvKey:'TS. Phạm Quốc Hùng'}, {ten:'Điểm GV chấm — TS. Lê Đức Thọ', trongSo:30, type:'hoidong_gc', gvKey:'TS. Lê Đức Thọ'}] }
     ]
   },
   {
@@ -938,6 +938,30 @@ const COUNCILS = [
         diemThanhPhan:[{ten:'Quá trình nghiên cứu', trongSo:20, diem:8.0}, {ten:'Báo cáo khóa luận', trongSo:30, diem:8.2}, {ten:'Điểm hội đồng', trongSo:50, type:'hoidong'}], conclusion:'dat' },
       { maSV:'B22DCCN151', tenSV:'Trịnh Văn Hiếu', svEmail:'b22dccn151@student.edu.vn', lop:'INT3110_2', ctdt:'HTTT', loaiHinh:'KLTN', maDeTai:'DT-2026-015', tenDeTai:'Ứng dụng blockchain trong quản lý chuỗi cung ứng', linhVuc:'CNPM', maxSv:1, tomTat:'Nghiên cứu ứng dụng công nghệ blockchain để minh bạch hóa chuỗi cung ứng hàng hóa.', yeuCau:'Có kiến thức về blockchain và lập trình smart contract.', sanPham:'Ứng dụng demo blockchain và báo cáo nghiên cứu.', congNghe:'Solidity, Ethereum, Node.js', gvhd:'ThS. Nguyễn Thu Hoa', baoCao:'BC_KLTN_B22DCCN151.pdf', baoCaoMeta:{ nopLuc:'19/06/2026 16:30', nopStatus:'dunghan', sourceUrl:'github.com/trinhvanhieu/supply-chain-blockchain' }, scores:{ 'TS. Nguyễn Minh Tuấn':{score:7.5, comment:'Cần bổ sung thêm thử nghiệm thực tế.'} },
         diemThanhPhan:[{ten:'Quá trình nghiên cứu', trongSo:20, diem:7.8}, {ten:'Báo cáo khóa luận', trongSo:30, diem:7.5}, {ten:'Điểm hội đồng', trongSo:50, type:'hoidong'}], conclusion:'dat' }
+    ]
+  },
+  {
+    id:11, code:'HD-2026-020', name:'Hội đồng chấm điểm TTTN HK2 2025-2026 (Nhóm CNPM 5)',
+    donvi:'Bộ môn Công nghệ phần mềm', nganh:'Kỹ thuật phần mềm', type:'chamdiem', dot:'HK2 2025-2026',
+    meetForm:'offline', date:'02/07/2026', time:'08:00', room:'Phòng họp A1-108', link:'', status:'approved',
+    qdNum:'335/QĐ-CNTT', qdDate:'23/06/2026', qdSignedBy:'Nguyễn Thị Lan — Trưởng phòng Đào tạo', qdFile:'',
+    createdBy:'TS. Trần Văn Bình', createdAt:'22/06/2026', note:'',
+    members:[
+      { role:'ct', name:'TS. Nguyễn Minh Tuấn', gvType:'noi', unit:'Khoa CNTT', email:'nguyenminhtuan@khoacntt.edu.vn' },
+      { role:'tk', name:'ThS. Nguyễn Thu Hoa',   gvType:'noi', unit:'Khoa CNTT', email:'nguyenthuhoa@khoacntt.edu.vn' },
+      { role:'gc', name:'TS. Phạm Thu Hà',       gvType:'noi', unit:'Khoa CNTT', email:'phamthuha@khoacntt.edu.vn' },
+      { role:'gc', name:'TS. Lê Đức Thọ',        gvType:'noi', unit:'Khoa CNTT', email:'leductho@khoacntt.edu.vn' }
+    ],
+    students:[
+      { maSV:'B22DCCN170', tenSV:'Nguyễn Văn Khang', svEmail:'b22dccn170@student.edu.vn', lop:'INT3110_1', ctdt:'KTPM', loaiHinh:'TTTN', maDeTai:'DT-2026-018', tenDeTai:'Hệ thống quản lý bán hàng đa kênh', linhVuc:'CNPM', maxSv:1, tomTat:'Xây dựng hệ thống quản lý bán hàng hợp nhất nhiều kênh (cửa hàng, sàn TMĐT, mạng xã hội).', yeuCau:'Có kiến thức về lập trình web và tích hợp API.', sanPham:'Ứng dụng web quản lý bán hàng đa kênh và tài liệu triển khai.', congNghe:'NestJS, PostgreSQL, ReactJS', gvhd:'TS. Trần Văn Bình', baoCao:'BC_TTTN_B22DCCN170.pdf', baoCaoMeta:{ nopLuc:'21/06/2026 10:15', nopStatus:'dunghan', sourceUrl:'github.com/nguyenvankhang/multi-channel-sales' },
+        scores:{ 'TS. Phạm Thu Hà':{score:8.6, comment:'Tích hợp đa kênh hoạt động ổn định.'}, 'TS. Lê Đức Thọ':{score:8.4, comment:'Kiến trúc hệ thống hợp lý, hiệu năng tốt.'}, 'TS. Nguyễn Minh Tuấn':{score:8.5, comment:'Sản phẩm hoàn thiện, trình bày thuyết phục.'} },
+        diemThanhPhan:[{ten:'Chuyên cần', trongSo:10, diem:8.5}, {ten:'Báo cáo giữa kỳ', trongSo:20, diem:8.0}, {ten:'Điểm GV chấm — TS. Phạm Thu Hà', trongSo:35, type:'hoidong_gc', gvKey:'TS. Phạm Thu Hà'}, {ten:'Điểm GV chấm — TS. Lê Đức Thọ', trongSo:35, type:'hoidong_gc', gvKey:'TS. Lê Đức Thọ'}], conclusion:'dat' },
+      { maSV:'B22DCCN171', tenSV:'Trần Thị Bích', svEmail:'b22dccn171@student.edu.vn', lop:'INT3110_2', ctdt:'ATTT', loaiHinh:'TTTN', maDeTai:'DT-2026-019', tenDeTai:'Ứng dụng phát hiện mã độc bằng học máy', linhVuc:'ATTT', maxSv:1, tomTat:'Xây dựng công cụ phát hiện mã độc dựa trên đặc trưng hành vi tệp tin, ứng dụng học máy.', yeuCau:'Có kiến thức về an toàn thông tin và Machine Learning.', sanPham:'Công cụ phát hiện mã độc và báo cáo đánh giá độ chính xác.', congNghe:'Python, scikit-learn, Yara', gvhd:'TS. Trần Văn Bình', baoCao:'BC_TTTN_B22DCCN171.pdf', baoCaoMeta:{ nopLuc:'22/06/2026 23:40', nopStatus:'trehan', sourceUrl:'github.com/tranthibich/malware-detection-ml' },
+        scores:{ 'TS. Phạm Thu Hà':{score:7.2, comment:'Mô hình hoạt động đúng hướng, cần mở rộng tập dữ liệu huấn luyện.'} },
+        diemThanhPhan:[{ten:'Chuyên cần', trongSo:10, diem:7.5}, {ten:'Báo cáo giữa kỳ', trongSo:20, diem:7.0}, {ten:'Điểm GV chấm — TS. Phạm Thu Hà', trongSo:35, type:'hoidong_gc', gvKey:'TS. Phạm Thu Hà'}, {ten:'Điểm GV chấm — TS. Lê Đức Thọ', trongSo:35, type:'hoidong_gc', gvKey:'TS. Lê Đức Thọ'}] },
+      { maSV:'B22DCCN172', tenSV:'Lê Hoàng Nam', svEmail:'b22dccn172@student.edu.vn', lop:'INT3110_1', ctdt:'KTPM', loaiHinh:'TTTN', maDeTai:'DT-2026-020', tenDeTai:'Nền tảng đấu giá trực tuyến', linhVuc:'CNPM', maxSv:1, tomTat:'Xây dựng nền tảng đấu giá trực tuyến thời gian thực với cơ chế chống gian lận đặt giá.', yeuCau:'Có kiến thức về lập trình web và xử lý đồng thời (concurrency).', sanPham:'Ứng dụng web đấu giá trực tuyến và tài liệu triển khai.', congNghe:'Node.js, WebSocket, Redis', gvhd:'TS. Trần Văn Bình', baoCao:null, baoCaoMeta:null,
+        scores:{},
+        diemThanhPhan:[{ten:'Chuyên cần', trongSo:10, diem:7.0}, {ten:'Báo cáo giữa kỳ', trongSo:20, diem:null}, {ten:'Điểm GV chấm — TS. Phạm Thu Hà', trongSo:35, type:'hoidong_gc', gvKey:'TS. Phạm Thu Hà'}, {ten:'Điểm GV chấm — TS. Lê Đức Thọ', trongSo:35, type:'hoidong_gc', gvKey:'TS. Lê Đức Thọ'}] }
     ]
   }
 ];
@@ -1017,6 +1041,10 @@ const closeButtonHtml = `<button class="btn btn-default btn-sm" onclick="cancelC
 /* ── Helpers ──────────────────────────────────────────────── */
 function council() { return COUNCILS.find(c => c.id === currentCouncilId); }
 function scoringMembers(c) { return c.members.filter(m => isScoringRole(m.role)); }
+/* Hội đồng "Chấm điểm" (type=chamdiem): chỉ vai trò GV chấm (gc) cho điểm CHÍNH THỨC — tính vào điểm tổng kết.
+   Điểm của CT/UV/PB trong loại hội đồng này chỉ mang tính THAM KHẢO, không tính vào điểm tổng kết. */
+function isOfficialScorer(m, c) { return c.type === 'chamdiem' ? m.role === 'gc' : true; }
+function officialScoringMembers(c) { return scoringMembers(c).filter(m => isOfficialScorer(m, c)); }
 function avgScore(sv) {
   const vals = Object.values(sv.scores).map(s => s.score).filter(v => typeof v === 'number');
   return vals.length ? (vals.reduce((a,b)=>a+b,0) / vals.length) : null;
@@ -1026,9 +1054,12 @@ function avgOf(names, sv) {
   return vals.length ? (vals.reduce((a,b)=>a+b,0) / vals.length) : null;
 }
 function pbScore(sv, c) { return avgOf(c.members.filter(m => m.role === 'pb').map(m => m.name), sv); }
-/* Đầu điểm "hoidong" không có giá trị cố định trong mock — luôn lấy điểm hội đồng hiện tại (avgScore) */
+/* Đầu điểm "hoidong" (Đánh giá/Phản biện): trung bình cộng mọi thành viên đã chấm.
+   Đầu điểm "hoidong_gc" (Chấm điểm): điểm CHÍNH THỨC riêng của đúng 1 GV chấm (d.gvKey), không trung bình với ai. */
 function resolveDiemThanhPhan(d, sv) {
-  return d.type === 'hoidong' ? avgScore(sv) : d.diem;
+  if (d.type === 'hoidong')    return avgScore(sv);
+  if (d.type === 'hoidong_gc') return (sv.scores[d.gvKey] && typeof sv.scores[d.gvKey].score === 'number') ? sv.scores[d.gvKey].score : null;
+  return d.diem;
 }
 /* Điểm GVHD: mỗi lớp học phần có cấu trúc đầu điểm (tên + trọng số) riêng, không cố định — tổng kết = trung bình có trọng số */
 function gvhdFinalScore(sv) {
@@ -1221,9 +1252,10 @@ function renderStudents() {
   }
 
   tbody.innerHTML = c.students.map((sv, i) => {
-    const sm  = scoringMembers(c);
+    /* Hội đồng "Chấm điểm": cột Điểm HĐ / Đã chấm chỉ tính trên nhóm GV chấm (điểm chính thức) — không gộp điểm tham khảo của CT/UV/PB */
+    const sm  = officialScoringMembers(c);
     const cnt = sm.filter(m => sv.scores[m.name] != null).length;
-    const avg = avgScore(sv);
+    const avg = c.type === 'chamdiem' ? avgOf(sm.map(m => m.name), sv) : avgScore(sv);
     const avgCell = avg !== null
       ? `<span class="score-avg ok">${avg.toFixed(1)}</span>`
       : `<span class="score-avg pending">—</span>`;
@@ -1362,12 +1394,14 @@ function openGvhdScoreDetail(maSV) {
     ? dp.map((d,i) => {
         const val = resolveDiemThanhPhan(d, sv);
         const isHoiDong = d.type === 'hoidong';
-        const nguoiCham = isHoiDong ? (chuTich ? `${chuTich.name} (Chủ tịch HĐ)` : '—') : sv.gvhd;
-        const diemCell = (canEdit && !isHoiDong)
+        const isHoiDongGc = d.type === 'hoidong_gc';
+        /* Đầu điểm "hoidong_gc": người chấm là đúng GV chấm gắn với đầu điểm đó (d.gvKey), điểm lấy từ modal Chấm điểm — không sửa tay tại đây */
+        const nguoiCham = isHoiDong ? (chuTich ? `${chuTich.name} (Chủ tịch HĐ)` : '—') : (isHoiDongGc ? d.gvKey : sv.gvhd);
+        const diemCell = (canEdit && !isHoiDong && !isHoiDongGc)
           ? `<input type="number" class="fc" min="0" max="10" step="0.1" value="${d.diem != null ? d.diem : ''}" style="padding:4px 6px;font-size:13px;text-align:right" onchange="saveDiemThanhPhan('${sv.maSV}', ${i}, this.value)">`
           : `<div style="font-size:14px;font-weight:700;color:var(--primary);text-align:right">${val !== null ? val.toFixed(1) : '—'}</div>`;
-        const minhChungVal = isHoiDong ? c.bienBanFile : d.minhChung;
-        const ghiChuVal = isHoiDong ? c.completeNote : d.ghiChu;
+        const minhChungVal = isHoiDong ? c.bienBanFile : (isHoiDongGc ? null : d.minhChung);
+        const ghiChuVal = isHoiDong ? c.completeNote : (isHoiDongGc ? (sv.scores[d.gvKey] && sv.scores[d.gvKey].comment) : d.ghiChu);
         const minhChungCell = minhChungVal
           ? `📎 ${minhChungVal}`
           : '<span style="color:var(--text-3)">—</span>';
@@ -1375,7 +1409,7 @@ function openGvhdScoreDetail(maSV) {
           ? ghiChuVal
           : '<span style="color:var(--text-3)">—</span>';
         return `<div style="display:grid;grid-template-columns:1fr 70px 70px 130px 140px 1fr;align-items:center;gap:10px;padding:10px 16px;${i<dp.length-1?'border-bottom:1px solid var(--border)':''}">
-        <div style="font-size:13px">${d.ten}${isHoiDong ? ' <span class="hd-type hd-chamdiem" style="margin-left:4px">Điểm hội đồng</span>' : ''}</div>
+        <div style="font-size:13px">${d.ten}${isHoiDong ? ' <span class="hd-type hd-chamdiem" style="margin-left:4px">Điểm hội đồng</span>' : ''}${isHoiDongGc ? ' <span class="hd-type hd-chamdiem" style="margin-left:4px">Điểm GV chấm</span>' : ''}</div>
         <div style="font-size:13px;color:var(--text-2);text-align:right">${d.trongSo}%</div>
         ${diemCell}
         <div style="font-size:12px;color:var(--text-2);word-break:break-word">${nguoiCham}</div>
@@ -1544,11 +1578,15 @@ function openScoreModal(maSV) {
     document.getElementById('sc-save-btn').style.display = 'none';
   }
 
-  updateAvgDisplay(sv);
+  updateAvgDisplay(sv, c);
   openModal('modal-score');
 }
 
-function updateAvgDisplay(sv) {
+/* Hội đồng "Chấm điểm": không còn 1 điểm trung bình đại diện (2 GV chấm giữ 2 đầu điểm độc lập) — ẩn khối này */
+function updateAvgDisplay(sv, c) {
+  const wrap = document.getElementById('sc-avg-wrap');
+  if (c.type === 'chamdiem') { wrap.style.display = 'none'; return; }
+  wrap.style.display = '';
   const avg = avgScore(sv);
   const el = document.getElementById('sc-avg');
   el.textContent = avg !== null ? avg.toFixed(2) : '—';
@@ -1726,10 +1764,10 @@ function exportStudentList() {
 
   const headers = ['Mã SV','Họ và tên','Lớp học phần','CTĐT','Loại hình','Đề tài','GVHD','GV phản biện','Điểm thành phần (chi tiết)','Điểm HĐ','Đã chấm','Kết luận','Ghi chú','File báo cáo'];
   const phanBienNames = c.members.filter(m => m.role === 'pb').map(m => m.name).join('; ') || '—';
-  const sm = scoringMembers(c);
+  const sm = officialScoringMembers(c);
 
   const rows = c.students.map(sv => {
-    const avg = avgScore(sv);
+    const avg = c.type === 'chamdiem' ? avgOf(sm.map(m => m.name), sv) : avgScore(sv);
     const cnt = sm.filter(m => sv.scores[m.name] != null).length;
     const conclLabel = sv.conclusion ? CONCLUSION_CFG[sv.conclusion].label : 'Chưa kết luận';
     const gvDongList = sv.gvDong || [];
@@ -1739,7 +1777,10 @@ function exportStudentList() {
     const dp = sv.diemThanhPhan || [];
     const diemThanhPhanCell = dp
       .filter(d => d.type !== 'hoidong')
-      .map(d => `${d.ten} (${d.trongSo}%): ${d.diem != null ? d.diem.toFixed(1) : '—'}`)
+      .map(d => {
+        const v = resolveDiemThanhPhan(d, sv);
+        return `${d.ten} (${d.trongSo}%): ${v != null ? v.toFixed(1) : '—'}`;
+      })
       .join('; ') || '—';
 
     return [

@@ -93,6 +93,15 @@
         </div>
       </div>
 
+      <!-- Tabs -->
+      <div class="tabs-nav">
+        <button class="tab-btn active" id="tab-btn-tt" onclick="switchTab('tt')">🎓 Thực tập tốt nghiệp</button>
+        <button class="tab-btn" id="tab-btn-dakl" onclick="switchTab('dakl')">📘 ĐA/KL tốt nghiệp</button>
+      </div>
+
+      <!-- ============ TAB: THỰC TẬP TỐT NGHIỆP ============ -->
+      <div class="tab-pane active" id="tab-pane-tt">
+
       <!-- Filter -->
       <div class="filter-bar">
         <div class="input-search" style="width:220px">
@@ -113,8 +122,6 @@
           <option>Tất cả loại yêu cầu</option>
           <option>Đổi doanh nghiệp</option>
           <option>Xin gia hạn TT</option>
-          <option>Gia hạn ĐA/KLTN</option>
-          <option>Đổi đề tài</option>
         </select>
         <select class="fc" style="width:170px">
           <option>Tất cả trạng thái</option>
@@ -126,11 +133,11 @@
       </div>
 
       <!-- Toolbar xuất (hiện khi có dòng được chọn) -->
-      <div class="export-bar" id="export-bar">
-        <span class="sel-count" id="sel-count">0 yêu cầu được chọn</span>
-        <button class="btn btn-default btn-sm" onclick="exportCSV()">⬇️ Xuất CSV</button>
-        <button class="btn btn-primary btn-sm" onclick="exportExcel()">📊 Xuất Excel</button>
-        <button class="btn btn-link btn-sm" style="color:#888" onclick="clearSelection()">✕ Bỏ chọn</button>
+      <div class="export-bar" id="export-bar-tt">
+        <span class="sel-count" id="sel-count-tt">0 yêu cầu được chọn</span>
+        <button class="btn btn-default btn-sm" onclick="exportCSV('tt')">⬇️ Xuất CSV</button>
+        <button class="btn btn-primary btn-sm" onclick="exportExcel('tt')">📊 Xuất Excel</button>
+        <button class="btn btn-link btn-sm" style="color:#888" onclick="clearSelection('tt')">✕ Bỏ chọn</button>
       </div>
 
       <!-- Table -->
@@ -139,7 +146,7 @@
           <table class="tbl">
             <thead>
               <tr>
-                <th style="width:36px;text-align:center"><input type="checkbox" id="chk-all" onclick="toggleAll(this)" title="Chọn tất cả"></th>
+                <th style="width:36px;text-align:center"><input type="checkbox" id="chk-all-tt" onclick="toggleAll(this,'tt')" title="Chọn tất cả"></th>
                 <th>Đơn vị</th>
                 <th>Đợt</th>
                 <th>Mã SV</th>
@@ -158,7 +165,7 @@
             <tbody>
               <!-- Row 1: chờ duyệt, đổi DN -->
               <tr>
-                <td style="text-align:center"><input type="checkbox" class="row-chk" value="1" onchange="onRowCheck()"></td>
+                <td style="text-align:center"><input type="checkbox" class="row-chk row-chk-tt" value="1" onchange="onRowCheck('tt')"></td>
                 <td style="font-size:12px;white-space:nowrap">Khoa CNTT</td>
                 <td style="font-size:12px;white-space:nowrap">TTTN HK1 2025-2026</td>
                 <td style="font-size:13px;font-weight:600">B22DCCN001</td>
@@ -179,7 +186,7 @@
               </tr>
               <!-- Row 2: chờ duyệt, gia hạn -->
               <tr>
-                <td style="text-align:center"><input type="checkbox" class="row-chk" value="2" onchange="onRowCheck()"></td>
+                <td style="text-align:center"><input type="checkbox" class="row-chk row-chk-tt" value="2" onchange="onRowCheck('tt')"></td>
                 <td style="font-size:12px;white-space:nowrap">Khoa CNTT</td>
                 <td style="font-size:12px;white-space:nowrap">TTTN HK1 2025-2026</td>
                 <td style="font-size:13px;font-weight:600">B22DCCN015</td>
@@ -200,7 +207,7 @@
               </tr>
               <!-- Row 3: đã duyệt -->
               <tr>
-                <td style="text-align:center"><input type="checkbox" class="row-chk" value="3" onchange="onRowCheck()"></td>
+                <td style="text-align:center"><input type="checkbox" class="row-chk row-chk-tt" value="3" onchange="onRowCheck('tt')"></td>
                 <td style="font-size:12px;white-space:nowrap">Khoa CNTT</td>
                 <td style="font-size:12px;white-space:nowrap">TTTN HK1 2025-2026</td>
                 <td style="font-size:13px;font-weight:600">B22DCCN033</td>
@@ -219,7 +226,7 @@
               </tr>
               <!-- Row 4: từ chối -->
               <tr>
-                <td style="text-align:center"><input type="checkbox" class="row-chk" value="4" onchange="onRowCheck()"></td>
+                <td style="text-align:center"><input type="checkbox" class="row-chk row-chk-tt" value="4" onchange="onRowCheck('tt')"></td>
                 <td style="font-size:12px;white-space:nowrap">Khoa CNTT</td>
                 <td style="font-size:12px;white-space:nowrap">Kiến tập HK hè 2024</td>
                 <td style="font-size:13px;font-weight:600">B22DCCN047</td>
@@ -236,9 +243,85 @@
                   <button class="icon-btn" onclick="openDetail(4)" title="Xem chi tiết">👁️</button>
                 </td>
               </tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="pagination">
+          <span class="pg-info">Tổng 24 yêu cầu</span>
+          <button class="pg-btn active">1</button>
+          <button class="pg-btn">2</button>
+        </div>
+      </div>
+      </div>
+      <!-- /TAB: THỰC TẬP TỐT NGHIỆP -->
+
+      <!-- ============ TAB: ĐA/KL TỐT NGHIỆP ============ -->
+      <div class="tab-pane" id="tab-pane-dakl">
+
+      <!-- Filter -->
+      <div class="filter-bar">
+        <div class="input-search" style="width:220px">
+          <input class="fc" type="text" placeholder="Tìm mã SV, họ tên...">
+        </div>
+        <select class="fc" style="width:200px">
+          <option>Tất cả đợt</option>
+          <option selected>TTTN HK1 2025-2026</option>
+          <option>Kiến tập HK hè 2024</option>
+        </select>
+        <select class="fc" style="width:175px">
+          <option>Tất cả lớp học phần</option>
+          <option selected>INT3110_1</option>
+          <option>INT3110_2</option>
+          <option>INT3110_3</option>
+        </select>
+        <select class="fc" style="width:175px">
+          <option>Tất cả loại yêu cầu</option>
+          <option>Gia hạn ĐA/KLTN</option>
+          <option>Đổi đề tài</option>
+        </select>
+        <select class="fc" style="width:170px">
+          <option>Tất cả trạng thái</option>
+          <option>Chờ GV duyệt</option>
+          <option>Chờ Khoa duyệt</option>
+          <option>Đã duyệt</option>
+          <option>Từ chối</option>
+        </select>
+      </div>
+
+      <!-- Toolbar xuất (hiện khi có dòng được chọn) -->
+      <div class="export-bar" id="export-bar-dakl">
+        <span class="sel-count" id="sel-count-dakl">0 yêu cầu được chọn</span>
+        <button class="btn btn-default btn-sm" onclick="exportCSV('dakl')">⬇️ Xuất CSV</button>
+        <button class="btn btn-primary btn-sm" onclick="exportExcel('dakl')">📊 Xuất Excel</button>
+        <button class="btn btn-link btn-sm" style="color:#888" onclick="clearSelection('dakl')">✕ Bỏ chọn</button>
+      </div>
+
+      <!-- Table -->
+      <div class="card" style="padding:0">
+        <div class="tbl-wrap">
+          <table class="tbl">
+            <thead>
+              <tr>
+                <th style="width:36px;text-align:center"><input type="checkbox" id="chk-all-dakl" onclick="toggleAll(this,'dakl')" title="Chọn tất cả"></th>
+                <th>Đơn vị</th>
+                <th>Đợt</th>
+                <th>Mã SV</th>
+                <th>Họ tên</th>
+                <th>CTĐT</th>
+                <th>Lớp Học phần</th>
+                <th style="min-width:130px">Thời gian học</th>
+                <th>Loại yêu cầu</th>
+                <th>Ngày gửi</th>
+                <th style="min-width:160px">Nội dung tóm tắt</th>
+                <th>Tài liệu</th>
+                <th>Trạng thái</th>
+                <th style="text-align:center">Thao tác</th>
+              </tr>
+            </thead>
+            <tbody>
               <!-- Row 5: chờ duyệt, gia hạn đồ án -->
               <tr>
-                <td style="text-align:center"><input type="checkbox" class="row-chk" value="5" onchange="onRowCheck()"></td>
+                <td style="text-align:center"><input type="checkbox" class="row-chk row-chk-dakl" value="5" onchange="onRowCheck('dakl')"></td>
                 <td style="font-size:12px;white-space:nowrap">Khoa CNTT</td>
                 <td style="font-size:12px;white-space:nowrap">TTTN HK1 2025-2026</td>
                 <td style="font-size:13px;font-weight:600">B22DCCN058</td>
@@ -259,7 +342,7 @@
               </tr>
               <!-- Row 6: chờ duyệt, đổi đề tài -->
               <tr>
-                <td style="text-align:center"><input type="checkbox" class="row-chk" value="6" onchange="onRowCheck()"></td>
+                <td style="text-align:center"><input type="checkbox" class="row-chk row-chk-dakl" value="6" onchange="onRowCheck('dakl')"></td>
                 <td style="font-size:12px;white-space:nowrap">Khoa CNTT</td>
                 <td style="font-size:12px;white-space:nowrap">TTTN HK1 2025-2026</td>
                 <td style="font-size:13px;font-weight:600">B22DCCN072</td>
@@ -280,7 +363,7 @@
               </tr>
               <!-- Row 7: chờ duyệt, gia hạn khóa luận -->
               <tr>
-                <td style="text-align:center"><input type="checkbox" class="row-chk" value="7" onchange="onRowCheck()"></td>
+                <td style="text-align:center"><input type="checkbox" class="row-chk row-chk-dakl" value="7" onchange="onRowCheck('dakl')"></td>
                 <td style="font-size:12px;white-space:nowrap">Khoa CNTT</td>
                 <td style="font-size:12px;white-space:nowrap">TTTN HK1 2025-2026</td>
                 <td style="font-size:13px;font-weight:600">B22DCCN091</td>
@@ -301,7 +384,7 @@
               </tr>
               <!-- Row 8: chờ duyệt, đổi đề tài (tự đề xuất) -->
               <tr>
-                <td style="text-align:center"><input type="checkbox" class="row-chk" value="8" onchange="onRowCheck()"></td>
+                <td style="text-align:center"><input type="checkbox" class="row-chk row-chk-dakl" value="8" onchange="onRowCheck('dakl')"></td>
                 <td style="font-size:12px;white-space:nowrap">Khoa CNTT</td>
                 <td style="font-size:12px;white-space:nowrap">TTTN HK1 2025-2026</td>
                 <td style="font-size:13px;font-weight:600">B22DCCN105</td>
@@ -324,11 +407,13 @@
           </table>
         </div>
         <div class="pagination">
-          <span class="pg-info">Tổng 34 yêu cầu</span>
+          <span class="pg-info">Tổng 10 yêu cầu</span>
           <button class="pg-btn active">1</button>
-          <button class="pg-btn">2</button>
         </div>
       </div>
+      </div>
+      <!-- /TAB: ĐA/KL TỐT NGHIỆP -->
+
     </main>
   </div>
 </div>
@@ -738,6 +823,13 @@ const REQUESTS = [
     congNgheDuKien:'Python, OR-Tools, PostgreSQL, React' }
 ];
 
+function switchTab(tab) {
+  document.getElementById('tab-btn-tt').classList.toggle('active', tab === 'tt');
+  document.getElementById('tab-btn-dakl').classList.toggle('active', tab === 'dakl');
+  document.getElementById('tab-pane-tt').classList.toggle('active', tab === 'tt');
+  document.getElementById('tab-pane-dakl').classList.toggle('active', tab === 'dakl');
+}
+
 function openDetailFiles(id) {
   const req = REQUESTS.find(r => r.id === id);
   document.getElementById('fl-title').textContent = '📎 Tài liệu minh chứng — ' + req.name;
@@ -983,30 +1075,30 @@ function downloadFile(filename) {
 }
 
 /* ---- Checkbox & xuất DS ---- */
-function toggleAll(chk) {
-  document.querySelectorAll('.row-chk').forEach(c => c.checked = chk.checked);
-  onRowCheck();
+function toggleAll(chk, tab) {
+  document.querySelectorAll('.row-chk-' + tab).forEach(c => c.checked = chk.checked);
+  onRowCheck(tab);
 }
 
-function onRowCheck() {
-  const checked = document.querySelectorAll('.row-chk:checked');
-  const total   = document.querySelectorAll('.row-chk').length;
-  const bar     = document.getElementById('export-bar');
-  document.getElementById('sel-count').textContent = checked.length + ' yêu cầu được chọn';
+function onRowCheck(tab) {
+  const checked = document.querySelectorAll('.row-chk-' + tab + ':checked');
+  const total   = document.querySelectorAll('.row-chk-' + tab).length;
+  const bar     = document.getElementById('export-bar-' + tab);
+  document.getElementById('sel-count-' + tab).textContent = checked.length + ' yêu cầu được chọn';
   bar.classList.toggle('show', checked.length > 0);
-  const chkAll = document.getElementById('chk-all');
+  const chkAll = document.getElementById('chk-all-' + tab);
   chkAll.indeterminate = checked.length > 0 && checked.length < total;
   chkAll.checked = checked.length === total;
 }
 
-function clearSelection() {
-  document.querySelectorAll('.row-chk').forEach(c => c.checked = false);
-  document.getElementById('chk-all').checked = false;
-  onRowCheck();
+function clearSelection(tab) {
+  document.querySelectorAll('.row-chk-' + tab).forEach(c => c.checked = false);
+  document.getElementById('chk-all-' + tab).checked = false;
+  onRowCheck(tab);
 }
 
-function _getSelectedRows() {
-  const ids = [...document.querySelectorAll('.row-chk:checked')].map(c => +c.value);
+function _getSelectedRows(tab) {
+  const ids = [...document.querySelectorAll('.row-chk-' + tab + ':checked')].map(c => +c.value);
   return REQUESTS.filter(r => ids.includes(r.id));
 }
 
@@ -1022,8 +1114,8 @@ function _rowToCols(r) {
   return [r.svId, r.name, r.lhp, LHP_TIME[r.lhp] || '', r.dot, typeLabel, r.date, statusMap[r.status] || r.status];
 }
 
-function exportCSV() {
-  const rows = _getSelectedRows();
+function exportCSV(tab) {
+  const rows = _getSelectedRows(tab);
   const header = ['Mã SV','Họ tên','Lớp HP','Thời gian học','Đợt','Loại yêu cầu','Ngày gửi','Trạng thái'];
   const lines  = [header, ...rows.map(_rowToCols)]
     .map(cols => cols.map(c => '"' + String(c).replace(/"/g,'""') + '"').join(','));
@@ -1032,8 +1124,8 @@ function exportCSV() {
   toast('Đã xuất ' + rows.length + ' yêu cầu ra CSV');
 }
 
-function exportExcel() {
-  const rows = _getSelectedRows();
+function exportExcel(tab) {
+  const rows = _getSelectedRows(tab);
   const header = ['Mã SV','Họ tên','Lớp HP','Thời gian học','Đợt','Loại yêu cầu','Ngày gửi','Trạng thái'];
   const allRows = [header, ...rows.map(_rowToCols)];
   const xml = `<?xml version="1.0" encoding="UTF-8"?>

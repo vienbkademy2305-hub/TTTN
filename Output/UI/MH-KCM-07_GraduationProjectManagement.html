@@ -497,7 +497,7 @@
     </div>
     <div class="modal-bd">
       <div class="fi">
-        <label>Danh sách đề tài đã duyệt</label>
+        <label id="ast-topic-label">Danh sách đề tài đã duyệt</label>
         <div style="display:flex;gap:8px;margin-bottom:8px;flex-wrap:wrap">
           <input class="fc" type="text" id="ast-f-code" placeholder="Lọc mã đề tài..." style="width:130px;font-size:12px" oninput="renderAstTopicTable()">
           <input class="fc" type="text" id="ast-f-name" placeholder="Lọc tên đề tài..." style="flex:1;min-width:160px;font-size:12px" oninput="renderAstTopicTable()">
@@ -523,7 +523,7 @@
                 <th style="width:90px">Loại</th>
                 <th style="width:90px">CTĐT</th>
                 <th style="min-width:140px">GVHD</th>
-                <th style="width:70px;text-align:center">SLSV</th>
+                <th style="width:70px;text-align:center" title="Số lượng SV đã được duyệt đề tài này trong đợt / Số lượng SV tối đa">SLSV</th>
               </tr>
             </thead>
             <tbody id="ast-topic-body"></tbody>
@@ -1580,6 +1580,7 @@ let students = [
 
 let selectedIds = [];
 let _assignTargetIds = [];
+let _assignDotId = null;
 
 /* ════════ INIT FILTER OPTIONS ════════ */
 (function initDotFilter(){
@@ -2120,6 +2121,12 @@ function _finalizeManualAssign(s){
 function openAssignTopic(id){
   _assignTargetIds = id ? [id] : [...selectedIds];
   if (!_assignTargetIds.length) { showToast('Vui lòng chọn ít nhất 1 sinh viên', 'warn'); return; }
+  const targetStudents = students.filter(s => _assignTargetIds.includes(s.id));
+  const dotIds = [...new Set(targetStudents.map(s => s.dotId))];
+  if (dotIds.length > 1) { showToast('Vui lòng chọn sinh viên trong cùng một đợt để phân công đề tài.', 'warn'); return; }
+  _assignDotId = dotIds[0];
+  const dotName = (ROUNDS.find(r => r.id === _assignDotId)||{}).name || _assignDotId;
+  document.getElementById('ast-topic-label').textContent = `Danh sách đề tài đã duyệt — Đợt hướng dẫn: ${dotName}`;
   document.getElementById('ast-f-code').value = '';
   document.getElementById('ast-f-name').value = '';
   document.getElementById('ast-f-loai').value = '';
@@ -2148,16 +2155,20 @@ function renderAstTopicTable(){
     && (!fCtdt || t.ctdt.includes(fCtdt))
     && (!fGvhd || t.gvhdDeXuat === fGvhd));
   const checkedCode = (document.querySelector('input[name="ast-topic-radio"]:checked')||{}).value;
-  document.getElementById('ast-topic-body').innerHTML = approved.length ? approved.map(t => `
-    <tr style="cursor:pointer" onclick="this.querySelector('input').click()">
-      <td style="text-align:center"><input type="radio" name="ast-topic-radio" value="${t.code}" ${t.code===checkedCode?'checked':''} onchange="onAstTopicChange()"></td>
+  document.getElementById('ast-topic-body').innerHTML = approved.length ? approved.map(t => {
+    const used = students.filter(s => s.topic && s.topic.code === t.code && s.dotId === _assignDotId).length;
+    const full = used >= t.qty;
+    return `
+    <tr style="cursor:${full?'not-allowed':'pointer'}" ${full?'':`onclick="this.querySelector('input').click()"`}>
+      <td style="text-align:center"><input type="radio" name="ast-topic-radio" value="${t.code}" ${t.code===checkedCode?'checked':''} ${full?'disabled':''} onchange="onAstTopicChange()"></td>
       <td><span class="code-prev">${t.code}</span></td>
       <td>${t.name}</td>
       <td style="font-size:12px">${t.types.map(x => x === 'Đồ án tốt nghiệp' ? 'ĐATN' : 'KLTN').join(', ')}</td>
       <td style="font-size:12px">${t.ctdt.join(', ')}</td>
       <td>${t.gvhdDeXuat || '<span style="color:var(--text-3)">—</span>'}</td>
-      <td style="text-align:center">${t.qty}</td>
-    </tr>`).join('') : `<tr><td colspan="7" style="text-align:center;color:var(--text-3);padding:16px;font-style:italic">Không có đề tài phù hợp</td></tr>`;
+      <td style="text-align:center${full?';color:var(--error);font-weight:700':''}" title="${full?'Đã đủ số lượng sinh viên':''}">${used}/${t.qty}</td>
+    </tr>`;
+  }).join('') : `<tr><td colspan="7" style="text-align:center;color:var(--text-3);padding:16px;font-style:italic">Không có đề tài phù hợp</td></tr>`;
 }
 function onAstTopicChange(){
   const sel = document.querySelector('input[name="ast-topic-radio"]:checked');

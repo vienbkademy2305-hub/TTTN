@@ -58,6 +58,46 @@
     .code-prev{font-family:monospace;font-size:13px;font-weight:700;color:var(--primary);letter-spacing:.02em}
     #footer-actions-wrap{position:fixed;left:var(--sidebar-w);right:0;bottom:0;z-index:20;border-radius:0;box-shadow:0 -2px 8px rgba(0,0,0,.06)}
     .content{padding-bottom:88px}
+
+    /* ── Lịch chọn ngày tùy biến (khóa ngày nghỉ) ── */
+    .cal-wrap{position:relative;display:inline-block;max-width:180px}
+    .cal-trigger{width:100%;padding:6px 11px;border:1px solid var(--border);border-radius:var(--radius);font-size:14px;background:#fff;cursor:pointer;text-align:left;font-family:inherit}
+    .cal-trigger:hover{border-color:var(--primary)}
+    .cal-popup{position:absolute;top:calc(100% + 4px);left:0;z-index:300;background:#fff;border:1px solid var(--border);border-radius:8px;box-shadow:0 6px 20px rgba(0,0,0,.15);padding:12px;width:264px;display:none}
+    .cal-popup.open{display:block}
+    .cal-hd{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px}
+    .cal-hd button{border:none;background:none;cursor:pointer;font-size:14px;padding:4px 8px;border-radius:4px}
+    .cal-hd button:hover{background:var(--primary-light);color:var(--primary)}
+    .cal-title{font-size:13px;font-weight:600}
+    .cal-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:2px;font-size:12px}
+    .cal-dow{text-align:center;color:var(--text-3);font-weight:600;padding:4px 0;font-size:11px}
+    .cal-day{text-align:center;padding:6px 0;border-radius:4px;cursor:pointer}
+    .cal-day:hover:not(.cal-disabled):not(.cal-empty){background:var(--primary-light);color:var(--primary)}
+    .cal-day.cal-selected{background:var(--primary);color:#fff;font-weight:600}
+    .cal-day.cal-disabled{color:var(--text-3);text-decoration:line-through;cursor:not-allowed;background:#fafafa;position:relative}
+    .cal-day.cal-empty{cursor:default}
+    .cal-legend{font-size:11px;color:var(--text-3);margin-top:8px;padding-top:8px;border-top:1px solid var(--border)}
+
+    /* ── Kiểm tra trùng lịch ── */
+    .check-tbl{width:100%;border-collapse:collapse;font-size:13px;margin-top:10px}
+    .check-tbl th{background:#fafafa;font-weight:600;padding:7px 10px;border:1px solid #e8e8e8;font-size:12px;text-align:left}
+    .check-tbl td{padding:7px 10px;border:1px solid #e8e8e8;vertical-align:middle}
+    .check-badge{font-size:12px;font-weight:600;padding:2px 8px;border-radius:10px;border:1px solid;white-space:nowrap;display:inline-block}
+    .check-ok{background:#f6ffed;color:#389e0d;border-color:#b7eb8f}
+    .check-err{background:#fff2f0;color:#cf1322;border-color:#ffa39e}
+    .check-warn{background:#fffbe6;color:#7c4d00;border-color:#ffe58f}
+    .check-summary{margin-top:10px;padding:10px 14px;border-radius:6px;font-size:13px;font-weight:500}
+    .check-summary.ok{background:#f6ffed;border:1px solid #b7eb8f;color:#389e0d}
+    .check-summary.err{background:#fff2f0;border:1px solid #ffa39e;color:#cf1322}
+    .check-badge.check-err{cursor:pointer}
+    .check-badge.check-err:hover{background:#ffccc7}
+    .check-detail-popup{position:fixed;z-index:400;background:#fff;border:1px solid var(--border);border-radius:8px;box-shadow:0 6px 20px rgba(0,0,0,.18);padding:12px 14px;width:270px;display:none;font-size:12px}
+    .check-detail-popup.open{display:block}
+    .cdp-title{font-weight:700;color:var(--error);margin-bottom:6px;font-size:13px}
+    .cdp-row{display:flex;gap:6px;margin-bottom:3px}
+    .cdp-row b{flex-shrink:0;color:var(--text-3);min-width:70px}
+    .cdp-close{position:absolute;top:6px;right:8px;cursor:pointer;color:var(--text-3);font-size:14px;background:none;border:none;padding:2px}
+    .cdp-close:hover{color:var(--text-1)}
   </style>
 </head>
 <body>
@@ -245,16 +285,38 @@
           <tr>
             <td class="itl">Ngày &amp; giờ họp <span class="req">*</span></td>
             <td>
-              <div style="display:flex;gap:10px">
-                <input type="date" class="fc" id="cr-date" value="2026-06-28" style="max-width:180px">
-                <input type="time" class="fc" id="cr-time" value="08:00" style="max-width:140px">
+              <div style="display:flex;gap:10px;align-items:flex-start">
+                <div class="cal-wrap" id="cal-wrap">
+                  <input type="hidden" id="cr-date">
+                  <button type="button" class="cal-trigger" id="cal-trigger" onclick="toggleMiniCal()">📅 -- Chọn ngày --</button>
+                  <div class="cal-popup" id="cal-popup"></div>
+                </div>
+                <input type="time" class="fc" id="cr-time" value="08:00" style="max-width:120px">
+                <span style="align-self:center;color:var(--text-3);font-size:13px">đến</span>
+                <input type="time" class="fc" id="cr-time-end" value="10:00" style="max-width:120px">
               </div>
+              <div class="f-hint">Ngày tô mờ/gạch ngang là ngày nghỉ (Lịch nghỉ chung / Thứ nghỉ trong tuần niên khoá) — không chọn được</div>
             </td>
           </tr>
           <tr>
             <td class="itl" id="fi-room-label">Địa điểm <span class="req">*</span></td>
             <td>
-              <input type="text" class="fc" id="cr-room" placeholder="Ví dụ: Phòng họp A1-101" style="max-width:420px">
+              <input type="hidden" id="cr-room">
+              <div id="cr-room-wrap">
+                <select class="fc" id="cr-room-select" onchange="onRoomSelectChange(this.value)" style="max-width:420px">
+                  <option value="">-- Chọn địa điểm --</option>
+                  <option>Phòng họp A1-101</option>
+                  <option>Phòng họp A1-102</option>
+                  <option>Phòng họp A1-103</option>
+                  <option>Phòng họp A1-105</option>
+                  <option>Phòng họp A1-108</option>
+                  <option>Phòng họp A1-201</option>
+                  <option>Phòng họp B2-105</option>
+                  <option value="__other__">Ngoài trường</option>
+                </select>
+                <input type="text" class="fc" id="cr-room-other" placeholder="Nhập địa chỉ ngoài trường..." style="max-width:420px;display:none;margin-top:8px" oninput="onRoomOtherInput(this.value)">
+                <div id="check-room-note"></div>
+              </div>
               <input type="text" class="fc" id="cr-link" placeholder="https://meet.google.com/..." style="max-width:420px;display:none">
             </td>
           </tr>
@@ -277,10 +339,11 @@
           <thead>
             <tr>
               <th style="width:36px;text-align:center"><input type="checkbox" id="mem-chk-all" onchange="toggleAllMembers(this.checked)" style="width:15px;height:15px;cursor:pointer;accent-color:var(--primary)"></th>
-              <th style="width:110px">Vai trò</th>
+              <th style="width:100px">Vai trò</th>
               <th>Họ và tên</th>
-              <th style="width:130px">Phân loại</th>
+              <th style="width:110px">Phân loại</th>
               <th>Đơn vị</th>
+              <th style="width:170px">Kiểm tra trùng lịch</th>
               <th style="width:80px;text-align:center">Email</th>
             </tr>
           </thead>
@@ -290,21 +353,25 @@
 
       <!-- Section B: Thành viên (chế độ tạo mới) -->
       <div class="card" style="margin-bottom:16px;display:none" id="section-b-create">
-        <div class="section-hd" style="margin-top:0">Danh sách thành viên</div>
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">
+          <div class="section-hd" style="margin-top:0;margin-bottom:0;border-bottom:none;padding-bottom:0">Danh sách thành viên</div>
+          <button class="btn btn-default" id="btn-check-schedule" onclick="checkScheduleConflict()">🔍 Kiểm tra trùng lịch</button>
+        </div>
         <div class="tbl-wrap" style="margin-bottom:10px">
           <table class="mem-tbl">
             <thead>
               <tr>
                 <th style="width:36px;text-align:center">STT</th>
-                <th style="width:110px">Vai trò</th>
+                <th style="width:100px">Vai trò</th>
                 <th>Họ và tên</th>
-                <th style="width:75px">Phân loại</th>
+                <th style="width:70px">Phân loại</th>
                 <th>Đơn vị / Liên hệ</th>
+                <th style="width:190px">Kiểm tra trùng lịch</th>
                 <th style="width:64px;text-align:center">Thao tác</th>
               </tr>
             </thead>
             <tbody id="cr-mem-tbody">
-              <tr><td colspan="6" class="tbl-empty">Chưa có thành viên — nhấn "+ Thêm thành viên" bên dưới.</td></tr>
+              <tr><td colspan="7" class="tbl-empty">Chưa có thành viên — nhấn "+ Thêm thành viên" bên dưới.</td></tr>
             </tbody>
           </table>
         </div>
@@ -409,7 +476,10 @@
       <div class="card" style="padding:0" id="section-c-wrap">
         <div class="card-hd" style="padding:20px 24px 0;display:flex;align-items:center;justify-content:space-between">
           <h3 class="card-title" style="margin:0">Danh sách Sinh viên &amp; Chấm điểm</h3>
-          <button class="btn btn-default btn-sm" onclick="exportStudentList()" title="Xuất danh sách sinh viên và điểm ra Excel">📥 Xuất Excel</button>
+          <div style="display:flex;gap:8px">
+            <button class="btn btn-default btn-sm" onclick="exportStudentList()" title="Xuất danh sách sinh viên và điểm ra Excel">📥 Xuất Excel</button>
+            <button class="btn btn-default btn-sm" onclick="exportCouncilScoreDetail()" title="Xuất điểm chi tiết theo từng thành viên hội đồng ra Excel">📊 Xuất điểm</button>
+          </div>
         </div>
         <div class="bulk-bar" id="sv-bulk-bar" style="display:none;margin:0 24px 12px">
           <span>Đã chọn <strong id="sv-bulk-count">0</strong> sinh viên</span>
@@ -419,25 +489,7 @@
         </div>
         <div class="tbl-wrap" style="padding:0 0 16px">
           <table class="sv-tbl">
-            <thead>
-              <tr>
-                <th style="width:36px;text-align:center"><input type="checkbox" id="sv-chk-all" onchange="toggleAllStudents(this.checked)" style="width:15px;height:15px;cursor:pointer;accent-color:var(--primary)"></th>
-                <th style="width:100px">Mã SV</th>
-                <th style="min-width:130px">Họ và tên</th>
-                <th style="width:110px">Lớp học phần</th>
-                <th style="width:65px">CTĐT</th>
-                <th>Đề tài</th>
-                <th style="min-width:130px">GVHD</th>
-                <th style="min-width:130px">GVPB</th>
-                <th style="width:90px;text-align:center">Báo cáo</th>
-                <th style="width:90px;text-align:center" title="Điểm hướng dẫn — cấu trúc đầu điểm tùy theo lớp học phần">Điểm thành phần</th>
-                <th style="width:90px;text-align:center" title="Điểm hội đồng">Điểm HĐ</th>
-                <th style="width:90px;text-align:center">Đã chấm</th>
-                <th style="width:160px;text-align:center">Kết luận</th>
-                <th style="min-width:160px">Ghi chú</th>
-                <th style="width:90px;text-align:center">Thao tác</th>
-              </tr>
-            </thead>
+            <thead id="sv-thead"></thead>
             <tbody id="sv-tbody"></tbody>
           </table>
         </div>
@@ -466,29 +518,30 @@
         <tr><td class="itl">Họ và tên</td><td><strong id="sc-name"></strong></td></tr>
         <tr><td class="itl">Đề tài</td><td id="sc-detai"></td></tr>
         <tr><td class="itl">GVHD</td><td id="sc-gvhd"></td></tr>
+        <tr><td class="itl">Điểm GVHD/GVPB</td><td id="sc-gvscore" style="font-size:12px;color:var(--text-2)"></td></tr>
       </table>
+
+      <div id="sc-self-form"></div>
+
+      <div id="sc-avg-wrap" style="background:#f6ffed;border:1px solid #b7eb8f;border-radius:6px;padding:10px 14px;font-size:13px;margin:14px 0 6px">
+        <span id="sc-avg-label">Điểm trung bình hiện tại:</span> <strong id="sc-avg" class="score-avg ok">—</strong>
+      </div>
 
       <div id="sc-lock-note" class="gate-note" style="display:none">🔒 Hội đồng chấm điểm theo hình thức bỏ phiếu kín — bạn chỉ xem được điểm của chính mình, không xem được điểm của các thành viên khác.</div>
 
       <div id="sc-mem-section">
-        <div class="section-hd" style="margin-top:0">Điểm theo từng thành viên hội đồng</div>
+        <div class="section-hd">Điểm đầu điểm hội đồng đã chấm — Chủ tịch/Thư ký xem được toàn bộ</div>
         <table class="mem-tbl" style="margin-bottom:14px">
           <thead>
             <tr>
-              <th style="width:110px">Vai trò</th>
-              <th>Họ và tên</th>
+              <th>Đầu điểm</th>
+              <th style="width:150px">Người chấm</th>
               <th style="width:80px;text-align:center">Điểm</th>
               <th>Nhận xét</th>
             </tr>
           </thead>
           <tbody id="sc-mem-tbody"></tbody>
         </table>
-      </div>
-
-      <div id="sc-self-form"></div>
-
-      <div id="sc-avg-wrap" style="background:#f6ffed;border:1px solid #b7eb8f;border-radius:6px;padding:10px 14px;font-size:13px;margin-top:6px">
-        <span id="sc-avg-label">Điểm trung bình hiện tại:</span> <strong id="sc-avg" class="score-avg ok">—</strong>
       </div>
     </div>
     <div class="modal-ft">
@@ -508,6 +561,11 @@
       <button class="modal-close" data-close="modal-bulkscore">✕</button>
     </div>
     <div class="modal-bd">
+      <div class="fi">
+        <label>Chấm cho đầu điểm <span class="req">*</span></label>
+        <select class="fc" id="bs-dtp-select"></select>
+        <div class="f-hint">SV nào không có đầu điểm này trong cấu trúc lớp học phần sẽ tự động bỏ qua.</div>
+      </div>
       <div class="fi">
         <label>Điểm (0–10) <span class="req">*</span></label>
         <input type="number" class="fc" id="bs-score" min="0" max="10" step="0.1">
@@ -651,8 +709,8 @@
     <div class="modal-bd">
       <div class="f-hint" style="margin-bottom:10px">Cấu trúc đầu điểm do lớp học phần quy định, mỗi lớp có thể khác nhau.</div>
       <div style="border:1px solid var(--border);border-radius:8px;overflow:hidden">
-        <div style="background:#fafafa;padding:10px 16px;border-bottom:1px solid var(--border);display:grid;grid-template-columns:1fr 70px 70px 130px 140px 1fr;gap:10px;font-size:12px;font-weight:600;color:var(--text-3)">
-          <span>Điểm thành phần</span><span style="text-align:right">Trọng số</span><span style="text-align:right">Điểm</span><span>Người chấm</span><span>Minh chứng</span><span>Ghi chú</span>
+        <div style="background:#fafafa;padding:10px 16px;border-bottom:1px solid var(--border);display:grid;grid-template-columns:1fr 70px 70px 160px 1fr;gap:10px;font-size:12px;font-weight:600;color:var(--text-3)">
+          <span>Đầu điểm thành phần</span><span style="text-align:right">Trọng số</span><span style="text-align:right">Điểm</span><span>Người chấm</span><span>Ghi chú</span>
         </div>
         <div id="ghs-body"></div>
       </div>
@@ -763,6 +821,7 @@
 </div>
 
 <div class="toast-box" id="toast-box"></div>
+<div class="check-detail-popup" id="check-detail-popup"></div>
 <script src="_utils.js"></script>
 <script>
 /* ── Constants ────────────────────────────────────────────── */
@@ -793,12 +852,11 @@ const CONCLUSION_CFG = {
 };
 /* Chỉ Chủ tịch & Thư ký được cập nhật kết luận hội đồng cho từng SV */
 function canEditConclusion(c) { const m = c.members.find(x => x.name === currentPersona); return !!m && (m.role === 'ct' || m.role === 'tk'); }
-/* Đầu điểm thành phần (A,B,C) chưa đồng bộ với lớp học phần — chỉ GVHD của SV và GV phản biện của hội đồng được sửa tạm */
-function canEditDiemThanhPhan(sv, c) {
-  if (!currentPersona) return false;
-  const gvNames = [sv.gvhd, ...(sv.gvDong || []).map(g => g.ten)];
-  if (gvNames.includes(currentPersona)) return true;
-  return c.members.some(m => m.role === 'pb' && m.name === currentPersona);
+/* Mọi đầu điểm thành phần giờ đều gắn type (GVHD/GVPB đồng bộ từ nơi GVHD/GVPB nhập; hoidong/hoidong_gc tính
+   từ điểm hội đồng chấm ở màn này) — không còn đầu điểm "trần" cho sửa tay tại MH-KCM-09 nữa. */
+/* Người chấm của 1 đầu điểm hội đồng = danh sách người có lượt chấm (sv.scores[...].dauDiem === ten) — không cố định trước. */
+function dtpNguoiChamList(sv, ten) {
+  return Object.entries(sv.scores).filter(([, s]) => s.dauDiem === ten).map(([name]) => name);
 }
 
 /* ── Mock data — hội đồng + thành viên + SV + điểm ───────────── */
@@ -817,9 +875,11 @@ const COUNCILS = [
     ],
     students:[
       { maSV:'B22DCCN001', tenSV:'Nguyễn Văn An', svEmail:'b22dccn001@student.edu.vn', lop:'INT3110_1', ctdt:'KTPM', loaiHinh:'TTTN', maDeTai:'DT-2026-001', tenDeTai:'Xây dựng hệ thống quản lý thực tập sinh viên', linhVuc:'CNPM', maxSv:1, tomTat:'Xây dựng hệ thống web hỗ trợ Khoa quản lý đợt thực tập, đăng ký nguyện vọng và theo dõi tiến độ sinh viên.', yeuCau:'Có kiến thức cơ bản về lập trình web và cơ sở dữ liệu quan hệ.', sanPham:'Ứng dụng web hoàn chỉnh, báo cáo thống kê và tài liệu hướng dẫn sử dụng.', congNghe:'ReactJS, Node.js, MySQL', gvhd:'PGS.TS. Lê Văn Minh', gvDong:[{ten:'TS. Trần Văn Bình', trongSo:30}], baoCao:null, scores:{},
-        diemThanhPhan:[{ten:'Chuyên cần', trongSo:10, diem:9.0}, {ten:'Báo cáo giữa kỳ', trongSo:30, diem:8.0}, {ten:'Điểm GV chấm — TS. Nguyễn Minh Tuấn', trongSo:30, type:'hoidong_gc', gvKey:'TS. Nguyễn Minh Tuấn'}, {ten:'Điểm GV chấm — TS. Phạm Quốc Hùng', trongSo:30, type:'hoidong_gc', gvKey:'TS. Phạm Quốc Hùng'}] },
+        diemGVHD:9.0, trongSoGVHD:10, diemGVPB:8.0, trongSoGVPB:30,
+        diemThanhPhan:[{ten:'Điểm GV chấm — TS. Nguyễn Minh Tuấn', trongSo:30}, {ten:'Điểm GV chấm — TS. Phạm Quốc Hùng', trongSo:30}] },
       { maSV:'B22DCCN022', tenSV:'Phạm Minh Khoa', svEmail:'b22dccn022@student.edu.vn', lop:'INT3110_2', ctdt:'KTPM', loaiHinh:'TTTN', maDeTai:'DT-2026-002', tenDeTai:'Ứng dụng AI trong chấm điểm tự động',        linhVuc:'AI', maxSv:1, tomTat:'Nghiên cứu ứng dụng mô hình học máy để hỗ trợ chấm điểm tự động báo cáo thực tập.', yeuCau:'Có kiến thức cơ bản về Machine Learning và Python.', sanPham:'Mô hình chấm điểm thử nghiệm và báo cáo đánh giá độ chính xác.', congNghe:'Python, scikit-learn, Flask', gvhd:'TS. Trần Văn Bình',    baoCao:null, scores:{},
-        diemThanhPhan:[{ten:'Nhật ký thực tập', trongSo:20, diem:8.0}, {ten:'Sản phẩm demo', trongSo:40, diem:7.5}, {ten:'Điểm GV chấm — TS. Nguyễn Minh Tuấn', trongSo:20, type:'hoidong_gc', gvKey:'TS. Nguyễn Minh Tuấn'}, {ten:'Điểm GV chấm — TS. Phạm Quốc Hùng', trongSo:20, type:'hoidong_gc', gvKey:'TS. Phạm Quốc Hùng'}] }
+        diemGVHD:8.0, trongSoGVHD:20, diemGVPB:7.5, trongSoGVPB:40,
+        diemThanhPhan:[{ten:'Điểm GV chấm — TS. Nguyễn Minh Tuấn', trongSo:20}, {ten:'Điểm GV chấm — TS. Phạm Quốc Hùng', trongSo:20}] }
     ]
   },
   {
@@ -836,10 +896,12 @@ const COUNCILS = [
       { role:'gc', name:'TS. Nguyễn Minh Tuấn', gvType:'noi', unit:'Khoa CNTT', email:'nguyenminhtuan@khoacntt.edu.vn' }
     ],
     students:[
-      { maSV:'B22DCCN033', tenSV:'Lê Quốc Cường',  svEmail:'b22dccn033@student.edu.vn', lop:'INT3110_2', ctdt:'KHMT', loaiHinh:'KLTN', maDeTai:'DT-2026-003', tenDeTai:'Mô hình học sâu nhận diện khuôn mặt',       linhVuc:'AI', maxSv:1, tomTat:'Xây dựng mô hình học sâu (CNN) nhận diện khuôn mặt phục vụ điểm danh tự động.', yeuCau:'Có kiến thức về Deep Learning và xử lý ảnh.', sanPham:'Mô hình nhận diện khuôn mặt và ứng dụng demo điểm danh.', congNghe:'Python, TensorFlow, OpenCV', gvhd:'TS. Phạm Thu Hà', baoCao:'BC_KLTN_B22DCCN033.pdf', baoCaoMeta:{ nopLuc:'10/06/2026 08:45', nopStatus:'dunghan', sourceUrl:'github.com/lequoccuong/kltn-face-recognition' }, scores:{ 'TS. Phạm Thu Hà':{score:8.5, comment:'Trình bày rõ ràng, đề tài có tính ứng dụng.'}, 'TS. Lê Đức Thọ':{score:8.0, comment:'Phản biện tốt, cần bổ sung thêm dữ liệu kiểm thử.'}, 'PGS.TS. Võ Thanh Tùng':{score:8.3, comment:'Đề tài có tính ứng dụng thực tiễn cao.'} },
-        diemThanhPhan:[{ten:'Quá trình nghiên cứu', trongSo:20, diem:8.5, minhChung:'NhatKy_B22DCCN033.pdf', ghiChu:'Tham gia đầy đủ các buổi báo cáo tiến độ.'}, {ten:'Báo cáo khóa luận', trongSo:30, diem:8.0, minhChung:'BC_KLTN_B22DCCN033.pdf', ghiChu:'Trình bày rõ ràng, đề tài có tính ứng dụng.'}, {ten:'Điểm hội đồng', trongSo:50, type:'hoidong'}] },
-      { maSV:'B22DCCN125', tenSV:'Trương Thị Yến', svEmail:'b22dccn125@student.edu.vn', lop:'INT3110_2', ctdt:'KHMT', loaiHinh:'KLTN', maDeTai:'DT-2026-004', tenDeTai:'Xử lý ngôn ngữ tự nhiên tiếng Việt',         linhVuc:'AI', maxSv:1, tomTat:'Nghiên cứu các kỹ thuật xử lý ngôn ngữ tự nhiên áp dụng cho văn bản tiếng Việt.', yeuCau:'Có kiến thức về NLP và lập trình Python.', sanPham:'Mô hình xử lý NLP và báo cáo đánh giá kết quả.', congNghe:'Python, PyTorch, Hugging Face', gvhd:'TS. Lê Đức Thọ',  baoCao:'BC_KLTN_B22DCCN125.pdf', baoCaoMeta:{ nopLuc:'12/06/2026 15:20', nopStatus:'dunghan', sourceUrl:'github.com/truongthiyen/kltn-vietnamese-nlp' }, scores:{ 'TS. Phạm Thu Hà':{score:7.6, comment:'Đề tài khá, còn thiếu thực nghiệm trên bộ dữ liệu lớn.'} },
-        diemThanhPhan:[{ten:'Quá trình nghiên cứu', trongSo:20, diem:7.5}, {ten:'Báo cáo khóa luận', trongSo:30, diem:7.8}, {ten:'Điểm hội đồng', trongSo:50, type:'hoidong'}] }
+      { maSV:'B22DCCN033', tenSV:'Lê Quốc Cường',  svEmail:'b22dccn033@student.edu.vn', lop:'INT3110_2', ctdt:'KHMT', loaiHinh:'KLTN', maDeTai:'DT-2026-003', tenDeTai:'Mô hình học sâu nhận diện khuôn mặt',       linhVuc:'AI', maxSv:1, tomTat:'Xây dựng mô hình học sâu (CNN) nhận diện khuôn mặt phục vụ điểm danh tự động.', yeuCau:'Có kiến thức về Deep Learning và xử lý ảnh.', sanPham:'Mô hình nhận diện khuôn mặt và ứng dụng demo điểm danh.', congNghe:'Python, TensorFlow, OpenCV', gvhd:'TS. Phạm Thu Hà', baoCao:'BC_KLTN_B22DCCN033.pdf', baoCaoMeta:{ nopLuc:'10/06/2026 08:45', nopStatus:'dunghan', sourceUrl:'github.com/lequoccuong/kltn-face-recognition' }, scores:{ 'TS. Phạm Thu Hà':{score:8.5, comment:'Trình bày rõ ràng, đề tài có tính ứng dụng.', dauDiem:'Điểm hội đồng'}, 'TS. Lê Đức Thọ':{score:8.0, comment:'Phản biện tốt, cần bổ sung thêm dữ liệu kiểm thử.', dauDiem:'Điểm hội đồng'}, 'PGS.TS. Võ Thanh Tùng':{score:8.3, comment:'Đề tài có tính ứng dụng thực tiễn cao.', dauDiem:'Điểm hội đồng'} },
+        diemGVHD:8.5, trongSoGVHD:20, diemGVPB:8.0, trongSoGVPB:30,
+        diemThanhPhan:[{ten:'Điểm hội đồng', trongSo:50}] },
+      { maSV:'B22DCCN125', tenSV:'Trương Thị Yến', svEmail:'b22dccn125@student.edu.vn', lop:'INT3110_2', ctdt:'KHMT', loaiHinh:'KLTN', maDeTai:'DT-2026-004', tenDeTai:'Xử lý ngôn ngữ tự nhiên tiếng Việt',         linhVuc:'AI', maxSv:1, tomTat:'Nghiên cứu các kỹ thuật xử lý ngôn ngữ tự nhiên áp dụng cho văn bản tiếng Việt.', yeuCau:'Có kiến thức về NLP và lập trình Python.', sanPham:'Mô hình xử lý NLP và báo cáo đánh giá kết quả.', congNghe:'Python, PyTorch, Hugging Face', gvhd:'TS. Lê Đức Thọ',  baoCao:'BC_KLTN_B22DCCN125.pdf', baoCaoMeta:{ nopLuc:'12/06/2026 15:20', nopStatus:'dunghan', sourceUrl:'github.com/truongthiyen/kltn-vietnamese-nlp' }, scores:{ 'TS. Phạm Thu Hà':{score:7.6, comment:'Đề tài khá, còn thiếu thực nghiệm trên bộ dữ liệu lớn.', dauDiem:'Điểm hội đồng'} },
+        diemGVHD:7.5, trongSoGVHD:20, diemGVPB:7.8, trongSoGVPB:30,
+        diemThanhPhan:[{ten:'Điểm hội đồng', trongSo:50}] }
     ]
   },
   {
@@ -858,22 +920,27 @@ const COUNCILS = [
     ],
     students:[
       { maSV:'B22DCCN058', tenSV:'Hoàng Minh Đức', svEmail:'b22dccn058@student.edu.vn', lop:'INT3110_1', ctdt:'HTTT', loaiHinh:'TTTN', maDeTai:'DT-2026-005', tenDeTai:'Hệ thống quản trị quan hệ khách hàng', linhVuc:'CNPM', maxSv:1, tomTat:'Xây dựng hệ thống CRM giúp doanh nghiệp quản lý thông tin và chăm sóc khách hàng.', yeuCau:'Có kiến thức cơ bản về lập trình web và CSDL.', sanPham:'Ứng dụng CRM hoàn chỉnh và tài liệu hướng dẫn sử dụng.', congNghe:'Java Spring Boot, MySQL, ReactJS', gvhd:'TS. Nguyễn Minh Tuấn', gvDong:[{ten:'TS. Phạm Thu Hà', trongSo:25}], baoCao:'BC_TTTN_B22DCCN058.pdf', baoCaoMeta:{ nopLuc:'14/06/2026 10:05', nopStatus:'dunghan', sourceUrl:'github.com/hoangminhduc/crm-system-tttn' },
-        scores:{ 'TS. Nguyễn Minh Tuấn':{score:8.0,comment:'Đạt yêu cầu.'}, 'TS. Phạm Thu Hà':{score:8.5,comment:'Tốt.'}, 'ThS. Nguyễn Thu Hoa':{score:8.2,comment:'Khá tốt.'}, 'TS. Lê Đức Thọ':{score:7.8,comment:'Cần bổ sung kiểm thử.'} },
-        diemThanhPhan:[{ten:'Ý thức, kỷ luật', trongSo:10, diem:9.0}, {ten:'Kỹ năng chuyên môn', trongSo:20, diem:8.0}, {ten:'Điểm GV chấm — ThS. Nguyễn Thu Hoa', trongSo:20, type:'hoidong_gc', gvKey:'ThS. Nguyễn Thu Hoa'}, {ten:'Điểm GV chấm — TS. Phạm Thu Hà', trongSo:20, type:'hoidong_gc', gvKey:'TS. Phạm Thu Hà'}], conclusion:'dat' },
+        scores:{ 'TS. Nguyễn Minh Tuấn':{score:8.0,comment:'Đạt yêu cầu.'}, 'TS. Phạm Thu Hà':{score:8.5,comment:'Tốt.', dauDiem:'Điểm GV chấm — TS. Phạm Thu Hà'}, 'ThS. Nguyễn Thu Hoa':{score:8.2,comment:'Khá tốt.', dauDiem:'Điểm GV chấm — ThS. Nguyễn Thu Hoa'}, 'TS. Lê Đức Thọ':{score:7.8,comment:'Cần bổ sung kiểm thử.'} },
+        diemGVHD:9.0, trongSoGVHD:10, diemGVPB:8.0, trongSoGVPB:20,
+        diemThanhPhan:[{ten:'Điểm GV chấm — ThS. Nguyễn Thu Hoa', trongSo:20}, {ten:'Điểm GV chấm — TS. Phạm Thu Hà', trongSo:20}], conclusion:'dat' },
       { maSV:'B22DCCN047', tenSV:'Ngô Thị Hà',     svEmail:'b22dccn047@student.edu.vn', lop:'INT3110_2', ctdt:'HTTT', loaiHinh:'TTTN', maDeTai:'DT-2026-006', tenDeTai:'Hệ thống cảnh báo gian lận giao dịch', linhVuc:'ATTT', maxSv:1, tomTat:'Xây dựng module phát hiện và cảnh báo các giao dịch bất thường, nghi ngờ gian lận theo thời gian thực.', yeuCau:'Có kiến thức về an toàn thông tin và lập trình backend.', sanPham:'Module phát hiện gian lận và báo cáo đánh giá hiệu quả.', congNghe:'Python, Kafka, PostgreSQL', gvhd:'TS. Nguyễn Minh Tuấn', baoCao:'BC_TTTN_B22DCCN047.pdf', baoCaoMeta:{ nopLuc:'13/06/2026 09:30', nopStatus:'dunghan', sourceUrl:'github.com/ngothiha/fraud-detection-system' },
-        scores:{ 'TS. Nguyễn Minh Tuấn':{score:9.0,comment:'Xuất sắc.'}, 'TS. Phạm Thu Hà':{score:8.8,comment:'Rất tốt.'}, 'ThS. Nguyễn Thu Hoa':{score:9.0,comment:'Xuất sắc.'}, 'TS. Lê Đức Thọ':{score:8.5,comment:'Tốt.'} },
-        diemThanhPhan:[{ten:'Ý thức, kỷ luật', trongSo:10, diem:9.5}, {ten:'Kỹ năng chuyên môn', trongSo:20, diem:9.0}, {ten:'Điểm GV chấm — ThS. Nguyễn Thu Hoa', trongSo:20, type:'hoidong_gc', gvKey:'ThS. Nguyễn Thu Hoa'}, {ten:'Điểm GV chấm — TS. Phạm Thu Hà', trongSo:20, type:'hoidong_gc', gvKey:'TS. Phạm Thu Hà'}], conclusion:'dat' },
+        scores:{ 'TS. Nguyễn Minh Tuấn':{score:9.0,comment:'Xuất sắc.'}, 'TS. Phạm Thu Hà':{score:8.8,comment:'Rất tốt.', dauDiem:'Điểm GV chấm — TS. Phạm Thu Hà'}, 'ThS. Nguyễn Thu Hoa':{score:9.0,comment:'Xuất sắc.', dauDiem:'Điểm GV chấm — ThS. Nguyễn Thu Hoa'}, 'TS. Lê Đức Thọ':{score:8.5,comment:'Tốt.'} },
+        diemGVHD:9.5, trongSoGVHD:10, diemGVPB:9.0, trongSoGVPB:20,
+        diemThanhPhan:[{ten:'Điểm GV chấm — ThS. Nguyễn Thu Hoa', trongSo:20}, {ten:'Điểm GV chấm — TS. Phạm Thu Hà', trongSo:20}], conclusion:'dat' },
       { maSV:'B22DCCN048', tenSV:'Phạm Văn Đạt', svEmail:'b22dccn048@student.edu.vn', lop:'INT3110_1', ctdt:'HTTT', loaiHinh:'TTTN', maDeTai:'DT-2026-009', tenDeTai:'Ứng dụng chatbot hỗ trợ khách hàng', linhVuc:'AI', maxSv:1, tomTat:'Xây dựng chatbot thông minh hỗ trợ giải đáp thắc mắc và tư vấn sản phẩm cho khách hàng trực tuyến.', yeuCau:'Có kiến thức cơ bản về NLP và lập trình web.', sanPham:'Chatbot hoạt động và tài liệu hướng dẫn tích hợp.', congNghe:'Python, Rasa, ReactJS', gvhd:'TS. Phạm Thu Hà', baoCao:'BC_TTTN_B22DCCN048.pdf', baoCaoMeta:{ nopLuc:'14/06/2026 11:30', nopStatus:'dunghan', sourceUrl:'github.com/phamvandat/chatbot-customer' },
-        scores:{ 'TS. Nguyễn Minh Tuấn':{score:5.0,comment:'Chưa đáp ứng yêu cầu.'}, 'TS. Phạm Thu Hà':{score:5.5,comment:'Cần chỉnh sửa nhiều.'}, 'ThS. Nguyễn Thu Hoa':{score:5.2,comment:'Cần bổ sung tính năng.'}, 'TS. Lê Đức Thọ':{score:5.1,comment:'Thiếu kiểm thử.'} },
+        scores:{ 'TS. Nguyễn Minh Tuấn':{score:5.0,comment:'Chưa đáp ứng yêu cầu.'}, 'TS. Phạm Thu Hà':{score:5.5,comment:'Cần chỉnh sửa nhiều.', dauDiem:'Điểm GV chấm — TS. Phạm Thu Hà'}, 'ThS. Nguyễn Thu Hoa':{score:5.2,comment:'Cần bổ sung tính năng.', dauDiem:'Điểm GV chấm — ThS. Nguyễn Thu Hoa'}, 'TS. Lê Đức Thọ':{score:5.1,comment:'Thiếu kiểm thử.'} },
         conclusion:'canchinh',
-        diemThanhPhan:[{ten:'Ý thức, kỷ luật', trongSo:10, diem:7.0}, {ten:'Kỹ năng chuyên môn', trongSo:20, diem:5.0}, {ten:'Điểm GV chấm — ThS. Nguyễn Thu Hoa', trongSo:20, type:'hoidong_gc', gvKey:'ThS. Nguyễn Thu Hoa'}, {ten:'Điểm GV chấm — TS. Phạm Thu Hà', trongSo:20, type:'hoidong_gc', gvKey:'TS. Phạm Thu Hà'}] },
+        diemGVHD:7.0, trongSoGVHD:10, diemGVPB:5.0, trongSoGVPB:20,
+        diemThanhPhan:[{ten:'Điểm GV chấm — ThS. Nguyễn Thu Hoa', trongSo:20}, {ten:'Điểm GV chấm — TS. Phạm Thu Hà', trongSo:20}] },
       { maSV:'B22DCCN077', tenSV:'Hoàng Thị Mai', svEmail:'b22dccn077@student.edu.vn', lop:'INT3110_2', ctdt:'HTTT', loaiHinh:'TTTN', maDeTai:'DT-2026-010', tenDeTai:'Hệ thống quản lý đặt lịch trực tuyến', linhVuc:'CNPM', maxSv:1, tomTat:'Xây dựng nền tảng đặt lịch hẹn trực tuyến cho các cơ sở dịch vụ như phòng khám, spa, salon.', yeuCau:'Có kiến thức về lập trình web và cơ sở dữ liệu.', sanPham:'Ứng dụng web đặt lịch và tài liệu hệ thống.', congNghe:'Laravel, MySQL, VueJS', gvhd:'TS. Phạm Thu Hà', baoCao:null, baoCaoMeta:null,
         scores:{}, conclusion:'hoanbaove',
-        diemThanhPhan:[{ten:'Ý thức, kỷ luật', trongSo:10, diem:6.0}, {ten:'Kỹ năng chuyên môn', trongSo:20, diem:null}, {ten:'Điểm GV chấm — ThS. Nguyễn Thu Hoa', trongSo:20, type:'hoidong_gc', gvKey:'ThS. Nguyễn Thu Hoa'}, {ten:'Điểm GV chấm — TS. Phạm Thu Hà', trongSo:20, type:'hoidong_gc', gvKey:'TS. Phạm Thu Hà'}] },
+        diemGVHD:6.0, trongSoGVHD:10, diemGVPB:null, trongSoGVPB:20,
+        diemThanhPhan:[{ten:'Điểm GV chấm — ThS. Nguyễn Thu Hoa', trongSo:20}, {ten:'Điểm GV chấm — TS. Phạm Thu Hà', trongSo:20}] },
       { maSV:'B22DCCN090', tenSV:'Đỗ Văn Khôi', svEmail:'b22dccn090@student.edu.vn', lop:'INT3110_1', ctdt:'HTTT', loaiHinh:'TTTN', maDeTai:'DT-2026-011', tenDeTai:'Ứng dụng theo dõi sức khỏe cá nhân', linhVuc:'CNPM', maxSv:1, tomTat:'Phát triển ứng dụng di động theo dõi sức khỏe, quản lý chế độ ăn uống và lịch luyện tập.', yeuCau:'Có kiến thức về lập trình mobile và REST API.', sanPham:'Ứng dụng mobile hoàn chỉnh và báo cáo thực tập.', congNghe:'React Native, Node.js, MongoDB', gvhd:'TS. Nguyễn Minh Tuấn', baoCao:'BC_TTTN_B22DCCN090.pdf', baoCaoMeta:{ nopLuc:'16/06/2026 08:20', nopStatus:'trehan', sourceUrl:'github.com/dovankhoI/health-tracker' },
-        scores:{ 'TS. Nguyễn Minh Tuấn':{score:3.8,comment:'Không đạt yêu cầu tối thiểu.'}, 'TS. Phạm Thu Hà':{score:3.8,comment:'Sản phẩm chưa hoàn thiện.'}, 'ThS. Nguyễn Thu Hoa':{score:3.8,comment:'Thiếu nhiều tính năng cơ bản.'}, 'TS. Lê Đức Thọ':{score:3.8,comment:'Không đạt.'} },
+        scores:{ 'TS. Nguyễn Minh Tuấn':{score:3.8,comment:'Không đạt yêu cầu tối thiểu.'}, 'TS. Phạm Thu Hà':{score:3.8,comment:'Sản phẩm chưa hoàn thiện.', dauDiem:'Điểm GV chấm — TS. Phạm Thu Hà'}, 'ThS. Nguyễn Thu Hoa':{score:3.8,comment:'Thiếu nhiều tính năng cơ bản.', dauDiem:'Điểm GV chấm — ThS. Nguyễn Thu Hoa'}, 'TS. Lê Đức Thọ':{score:3.8,comment:'Không đạt.'} },
         conclusion:'khongdat',
-        diemThanhPhan:[{ten:'Ý thức, kỷ luật', trongSo:10, diem:5.0}, {ten:'Kỹ năng chuyên môn', trongSo:20, diem:3.5}, {ten:'Điểm GV chấm — ThS. Nguyễn Thu Hoa', trongSo:20, type:'hoidong_gc', gvKey:'ThS. Nguyễn Thu Hoa'}, {ten:'Điểm GV chấm — TS. Phạm Thu Hà', trongSo:20, type:'hoidong_gc', gvKey:'TS. Phạm Thu Hà'}] }
+        diemGVHD:5.0, trongSoGVHD:10, diemGVPB:3.5, trongSoGVPB:20,
+        diemThanhPhan:[{ten:'Điểm GV chấm — ThS. Nguyễn Thu Hoa', trongSo:20}, {ten:'Điểm GV chấm — TS. Phạm Thu Hà', trongSo:20}] }
     ]
   },
   {
@@ -895,10 +962,12 @@ const COUNCILS = [
       { role:'uv', name:'TS. Nguyễn Minh Tuấn',  gvType:'noi', unit:'Khoa CNTT', email:'nguyenminhtuan@khoacntt.edu.vn' }
     ],
     students:[
-      { maSV:'B22DCCN110', tenSV:'Lý Gia Bảo',     svEmail:'b22dccn110@student.edu.vn', lop:'INT3110_1', ctdt:'HTTT', loaiHinh:'TTTN', maDeTai:'DT-2026-007', tenDeTai:'Hệ thống ERP cho doanh nghiệp nhỏ', linhVuc:'CNPM', maxSv:2, tomTat:'Xây dựng phân hệ ERP cơ bản (kho, bán hàng, kế toán) phù hợp doanh nghiệp quy mô nhỏ.', yeuCau:'Có kiến thức về phân tích thiết kế hệ thống và lập trình web.', sanPham:'Phân hệ ERP hoàn chỉnh và tài liệu phân tích thiết kế.', congNghe:'C#, .NET, SQL Server', gvhd:'TS. Phạm Quốc Hùng', baoCao:'BC_TTTN_B22DCCN110.pdf', baoCaoMeta:{ nopLuc:'16/06/2026 23:52', nopStatus:'trehan', sourceUrl:'github.com/lygiabao/erp-small-business' }, scores:{ 'TS. Phạm Quốc Hùng':{score:8.0, comment:'Sản phẩm hoàn thiện, trình bày rõ ràng.'}, 'TS. Lê Đức Thọ':{score:7.8, comment:'Cần bổ sung thêm tài liệu triển khai.'} },
-        diemThanhPhan:[{ten:'Chuyên cần', trongSo:10, diem:8.0}, {ten:'Báo cáo giữa kỳ', trongSo:30, diem:7.5}, {ten:'Điểm hội đồng', trongSo:60, type:'hoidong'}] },
-      { maSV:'B22DCCN102', tenSV:'Bùi Văn Phúc',   svEmail:'b22dccn102@student.edu.vn', lop:'INT3110_2', ctdt:'HTTT', loaiHinh:'TTTN', maDeTai:'DT-2026-008', tenDeTai:'Hệ thống giám sát an ninh mạng nội bộ', linhVuc:'ATTT', maxSv:1, tomTat:'Xây dựng công cụ giám sát lưu lượng mạng nội bộ, phát hiện truy cập bất thường.', yeuCau:'Có kiến thức về mạng máy tính và an toàn thông tin.', sanPham:'Công cụ giám sát mạng và báo cáo phân tích lưu lượng.', congNghe:'Python, Wireshark API, Elasticsearch', gvhd:'TS. Lê Đức Thọ',   baoCao:'BC_TTTN_B22DCCN102.pdf', baoCaoMeta:{ nopLuc:'14/06/2026 22:15', nopStatus:'trehan', sourceUrl:'' }, scores:{ 'TS. Phạm Quốc Hùng':{score:7.5, comment:'Ý tưởng tốt, cần tối ưu hiệu năng xử lý.'} },
-        diemThanhPhan:[{ten:'Chuyên cần', trongSo:10, diem:8.5}, {ten:'Báo cáo giữa kỳ', trongSo:30, diem:8.0}, {ten:'Điểm hội đồng', trongSo:60, type:'hoidong'}] }
+      { maSV:'B22DCCN110', tenSV:'Lý Gia Bảo',     svEmail:'b22dccn110@student.edu.vn', lop:'INT3110_1', ctdt:'HTTT', loaiHinh:'TTTN', maDeTai:'DT-2026-007', tenDeTai:'Hệ thống ERP cho doanh nghiệp nhỏ', linhVuc:'CNPM', maxSv:2, tomTat:'Xây dựng phân hệ ERP cơ bản (kho, bán hàng, kế toán) phù hợp doanh nghiệp quy mô nhỏ.', yeuCau:'Có kiến thức về phân tích thiết kế hệ thống và lập trình web.', sanPham:'Phân hệ ERP hoàn chỉnh và tài liệu phân tích thiết kế.', congNghe:'C#, .NET, SQL Server', gvhd:'TS. Phạm Quốc Hùng', baoCao:'BC_TTTN_B22DCCN110.pdf', baoCaoMeta:{ nopLuc:'16/06/2026 23:52', nopStatus:'trehan', sourceUrl:'github.com/lygiabao/erp-small-business' }, scores:{ 'TS. Phạm Quốc Hùng':{score:8.0, comment:'Sản phẩm hoàn thiện, trình bày rõ ràng.', dauDiem:'Điểm hội đồng'}, 'TS. Lê Đức Thọ':{score:7.8, comment:'Cần bổ sung thêm tài liệu triển khai.', dauDiem:'Điểm hội đồng'} },
+        diemGVHD:8.0, trongSoGVHD:10, diemGVPB:7.5, trongSoGVPB:30,
+        diemThanhPhan:[{ten:'Điểm hội đồng', trongSo:60}] },
+      { maSV:'B22DCCN102', tenSV:'Bùi Văn Phúc',   svEmail:'b22dccn102@student.edu.vn', lop:'INT3110_2', ctdt:'HTTT', loaiHinh:'TTTN', maDeTai:'DT-2026-008', tenDeTai:'Hệ thống giám sát an ninh mạng nội bộ', linhVuc:'ATTT', maxSv:1, tomTat:'Xây dựng công cụ giám sát lưu lượng mạng nội bộ, phát hiện truy cập bất thường.', yeuCau:'Có kiến thức về mạng máy tính và an toàn thông tin.', sanPham:'Công cụ giám sát mạng và báo cáo phân tích lưu lượng.', congNghe:'Python, Wireshark API, Elasticsearch', gvhd:'TS. Lê Đức Thọ',   baoCao:'BC_TTTN_B22DCCN102.pdf', baoCaoMeta:{ nopLuc:'14/06/2026 22:15', nopStatus:'trehan', sourceUrl:'' }, scores:{ 'TS. Phạm Quốc Hùng':{score:7.5, comment:'Ý tưởng tốt, cần tối ưu hiệu năng xử lý.', dauDiem:'Điểm hội đồng'} },
+        diemGVHD:8.5, trongSoGVHD:10, diemGVPB:8.0, trongSoGVPB:30,
+        diemThanhPhan:[{ten:'Điểm hội đồng', trongSo:60}] }
     ]
   },
   {
@@ -914,10 +983,12 @@ const COUNCILS = [
       { role:'gc', name:'TS. Lê Đức Thọ',          gvType:'noi', unit:'Khoa CNTT', email:'leductho@khoacntt.edu.vn' }
     ],
     students:[
-      { maSV:'B22DCCN140', tenSV:'Vũ Thị Ngọc', svEmail:'b22dccn140@student.edu.vn', lop:'INT3110_1', ctdt:'KTPM', loaiHinh:'TTTN', maDeTai:'DT-2026-012', tenDeTai:'Ứng dụng quản lý kho hàng thông minh', linhVuc:'CNPM', maxSv:1, tomTat:'Xây dựng hệ thống quản lý kho hàng có tích hợp mã vạch và cảnh báo tồn kho.', yeuCau:'Có kiến thức về lập trình web và CSDL.', sanPham:'Ứng dụng web quản lý kho và tài liệu hướng dẫn sử dụng.', congNghe:'ASP.NET Core, SQL Server, ReactJS', gvhd:'TS. Trần Văn Bình', baoCao:'BC_TTTN_B22DCCN140.pdf', baoCaoMeta:{ nopLuc:'15/06/2026 09:10', nopStatus:'dunghan', sourceUrl:'github.com/vuthingoc/warehouse-management' }, scores:{ 'TS. Phạm Quốc Hùng':{score:8.2,comment:'Đạt yêu cầu.'} },
-        diemThanhPhan:[{ten:'Chuyên cần', trongSo:10, diem:8.5}, {ten:'Báo cáo giữa kỳ', trongSo:30, diem:8.0}, {ten:'Điểm GV chấm — TS. Phạm Quốc Hùng', trongSo:30, type:'hoidong_gc', gvKey:'TS. Phạm Quốc Hùng'}, {ten:'Điểm GV chấm — TS. Lê Đức Thọ', trongSo:30, type:'hoidong_gc', gvKey:'TS. Lê Đức Thọ'}] },
+      { maSV:'B22DCCN140', tenSV:'Vũ Thị Ngọc', svEmail:'b22dccn140@student.edu.vn', lop:'INT3110_1', ctdt:'KTPM', loaiHinh:'TTTN', maDeTai:'DT-2026-012', tenDeTai:'Ứng dụng quản lý kho hàng thông minh', linhVuc:'CNPM', maxSv:1, tomTat:'Xây dựng hệ thống quản lý kho hàng có tích hợp mã vạch và cảnh báo tồn kho.', yeuCau:'Có kiến thức về lập trình web và CSDL.', sanPham:'Ứng dụng web quản lý kho và tài liệu hướng dẫn sử dụng.', congNghe:'ASP.NET Core, SQL Server, ReactJS', gvhd:'TS. Trần Văn Bình', baoCao:'BC_TTTN_B22DCCN140.pdf', baoCaoMeta:{ nopLuc:'15/06/2026 09:10', nopStatus:'dunghan', sourceUrl:'github.com/vuthingoc/warehouse-management' }, scores:{ 'TS. Phạm Quốc Hùng':{score:8.2,comment:'Đạt yêu cầu.', dauDiem:'Điểm GV chấm — TS. Phạm Quốc Hùng'} },
+        diemGVHD:8.5, trongSoGVHD:10, diemGVPB:8.0, trongSoGVPB:30,
+        diemThanhPhan:[{ten:'Điểm GV chấm — TS. Phạm Quốc Hùng', trongSo:30}, {ten:'Điểm GV chấm — TS. Lê Đức Thọ', trongSo:30}] },
       { maSV:'B22DCCN141', tenSV:'Đặng Văn Long', svEmail:'b22dccn141@student.edu.vn', lop:'INT3110_2', ctdt:'KTPM', loaiHinh:'TTTN', maDeTai:'DT-2026-013', tenDeTai:'Hệ thống đặt vé xem phim trực tuyến', linhVuc:'CNPM', maxSv:1, tomTat:'Xây dựng nền tảng đặt vé xem phim trực tuyến kèm chọn ghế và thanh toán online.', yeuCau:'Có kiến thức về lập trình web và tích hợp thanh toán.', sanPham:'Ứng dụng web đặt vé hoàn chỉnh và tài liệu triển khai.', congNghe:'Laravel, MySQL, VueJS', gvhd:'TS. Phạm Quốc Hùng', baoCao:'BC_TTTN_B22DCCN141.pdf', baoCaoMeta:{ nopLuc:'16/06/2026 14:40', nopStatus:'dunghan', sourceUrl:'github.com/dangvanlong/movie-ticket-booking' }, scores:{},
-        diemThanhPhan:[{ten:'Chuyên cần', trongSo:10, diem:7.5}, {ten:'Báo cáo giữa kỳ', trongSo:30, diem:7.8}, {ten:'Điểm GV chấm — TS. Phạm Quốc Hùng', trongSo:30, type:'hoidong_gc', gvKey:'TS. Phạm Quốc Hùng'}, {ten:'Điểm GV chấm — TS. Lê Đức Thọ', trongSo:30, type:'hoidong_gc', gvKey:'TS. Lê Đức Thọ'}] }
+        diemGVHD:7.5, trongSoGVHD:10, diemGVPB:7.8, trongSoGVPB:30,
+        diemThanhPhan:[{ten:'Điểm GV chấm — TS. Phạm Quốc Hùng', trongSo:30}, {ten:'Điểm GV chấm — TS. Lê Đức Thọ', trongSo:30}] }
     ]
   },
   {
@@ -934,10 +1005,12 @@ const COUNCILS = [
       { role:'pb', name:'PGS.TS. Võ Thanh Tùng', gvType:'ngoai', unit:'Trường ĐH Bách Khoa', email:'vttung@hcmut.edu.vn' }
     ],
     students:[
-      { maSV:'B22DCCN150', tenSV:'Hồ Thị Kim Anh', svEmail:'b22dccn150@student.edu.vn', lop:'INT3110_1', ctdt:'HTTT', loaiHinh:'KLTN', maDeTai:'DT-2026-014', tenDeTai:'Hệ thống dự đoán rủi ro tín dụng', linhVuc:'AI', maxSv:1, tomTat:'Xây dựng mô hình học máy dự đoán rủi ro tín dụng khách hàng cho ngân hàng.', yeuCau:'Có kiến thức về Machine Learning và phân tích dữ liệu.', sanPham:'Mô hình dự đoán và báo cáo đánh giá độ chính xác.', congNghe:'Python, scikit-learn, Pandas', gvhd:'TS. Phạm Thu Hà', baoCao:'BC_KLTN_B22DCCN150.pdf', baoCaoMeta:{ nopLuc:'18/06/2026 10:00', nopStatus:'dunghan', sourceUrl:'github.com/hothikimanh/credit-risk-prediction' }, scores:{ 'TS. Nguyễn Minh Tuấn':{score:8.2, comment:'Đề tài có tính ứng dụng cao.'} },
-        diemThanhPhan:[{ten:'Quá trình nghiên cứu', trongSo:20, diem:8.0}, {ten:'Báo cáo khóa luận', trongSo:30, diem:8.2}, {ten:'Điểm hội đồng', trongSo:50, type:'hoidong'}], conclusion:'dat' },
-      { maSV:'B22DCCN151', tenSV:'Trịnh Văn Hiếu', svEmail:'b22dccn151@student.edu.vn', lop:'INT3110_2', ctdt:'HTTT', loaiHinh:'KLTN', maDeTai:'DT-2026-015', tenDeTai:'Ứng dụng blockchain trong quản lý chuỗi cung ứng', linhVuc:'CNPM', maxSv:1, tomTat:'Nghiên cứu ứng dụng công nghệ blockchain để minh bạch hóa chuỗi cung ứng hàng hóa.', yeuCau:'Có kiến thức về blockchain và lập trình smart contract.', sanPham:'Ứng dụng demo blockchain và báo cáo nghiên cứu.', congNghe:'Solidity, Ethereum, Node.js', gvhd:'ThS. Nguyễn Thu Hoa', baoCao:'BC_KLTN_B22DCCN151.pdf', baoCaoMeta:{ nopLuc:'19/06/2026 16:30', nopStatus:'dunghan', sourceUrl:'github.com/trinhvanhieu/supply-chain-blockchain' }, scores:{ 'TS. Nguyễn Minh Tuấn':{score:7.5, comment:'Cần bổ sung thêm thử nghiệm thực tế.'} },
-        diemThanhPhan:[{ten:'Quá trình nghiên cứu', trongSo:20, diem:7.8}, {ten:'Báo cáo khóa luận', trongSo:30, diem:7.5}, {ten:'Điểm hội đồng', trongSo:50, type:'hoidong'}], conclusion:'dat' }
+      { maSV:'B22DCCN150', tenSV:'Hồ Thị Kim Anh', svEmail:'b22dccn150@student.edu.vn', lop:'INT3110_1', ctdt:'HTTT', loaiHinh:'KLTN', maDeTai:'DT-2026-014', tenDeTai:'Hệ thống dự đoán rủi ro tín dụng', linhVuc:'AI', maxSv:1, tomTat:'Xây dựng mô hình học máy dự đoán rủi ro tín dụng khách hàng cho ngân hàng.', yeuCau:'Có kiến thức về Machine Learning và phân tích dữ liệu.', sanPham:'Mô hình dự đoán và báo cáo đánh giá độ chính xác.', congNghe:'Python, scikit-learn, Pandas', gvhd:'TS. Phạm Thu Hà', baoCao:'BC_KLTN_B22DCCN150.pdf', baoCaoMeta:{ nopLuc:'18/06/2026 10:00', nopStatus:'dunghan', sourceUrl:'github.com/hothikimanh/credit-risk-prediction' }, scores:{ 'TS. Nguyễn Minh Tuấn':{score:8.2, comment:'Đề tài có tính ứng dụng cao.', dauDiem:'Điểm hội đồng'} },
+        diemGVHD:8.0, trongSoGVHD:20, diemGVPB:8.2, trongSoGVPB:30,
+        diemThanhPhan:[{ten:'Điểm hội đồng', trongSo:50}], conclusion:'dat' },
+      { maSV:'B22DCCN151', tenSV:'Trịnh Văn Hiếu', svEmail:'b22dccn151@student.edu.vn', lop:'INT3110_2', ctdt:'HTTT', loaiHinh:'KLTN', maDeTai:'DT-2026-015', tenDeTai:'Ứng dụng blockchain trong quản lý chuỗi cung ứng', linhVuc:'CNPM', maxSv:1, tomTat:'Nghiên cứu ứng dụng công nghệ blockchain để minh bạch hóa chuỗi cung ứng hàng hóa.', yeuCau:'Có kiến thức về blockchain và lập trình smart contract.', sanPham:'Ứng dụng demo blockchain và báo cáo nghiên cứu.', congNghe:'Solidity, Ethereum, Node.js', gvhd:'ThS. Nguyễn Thu Hoa', baoCao:'BC_KLTN_B22DCCN151.pdf', baoCaoMeta:{ nopLuc:'19/06/2026 16:30', nopStatus:'dunghan', sourceUrl:'github.com/trinhvanhieu/supply-chain-blockchain' }, scores:{ 'TS. Nguyễn Minh Tuấn':{score:7.5, comment:'Cần bổ sung thêm thử nghiệm thực tế.', dauDiem:'Điểm hội đồng'} },
+        diemGVHD:7.8, trongSoGVHD:20, diemGVPB:7.5, trongSoGVPB:30,
+        diemThanhPhan:[{ten:'Điểm hội đồng', trongSo:50}], conclusion:'dat' }
     ]
   },
   {
@@ -954,14 +1027,17 @@ const COUNCILS = [
     ],
     students:[
       { maSV:'B22DCCN170', tenSV:'Nguyễn Văn Khang', svEmail:'b22dccn170@student.edu.vn', lop:'INT3110_1', ctdt:'KTPM', loaiHinh:'TTTN', maDeTai:'DT-2026-018', tenDeTai:'Hệ thống quản lý bán hàng đa kênh', linhVuc:'CNPM', maxSv:1, tomTat:'Xây dựng hệ thống quản lý bán hàng hợp nhất nhiều kênh (cửa hàng, sàn TMĐT, mạng xã hội).', yeuCau:'Có kiến thức về lập trình web và tích hợp API.', sanPham:'Ứng dụng web quản lý bán hàng đa kênh và tài liệu triển khai.', congNghe:'NestJS, PostgreSQL, ReactJS', gvhd:'TS. Trần Văn Bình', baoCao:'BC_TTTN_B22DCCN170.pdf', baoCaoMeta:{ nopLuc:'21/06/2026 10:15', nopStatus:'dunghan', sourceUrl:'github.com/nguyenvankhang/multi-channel-sales' },
-        scores:{ 'TS. Phạm Thu Hà':{score:8.6, comment:'Tích hợp đa kênh hoạt động ổn định.'}, 'TS. Lê Đức Thọ':{score:8.4, comment:'Kiến trúc hệ thống hợp lý, hiệu năng tốt.'}, 'TS. Nguyễn Minh Tuấn':{score:8.5, comment:'Sản phẩm hoàn thiện, trình bày thuyết phục.'} },
-        diemThanhPhan:[{ten:'Chuyên cần', trongSo:10, diem:8.5}, {ten:'Báo cáo giữa kỳ', trongSo:20, diem:8.0}, {ten:'Điểm GV chấm — TS. Phạm Thu Hà', trongSo:35, type:'hoidong_gc', gvKey:'TS. Phạm Thu Hà'}, {ten:'Điểm GV chấm — TS. Lê Đức Thọ', trongSo:35, type:'hoidong_gc', gvKey:'TS. Lê Đức Thọ'}], conclusion:'dat' },
+        scores:{ 'TS. Phạm Thu Hà':{score:8.6, comment:'Tích hợp đa kênh hoạt động ổn định.', dauDiem:'Điểm GV chấm — TS. Phạm Thu Hà'}, 'TS. Lê Đức Thọ':{score:8.4, comment:'Kiến trúc hệ thống hợp lý, hiệu năng tốt.', dauDiem:'Điểm GV chấm — TS. Lê Đức Thọ'}, 'TS. Nguyễn Minh Tuấn':{score:8.5, comment:'Sản phẩm hoàn thiện, trình bày thuyết phục.'} },
+        diemGVHD:8.5, trongSoGVHD:10, diemGVPB:8.0, trongSoGVPB:20,
+        diemThanhPhan:[{ten:'Điểm GV chấm — TS. Phạm Thu Hà', trongSo:35}, {ten:'Điểm GV chấm — TS. Lê Đức Thọ', trongSo:35}], conclusion:'dat' },
       { maSV:'B22DCCN171', tenSV:'Trần Thị Bích', svEmail:'b22dccn171@student.edu.vn', lop:'INT3110_2', ctdt:'ATTT', loaiHinh:'TTTN', maDeTai:'DT-2026-019', tenDeTai:'Ứng dụng phát hiện mã độc bằng học máy', linhVuc:'ATTT', maxSv:1, tomTat:'Xây dựng công cụ phát hiện mã độc dựa trên đặc trưng hành vi tệp tin, ứng dụng học máy.', yeuCau:'Có kiến thức về an toàn thông tin và Machine Learning.', sanPham:'Công cụ phát hiện mã độc và báo cáo đánh giá độ chính xác.', congNghe:'Python, scikit-learn, Yara', gvhd:'TS. Trần Văn Bình', baoCao:'BC_TTTN_B22DCCN171.pdf', baoCaoMeta:{ nopLuc:'22/06/2026 23:40', nopStatus:'trehan', sourceUrl:'github.com/tranthibich/malware-detection-ml' },
-        scores:{ 'TS. Phạm Thu Hà':{score:7.2, comment:'Mô hình hoạt động đúng hướng, cần mở rộng tập dữ liệu huấn luyện.'} },
-        diemThanhPhan:[{ten:'Chuyên cần', trongSo:10, diem:7.5}, {ten:'Báo cáo giữa kỳ', trongSo:20, diem:7.0}, {ten:'Điểm GV chấm — TS. Phạm Thu Hà', trongSo:35, type:'hoidong_gc', gvKey:'TS. Phạm Thu Hà'}, {ten:'Điểm GV chấm — TS. Lê Đức Thọ', trongSo:35, type:'hoidong_gc', gvKey:'TS. Lê Đức Thọ'}] },
+        scores:{ 'TS. Phạm Thu Hà':{score:7.2, comment:'Mô hình hoạt động đúng hướng, cần mở rộng tập dữ liệu huấn luyện.', dauDiem:'Điểm GV chấm — TS. Phạm Thu Hà'} },
+        diemGVHD:7.5, trongSoGVHD:10, diemGVPB:7.0, trongSoGVPB:20,
+        diemThanhPhan:[{ten:'Điểm GV chấm — TS. Phạm Thu Hà', trongSo:35}, {ten:'Điểm GV chấm — TS. Lê Đức Thọ', trongSo:35}] },
       { maSV:'B22DCCN172', tenSV:'Lê Hoàng Nam', svEmail:'b22dccn172@student.edu.vn', lop:'INT3110_1', ctdt:'KTPM', loaiHinh:'TTTN', maDeTai:'DT-2026-020', tenDeTai:'Nền tảng đấu giá trực tuyến', linhVuc:'CNPM', maxSv:1, tomTat:'Xây dựng nền tảng đấu giá trực tuyến thời gian thực với cơ chế chống gian lận đặt giá.', yeuCau:'Có kiến thức về lập trình web và xử lý đồng thời (concurrency).', sanPham:'Ứng dụng web đấu giá trực tuyến và tài liệu triển khai.', congNghe:'Node.js, WebSocket, Redis', gvhd:'TS. Trần Văn Bình', baoCao:null, baoCaoMeta:null,
         scores:{},
-        diemThanhPhan:[{ten:'Chuyên cần', trongSo:10, diem:7.0}, {ten:'Báo cáo giữa kỳ', trongSo:20, diem:null}, {ten:'Điểm GV chấm — TS. Phạm Thu Hà', trongSo:35, type:'hoidong_gc', gvKey:'TS. Phạm Thu Hà'}, {ten:'Điểm GV chấm — TS. Lê Đức Thọ', trongSo:35, type:'hoidong_gc', gvKey:'TS. Lê Đức Thọ'}] }
+        diemGVHD:7.0, trongSoGVHD:10, diemGVPB:null, trongSoGVPB:20,
+        diemThanhPhan:[{ten:'Điểm GV chấm — TS. Phạm Thu Hà', trongSo:35}, {ten:'Điểm GV chấm — TS. Lê Đức Thọ', trongSo:35}] }
     ]
   }
 ];
@@ -1054,21 +1130,61 @@ function avgOf(names, sv) {
   return vals.length ? (vals.reduce((a,b)=>a+b,0) / vals.length) : null;
 }
 function pbScore(sv, c) { return avgOf(c.members.filter(m => m.role === 'pb').map(m => m.name), sv); }
-/* Đầu điểm "hoidong" (Đánh giá/Phản biện): trung bình cộng mọi thành viên đã chấm.
-   Đầu điểm "hoidong_gc" (Chấm điểm): điểm CHÍNH THỨC riêng của đúng 1 GV chấm (d.gvKey), không trung bình với ai. */
-function resolveDiemThanhPhan(d, sv) {
-  if (d.type === 'hoidong')    return avgScore(sv);
-  if (d.type === 'hoidong_gc') return (sv.scores[d.gvKey] && typeof sv.scores[d.gvKey].score === 'number') ? sv.scores[d.gvKey].score : null;
-  return d.diem;
+/* Đầu điểm hội đồng (sv.diemThanhPhan) KHÔNG gắn type/nhãn phân loại nào — giá trị của 1 đầu điểm luôn là
+   trung bình cộng các lượt chấm (sv.scores[...]) có đúng dauDiem === tên đầu điểm đó. Ai chấm cho đầu điểm nào
+   là do NGƯỜI CHẤM tự chọn ngay lúc chấm (xem openScoreModal) — 1 người chấm thì giá trị = chính điểm đó,
+   nhiều người cùng chấm 1 đầu điểm thì lấy trung bình. Không cần biết trước "loại" gì. */
+function scoresForDauDiem(sv, ten) {
+  return Object.values(sv.scores).filter(s => s.dauDiem === ten && typeof s.score === 'number');
 }
-/* Điểm GVHD: mỗi lớp học phần có cấu trúc đầu điểm (tên + trọng số) riêng, không cố định — tổng kết = trung bình có trọng số */
+function resolveDiemThanhPhan(d, sv) {
+  const matched = scoresForDauDiem(sv, d.ten);
+  return matched.length ? matched.reduce((a,s) => a + s.score, 0) / matched.length : null;
+}
+/* Điểm HĐ / Đã chấm của 1 SV = tính trực tiếp từ các cột đầu điểm hội đồng của chính SV đó
+   (trung bình cộng các cột đã có giá trị) — dùng chung cho bảng danh sách và các file xuất. */
+function rowDtpAvg(sv) {
+  const svDp = sv.diemThanhPhan || [];
+  const vals = svDp.map(d => resolveDiemThanhPhan(d, sv));
+  const filled = vals.filter(v => v != null);
+  return { avg: filled.length ? filled.reduce((a,b) => a+b, 0) / filled.length : null, filled: filled.length, total: svDp.length };
+}
+/* Điểm GVHD/GVPB: đồng bộ từ nơi GVHD/GVPB đã nhập (sv.diemGVHD/sv.diemGVPB), không chấm ở màn hội đồng.
+   Điểm cuối = trung bình có trọng số giữa GVHD + GVPB + các đầu điểm hội đồng (sv.diemThanhPhan, tên+trọng số riêng theo lớp học phần).
+   Đầu điểm có thể thuộc 1 "Loại thành phần" (d.nhom, trọng số nhóm d.nhomTrongSo trong tổng) — khi đó d.trongSo là
+   trọng số CỦA ĐẦU ĐIỂM ĐÓ TRONG NHÓM (cộng dồn trong nhóm ≈ 100), không phải trọng số trong tổng. */
 function gvhdFinalScore(sv) {
-  const dp = sv.diemThanhPhan;
-  if (!dp || !dp.length) return null;
-  const tongTrongSo = dp.reduce((s,d) => s + d.trongSo, 0);
-  if (!tongTrongSo) return null;
+  const dp = sv.diemThanhPhan || [];
+  const fixed = [
+    { ten:'Điểm hướng dẫn (GVHD)', trongSo: sv.trongSoGVHD, val: sv.diemGVHD },
+    { ten:'Điểm phản biện (GVPB)', trongSo: sv.trongSoGVPB, val: sv.diemGVPB },
+  ].filter(x => x.trongSo != null);
+  if (!fixed.length && !dp.length) return null;
+  if (fixed.some(x => x.val == null)) return null;
   if (dp.some(d => resolveDiemThanhPhan(d, sv) === null)) return null;
-  return dp.reduce((s,d) => s + resolveDiemThanhPhan(d, sv) * d.trongSo, 0) / tongTrongSo;
+
+  const groups = {};
+  const standalone = [...fixed.map(x => ({ trongSo:x.trongSo, val:x.val }))];
+  dp.forEach(d => {
+    if (d.nhom) {
+      if (!groups[d.nhom]) groups[d.nhom] = { trongSo: d.nhomTrongSo, items: [] };
+      groups[d.nhom].items.push(d);
+    } else {
+      standalone.push({ trongSo: d.trongSo, val: resolveDiemThanhPhan(d, sv) });
+    }
+  });
+
+  let weightedSum = 0, tongTrongSo = 0;
+  standalone.forEach(x => { weightedSum += x.val * x.trongSo; tongTrongSo += x.trongSo; });
+  Object.values(groups).forEach(g => {
+    const nhomTongTrongSo = g.items.reduce((s,d) => s + d.trongSo, 0);
+    if (!nhomTongTrongSo) return;
+    const nhomAvg = g.items.reduce((s,d) => s + resolveDiemThanhPhan(d, sv) * d.trongSo, 0) / nhomTongTrongSo;
+    weightedSum += nhomAvg * g.trongSo;
+    tongTrongSo += g.trongSo;
+  });
+
+  return tongTrongSo ? weightedSum / tongTrongSo : null;
 }
 /* Bỏ phiếu kín: chỉ cho xem điểm của 1 nhóm thành viên cụ thể nếu xem-được-tất-cả, hoặc chính người trong nhóm đó */
 function canSeeScoreOf(names, c) {
@@ -1223,49 +1339,88 @@ function renderCouncilInfo(c) {
   document.getElementById('mem-bienban-note').innerHTML = '';
 
   document.getElementById('mem-count').textContent = c.members.length;
+  const viewDateISO = c.date ? c.date.split('/').reverse().join('-') : '';
+  const viewTimeEnd = c.timeEnd || addHoursToTime(c.time, 2); // hội đồng cũ chưa có timeEnd — giả định 2 tiếng
   document.getElementById('mem-tbody').innerHTML = c.members.length
-    ? c.members.map((m,i) => `<tr>
+    ? c.members.map((m,i) => {
+        const busyList = GV_BUSY_SCHEDULE[m.name] || [];
+        const conflict = viewDateISO && c.time
+          ? busyList.find(b => b.date === viewDateISO && rangesOverlap(c.time, viewTimeEnd, b.start, b.end))
+          : null;
+        const checkCell = conflict
+          ? `<span class="check-badge check-err" onclick="showViewCheckDetail(event, '${m.name.replace(/'/g,"\\'")}', ${i})">❌ Trùng lịch</span>`
+          : `<span class="check-badge check-ok">✅ Không trùng lịch</span>`;
+        return `<tr>
         <td style="text-align:center"><input type="checkbox" class="mem-chk" data-name="${m.name}" onchange="onMemberCheck(this)" style="width:15px;height:15px;cursor:pointer;accent-color:var(--primary)"></td>
         <td><span class="role-tag ${ROLE_CLS[m.role]}">${ROLE_LABEL[m.role]}</span></td>
         <td style="font-weight:600;font-size:13px">${m.name}</td>
         <td>${m.gvType==='ngoai' ? '<span class="gv-ext-badge">Ngoài trường</span>' : '<span class="gv-int-badge">Trong trường</span>'}</td>
         <td style="font-size:12px;color:var(--text-2)">${m.unit}</td>
+        <td>${checkCell}</td>
         <td style="text-align:center"><button class="icon-btn" title="Gửi email" onclick="sendMemberEmail('${m.name}')">📧</button></td>
-      </tr>`).join('')
-    : '<tr><td colspan="6" class="tbl-empty">Hội đồng chưa có thành viên.</td></tr>';
+      </tr>`;
+      }).join('')
+    : '<tr><td colspan="7" class="tbl-empty">Hội đồng chưa có thành viên.</td></tr>';
   clearMemberSelection();
+  window.__viewCouncilForCheck = c;
 
   const gateWrap = document.getElementById('gate-note-wrap');
   gateWrap.innerHTML = '';
 }
 
 /* ── Render: students & scores ────────────────────────────── */
+/* Cột đầu điểm hội đồng động = hợp của mọi tên đầu điểm đang xuất hiện trong cấu trúc lớp học phần của các SV trong hội đồng. */
+function dauDiemColumns(c) {
+  const names = [];
+  c.students.forEach(sv => (sv.diemThanhPhan || []).forEach(d => { if (!names.includes(d.ten)) names.push(d.ten); }));
+  return names;
+}
+function renderTableHeader(dtpCols) {
+  document.getElementById('sv-thead').innerHTML = `<tr>
+    <th style="width:36px;text-align:center"><input type="checkbox" id="sv-chk-all" onchange="toggleAllStudents(this.checked)" style="width:15px;height:15px;cursor:pointer;accent-color:var(--primary)"></th>
+    <th style="width:100px">Mã SV</th>
+    <th style="min-width:130px">Họ và tên</th>
+    <th style="width:110px">Lớp học phần</th>
+    <th style="width:65px">CTĐT</th>
+    <th>Đề tài</th>
+    <th style="min-width:130px">GVHD</th>
+    <th style="min-width:130px">GVPB</th>
+    <th style="width:90px;text-align:center">Báo cáo</th>
+    <th style="width:85px;text-align:center" title="Đồng bộ từ nơi GVHD nhập, không chấm ở màn này">Điểm GVHD</th>
+    <th style="width:85px;text-align:center" title="Đồng bộ từ nơi GVPB nhập, không chấm ở màn này">Điểm GVPB</th>
+    ${dtpCols.map(t => `<th style="width:110px;text-align:center" title="Đầu điểm hội đồng chấm — click điểm để xem chi tiết">${t}</th>`).join('')}
+    <th style="width:90px;text-align:center" title="Trung bình cộng các cột đầu điểm hội đồng của chính dòng này">Điểm HĐ</th>
+    <th style="width:90px;text-align:center" title="Số đầu điểm hội đồng đã có giá trị / tổng số đầu điểm của SV này">Đã chấm</th>
+    <th style="width:160px;text-align:center">Kết luận</th>
+    <th style="min-width:160px">Ghi chú</th>
+    <th style="width:90px;text-align:center">Thao tác</th>
+  </tr>`;
+}
 function renderStudents() {
   const c = council();
   const canScore = canScoreNow(c);
   const tbody = document.getElementById('sv-tbody');
+  const dtpCols = dauDiemColumns(c);
+  renderTableHeader(dtpCols);
 
   if (!c.students.length) {
-    tbody.innerHTML = '<tr><td colspan="15" class="tbl-empty">Hội đồng chưa có sinh viên được phân công.</td></tr>';
+    tbody.innerHTML = `<tr><td colspan="${16 + dtpCols.length}" class="tbl-empty">Hội đồng chưa có sinh viên được phân công.</td></tr>`;
     clearStudentSelection();
     return;
   }
 
   tbody.innerHTML = c.students.map((sv, i) => {
-    /* Hội đồng "Chấm điểm": cột Điểm HĐ / Đã chấm chỉ tính trên nhóm GV chấm (điểm chính thức) — không gộp điểm tham khảo của CT/UV/PB */
-    const sm  = officialScoringMembers(c);
-    const cnt = sm.filter(m => sv.scores[m.name] != null).length;
-    const avg = c.type === 'chamdiem' ? avgOf(sm.map(m => m.name), sv) : avgScore(sv);
+    const { avg, filled, total } = rowDtpAvg(sv);
     const avgCell = avg !== null
       ? `<span class="score-avg ok">${avg.toFixed(1)}</span>`
       : `<span class="score-avg pending">—</span>`;
-    const statusCell = !sm.length
+    const statusCell = !total
       ? '<span style="color:var(--text-3);font-size:12px">—</span>'
-      : cnt === sm.length
-        ? `<span style="color:var(--success);font-weight:600">${cnt}/${sm.length}</span>`
-        : cnt > 0
-          ? `<span style="color:#d46b08;font-weight:600">${cnt}/${sm.length}</span>`
-          : `<span style="color:var(--text-3)">${cnt}/${sm.length}</span>`;
+      : filled === total
+        ? `<span style="color:var(--success);font-weight:600">${filled}/${total}</span>`
+        : filled > 0
+          ? `<span style="color:#d46b08;font-weight:600">${filled}/${total}</span>`
+          : `<span style="color:var(--text-3)">${filled}/${total}</span>`;
     const action = canScore
       ? `<button class="icon-btn" onclick="openScoreModal('${sv.maSV}')" title="${sv.scores[currentPersona] ? 'Sửa điểm' : 'Chấm điểm'}">✎</button>`
       : `<button class="icon-btn" onclick="openScoreModal('${sv.maSV}')" title="Chỉ xem">👁</button>`;
@@ -1282,10 +1437,14 @@ function renderStudents() {
     const gvCell = `<div style="cursor:pointer" onclick="openGVDetail('${sv.maSV}')" title="Xem GVHD &amp; trọng số">
       ${allGV.map((g,gi) => `<div style="font-size:12px;${gi===0?'color:var(--text-1);font-weight:600':'color:var(--text-2)'}">${g.ten}</div>`).join('')}
     </div>`;
-    const hasDiemThanhPhan = !!(sv.diemThanhPhan && sv.diemThanhPhan.length);
-    const ghCell = hasDiemThanhPhan
-      ? `<span class="score-avg pending" style="cursor:pointer;text-decoration:underline dotted" onclick="openGvhdScoreDetail('${sv.maSV}')" title="Xem chi tiết điểm thành phần">Chi tiết</span>`
-      : `<span class="score-avg pending">—</span>`;
+    const gvhdScoreCell = sv.diemGVHD != null ? `<span class="score-avg ok">${sv.diemGVHD.toFixed(1)}</span>` : `<span class="score-avg pending">—</span>`;
+    const gvpbScoreCell = sv.diemGVPB != null ? `<span class="score-avg ok">${sv.diemGVPB.toFixed(1)}</span>` : `<span class="score-avg pending">—</span>`;
+    const dtpCellsHtml = dtpCols.map(ten => {
+      const d = (sv.diemThanhPhan || []).find(x => x.ten === ten);
+      if (!d) return `<td style="text-align:center"><span style="color:var(--text-3);font-size:12px">—</span></td>`;
+      const v = resolveDiemThanhPhan(d, sv);
+      return `<td style="text-align:center"><span class="score-avg ${v!=null?'ok':'pending'}" style="cursor:pointer;text-decoration:underline dotted" onclick="openGvhdScoreDetail('${sv.maSV}')" title="${ten} (${d.trongSo}%)">${v!=null?v.toFixed(1):'—'}</span></td>`;
+    }).join('');
     const conclusionCell = canEditConclusion(c)
       ? `<select class="conclusion-select" onchange="setConclusion('${sv.maSV}', this.value)">
           <option value="" ${!sv.conclusion ? 'selected' : ''}>— Chưa kết luận —</option>
@@ -1308,7 +1467,9 @@ function renderStudents() {
       <td>${gvCell}</td>
       <td>${phanBienCell}</td>
       <td style="text-align:center">${baoCaoCell}</td>
-      <td style="text-align:center">${ghCell}</td>
+      <td style="text-align:center">${gvhdScoreCell}</td>
+      <td style="text-align:center">${gvpbScoreCell}</td>
+      ${dtpCellsHtml}
       <td style="text-align:center">${avgCell}</td>
       <td style="text-align:center">${statusCell}</td>
       <td style="text-align:center">${conclusionCell}</td>
@@ -1386,34 +1547,31 @@ function openGvhdScoreDetail(maSV) {
   const sv = c.students.find(s => s.maSV === maSV);
   const dp = sv.diemThanhPhan || [];
 
-  const chuTich = c.members.find(m => m.role === 'ct');
-  const canEdit = canEditDiemThanhPhan(sv, c);
+  /* Hàng GVHD/GVPB tổng hợp sẵn (đồng bộ, không phải đầu điểm hội đồng chấm) + từng đầu điểm hội đồng
+     (người chấm = ai thực tế có lượt chấm gắn đúng tên đầu điểm đó — không cố định trước). */
+  const fixedRows = [];
+  if (sv.trongSoGVHD != null) fixedRows.push({ ten:'Điểm hướng dẫn (GVHD)', trongSo:sv.trongSoGVHD, val:sv.diemGVHD, nguoiCham: sv.gvhd || '—', badge:'Đồng bộ GVHD' });
+  if (sv.trongSoGVPB != null) { const pb = c.members.find(m => m.role === 'pb'); fixedRows.push({ ten:'Điểm phản biện (GVPB)', trongSo:sv.trongSoGVPB, val:sv.diemGVPB, nguoiCham: pb ? pb.name : '—', badge:'Đồng bộ GVPB' }); }
+  const hdRows = dp.map(d => {
+    const nguoiChamList = dtpNguoiChamList(sv, d.ten);
+    const comments = nguoiChamList.map(n => sv.scores[n].comment).filter(Boolean);
+    return { ten:d.ten, trongSo:d.trongSo, val: resolveDiemThanhPhan(d, sv),
+      nguoiCham: nguoiChamList.length ? nguoiChamList.join(', ') : '<span style="color:var(--text-3)">Chưa có ai chấm</span>',
+      ghiChu: comments.join(' · '), badge: nguoiChamList.length > 1 ? `Trung bình ${nguoiChamList.length} người chấm` : null };
+  });
+  const rows = [...fixedRows, ...hdRows];
 
   document.getElementById('ghs-title').textContent = `Thông tin chi tiết điểm`;
-  document.getElementById('ghs-body').innerHTML = dp.length
-    ? dp.map((d,i) => {
-        const val = resolveDiemThanhPhan(d, sv);
-        const isHoiDong = d.type === 'hoidong';
-        const isHoiDongGc = d.type === 'hoidong_gc';
-        /* Đầu điểm "hoidong_gc": người chấm là đúng GV chấm gắn với đầu điểm đó (d.gvKey), điểm lấy từ modal Chấm điểm — không sửa tay tại đây */
-        const nguoiCham = isHoiDong ? (chuTich ? `${chuTich.name} (Chủ tịch HĐ)` : '—') : (isHoiDongGc ? d.gvKey : sv.gvhd);
-        const diemCell = (canEdit && !isHoiDong && !isHoiDongGc)
-          ? `<input type="number" class="fc" min="0" max="10" step="0.1" value="${d.diem != null ? d.diem : ''}" style="padding:4px 6px;font-size:13px;text-align:right" onchange="saveDiemThanhPhan('${sv.maSV}', ${i}, this.value)">`
-          : `<div style="font-size:14px;font-weight:700;color:var(--primary);text-align:right">${val !== null ? val.toFixed(1) : '—'}</div>`;
-        const minhChungVal = isHoiDong ? c.bienBanFile : (isHoiDongGc ? null : d.minhChung);
-        const ghiChuVal = isHoiDong ? c.completeNote : (isHoiDongGc ? (sv.scores[d.gvKey] && sv.scores[d.gvKey].comment) : d.ghiChu);
-        const minhChungCell = minhChungVal
-          ? `📎 ${minhChungVal}`
-          : '<span style="color:var(--text-3)">—</span>';
-        const ghiChuCell = ghiChuVal
-          ? ghiChuVal
-          : '<span style="color:var(--text-3)">—</span>';
-        return `<div style="display:grid;grid-template-columns:1fr 70px 70px 130px 140px 1fr;align-items:center;gap:10px;padding:10px 16px;${i<dp.length-1?'border-bottom:1px solid var(--border)':''}">
-        <div style="font-size:13px">${d.ten}${isHoiDong ? ' <span class="hd-type hd-chamdiem" style="margin-left:4px">Điểm hội đồng</span>' : ''}${isHoiDongGc ? ' <span class="hd-type hd-chamdiem" style="margin-left:4px">Điểm GV chấm</span>' : ''}</div>
-        <div style="font-size:13px;color:var(--text-2);text-align:right">${d.trongSo}%</div>
+  document.getElementById('ghs-body').innerHTML = rows.length
+    ? rows.map((r,i) => {
+        const diemCell = `<div style="font-size:14px;font-weight:700;color:var(--primary);text-align:right">${r.val != null ? r.val.toFixed(1) : '—'}</div>`;
+        const ghiChuCell = r.ghiChu ? r.ghiChu : '<span style="color:var(--text-3)">—</span>';
+        const typeBadge = r.badge ? ` <span class="hd-type hd-chamdiem" style="margin-left:4px">${r.badge}</span>` : '';
+        return `<div style="display:grid;grid-template-columns:1fr 70px 70px 160px 1fr;align-items:center;gap:10px;padding:10px 16px;${i<rows.length-1?'border-bottom:1px solid var(--border)':''}">
+        <div style="font-size:13px">${r.ten}${typeBadge}</div>
+        <div style="font-size:13px;color:var(--text-2);text-align:right">${r.trongSo}%</div>
         ${diemCell}
-        <div style="font-size:12px;color:var(--text-2);word-break:break-word">${nguoiCham}</div>
-        <div style="font-size:12px;color:var(--text-2);word-break:break-word">${minhChungCell}</div>
+        <div style="font-size:12px;color:var(--text-2);word-break:break-word">${r.nguoiCham}</div>
         <div style="font-size:12px;color:var(--text-2);word-break:break-word">${ghiChuCell}</div>
       </div>`;
       }).join('')
@@ -1422,17 +1580,6 @@ function openGvhdScoreDetail(maSV) {
   const final = gvhdFinalScore(sv);
   document.getElementById('ghs-final').textContent = final !== null ? final.toFixed(2) : '—';
   openModal('modal-ghscore');
-}
-
-function saveDiemThanhPhan(maSV, index, value) {
-  const c  = council();
-  const sv = c.students.find(s => s.maSV === maSV);
-  if (!canEditDiemThanhPhan(sv, c)) { showToast('Bạn không có quyền sửa đầu điểm thành phần của sinh viên này.', 'err'); return; }
-  const score = parseFloat(value);
-  if (isNaN(score) || score < 0 || score > 10) { showToast('Vui lòng nhập điểm hợp lệ trong khoảng 0–10.', 'err'); return; }
-  sv.diemThanhPhan[index].diem = score;
-  renderStudents();
-  showToast(`💾 Đã lưu điểm thành phần "${sv.diemThanhPhan[index].ten}" cho ${sv.tenSV}.`, 'ok');
 }
 
 /* ── Chi tiết đề tài ──────────────────────────────────────── */
@@ -1526,63 +1673,107 @@ function bcAllowResubmit() {
 }
 
 /* ── Score modal ──────────────────────────────────────────── */
+/* Chấm điểm là 2 BƯỚC RIÊNG trong cùng 1 popup — không gộp chung 1 màn hình:
+   Bước 1: chọn đầu điểm cần chấm (danh sách, chưa có ô nhập điểm nào hiện ra).
+   Bước 2: mới hiện ô nhập điểm/nhận xét CHO ĐÚNG đầu điểm vừa chọn. Có nút quay lại Bước 1 để đổi. */
+let _scSelectedDauDiem = null;
 function openScoreModal(maSV) {
   const c  = council();
   const sv = c.students.find(s => s.maSV === maSV);
   scoringSvId = maSV;
-  const canScore = canScoreNow(c);
+  _scSelectedDauDiem = null; // luôn mở lại từ Bước 1
 
   document.getElementById('sc-title').textContent = `Chấm điểm — ${sv.tenSV}`;
   document.getElementById('sc-masv').textContent  = sv.maSV;
   document.getElementById('sc-name').textContent  = sv.tenSV;
   document.getElementById('sc-detai').textContent = sv.tenDeTai;
   document.getElementById('sc-gvhd').textContent  = sv.gvhd;
+  document.getElementById('sc-gvscore').textContent =
+    `GVHD: ${sv.diemGVHD != null ? sv.diemGVHD.toFixed(1) : '—'} · GVPB: ${sv.diemGVPB != null ? sv.diemGVPB.toFixed(1) : '—'} (đồng bộ — xem "Điểm thành phần" để biết chi tiết)`;
 
-  const sm = scoringMembers(c);
-  const viewAll = canViewAllScores(c);
-  document.getElementById('sc-lock-note').style.display = viewAll ? 'none' : '';
-  document.getElementById('sc-mem-section').style.display = viewAll ? '' : 'none';
-  if (viewAll) {
-    document.getElementById('sc-mem-tbody').innerHTML = sm.length
-      ? sm.map(m => {
-          const s = sv.scores[m.name];
-          const isSelf = m.name === currentPersona;
-          return `<tr class="${isSelf ? 'score-row-self' : ''}">
-            <td><span class="role-tag ${ROLE_CLS[m.role]}">${ROLE_LABEL[m.role]}</span></td>
-            <td style="font-size:13px;font-weight:600">${m.name}${isSelf ? ' <span style="color:var(--primary);font-size:11px">(bạn)</span>' : ''}</td>
-            <td style="text-align:center;font-weight:700">${s ? s.score.toFixed(1) : '<span style="color:var(--text-3);font-weight:400">—</span>'}</td>
-            <td style="font-size:12px;color:var(--text-2)">${s ? s.comment || '' : '<span style="color:var(--text-3)">Chưa chấm</span>'}</td>
-          </tr>`;
-        }).join('')
-      : '<tr><td colspan="4" class="tbl-empty">Hội đồng chưa có thành viên chấm điểm.</td></tr>';
-  }
-
-  const selfForm = document.getElementById('sc-self-form');
-  if (canScore) {
-    const existing = sv.scores[currentPersona];
-    selfForm.innerHTML = `
-      <div class="section-hd">Điểm của bạn (${currentPersona})</div>
-      <div style="display:grid;grid-template-columns:120px 1fr;gap:12px">
-        <div class="fi" style="margin:0">
-          <label>Điểm (0–10) <span class="req">*</span></label>
-          <input type="number" class="fc" id="sc-self-score" min="0" max="10" step="0.1" value="${existing ? existing.score : ''}">
-        </div>
-        <div class="fi" style="margin:0">
-          <label>Nhận xét</label>
-          <input type="text" class="fc" id="sc-self-comment" value="${existing ? (existing.comment||'').replace(/"/g,'&quot;') : ''}" placeholder="Nhận xét cho sinh viên...">
-        </div>
-      </div>`;
-    document.getElementById('sc-save-btn').style.display = '';
-  } else {
-    selfForm.innerHTML = '';
-    document.getElementById('sc-save-btn').style.display = 'none';
-  }
-
+  renderScoreSelfForm();
+  renderScoreMemTable(sv, c);
   updateAvgDisplay(sv, c);
   openModal('modal-score');
 }
+function renderScoreSelfForm() {
+  const c  = council();
+  const sv = c.students.find(s => s.maSV === scoringSvId);
+  const canScore = canScoreNow(c);
+  const dp = sv.diemThanhPhan || [];
+  const selfForm = document.getElementById('sc-self-form');
 
-/* Hội đồng "Chấm điểm": không còn 1 điểm trung bình đại diện (2 GV chấm giữ 2 đầu điểm độc lập) — ẩn khối này */
+  if (!canScore) { selfForm.innerHTML = ''; document.getElementById('sc-save-btn').style.display = 'none'; return; }
+  if (!dp.length) { selfForm.innerHTML = '<div class="f-hint" style="margin-top:0">Lớp học phần chưa cấu hình đầu điểm cần hội đồng chấm.</div>'; document.getElementById('sc-save-btn').style.display = 'none'; return; }
+
+  if (!_scSelectedDauDiem) {
+    /* BƯỚC 1 — chọn đầu điểm, chưa hiện ô nhập điểm */
+    document.getElementById('sc-save-btn').style.display = 'none';
+    selfForm.innerHTML = `
+      <div class="section-hd" style="margin-top:0">Bước 1 — Chọn đầu điểm cần chấm</div>
+      <div style="border:1px solid var(--border);border-radius:8px;overflow:hidden">
+        ${dp.map((d,i) => {
+          const already = sv.scores[currentPersona] && sv.scores[currentPersona].dauDiem === d.ten;
+          return `<div onclick="selectScoreDauDiem(${i})" style="padding:10px 14px;cursor:pointer;display:flex;justify-content:space-between;align-items:center;${i<dp.length-1?'border-bottom:1px solid var(--border)':''}">
+            <span style="font-size:13px">${d.ten} <span style="color:var(--text-2);font-size:12px">(${d.trongSo}%)</span></span>
+            ${already ? `<span style="color:var(--success);font-size:12px;font-weight:600">Đã chấm: ${sv.scores[currentPersona].score.toFixed(1)} ›</span>` : `<span style="color:var(--text-3);font-size:12px">Chưa chấm ›</span>`}
+          </div>`;
+        }).join('')}
+      </div>`;
+  } else {
+    /* BƯỚC 2 — nhập điểm cho đúng đầu điểm đã chọn ở Bước 1 */
+    const d = dp.find(x => x.ten === _scSelectedDauDiem);
+    const existing = sv.scores[currentPersona];
+    const hasExisting = existing && existing.dauDiem === _scSelectedDauDiem;
+    selfForm.innerHTML = `
+      <div class="section-hd" style="margin-top:0">Bước 2 — Nhập điểm cho "${d.ten}" (${d.trongSo}%)</div>
+      <div style="display:grid;grid-template-columns:120px 1fr;gap:12px">
+        <div class="fi" style="margin:0">
+          <label>Điểm (0–10) <span class="req">*</span></label>
+          <input type="number" class="fc" id="sc-self-score" min="0" max="10" step="0.1" value="${hasExisting ? existing.score : ''}">
+        </div>
+        <div class="fi" style="margin:0">
+          <label>Nhận xét</label>
+          <input type="text" class="fc" id="sc-self-comment" value="${hasExisting ? (existing.comment||'').replace(/"/g,'&quot;') : ''}" placeholder="Nhận xét cho sinh viên...">
+        </div>
+      </div>
+      <button type="button" class="btn btn-default btn-sm" style="margin-top:10px" onclick="backToScoreDauDiemSelect()">‹ Đổi đầu điểm (quay lại Bước 1)</button>`;
+    document.getElementById('sc-save-btn').style.display = '';
+  }
+}
+function selectScoreDauDiem(index) {
+  const sv = council().students.find(s => s.maSV === scoringSvId);
+  _scSelectedDauDiem = (sv.diemThanhPhan || [])[index].ten;
+  renderScoreSelfForm();
+}
+function backToScoreDauDiemSelect() {
+  _scSelectedDauDiem = null;
+  renderScoreSelfForm();
+}
+/* Điểm đã chấm — theo từng đầu điểm hội đồng, cho Chủ tịch/Thư ký (hoặc ai xem-được-hết) nhìn lại toàn bộ. */
+function renderScoreMemTable(sv, c) {
+  const viewAll = canViewAllScores(c);
+  document.getElementById('sc-lock-note').style.display = viewAll ? 'none' : '';
+  document.getElementById('sc-mem-section').style.display = viewAll ? '' : 'none';
+  if (!viewAll) return;
+  const dp = sv.diemThanhPhan || [];
+  const rows = [];
+  dp.forEach(d => {
+    const names = dtpNguoiChamList(sv, d.ten);
+    if (!names.length) { rows.push({ dauDiem: d.ten, nguoiCham: null }); return; }
+    names.forEach(n => rows.push({ dauDiem: d.ten, nguoiCham: n, diem: sv.scores[n].score, nx: sv.scores[n].comment, isSelf: n === currentPersona }));
+  });
+  document.getElementById('sc-mem-tbody').innerHTML = rows.length
+    ? rows.map(r => `<tr class="${r.isSelf ? 'score-row-self' : ''}">
+        <td style="font-size:13px">${r.dauDiem}</td>
+        <td style="font-size:13px;font-weight:600">${r.nguoiCham ? r.nguoiCham + (r.isSelf ? ' <span style="color:var(--primary);font-size:11px">(bạn)</span>' : '') : '<span style="color:var(--text-3);font-weight:400">Chưa có ai chấm</span>'}</td>
+        <td style="text-align:center;font-weight:700">${r.diem != null ? r.diem.toFixed(1) : '—'}</td>
+        <td style="font-size:12px;color:var(--text-2)">${r.nx || ''}</td>
+      </tr>`).join('')
+    : '<tr><td colspan="4" class="tbl-empty">Lớp học phần chưa cấu hình đầu điểm cần hội đồng chấm.</td></tr>';
+}
+
+/* Hội đồng "Chấm điểm": không còn 1 điểm trung bình đại diện (mỗi GV chấm giữ đầu điểm độc lập) — ẩn khối này */
 function updateAvgDisplay(sv, c) {
   const wrap = document.getElementById('sc-avg-wrap');
   if (c.type === 'chamdiem') { wrap.style.display = 'none'; return; }
@@ -1595,14 +1786,15 @@ function updateAvgDisplay(sv, c) {
 function saveScore() {
   const c  = council();
   const sv = c.students.find(s => s.maSV === scoringSvId);
-  const scoreInput = document.getElementById('sc-self-score');
-  const score = parseFloat(scoreInput.value);
+  if (!_scSelectedDauDiem) { showToast('Vui lòng chọn đầu điểm cần chấm (Bước 1) trước.', 'err'); return; }
+  const dauDiem = _scSelectedDauDiem;
+  const score = parseFloat(document.getElementById('sc-self-score').value);
   if (isNaN(score) || score < 0 || score > 10) { showToast('Vui lòng nhập điểm hợp lệ trong khoảng 0–10.', 'err'); return; }
   const comment = document.getElementById('sc-self-comment').value.trim();
-  sv.scores[currentPersona] = { score, comment };
+  sv.scores[currentPersona] = { score, comment, dauDiem };
   closeModal('modal-score');
   renderStudents();
-  showToast(`💾 Đã lưu điểm (${score.toFixed(1)}) cho ${sv.tenSV}.`, 'ok');
+  showToast(`💾 Đã lưu điểm (${score.toFixed(1)}) cho đầu điểm "${dauDiem}" — ${sv.tenSV}.`, 'ok');
 }
 
 /* ── Kết luận hội đồng (chỉ Chủ tịch/Thư ký) ───────────────── */
@@ -1646,20 +1838,28 @@ function openBulkScoreModal() {
   if (!canScoreNow(c)) { showToast('Hội đồng hiện không cho chấm điểm.', 'err'); return; }
   const svs = c.students.filter(sv => selectedStudents.has(sv.maSV));
   if (!svs.length) { showToast('Vui lòng chọn ít nhất 1 sinh viên.', 'err'); return; }
+  /* Đầu điểm khả dụng = hợp của mọi đầu điểm đang xuất hiện trong cấu trúc lớp học phần của các SV đã chọn. */
+  const tenSet = [...new Set(svs.flatMap(sv => (sv.diemThanhPhan || []).map(d => d.ten)))];
+  const sel = document.getElementById('bs-dtp-select');
+  if (!tenSet.length) { showToast('Các SV đã chọn chưa có đầu điểm hội đồng nào được cấu hình.', 'err'); return; }
+  sel.innerHTML = tenSet.map(t => `<option value="${t.replace(/"/g,'&quot;')}">${t}</option>`).join('');
   document.getElementById('bs-score').value = '';
   document.getElementById('bs-comment').value = '';
   openModal('modal-bulkscore');
 }
 function confirmBulkScore() {
   const c = council();
+  const dauDiem = document.getElementById('bs-dtp-select').value;
   const score = parseFloat(document.getElementById('bs-score').value);
   if (isNaN(score) || score < 0 || score > 10) { showToast('Vui lòng nhập điểm hợp lệ trong khoảng 0–10.', 'err'); return; }
   const comment = document.getElementById('bs-comment').value.trim();
   const svs = c.students.filter(sv => selectedStudents.has(sv.maSV));
-  svs.forEach(sv => { sv.scores[currentPersona] = { score, comment }; });
+  const applied = svs.filter(sv => (sv.diemThanhPhan || []).some(d => d.ten === dauDiem));
+  applied.forEach(sv => { sv.scores[currentPersona] = { score, comment, dauDiem }; });
   closeModal('modal-bulkscore');
   renderStudents();
-  showToast(`💾 Đã lưu điểm (${score.toFixed(1)}) cho ${svs.length} sinh viên.`, 'ok');
+  const skipped = svs.length - applied.length;
+  showToast(`💾 Đã lưu điểm (${score.toFixed(1)}) cho đầu điểm "${dauDiem}" — ${applied.length} sinh viên${skipped ? ` (bỏ qua ${skipped} SV không có đầu điểm này)` : ''}.`, 'ok');
 }
 
 /* ── Đánh dấu hoàn thành (ghi chú + biên bản họp) ─────────── */
@@ -1764,11 +1964,9 @@ function exportStudentList() {
 
   const headers = ['Mã SV','Họ và tên','Lớp học phần','CTĐT','Loại hình','Đề tài','GVHD','GV phản biện','Điểm thành phần (chi tiết)','Điểm HĐ','Đã chấm','Kết luận','Ghi chú','File báo cáo'];
   const phanBienNames = c.members.filter(m => m.role === 'pb').map(m => m.name).join('; ') || '—';
-  const sm = officialScoringMembers(c);
 
   const rows = c.students.map(sv => {
-    const avg = c.type === 'chamdiem' ? avgOf(sm.map(m => m.name), sv) : avgScore(sv);
-    const cnt = sm.filter(m => sv.scores[m.name] != null).length;
+    const { avg, filled: cnt, total: cntTotal } = rowDtpAvg(sv);
     const conclLabel = sv.conclusion ? CONCLUSION_CFG[sv.conclusion].label : 'Chưa kết luận';
     const gvDongList = sv.gvDong || [];
     const primaryTS  = gvDongList.length ? 100 - gvDongList.reduce((s,g) => s + g.trongSo, 0) : 100;
@@ -1776,7 +1974,6 @@ function exportStudentList() {
     const gvCell     = allGV.map(g => `${g.ten} (${g.trongSo}%)`).join('; ');
     const dp = sv.diemThanhPhan || [];
     const diemThanhPhanCell = dp
-      .filter(d => d.type !== 'hoidong')
       .map(d => {
         const v = resolveDiemThanhPhan(d, sv);
         return `${d.ten} (${d.trongSo}%): ${v != null ? v.toFixed(1) : '—'}`;
@@ -1794,7 +1991,7 @@ function exportStudentList() {
       phanBienNames,
       diemThanhPhanCell,
       avg  !== null ? avg.toFixed(2)  : '—',
-      sm.length ? `${cnt}/${sm.length}` : '—',
+      cntTotal ? `${cnt}/${cntTotal}` : '—',
       conclLabel,
       sv.conclusionNote || '',
       sv.baoCao || ''
@@ -1818,6 +2015,106 @@ function exportStudentList() {
   URL.revokeObjectURL(url);
 
   showToast(`📥 Đã xuất ${c.students.length} sinh viên — ${a.download}`, 'ok');
+}
+
+/* ── Xuất điểm chi tiết theo từng thành viên hội đồng ──────
+   Mỗi thành viên chấm điểm (CT/TK/UV/PB/GC) là 1 cột riêng — hội đồng có
+   danh sách thành viên cố định và ít nên không bị thưa cột như đầu điểm GVHD. */
+function exportCouncilScoreDetail() {
+  const c = council();
+  if (!c.students.length) { showToast('Hội đồng chưa có sinh viên để xuất.', 'err'); return; }
+
+  /* Bắt buộc phải tick chọn SV (checkbox ở bảng) trước khi xuất — không cho xuất ngầm định cả hội đồng. */
+  if (!selectedStudents.size) { showToast('Vui lòng chọn sinh viên cần xuất.', 'err'); return; }
+  const targetStudents = c.students.filter(sv => selectedStudents.has(sv.maSV));
+  if (!targetStudents.length) { showToast('Không tìm thấy sinh viên đã chọn để xuất.', 'err'); return; }
+
+  /* Chặn xuất nếu danh sách xuất gồm SV thuộc nhiều lớp học phần khác nhau — vì cấu trúc đầu điểm
+     do lớp học phần quy định, trộn lẫn nhiều lớp trong 1 file dễ gây hiểu lầm điểm nào của lớp nào.
+     Nếu muốn xuất, người dùng cần tick chọn SV cùng 1 lớp học phần rồi xuất riêng. */
+  const lopSet = new Set(targetStudents.map(sv => sv.lop));
+  if (lopSet.size > 1) {
+    showToast(`Danh sách xuất gồm nhiều lớp học phần (${[...lopSet].join(', ')}). Vui lòng chỉ chọn sinh viên cùng 1 lớp học phần rồi xuất lại.`, 'err');
+    return;
+  }
+
+  const sm = scoringMembers(c);
+  const official = officialScoringMembers(c);
+  if (!sm.length) { showToast('Hội đồng chưa có thành viên chấm điểm.', 'err'); return; }
+
+  const phanBienNames = c.members.filter(m => m.role === 'pb').map(m => m.name).join('; ') || '—';
+  const memberHeaders = sm.map(m => `Điểm - ${ROLE_LABEL[m.role]} ${m.name}`);
+
+  /* Cột đầu điểm hội đồng: gộp theo tên tiêu chí — vì đã đảm bảo mọi SV trong lượt xuất
+     này cùng 1 lớp học phần (chặn ở trên), không cần gắn tên lớp vào tiêu đề nữa. */
+  const dpCols = [];
+  targetStudents.forEach(sv => (sv.diemThanhPhan || []).forEach(d => {
+    const key = `${d.nhom || ''}|${d.nhomTrongSo || ''}|${d.ten}|${d.trongSo}`;
+    if (!dpCols.some(x => x.key === key)) dpCols.push({ key, nhom: d.nhom, nhomTrongSo: d.nhomTrongSo, ten: d.ten, trongSo: d.trongSo });
+  }));
+  const dpHeaders = dpCols.map(col => col.nhom
+    ? `ĐTP - ${col.nhom} (${col.nhomTrongSo}%) - ${col.ten} (${col.trongSo}%)`
+    : `ĐTP - ${col.ten} (${col.trongSo}%)`);
+
+  const headers = ['Mã SV','Họ và tên','Lớp học phần','CTĐT','Đề tài','GVHD','GVPB', ...dpHeaders, ...memberHeaders, 'Điểm HĐ (TB)', 'Đã chấm', 'Nhận xét HĐ (gộp)'];
+
+  const rows = targetStudents.map(sv => {
+    const gvDongList = sv.gvDong || [];
+    const primaryTS  = gvDongList.length ? 100 - gvDongList.reduce((s,g) => s + g.trongSo, 0) : 100;
+    const allGV      = [{ ten: sv.gvhd, trongSo: primaryTS }, ...gvDongList];
+    const gvCell     = allGV.map(g => `${g.ten} (${g.trongSo}%)`).join('; ');
+
+    const dp = sv.diemThanhPhan || [];
+    const dpVals = dpCols.map(col => {
+      const d = dp.find(x => (x.nhom || '') === (col.nhom || '') && x.ten === col.ten && x.trongSo === col.trongSo);
+      if (!d) return '';
+      const v = resolveDiemThanhPhan(d, sv);
+      return v != null ? v.toFixed(1) : '';
+    });
+
+    const memberVals = sm.map(m => {
+      const s = sv.scores[m.name];
+      return (s && typeof s.score === 'number') ? s.score.toFixed(1) : '—';
+    });
+    const { avg, filled: cnt, total: cntTotal } = rowDtpAvg(sv);
+    const notes = sm
+      .filter(m => sv.scores[m.name] && sv.scores[m.name].comment)
+      .map(m => `${m.name}: ${sv.scores[m.name].comment}`)
+      .join('; ') || '—';
+
+    return [
+      sv.maSV,
+      sv.tenSV,
+      sv.lop,
+      sv.ctdt,
+      sv.tenDeTai,
+      gvCell,
+      phanBienNames,
+      ...dpVals,
+      ...memberVals,
+      avg !== null ? avg.toFixed(2) : '—',
+      cntTotal ? `${cnt}/${cntTotal}` : '—',
+      notes
+    ];
+  });
+
+  const csvLines = [headers, ...rows].map(row =>
+    row.map(cell => `"${String(cell).replace(/"/g,'""')}"`).join(',')
+  );
+  const bom = '﻿';
+  const csv = bom + csvLines.join('\r\n');
+
+  const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+  const url  = URL.createObjectURL(blob);
+  const a    = document.createElement('a');
+  a.href     = url;
+  a.download = `ChiTietDiemHD_${c.code.replace(/\//g,'-')}.csv`;
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+
+  showToast(`📊 Đã xuất chi tiết điểm HĐ cho ${targetStudents.length} sinh viên — ${a.download}`, 'ok');
 }
 
 /* ── Xuất thông tin chi tiết hội đồng ──────────────────────── */
@@ -1906,13 +2203,48 @@ function renderAll() {
 /* ── Tạo hội đồng mới ─────────────────────────────────────── */
 function setMeetForm(form) {
   document.getElementById('cr-meetform').value = form;
-  document.getElementById('cr-room').style.display = form === 'offline' ? '' : 'none';
+  document.getElementById('cr-room-wrap').style.display = form === 'offline' ? '' : 'none';
   document.getElementById('cr-link').style.display = form === 'online'  ? '' : 'none';
   document.getElementById('fi-room-label').innerHTML = form === 'offline'
     ? 'Địa điểm <span class="req">*</span>'
     : 'Link họp trực tuyến <span class="req">*</span>';
 }
 function getMeetForm() { return document.getElementById('cr-meetform').value; }
+
+function onRoomSelectChange(val) {
+  const otherInput = document.getElementById('cr-room-other');
+  if (val === '__other__') {
+    otherInput.style.display = '';
+    document.getElementById('cr-room').value = otherInput.value.trim();
+    otherInput.focus();
+  } else {
+    otherInput.style.display = 'none';
+    otherInput.value = '';
+    document.getElementById('cr-room').value = val;
+  }
+}
+function onRoomOtherInput(val) {
+  document.getElementById('cr-room').value = val.trim();
+}
+function setRoomValue(roomName) {
+  const select = document.getElementById('cr-room-select');
+  const otherInput = document.getElementById('cr-room-other');
+  const known = [...select.options].some(o => o.value === roomName);
+  if (roomName && known) {
+    select.value = roomName;
+    otherInput.style.display = 'none';
+    otherInput.value = '';
+  } else if (roomName) {
+    select.value = '__other__';
+    otherInput.style.display = '';
+    otherInput.value = roomName;
+  } else {
+    select.value = '';
+    otherInput.style.display = 'none';
+    otherInput.value = '';
+  }
+  document.getElementById('cr-room').value = roomName || '';
+}
 
 function mergeNewCouncilsFromStorage() {
   let stored = [];
@@ -1964,13 +2296,14 @@ function enterCreateMode() {
   document.getElementById('cr-nganh').value = '';
   document.getElementById('cr-type').value  = '';
   document.getElementById('cr-dot').value   = '';
-  document.getElementById('cr-date').value  = '2026-06-28';
   document.getElementById('cr-time').value  = '08:00';
-  document.getElementById('cr-room').value  = '';
+  document.getElementById('cr-time-end').value = '10:00';
+  setRoomValue('');
   document.getElementById('cr-link').value  = '';
   document.getElementById('cr-note').value  = '';
   setMeetForm('offline');
   hideAddForm();
+  resetScheduleCheck();
   renderCreateMembers();
 }
 
@@ -1996,13 +2329,20 @@ function enterEditMode(code) {
   document.getElementById('cr-nganh').value = c.nganh || '';
   document.getElementById('cr-type').value  = c.type;
   document.getElementById('cr-dot').value   = c.dot;
-  document.getElementById('cr-date').value  = c.date.split('/').reverse().join('-');
   document.getElementById('cr-time').value  = c.time;
-  document.getElementById('cr-room').value  = c.room || '';
+  document.getElementById('cr-time-end').value = c.timeEnd || '10:00';
+  setRoomValue(c.room || '');
   document.getElementById('cr-link').value  = c.link || '';
   document.getElementById('cr-note').value  = c.note || '';
   setMeetForm(c.meetForm);
   hideAddForm();
+  resetScheduleCheck();
+  const isoDate = c.date.split('/').reverse().join('-');
+  selectedCalDateISO = isoDate;
+  document.getElementById('cr-date').value = isoDate;
+  const [yy,mm,dd] = isoDate.split('-');
+  document.getElementById('cal-trigger').textContent = `📅 ${dd}/${mm}/${yy}`;
+  calViewYear = Number(yy); calViewMonth = Number(mm) - 1;
   renderCreateMembers();
 
   if (c.status === 'rejected') {
@@ -2094,6 +2434,165 @@ function onGvTypeChange() {
   document.getElementById('am-ngoai-fields').style.display = val === 'ngoai' ? '' : 'none';
 }
 
+/* ══════════════════════════════════════════════════════════════
+   DỮ LIỆU MẪU — giả lập nguồn từ hệ thống khác của trường
+   (Lịch nghỉ chung + Thứ nghỉ niên khoá, Lịch giảng viên: dạy/thi/bận rỗi/khác)
+   Dùng cho demo cơ chế kiểm tra trùng lịch — CR-20260824-005.
+   ══════════════════════════════════════════════════════════════ */
+const HOLIDAYS = {
+  '2026-06-20': 'Thứ nghỉ trong tuần niên khoá',
+  '2026-06-21': 'Lịch nghỉ chung — Nghỉ cuối tuần theo lịch trường',
+  '2026-06-25': 'Lịch nghỉ chung — Ngày truyền thống Khoa',
+  '2026-07-01': 'Thứ nghỉ trong tuần niên khoá'
+};
+
+const GV_BUSY_SCHEDULE = {
+  'TS. Nguyễn Minh Tuấn': [
+    { date:'2026-06-24', start:'08:00', end:'10:00', loai:'Lịch dạy',    ghiChu:'Dạy môn Nhập môn CNTT — A1-201' },
+    { date:'2026-06-27', start:'13:30', end:'15:30', loai:'Lịch coi thi', ghiChu:'Coi thi HK2 — B2-105' }
+  ],
+  'TS. Trần Văn Bình': [
+    { date:'2026-06-27', start:'08:00', end:'11:00', loai:'Lịch khác', ghiChu:'Họp Bộ môn Công nghệ phần mềm' }
+  ],
+  'ThS. Nguyễn Thu Hoa': [
+    { date:'2026-06-30', start:'08:00', end:'09:30', loai:'Lịch bận rỗi', ghiChu:'Bận cá nhân (đăng ký thủ công)' }
+  ],
+  'TS. Phạm Quốc Hùng': [
+    { date:'2026-06-24', start:'07:30', end:'09:00', loai:'Lịch dạy', ghiChu:'Dạy môn Cơ sở dữ liệu — A1-105' }
+  ]
+};
+
+function timeToMin(t) { const [h,m] = t.split(':').map(Number); return h*60+m; }
+function rangesOverlap(s1,e1,s2,e2) { return timeToMin(s1) < timeToMin(e2) && timeToMin(s2) < timeToMin(e1); }
+function addHoursToTime(t, hours) {
+  if (!t) return '23:59';
+  const mins = timeToMin(t) + hours*60;
+  const h = Math.floor(mins/60) % 24, m = mins % 60;
+  return `${String(h).padStart(2,'0')}:${String(m).padStart(2,'0')}`;
+}
+
+/* ── Lịch chọn ngày tùy biến (khóa ngày nghỉ) ── */
+let calViewYear = 2026, calViewMonth = 5; // tháng 6 = index 5
+let selectedCalDateISO = '';
+
+function toggleMiniCal() {
+  const popup = document.getElementById('cal-popup');
+  const willOpen = !popup.classList.contains('open');
+  popup.classList.toggle('open', willOpen);
+  if (willOpen) renderMiniCal();
+}
+
+function renderMiniCal() {
+  const popup = document.getElementById('cal-popup');
+  const monthNames = ['Tháng 1','Tháng 2','Tháng 3','Tháng 4','Tháng 5','Tháng 6','Tháng 7','Tháng 8','Tháng 9','Tháng 10','Tháng 11','Tháng 12'];
+  const firstDow = new Date(calViewYear, calViewMonth, 1).getDay();
+  const daysInMonth = new Date(calViewYear, calViewMonth+1, 0).getDate();
+
+  let cells = '';
+  for (let i=0; i<firstDow; i++) cells += `<div class="cal-day cal-empty"></div>`;
+  for (let d=1; d<=daysInMonth; d++) {
+    const iso = `${calViewYear}-${String(calViewMonth+1).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
+    const holiday = HOLIDAYS[iso];
+    const isSelected = iso === selectedCalDateISO;
+    cells += `<div class="cal-day ${holiday?'cal-disabled':''} ${isSelected?'cal-selected':''}"
+      ${holiday ? `title="${holiday}"` : `onclick="pickCalDate('${iso}')"`}>${d}</div>`;
+  }
+
+  popup.innerHTML = `
+    <div class="cal-hd">
+      <button type="button" onclick="navCalMonth(-1)">◀</button>
+      <span class="cal-title">${monthNames[calViewMonth]} ${calViewYear}</span>
+      <button type="button" onclick="navCalMonth(1)">▶</button>
+    </div>
+    <div class="cal-grid">
+      <div class="cal-dow">CN</div><div class="cal-dow">T2</div><div class="cal-dow">T3</div>
+      <div class="cal-dow">T4</div><div class="cal-dow">T5</div><div class="cal-dow">T6</div><div class="cal-dow">T7</div>
+      ${cells}
+    </div>
+    <div class="cal-legend">🚫 Ngày mờ/gạch = ngày nghỉ, không chọn được</div>`;
+}
+
+function navCalMonth(delta) {
+  calViewMonth += delta;
+  if (calViewMonth < 0) { calViewMonth = 11; calViewYear--; }
+  if (calViewMonth > 11) { calViewMonth = 0; calViewYear++; }
+  renderMiniCal();
+}
+
+function pickCalDate(iso) {
+  selectedCalDateISO = iso;
+  document.getElementById('cr-date').value = iso;
+  const [y,m,d] = iso.split('-');
+  document.getElementById('cal-trigger').textContent = `📅 ${d}/${m}/${y}`;
+  document.getElementById('cal-popup').classList.remove('open');
+}
+
+document.addEventListener('click', function(e) {
+  const wrap = document.getElementById('cal-wrap');
+  if (wrap && !wrap.contains(e.target)) {
+    const popup = document.getElementById('cal-popup');
+    if (popup) popup.classList.remove('open');
+  }
+});
+
+/* ── Kiểm tra trùng lịch GV + phòng ── */
+let lastCheckPassed = false;
+
+function checkScheduleConflict() {
+  const date = document.getElementById('cr-date').value;
+  const start = document.getElementById('cr-time').value;
+  const end   = document.getElementById('cr-time-end').value;
+  const room  = document.getElementById('cr-room').value.trim();
+  const meetForm = getMeetForm();
+
+  if (!date) { showToast('Vui lòng chọn ngày họp trước khi kiểm tra.', 'err'); return; }
+  if (!start || !end) { showToast('Vui lòng nhập đủ giờ bắt đầu và giờ kết thúc.', 'err'); return; }
+  if (timeToMin(end) <= timeToMin(start)) { showToast('Giờ kết thúc phải sau giờ bắt đầu.', 'err'); return; }
+
+  // Gán kết quả trực tiếp vào từng thành viên — hiển thị ngay trong cột
+  // "Kết quả kiểm tra" của bảng Danh sách thành viên (không tách bảng riêng).
+  createMembers.forEach(m => {
+    const busyList = GV_BUSY_SCHEDULE[m.name] || [];
+    const conflict = busyList.find(b => b.date === date && rangesOverlap(start, end, b.start, b.end));
+    m.checkResult = { conflict };
+  });
+  renderCreateMembers();
+
+  const results = createMembers.map(m => ({ member: m, conflict: m.checkResult.conflict }));
+
+  // Check trùng phòng (chỉ khi Trực tiếp + có chọn phòng trong trường) — chỉ cảnh báo
+  const roomNote = document.getElementById('check-room-note');
+  roomNote.innerHTML = '';
+  if (meetForm === 'offline' && room) {
+    const conflictCouncil = COUNCILS.find(c => c.room === room && c.date === fmtDMY(date) && c.status === 'approved');
+    if (conflictCouncil) {
+      roomNote.innerHTML = `<div class="check-badge check-warn" style="margin-top:8px">⚠ Phòng "${room}" đã được đặt bởi Hội đồng ${conflictCouncil.code} cùng ngày ${conflictCouncil.date} ${conflictCouncil.time} — vẫn có thể tiếp tục.</div>`;
+    }
+  }
+
+  const hasError = results.some(r => r.conflict);
+  lastCheckPassed = !hasError;
+
+  if (!results.length) {
+    showToast('Chưa có thành viên nào để kiểm tra — vui lòng thêm thành viên trước.', 'warn');
+  } else {
+    showToast(hasError ? 'Còn thành viên trùng lịch — xem chi tiết trong bảng thành viên.' : 'Không có xung đột lịch giảng viên.', hasError ? 'err' : 'ok');
+  }
+
+  return !hasError;
+}
+
+function resetScheduleCheck() {
+  lastCheckPassed = false;
+  const roomNote = document.getElementById('check-room-note');
+  if (roomNote) roomNote.innerHTML = '';
+  selectedCalDateISO = '';
+  const trigger = document.getElementById('cal-trigger');
+  if (trigger) trigger.textContent = '📅 -- Chọn ngày --';
+  const hidden = document.getElementById('cr-date');
+  if (hidden) hidden.value = '';
+}
+
 function confirmAddMember() {
   const gvType = document.getElementById('am-type').value;
   const role   = document.getElementById('am-role').value;
@@ -2132,6 +2631,7 @@ function confirmAddMember() {
   } else {
     createMembers.push({ role, name, gvType, unit, email, phone });
   }
+  invalidateScheduleCheck();
   renderCreateMembers();
   hideAddForm();
 }
@@ -2139,19 +2639,26 @@ function confirmAddMember() {
 function renderCreateMembers() {
   const tbody = document.getElementById('cr-mem-tbody');
   if (!createMembers.length) {
-    tbody.innerHTML = '<tr><td colspan="6" class="tbl-empty">Chưa có thành viên — nhấn "+ Thêm thành viên" bên dưới.</td></tr>';
+    tbody.innerHTML = '<tr><td colspan="7" class="tbl-empty">Chưa có thành viên — nhấn "+ Thêm thành viên" bên dưới.</td></tr>';
     return;
   }
   tbody.innerHTML = createMembers.map((m, i) => {
     const contact = m.gvType === 'ngoai' && (m.email || m.phone)
       ? `<div style="font-size:11px;color:var(--text-3);margin-top:2px">${[m.email, m.phone].filter(Boolean).join(' · ')}</div>`
       : '';
+    let checkCell = '<span style="font-size:12px;color:var(--text-3)">— Chưa kiểm tra</span>';
+    if (m.checkResult) {
+      checkCell = m.checkResult.conflict
+        ? `<span class="check-badge check-err" onclick="showCheckDetail(event, ${i})">❌ Trùng lịch</span>`
+        : `<span class="check-badge check-ok">✅ Không trùng lịch</span>`;
+    }
     return `<tr>
     <td style="text-align:center;color:var(--text-3)">${i+1}</td>
     <td><span class="role-tag ${ROLE_CLS[m.role]}">${ROLE_LABEL[m.role]}</span></td>
     <td style="font-size:13px;font-weight:600">${m.name}</td>
     <td>${m.gvType==='ngoai' ? '<span class="gv-ext-badge">Ngoài trường</span>' : '<span class="gv-int-badge">Trong trường</span>'}</td>
     <td style="font-size:12px;color:var(--text-2)">${m.unit}${contact}</td>
+    <td>${checkCell}</td>
     <td style="text-align:center;white-space:nowrap">
       <button class="icon-btn" onclick="editMember(${i})" title="Sửa">✎</button>
       <button class="icon-btn" style="color:var(--error)" onclick="removeMember(${i})" title="Xóa">🗑</button>
@@ -2163,8 +2670,77 @@ function renderCreateMembers() {
 function removeMember(idx) {
   createMembers.splice(idx, 1);
   if (editingMemberIdx !== null) hideAddForm();
+  invalidateScheduleCheck();
   renderCreateMembers();
 }
+
+function invalidateScheduleCheck() {
+  createMembers.forEach(m => { delete m.checkResult; });
+  const roomNote = document.getElementById('check-room-note');
+  if (roomNote) roomNote.innerHTML = '';
+  closeCheckDetail();
+  lastCheckPassed = false;
+}
+
+/* ── Popup chi tiết khi bấm vào kết quả ❌ trong bảng thành viên ── */
+function showCheckDetail(event, idx) {
+  event.stopPropagation();
+  const m = createMembers[idx];
+  const c = m && m.checkResult && m.checkResult.conflict;
+  if (!c) return;
+
+  const [y, mo, d] = document.getElementById('cr-date').value.split('-');
+  const popup = document.getElementById('check-detail-popup');
+  popup.innerHTML = `
+    <button type="button" class="cdp-close" onclick="closeCheckDetail()">✕</button>
+    <div class="cdp-title">❌ ${m.name} — Trùng lịch</div>
+    <div class="cdp-row"><b>Loại lịch:</b><span>${c.loai}</span></div>
+    <div class="cdp-row"><b>Thời gian:</b><span>${c.start} – ${c.end}, ${d}/${mo}/${y}</span></div>
+    <div class="cdp-row"><b>Ghi chú:</b><span>${c.ghiChu}</span></div>
+    <div class="cdp-row" style="margin-top:6px;color:var(--text-3)">Nguồn: Lịch giảng viên (hệ thống đào tạo)</div>`;
+
+  const rect = event.target.getBoundingClientRect();
+  popup.style.top  = (rect.bottom + 6) + 'px';
+  popup.style.left = Math.min(rect.left, window.innerWidth - 286) + 'px';
+  popup.classList.add('open');
+}
+
+function showViewCheckDetail(event, name) {
+  event.stopPropagation();
+  const c = window.__viewCouncilForCheck;
+  if (!c) return;
+  const viewDateISO = c.date ? c.date.split('/').reverse().join('-') : '';
+  const viewTimeEnd = c.timeEnd || addHoursToTime(c.time, 2);
+  const busyList = GV_BUSY_SCHEDULE[name] || [];
+  const conflict = busyList.find(b => b.date === viewDateISO && rangesOverlap(c.time, viewTimeEnd, b.start, b.end));
+  if (!conflict) return;
+
+  const popup = document.getElementById('check-detail-popup');
+  popup.innerHTML = `
+    <button type="button" class="cdp-close" onclick="closeCheckDetail()">✕</button>
+    <div class="cdp-title">❌ ${name} — Trùng lịch</div>
+    <div class="cdp-row"><b>Loại lịch:</b><span>${conflict.loai}</span></div>
+    <div class="cdp-row"><b>Thời gian:</b><span>${conflict.start} – ${conflict.end}, ${c.date}</span></div>
+    <div class="cdp-row"><b>Ghi chú:</b><span>${conflict.ghiChu}</span></div>
+    <div class="cdp-row" style="margin-top:6px;color:var(--text-3)">Nguồn: Lịch giảng viên (hệ thống đào tạo)</div>`;
+
+  const rect = event.target.getBoundingClientRect();
+  popup.style.top  = (rect.bottom + 6) + 'px';
+  popup.style.left = Math.min(rect.left, window.innerWidth - 286) + 'px';
+  popup.classList.add('open');
+}
+
+function closeCheckDetail() {
+  const popup = document.getElementById('check-detail-popup');
+  if (popup) popup.classList.remove('open');
+}
+
+document.addEventListener('click', function(e) {
+  const popup = document.getElementById('check-detail-popup');
+  if (popup && popup.classList.contains('open') && !popup.contains(e.target)) {
+    closeCheckDetail();
+  }
+});
 
 /* ── Lưu hội đồng mới (localStorage — không có backend dùng chung giữa các trang) ── */
 function submitCreateCouncil(action) {
@@ -2175,6 +2751,7 @@ function submitCreateCouncil(action) {
   const dot   = document.getElementById('cr-dot').value;
   const date  = document.getElementById('cr-date').value;
   const time  = document.getElementById('cr-time').value;
+  const timeEnd = document.getElementById('cr-time-end').value;
   const room  = document.getElementById('cr-room').value.trim();
   const link  = document.getElementById('cr-link').value.trim();
   const note  = document.getElementById('cr-note').value.trim();
@@ -2188,23 +2765,32 @@ function submitCreateCouncil(action) {
     if (!nganh) { showToast('Vui lòng chọn ngành / lĩnh vực.', 'err'); return; }
     if (!type)  { showToast('Vui lòng chọn phân loại hội đồng.', 'err'); return; }
     if (!dot)   { showToast('Vui lòng chọn đợt / học kỳ.', 'err'); return; }
-    if (meetForm === 'offline' && !room) { showToast('Vui lòng nhập địa điểm họp.', 'err'); return; }
+    if (meetForm === 'offline' && !room) { showToast('Vui lòng chọn địa điểm họp.', 'err'); return; }
     if (meetForm === 'online'  && !isUrl(link)) { showToast('Vui lòng nhập link họp trực tuyến hợp lệ (http/https).', 'err'); return; }
     if (!date || parseDMY(fmtDMY(date)) < new Date(TODAY.getFullYear(), TODAY.getMonth(), TODAY.getDate()+3)) {
       showToast('Ngày họp phải từ 3 ngày sau ngày hiện tại (20/06/2026) trở đi.', 'err'); return;
     }
     if (time < '07:00' || time > '17:00') { showToast('Giờ họp phải trong khung 07:00 – 17:00.', 'err'); return; }
+    if (!timeEnd || timeEnd <= time) { showToast('Giờ kết thúc phải sau giờ bắt đầu.', 'err'); return; }
     if (!createMembers.some(m => m.role === 'ct')) { showToast('Hội đồng phải có 1 Chủ tịch.', 'err'); return; }
     if (!createMembers.some(m => m.role === 'tk')) { showToast('Hội đồng phải có 1 Thư ký.', 'err'); return; }
     if (createMembers.length < 3) { showToast('Hội đồng phải có tối thiểu 3 thành viên.', 'err'); return; }
     if (type === 'phanbien' && !createMembers.some(m => m.role === 'pb')) {
       showToast('Hội đồng Phản biện phải có ít nhất 1 thành viên giữ vai trò Phản biện.', 'err'); return;
     }
+    // Safety net — luôn tự re-check trùng lịch ngầm trước khi gửi thật,
+    // dù người dùng đã bấm nút "🔍 Kiểm tra trùng lịch" thủ công hay chưa.
+    const stillOk = checkScheduleConflict();
+    if (!stillOk) {
+      showToast('Còn thành viên trùng lịch — xem cột "Kiểm tra trùng lịch" trong bảng thành viên.', 'err');
+      document.getElementById('cr-mem-tbody').scrollIntoView({behavior:'smooth', block:'center'});
+      return;
+    }
   }
 
   const payload = {
     name, donvi, nganh, type, dot, meetForm, room, link, note,
-    date: date ? fmtDMY(date) : '', time,
+    date: date ? fmtDMY(date) : '', time, timeEnd,
     status: action === 'draft' ? 'draft' : 'pending',
     members: createMembers.map(m => ({...m}))
   };

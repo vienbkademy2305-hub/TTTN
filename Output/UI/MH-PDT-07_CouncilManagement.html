@@ -894,6 +894,58 @@ function isVNPhone(s){ return s === '' || /^0\d{9}$/.test(s.trim()); }
 function setErr(id, on){ document.getElementById(id).classList.toggle('err', on); }
 function todayIso(){ return new Date().toISOString().slice(0,10); }
 
+/* ══════════════════════════════════════════════════════════════
+   Kiểm tra trùng lịch khi Phòng Đào tạo phê duyệt — CR-20260824-005
+   Dữ liệu mẫu giả lập nguồn Lịch giảng viên (dạy/thi/bận rỗi/khác)
+   từ hệ thống khác của trường. Đồng bộ tên GV với MH-KCM-09.
+   ══════════════════════════════════════════════════════════════ */
+const GV_BUSY_SCHEDULE = {
+  'TS. Nguyễn Minh Tuấn': [
+    { date:'2026-06-24', start:'08:00', end:'10:00', loai:'Lịch dạy',    ghiChu:'Dạy môn Nhập môn CNTT — A1-201' },
+    { date:'2026-06-27', start:'13:30', end:'15:30', loai:'Lịch coi thi', ghiChu:'Coi thi HK2 — B2-105' }
+  ],
+  'TS. Trần Văn Bình': [
+    { date:'2026-06-27', start:'08:00', end:'11:00', loai:'Lịch khác', ghiChu:'Họp Bộ môn Công nghệ phần mềm' }
+  ],
+  'ThS. Nguyễn Thu Hoa': [
+    { date:'2026-06-30', start:'08:00', end:'09:30', loai:'Lịch bận rỗi', ghiChu:'Bận cá nhân (đăng ký thủ công)' }
+  ],
+  'TS. Phạm Quốc Hùng': [
+    { date:'2026-06-24', start:'07:30', end:'09:00', loai:'Lịch dạy', ghiChu:'Dạy môn Cơ sở dữ liệu — A1-105' }
+  ]
+};
+
+function timeToMin(t) { const [h,m] = t.split(':').map(Number); return h*60+m; }
+function rangesOverlap(s1,e1,s2,e2) { return timeToMin(s1) < timeToMin(e2) && timeToMin(s2) < timeToMin(e1); }
+function addHoursToTime(t, hours) {
+  if (!t) return '23:59';
+  const mins = timeToMin(t) + hours*60;
+  const h = Math.floor(mins/60) % 24, m = mins % 60;
+  return `${String(h).padStart(2,'0')}:${String(m).padStart(2,'0')}`;
+}
+
+/* Re-check tại thời điểm Duyệt (chống race condition — 2 hội đồng cùng
+   trạng thái "chờ duyệt" cùng GV/giờ, không cái nào thấy cái kia lúc tạo).
+   Trả về { conflict, source } — source = 'gv-schedule' (lịch dạy/thi/bận rỗi/khác)
+   hoặc 'other-council' (hội đồng khác đã approved, cùng GV, cùng khung giờ). */
+function checkApproveConflict(c) {
+  const dateISO = c.date ? c.date.split('/').reverse().join('-') : '';
+  const timeEnd = c.timeEnd || addHoursToTime(c.time, 2);
+
+  for (const m of (c.members || [])) {
+    const busyList = GV_BUSY_SCHEDULE[m.name] || [];
+    const gvConflict = busyList.find(b => b.date === dateISO && rangesOverlap(c.time, timeEnd, b.start, b.end));
+    if (gvConflict) return { member: m, source: 'gv-schedule', detail: gvConflict };
+
+    const otherCouncil = COUNCILS.find(oc =>
+      oc.id !== c.id && oc.status === 'approved' && oc.date === c.date &&
+      rangesOverlap(c.time, timeEnd, oc.time, oc.timeEnd || addHoursToTime(oc.time, 2)) &&
+      (oc.members || []).some(om => om.name === m.name));
+    if (otherCouncil) return { member: m, source: 'other-council', detail: otherCouncil };
+  }
+  return null;
+}
+
 /* ── Lịch sử xét duyệt (timeline) ─────────────────────────── */
 function buildHistory(c) {
   const events = [];
@@ -1297,10 +1349,37 @@ function confirmWithdraw(id) {
 /* ── Duyệt yêu cầu (vai trò Phòng ĐT — chưa cần số QĐ) ────── */
 function approveCouncil(id) {
   const c = COUNCILS.find(x => x.id === id);
+
+  // Re-check ngay tại thời điểm bấm Duyệt — chống race condition: 2 hội đồng
+  // cùng ở trạng thái "chờ duyệt" (cùng GV, cùng giờ) không thấy nhau lúc tạo
+  // vì chỉ hội đồng ĐÃ duyệt mới ghi vào Lịch bận rỗi. Đây là lớp chặn cuối
+  // trước khi khung giờ họp thực sự được khóa vào lịch GV.
+  const conflict = checkApproveConflict(c);
+  if (conflict) {
+    const msg = conflict.source === 'gv-schedule'
+      ? `Không thể duyệt: ${conflict.member.name} đã trùng ${conflict.detail.loai.toLowerCase()} (${conflict.detail.start}-${conflict.detail.end}, ${c.date}) — ${conflict.detail.ghiChu}.`
+      : `Không thể duyệt: ${conflict.member.name} đã trùng giờ với Hội đồng ${conflict.detail.code} (đã duyệt lúc ${conflict.detail.approvedAt || '—'}, cùng ${c.date} ${conflict.detail.time}).`;
+    showToast(msg, 'err');
+    return;
+  }
+
   showConfirm(`Phê duyệt yêu cầu thành lập "${c.name}"?`, () => {
     c.status     = 'approved';
     c.approvedBy = 'Nguyễn Thị Lan';
     c.approvedAt = fmtDMY(todayIso());
+
+    // Tự động ghi giờ họp vào Lịch bận rỗi của từng thành viên (giả lập ghi
+    // ngược sang hệ thống khác) — để các lần duyệt hội đồng sau tự phát
+    // hiện trùng qua nhánh 'other-council' phía trên.
+    const timeEnd = c.timeEnd || addHoursToTime(c.time, 2);
+    (c.members || []).forEach(m => {
+      if (!GV_BUSY_SCHEDULE[m.name]) GV_BUSY_SCHEDULE[m.name] = [];
+      GV_BUSY_SCHEDULE[m.name].push({
+        date: c.date.split('/').reverse().join('-'), start: c.time, end: timeEnd,
+        loai: 'Lịch bận rỗi', ghiChu: `Họp hội đồng ${c.code} (tự động ghi khi duyệt)`
+      });
+    });
+
     render();
     showToast('✅ Đã phê duyệt yêu cầu thành lập. Vui lòng nhập quyết định khi ban hành.', 'success');
   }, 'Phê duyệt', 'btn-success');

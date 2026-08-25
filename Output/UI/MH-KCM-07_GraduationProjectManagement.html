@@ -116,9 +116,14 @@
     .tbl.hide-col-dongbo [data-col=dongbo],
     .tbl.hide-col-diem [data-col=diem],
     .tbl.hide-col-ketluanhd [data-col=ketluanhd],
+    .tbl.hide-col-nopquyen [data-col=nopquyen],
     .tbl.hide-col-quyetdinh [data-col=quyetdinh],
     .tbl.hide-col-ghichuhd [data-col=ghichuhd]
     {display:none}
+    /* SV bị GVHD/GVPB từ chối cho bảo vệ — Kết luận tự động "Không đạt", khóa mọi phân công tiếp theo */
+    tr.row-disqualified{background:#fafafa;opacity:.6}
+    tr.row-disqualified td{color:var(--text-3) !important}
+    tr.row-disqualified:hover td{background:#f0f0f0}
   </style>
 </head>
 <body>
@@ -269,7 +274,8 @@
               <label class="colvis-item"><input type="checkbox" checked onchange="onColVisToggle('nxgvpb',this.checked)"> Nhận xét GVPB</label>
               <label class="colvis-item"><input type="checkbox" checked onchange="onColVisToggle('diem',this.checked)"> Điểm thành phần</label>
               <label class="colvis-item"><input type="checkbox" checked onchange="onColVisToggle('decuongtt',this.checked)"> Trạng thái đề cương</label>
-              <label class="colvis-item"><input type="checkbox" checked onchange="onColVisToggle('ketluanhd',this.checked)"> Kết luận hội đồng</label>
+              <label class="colvis-item"><input type="checkbox" checked onchange="onColVisToggle('ketluanhd',this.checked)"> Kết luận</label>
+              <label class="colvis-item"><input type="checkbox" checked onchange="onColVisToggle('nopquyen',this.checked)"> Xác nhận nộp quyển</label>
               <label class="colvis-item"><input type="checkbox" checked onchange="onColVisToggle('dongbo',this.checked)"> Đồng bộ điểm</label>
               <label class="colvis-item"><input type="checkbox" checked onchange="onColVisToggle('quyetdinh',this.checked)"> Quyết định</label>
               <label class="colvis-item"><input type="checkbox" checked onchange="onColVisToggle('ghichuhd',this.checked)"> Ghi chú</label>
@@ -286,6 +292,7 @@
               <button type="button" class="func-item" onclick="closeFuncPanel();openDecisionLog()">📜 Danh sách quyết định</button>
               <button type="button" class="func-item" onclick="closeFuncPanel();exportBulk()">📄 Xuất quyết định</button>
               <button type="button" class="func-item" onclick="closeFuncPanel();openBulkKetLuanHoiDong()">✅ Cập nhật kết luận</button>
+              <button type="button" class="func-item" onclick="closeFuncPanel();openNopQuyen()">📚 Xác nhận nộp quyển</button>
               <button type="button" class="func-item" onclick="closeFuncPanel();syncDiemBulk()">🔄 Đồng bộ điểm</button>
               <button type="button" class="func-item" onclick="closeFuncPanel();exportDSSV()">📊 Xuất DSSV</button>
             </div>
@@ -319,7 +326,8 @@
                 <th style="width:160px" data-col="nxgvpb">Nhận xét GVPB</th>
                 <th style="width:90px;text-align:center" data-col="diem">Điểm thành phần</th>
                 <th style="width:150px" data-col="decuongtt">Trạng thái đề cương</th>
-                <th style="width:160px;text-align:center" data-col="ketluanhd" title="Kết luận của hội đồng chấm điểm">Kết luận hội đồng</th>
+                <th style="width:160px;text-align:center" data-col="ketluanhd" title="Kết luận của hội đồng chấm điểm">Kết luận</th>
+                <th style="width:170px;text-align:center" data-col="nopquyen" title="Thư viện/Khoa chuyên môn xác nhận SV đã nộp quyển — chỉ áp dụng khi Kết luận Đạt/Đạt nhưng cần chỉnh sửa">Xác nhận nộp quyển</th>
                 <th style="width:110px;text-align:center" data-col="dongbo" title="Trạng thái đồng bộ điểm sang hệ thống đào tạo">Đồng bộ điểm</th>
                 <th style="width:128px" data-col="quyetdinh">Quyết định</th>
                 <th style="min-width:180px" data-col="ghichuhd">Ghi chú</th>
@@ -708,6 +716,7 @@
           </table>
         </div>
         <div class="f-hint" id="ahd-council-hint"></div>
+        <div id="ahd-sv-warning" style="margin-top:10px"></div>
       </div>
       <div class="fe" id="ahd-err" style="display:none">Vui lòng chọn hội đồng.</div>
     </div>
@@ -794,6 +803,48 @@
     <div class="modal-ft">
       <button class="btn btn-default" data-close="m-nhanxet-gvpb">Hủy</button>
       <button class="btn btn-primary" onclick="saveNhanXetGvpb()">Lưu</button>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ MODAL: XÁC NHẬN NỘP QUYỂN — Thư viện/Khoa chuyên môn xác nhận SV đã nộp quyển ═══ -->
+<div class="overlay hidden" id="m-nopquyen">
+  <div class="modal-box w480">
+    <div class="modal-hd">
+      <span class="modal-title">📚 Xác nhận nộp quyển</span>
+      <button class="modal-close" data-close="m-nopquyen">✕</button>
+    </div>
+    <div class="modal-bd">
+      <div class="fi">
+        <label style="display:flex;align-items:center;gap:8px;cursor:pointer;font-weight:400">
+          <input type="checkbox" id="nq-daxacnhan" style="width:16px;height:16px;cursor:pointer">
+          Đã xác nhận nộp quyển
+        </label>
+      </div>
+      <div class="f-row col-2">
+        <div class="fi">
+          <label>Người xác nhận</label>
+          <input class="fc readonly" type="text" id="nq-nguoixacnhan" readonly>
+        </div>
+        <div class="fi">
+          <label>Ngày xác nhận</label>
+          <input class="fc readonly" type="text" id="nq-ngayxacnhan" readonly>
+        </div>
+      </div>
+      <div class="fi">
+        <label>Minh chứng</label>
+        <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">
+          <input type="file" id="nq-file-input" accept=".doc,.docx,.pdf,.jpg,.png" style="display:none" onchange="onNqFileSelect(this)">
+          <button type="button" class="btn btn-default btn-sm" onclick="document.getElementById('nq-file-input').click()">📎 Tải lên tài liệu</button>
+          <span style="font-size:12px;color:var(--text-2)" id="nq-file-name">Chưa có file</span>
+          <button type="button" class="btn btn-default btn-sm" id="nq-file-clear" style="display:none;color:var(--error)" onclick="clearNqFile()">✕</button>
+        </div>
+      </div>
+      <div class="fe" id="nq-err" style="display:none">Vui lòng tích "Đã xác nhận nộp quyển" trước khi lưu.</div>
+    </div>
+    <div class="modal-ft">
+      <button class="btn btn-default" data-close="m-nopquyen">Hủy</button>
+      <button class="btn btn-primary" onclick="saveNopQuyen()">Lưu</button>
     </div>
   </div>
 </div>
@@ -1306,6 +1357,44 @@ const COUNCIL_CATALOG = [
     ]},
 ];
 
+/* ══════════════════════════════════════════════════════════════
+   Kiểm tra trùng lịch SINH VIÊN khi Phân hội đồng — CR-20260824-006.
+   Dữ liệu mẫu giả lập nguồn Lịch sinh viên (hệ thống đào tạo khác của
+   trường): Lịch học, Lịch thi, Lịch hoạt động ngoại khóa. Đây là dạng
+   CẢNH BÁO (không chặn) — khác trùng lịch GV (chặn cứng) ở MH-KCM-09.
+   ══════════════════════════════════════════════════════════════ */
+const SV_BUSY_SCHEDULE = {
+  'B22DCCN001': [
+    { date:'2026-07-05', start:'08:00', end:'10:00', loai:'Lịch thi', ghiChu:'Thi cuối kỳ môn Mạng máy tính — Phòng B2-201' }
+  ],
+  'B22DCCN022': [
+    { date:'2026-07-06', start:'07:30', end:'09:30', loai:'Lịch học', ghiChu:'Học bù môn Kiến trúc máy tính — Phòng A1-305' }
+  ],
+  'B22DCCN033': [
+    { date:'2026-07-07', start:'13:00', end:'15:00', loai:'Lịch hoạt động ngoại khóa', ghiChu:'Hội thao sinh viên Khoa CNTT' }
+  ]
+};
+
+function timeToMinSv(t) { const [h,m] = t.split(':').map(Number); return h*60+m; }
+function rangesOverlapSv(s1,e1,s2,e2) { return timeToMinSv(s1) < timeToMinSv(e2) && timeToMinSv(s2) < timeToMinSv(e1); }
+function addHoursToTimeSv(t, hours) {
+  if (!t) return '23:59';
+  const mins = timeToMinSv(t) + hours*60;
+  const h = Math.floor(mins/60) % 24, m = mins % 60;
+  return `${String(h).padStart(2,'0')}:${String(m).padStart(2,'0')}`;
+}
+/* Trả về mảng { student, conflict } cho các SV trong `targetStudents` bị
+   trùng lịch với khung giờ của `hoiDong` — không chặn, chỉ để hiển thị cảnh báo. */
+function checkStudentScheduleConflicts(hoiDong, targetStudents) {
+  const dateISO = hoiDong.ngay ? hoiDong.ngay.split('/').reverse().join('-') : '';
+  const timeEnd = hoiDong.gioKetThuc || addHoursToTimeSv(hoiDong.gio, 2);
+  return targetStudents.map(s => {
+    const busyList = SV_BUSY_SCHEDULE[s.maSV] || [];
+    const conflict = busyList.find(b => b.date === dateISO && rangesOverlapSv(hoiDong.gio, timeEnd, b.start, b.end));
+    return { student: s, conflict };
+  }).filter(r => r.conflict);
+}
+
 const GV_CAPACITY = {
   'TS. Nguyễn Minh Tuấn': {donVi:'BM. Công nghệ phần mềm', max:5},
   'TS. Lê Thị Mai':       {donVi:'BM. Hệ thống thông tin',  max:3},
@@ -1773,6 +1862,13 @@ function render(){
     const ketLuanHoiDongCell = s.conclusion
       ? `<span style="font-size:12px">${CONCLUSION_CFG[s.conclusion].label}</span>`
       : `<span style="color:var(--text-3);font-size:12px">— Chưa kết luận —</span>`;
+    // Chỉ SV Kết luận Đạt/Đạt nhưng cần chỉnh sửa mới có ô xác nhận nộp quyển —
+    // Không đạt/Hoãn bảo vệ hoặc chưa có kết luận thì để TRỐNG (không hiện gì).
+    const nopQuyenCell = !canNopQuyen(s)
+      ? ''
+      : (s.nopQuyen && s.nopQuyen.daNop
+          ? `<span class="ketluan-pill pass" onclick="openNopQuyen(${s.id})" title="${s.nopQuyen.minhChung ? '📎 ' + s.nopQuyen.minhChung : 'Chưa có minh chứng'}">✅ Đã nộp — ${s.nopQuyen.ngayXacNhan}</span>`
+          : `<span class="ketluan-pill wait" onclick="openNopQuyen(${s.id})" title="Xác nhận sinh viên đã nộp quyển">⏳ Chưa xác nhận</span>`);
     const dongBoCell = s.diemTongKet != null && s.dongBoDiem === 'Đã đồng bộ'
       ? `<span style="font-size:12px" title="Đã đồng bộ ${s.dongBoNgay||''}">Đã đồng bộ</span>`
       : `<span style="color:var(--text-3);font-size:12px">Chưa đồng bộ</span>`;
@@ -1797,10 +1893,12 @@ function render(){
     const daDongBo = s.dongBoDiem === 'Đã đồng bộ';
     const actions = `
       ${s.baoCao ? `<button class="icon-btn success-btn" title="${daDongBo ? 'Đã đồng bộ điểm — không thể sửa' : 'Nhập điểm cuối'}" onclick="openDiem(${s.id})" ${daDongBo ? 'disabled' : ''}>✏️</button>` : ''}
+      ${canNopQuyen(s) ? `<button class="icon-btn" title="Xác nhận nộp quyển" onclick="openNopQuyen(${s.id})">📚</button>` : ''}
       <button class="icon-btn" title="Nhập quyết định" onclick="openCreateDecision(${s.id})">🖊️</button>
       <button class="icon-btn" title="DS các yêu cầu của sinh viên" onclick="openYeuCauSv(${s.id})" style="position:relative">📨${yeuCauList.length ? `<span style="position:absolute;top:-4px;right:-4px;background:var(--error);color:#fff;border-radius:8px;font-size:9px;line-height:1;padding:1px 4px">${yeuCauList.length}</span>` : ''}</button>
     `;
-    return `<tr>
+    const disqualified = isDisqualified(s);
+    return `<tr${disqualified ? ` class="row-disqualified" title="${disqualifyReason(s)}"` : ''}>
       <td style="text-align:center"><input type="checkbox" class="row-chk" data-id="${s.id}" onchange="onRowChk()" ${selectedIds.includes(s.id)?'checked':''}></td>
       <td style="font-size:12px;color:var(--text-2)" data-col="donvi">${donViCell}</td>
       <td style="font-family:monospace;font-size:12px;white-space:nowrap">${s.maSV}</td>
@@ -1821,12 +1919,13 @@ function render(){
       <td style="text-align:center" data-col="diem">${diemCell}</td>
       <td data-col="decuongtt">${decuongStatusCell}</td>
       <td style="text-align:center" data-col="ketluanhd">${ketLuanHoiDongCell}</td>
+      <td style="text-align:center" data-col="nopquyen">${nopQuyenCell}</td>
       <td style="text-align:center" data-col="dongbo">${dongBoCell}</td>
       <td data-col="quyetdinh">${qdCell}</td>
       <td data-col="ghichuhd">${ghiChuHoiDongCell}</td>
       <td class="tbl-actions">${actions}</td>
     </tr>`;
-  }).join('') : `<tr><td colspan="27" class="tbl-empty">Không có sinh viên phù hợp</td></tr>`;
+  }).join('') : `<tr><td colspan="28" class="tbl-empty">Không có sinh viên phù hợp</td></tr>`;
 
   document.getElementById('pg-info').textContent = `Hiển thị ${filtered.length} / ${students.length} sinh viên`;
   lastFiltered = filtered;
@@ -2394,12 +2493,102 @@ function saveAssignGv(){
   render();
 }
 
+/* ════════ MODAL: XÁC NHẬN NỘP QUYỂN (Thư viện/Khoa chuyên môn) ════════ */
+// Chỉ SV Kết luận Đạt/Đạt nhưng cần chỉnh sửa mới được xác nhận nộp quyển —
+// Không đạt/Hoãn bảo vệ hoặc chưa có Kết luận thì KHÔNG có thao tác này (cột trống).
+function canNopQuyen(s){ return s.conclusion === 'dat' || s.conclusion === 'canchinh'; }
+
+let _nqTargetIds = [];
+let _nqFile = null;
+
+function openNopQuyen(id){
+  const targets = id ? [id] : [...selectedIds];
+  if (!targets.length) { showToast('Vui lòng chọn ít nhất 1 sinh viên', 'warn'); return; }
+  const list = students.filter(s => targets.includes(s.id));
+  const blocked = list.filter(s => !canNopQuyen(s));
+  const eligible = list.filter(s => canNopQuyen(s));
+  if (!eligible.length) {
+    showToast(`Không thể xác nhận nộp quyển — toàn bộ ${blocked.length} sinh viên đã chọn chưa có Kết luận Đạt/Đạt nhưng cần chỉnh sửa.`, 'err');
+    return;
+  }
+  if (blocked.length) {
+    showToast(`Đã loại ${blocked.length} sinh viên chưa đủ điều kiện (Kết luận không phải Đạt/Đạt nhưng cần chỉnh sửa) khỏi thao tác này.`, 'warn');
+  }
+  _nqTargetIds = eligible.map(s => s.id);
+  const single = eligible.length === 1 ? eligible[0] : null;
+  document.getElementById('nq-daxacnhan').checked = !!(single && single.nopQuyen && single.nopQuyen.daNop);
+  // Người xác nhận/Ngày xác nhận readonly, không gõ tay được. Chưa từng xác nhận
+  // (nopQuyen null) → để TRỐNG, chỉ tự điền tài khoản đăng nhập + ngày hiện tại
+  // SAU KHI bấm Lưu (xem saveNopQuyen). Đã xác nhận trước đó → hiện đúng giá trị đã lưu.
+  document.getElementById('nq-nguoixacnhan').value = (single && single.nopQuyen && single.nopQuyen.nguoiXacNhan) || '';
+  document.getElementById('nq-ngayxacnhan').value = (single && single.nopQuyen && single.nopQuyen.ngayXacNhan) || '';
+  _nqFile = (single && single.nopQuyen && single.nopQuyen.minhChung) || null;
+  document.getElementById('nq-file-name').textContent = _nqFile ? '📎 ' + _nqFile : 'Chưa có file';
+  document.getElementById('nq-file-name').style.color = _nqFile ? 'var(--primary)' : 'var(--text-2)';
+  document.getElementById('nq-file-clear').style.display = _nqFile ? '' : 'none';
+  document.getElementById('nq-err').style.display = 'none';
+  openModal('m-nopquyen');
+}
+function onNqFileSelect(input){
+  if (!input.files.length) return;
+  _nqFile = input.files[0].name;
+  document.getElementById('nq-file-name').textContent = '📎 ' + _nqFile;
+  document.getElementById('nq-file-name').style.color = 'var(--primary)';
+  document.getElementById('nq-file-clear').style.display = '';
+}
+function clearNqFile(){
+  _nqFile = null;
+  document.getElementById('nq-file-input').value = '';
+  document.getElementById('nq-file-name').textContent = 'Chưa có file';
+  document.getElementById('nq-file-name').style.color = 'var(--text-2)';
+  document.getElementById('nq-file-clear').style.display = 'none';
+}
+function saveNopQuyen(){
+  const daNop = document.getElementById('nq-daxacnhan').checked;
+  const errEl = document.getElementById('nq-err');
+  if (!daNop) { errEl.style.display = ''; return; }
+  errEl.style.display = 'none';
+  const today = new Date().toLocaleDateString('vi');
+  // Người xác nhận/Ngày xác nhận readonly — nếu đang trống (lần xác nhận đầu tiên)
+  // thì hệ thống tự điền NGAY KHI LƯU: tài khoản đang đăng nhập + ngày hiện tại.
+  const nguoiXacNhan = document.getElementById('nq-nguoixacnhan').value || CURRENT_USER;
+  const ngayXacNhan = document.getElementById('nq-ngayxacnhan').value || today;
+  students = students.map(s => {
+    if (!_nqTargetIds.includes(s.id)) return s;
+    const next = { ...s, nopQuyen: { daNop: true, nguoiXacNhan, ngayXacNhan, minhChung: _nqFile } };
+    next.history = [...s.history, {time:today, actor:CURRENT_USER, action:'Xác nhận nộp quyển', result:`Người xác nhận: ${nguoiXacNhan} · Ngày: ${ngayXacNhan}${_nqFile ? ' · Minh chứng: ' + _nqFile : ''}`, dot:'ok'}];
+    return next;
+  });
+  closeModal('m-nopquyen');
+  showToast(`Đã xác nhận nộp quyển cho ${_nqTargetIds.length} sinh viên`);
+  render();
+}
+
 /* ════════ MODAL: PHÂN CÔNG GIẢNG VIÊN PHẢN BIỆN ════════ */
+// GVHD không đồng ý → chặn Phân GVPB. GVHD HOẶC GVPB không đồng ý → chặn Phân hội đồng.
+// (GVPB không đồng ý không chặn "Phân GVPB" vì lúc đó thường cần đổi sang GVPB khác.)
+function isBlockedByGvhd(s){ return !!(s.nxGVHD && s.nxGVHD.ketLuan === 'Không đồng ý'); }
+function isDisqualified(s){ return isBlockedByGvhd(s) || !!(s.nxGVPB && s.nxGVPB.ketLuan === 'Không đồng ý'); }
+function disqualifyReason(s){
+  if (isBlockedByGvhd(s)) return 'GVHD không đồng ý cho bảo vệ';
+  if (s.nxGVPB && s.nxGVPB.ketLuan === 'Không đồng ý') return 'GVPB không đồng ý cho bảo vệ';
+  return '';
+}
+
 function openAssignGvpb(id){
   const targets = id ? [id] : [...selectedIds];
   if (!targets.length) { showToast('Vui lòng chọn ít nhất 1 sinh viên', 'warn'); return; }
   const list = students.filter(s => targets.includes(s.id));
-  _assignTargetIds = list.map(s => s.id);
+  const blocked = list.filter(s => isBlockedByGvhd(s));
+  const eligible = list.filter(s => !isBlockedByGvhd(s));
+  if (!eligible.length) {
+    showToast(`Không thể phân GVPB — toàn bộ ${blocked.length} sinh viên đã chọn đều bị GVHD từ chối cho bảo vệ.`, 'err');
+    return;
+  }
+  if (blocked.length) {
+    showToast(`Đã loại ${blocked.length} sinh viên bị GVHD từ chối cho bảo vệ khỏi thao tác này.`, 'warn');
+  }
+  _assignTargetIds = eligible.map(s => s.id);
   document.getElementById('asp-gv').value = '';
   document.getElementById('asp-err').style.display = 'none';
   openModal('m-assign-gvpb');
@@ -2431,7 +2620,16 @@ function openAssignHoiDong(id){
   const targets = id ? [id] : [...selectedIds];
   if (!targets.length) { showToast('Vui lòng chọn ít nhất 1 sinh viên', 'warn'); return; }
   const list = students.filter(s => targets.includes(s.id));
-  _assignTargetIds = list.map(s => s.id);
+  const blocked = list.filter(s => isDisqualified(s));
+  const eligible = list.filter(s => !isDisqualified(s));
+  if (!eligible.length) {
+    showToast(`Không thể phân hội đồng — toàn bộ ${blocked.length} sinh viên đã chọn đều bị GVHD/GVPB từ chối cho bảo vệ.`, 'err');
+    return;
+  }
+  if (blocked.length) {
+    showToast(`Đã loại ${blocked.length} sinh viên bị GVHD/GVPB từ chối cho bảo vệ khỏi thao tác này.`, 'warn');
+  }
+  _assignTargetIds = eligible.map(s => s.id);
   document.getElementById('ahd-f-code').value = '';
   document.getElementById('ahd-f-name').value = '';
   document.getElementById('ahd-f-phanloai').value = '';
@@ -2441,6 +2639,7 @@ function openAssignHoiDong(id){
   const dvSet = [...new Set(COUNCIL_CATALOG.map(c => c.donvi))];
   document.getElementById('ahd-f-donvi').innerHTML = '<option value="">-- Đơn vị --</option>' + dvSet.map(d => `<option value="${d}">${d}</option>`).join('');
   document.getElementById('ahd-council-hint').textContent = '';
+  document.getElementById('ahd-sv-warning').innerHTML = '';
   document.getElementById('ahd-err').style.display = 'none';
   renderAhdCouncilTable();
   openModal('m-assign-hoidong');
@@ -2473,6 +2672,22 @@ function onAhdCouncilChange(){
   const sel = document.querySelector('input[name="ahd-council-radio"]:checked');
   const c = sel ? COUNCIL_CATALOG.find(x => x.code === sel.value) : null;
   document.getElementById('ahd-council-hint').textContent = c ? `${c.hocKy} · ${c.donvi} · ${c.hinhThuc || ''} · ${c.ngay} ${c.gio} · ${c.phong}` : '';
+
+  const warnEl = document.getElementById('ahd-sv-warning');
+  if (!c) { warnEl.innerHTML = ''; return; }
+
+  const targetStudents = students.filter(s => _assignTargetIds.includes(s.id));
+  const conflicts = checkStudentScheduleConflicts(c, targetStudents);
+  if (!conflicts.length) {
+    warnEl.innerHTML = `<div class="alert alert-success"><span class="alert-ico">✅</span><div class="alert-body"><div class="alert-title">Không có sinh viên nào trùng lịch</div></div></div>`;
+    return;
+  }
+  const rows = conflicts.map(r => `<li><strong>${r.student.maSV} — ${r.student.tenSV}</strong>: trùng ${r.conflict.loai.toLowerCase()} ${r.conflict.start}-${r.conflict.end} (${r.conflict.ghiChu})</li>`).join('');
+  warnEl.innerHTML = `<div class="alert alert-warning"><span class="alert-ico">⚠️</span><div class="alert-body">
+      <div class="alert-title">${conflicts.length} sinh viên trùng lịch với khung giờ hội đồng (${c.ngay} ${c.gio})</div>
+      <div class="alert-desc">Nguồn: Lịch sinh viên (lịch học/thi/hoạt động ngoại khóa — hệ thống đào tạo). Đây chỉ là cảnh báo, vẫn có thể tiếp tục phân hội đồng.</div>
+      <ul style="margin:6px 0 0;padding-left:18px">${rows}</ul>
+    </div></div>`;
 }
 function saveAssignHoiDong(){
   const sel = document.querySelector('input[name="ahd-council-radio"]:checked');
@@ -2553,6 +2768,12 @@ function saveNhanXetGvhd(){
     const next = { ...s, nxGVHD: {...(s.nxGVHD||{}), ketLuan, ngay:today, file:_nxFiles.gvhd, ghiChu} };
     next.history = [...s.history, {time:today, actor:CURRENT_USER, action:'Nhận xét & kết luận của GVHD', result:`${ketLuan} cho bảo vệ`, dot: ketLuan==='Đồng ý'?'ok':'err'}];
     next.history = _nxAppendSystemGate(next, today);
+    // GVHD không đồng ý cho bảo vệ → tự động chuyển Kết luận thành "Không đạt",
+    // chặn phân GVPB/Hội đồng (xem openAssignGvpb/openAssignHoiDong), dòng bị xám (xem renderTable).
+    if (ketLuan === 'Không đồng ý') {
+      next.conclusion = 'khongdat';
+      next.history = [...next.history, {time:today, actor:'Hệ thống', action:'Tự động cập nhật Kết luận', result:'GVHD không đồng ý cho bảo vệ → Kết luận: Không đạt', dot:'err'}];
+    }
     return next;
   });
   closeModal('m-nhanxet-gvhd');
@@ -2580,6 +2801,12 @@ function saveNhanXetGvpb(){
     const next = { ...s, nxGVPB: {...(s.nxGVPB||{}), ketLuan, ngay:today, file:_nxFiles.gvpb, ghiChu} };
     next.history = [...s.history, {time:today, actor:CURRENT_USER, action:'Nhận xét & kết luận của GVPB', result:`${ketLuan} cho bảo vệ`, dot: ketLuan==='Đồng ý'?'ok':'err'}];
     next.history = _nxAppendSystemGate(next, today);
+    // GVPB không đồng ý cho bảo vệ → tự động chuyển Kết luận thành "Không đạt",
+    // chặn phân Hội đồng (xem openAssignHoiDong), dòng bị xám (xem renderTable).
+    if (ketLuan === 'Không đồng ý') {
+      next.conclusion = 'khongdat';
+      next.history = [...next.history, {time:today, actor:'Hệ thống', action:'Tự động cập nhật Kết luận', result:'GVPB không đồng ý cho bảo vệ → Kết luận: Không đạt', dot:'err'}];
+    }
     return next;
   });
   closeModal('m-nhanxet-gvpb');
@@ -3063,12 +3290,13 @@ function exportDSSV(){
   const list = lastFiltered && lastFiltered.length ? lastFiltered : students;
   if (!list.length) { showToast('Không có sinh viên phù hợp để xuất', 'warn'); return; }
 
-  const headers = ['Mã SV','Họ và tên','Lớp học phần','CTĐT','Loại hình','Đợt','Đề tài','GVHD','GVPB','Hội đồng','Trạng thái đề cương','Điểm tổng kết','Đồng bộ điểm','Kết luận hội đồng','Trạng thái'];
+  const headers = ['Mã SV','Họ và tên','Lớp học phần','CTĐT','Loại hình','Đợt','Đề tài','GVHD','GVPB','Hội đồng','Trạng thái đề cương','Điểm tổng kết','Đồng bộ điểm','Kết luận','Xác nhận nộp quyển','Trạng thái'];
 
   const rows = list.map(s => {
     const dotName = (ROUNDS.find(r => r.id === s.dotId)||{}).name || s.dotId;
     const deCuongStage = s.topic ? getDeCuongStage(s) : null;
     const conclLabel = s.conclusion ? CONCLUSION_CFG[s.conclusion].label : 'Chưa kết luận';
+    const nopQuyenLabel = !canNopQuyen(s) ? '' : (s.nopQuyen && s.nopQuyen.daNop ? `Đã nộp — ${s.nopQuyen.ngayXacNhan}` : 'Chưa xác nhận');
     return [
       s.maSV,
       s.tenSV,
@@ -3084,6 +3312,7 @@ function exportDSSV(){
       s.diemTongKet != null ? s.diemTongKet.toFixed(1) : '—',
       s.dongBoDiem || '—',
       conclLabel,
+      nopQuyenLabel,
       s.status
     ];
   });

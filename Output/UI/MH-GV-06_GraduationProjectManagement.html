@@ -624,21 +624,57 @@
       <button class="modal-close" data-close="m-report-info">✕</button>
     </div>
     <div class="modal-bd">
-      <div style="font-size:13px;color:var(--text-2);margin-bottom:8px">File báo cáo chính thức</div>
+      <div id="rp-pending-alert" style="display:none;margin-bottom:14px" class="alert" style="border-color:#ffe58f;background:#fffbe6">
+        <span class="alert-ico">⏳</span>
+        <div class="alert-body"><div class="alert-title" style="color:#d48806">Đang chờ sinh viên nộp lại</div><span class="alert-desc" id="rp-pending-reason"></span></div>
+      </div>
+      <div style="font-size:13px;color:var(--text-2);margin-bottom:8px">File báo cáo hiện tại</div>
       <div style="display:flex;align-items:center;gap:8px;margin-bottom:16px">
         <span id="rp-file-name" style="font-family:monospace;color:#fa8c16"></span>
         <button class="btn btn-default btn-sm" onclick="viewReportFile()">👁️ Xem</button>
         <button class="btn btn-default btn-sm" onclick="downloadReportFile()">⬇️ Tải</button>
       </div>
       <div style="font-size:13px;color:var(--text-2);margin-bottom:8px">Mã nguồn / Sản phẩm</div>
-      <div style="display:flex;align-items:center;gap:8px">
+      <div style="display:flex;align-items:center;gap:8px;margin-bottom:16px">
         <a href="#" id="rp-sourcelink" onclick="return false" style="color:var(--primary)"></a>
         <button class="btn btn-default btn-sm" onclick="openReportSource()">🔗 Mở</button>
+      </div>
+      <div id="rp-history-wrap" style="display:none">
+        <div style="font-size:13px;color:var(--text-2);margin-bottom:8px">Lịch sử nộp</div>
+        <div id="rp-history-body" style="font-size:12px;color:var(--text-2)"></div>
       </div>
     </div>
     <div class="modal-ft">
       <button class="btn btn-default" data-close="m-report-info">Đóng</button>
-      <button class="btn btn-primary" onclick="allowResubmit()">🔓 Cho phép nộp lại</button>
+      <button class="btn btn-primary" id="rp-resubmit-btn" onclick="requestResubmitReport()">🔄 Yêu cầu nộp lại</button>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ MODAL: LÝ DO YÊU CẦU NỘP LẠI BÁO CÁO ═══ -->
+<div class="overlay hidden" id="m-report-resubmit-reason">
+  <div class="modal-box" style="width:480px">
+    <div class="modal-hd">
+      <span class="modal-title">🔄 Yêu cầu nộp lại báo cáo</span>
+      <button class="modal-close" data-close="m-report-resubmit-reason">✕</button>
+    </div>
+    <div class="modal-bd">
+      <div class="alert alert-warning" style="margin-bottom:16px">
+        <span class="alert-ico">⚠️</span>
+        <div class="alert-body">
+          <div class="alert-title">Sinh viên sẽ nhận được lý do này</div>
+          <span class="alert-desc">Bản báo cáo hiện tại vẫn được giữ trong lịch sử — sinh viên nộp bản mới sẽ không ghi đè, chỉ thêm vào danh sách các lần nộp.</span>
+        </div>
+      </div>
+      <div class="fi">
+        <label>Lý do yêu cầu nộp lại <span class="req">*</span></label>
+        <textarea class="fc" id="rrp-reason" rows="4" placeholder="Nhập lý do cụ thể để sinh viên chỉnh sửa và nộp lại..."></textarea>
+        <div class="fe" id="rrp-reason-err" style="display:none">Bắt buộc nhập lý do khi yêu cầu nộp lại</div>
+      </div>
+    </div>
+    <div class="modal-ft">
+      <button class="btn btn-default" data-close="m-report-resubmit-reason">Hủy</button>
+      <button class="btn btn-primary" onclick="confirmRequestResubmitReport()">🔄 Xác nhận yêu cầu</button>
     </div>
   </div>
 </div>
@@ -782,6 +818,27 @@ let students = [
     topic:TOPIC_CATALOG[2], gvhd:'TS. Nguyễn Minh Tuấn', gvpb:null, baoCao:null,
     decuong:{trangThai:'Chờ SV nộp', file:null, ngayNop:null, kePlan:[]},
     ghiChu:''},
+
+  {id:19, maSV:'B22DCCN135', tenSV:'Ngô Thị Bích Trâm', lop:'INT3110_2', ctdt:'HTTT', dotId:'DA-HK1-2025-2026', loaiHinh:'Đồ án tốt nghiệp',
+    topic:TOPIC_CATALOG[1], gvhd:'TS. Nguyễn Minh Tuấn', gvpb:null,
+    baoCao:{file:'BC_DATN_B22DCCN135_v1.pdf', ngayNop:'20/06/2026 22:10', dungHan:true, sourceUrl:'github.com/ngobichtram/datn-2026'},
+    choPhepNopLai:true, lyDoNopLai:'Chương 4 chưa có đánh giá thực nghiệm, cần bổ sung số liệu benchmark trước khi chấm.', baoCaoLichSu:[],
+    decuong:{trangThai:'Đã duyệt', file:'DeCuong_B22DCCN135_v1.docx', ngayNop:'15/04/2026',
+      kePlan:[
+        {tuan:1, nhiemVu:'Khảo sát yêu cầu, xây dựng đề cương chi tiết', ketQua:'Tài liệu đề cương chi tiết', ghiChu:'', trangThai:'Đã duyệt'},
+      ]},
+    ghiChu:''},
+
+  {id:20, maSV:'B22DCCN140', tenSV:'Bùi Quang Huy', lop:'INT3110_1', ctdt:'KTPM', dotId:'DA-HK1-2025-2026', loaiHinh:'Đồ án tốt nghiệp',
+    topic:TOPIC_CATALOG[2], gvhd:'TS. Nguyễn Minh Tuấn', gvpb:null,
+    baoCao:{file:'BC_DATN_B22DCCN140_v2.pdf', ngayNop:'25/06/2026 10:05', dungHan:true, sourceUrl:'github.com/buiquanghuy/datn-2026'},
+    choPhepNopLai:false, lyDoNopLai:'',
+    baoCaoLichSu:[{lan:1, file:'BC_DATN_B22DCCN140_v1.pdf', ngayNop:'18/06/2026 21:40', dungHan:true, sourceUrl:'github.com/buiquanghuy/datn-2026'}],
+    decuong:{trangThai:'Đã duyệt', file:'DeCuong_B22DCCN140_v1.docx', ngayNop:'12/04/2026',
+      kePlan:[
+        {tuan:1, nhiemVu:'Khảo sát yêu cầu, xây dựng đề cương chi tiết', ketQua:'Tài liệu đề cương chi tiết', ghiChu:'', trangThai:'Đã duyệt'},
+      ]},
+    ghiChu:''},
 ];
 
 /* ════════ TRẠNG THÁI ĐỀ CƯƠNG ════════ */
@@ -883,9 +940,12 @@ function renderRow(s){
          <div class="tbl-truncate" style="font-size:12px;color:var(--text-2);margin-top:2px">${s.hoiDong.name}</div>
        </div>`
     : `<span style="color:var(--text-3);font-size:12px">—</span>`;
+  const baoCaoLan = (s.baoCaoLichSu && s.baoCaoLichSu.length) ? s.baoCaoLichSu.length + 1 : null;
   const baoCaoCell = !s.baoCao
     ? `<span style="color:var(--text-3);font-size:12px">—</span>`
-    : `<a href="#" onclick="viewReport(${s.id});return false" title="Xem báo cáo">📄 Xem</a>`;
+    : s.choPhepNopLai
+      ? `<div><span class="ketluan-pill wait" style="cursor:default;margin-bottom:4px;display:inline-flex" title="${s.lyDoNopLai||''}">🔄 Chờ nộp lại</span><br><a href="#" onclick="viewReport(${s.id});return false" title="Xem báo cáo">Xem chi tiết</a></div>`
+      : `<a href="#" onclick="viewReport(${s.id});return false" title="Xem báo cáo">📄 Xem${baoCaoLan ? ` (lần ${baoCaoLan})` : ''}</a>`;
   const daoVanCell = !s.baoCao
     ? `<span style="color:var(--text-3);font-size:12px">—</span>`
     : s.daoVanNoiBo != null
@@ -1532,6 +1592,31 @@ function viewReport(id){
   const linkEl = document.getElementById('rp-sourcelink');
   linkEl.textContent = bc.sourceUrl || '—';
   linkEl.style.display = bc.sourceUrl ? '' : 'none';
+
+  const pendingAlert = document.getElementById('rp-pending-alert');
+  const resubmitBtn = document.getElementById('rp-resubmit-btn');
+  if (s.choPhepNopLai) {
+    pendingAlert.style.display = '';
+    document.getElementById('rp-pending-reason').textContent = s.lyDoNopLai || '';
+    resubmitBtn.disabled = true;
+    resubmitBtn.textContent = '⏳ Đang chờ SV nộp lại';
+  } else {
+    pendingAlert.style.display = 'none';
+    resubmitBtn.disabled = false;
+    resubmitBtn.textContent = '🔄 Yêu cầu nộp lại';
+  }
+
+  const lichSu = s.baoCaoLichSu || [];
+  const historyWrap = document.getElementById('rp-history-wrap');
+  if (lichSu.length) {
+    historyWrap.style.display = '';
+    document.getElementById('rp-history-body').innerHTML = lichSu.map(h =>
+      `<div style="margin-bottom:4px">Lần ${h.lan}: 📎 ${h.file} — nộp ${h.ngayNop}${h.dungHan === false ? ' <span style="color:var(--error)">(trễ hạn)</span>' : ''}</div>`
+    ).join('') + `<div>Lần ${lichSu.length + 1}: 📎 ${bc.file} — nộp ${bc.ngayNop} <span style="color:var(--primary)">(hiện tại)</span></div>`;
+  } else {
+    historyWrap.style.display = 'none';
+  }
+
   openModal('m-report-info');
 }
 function viewReportFile(){
@@ -1546,13 +1631,23 @@ function openReportSource(){
   const s = students.find(x => x.id === curReportStudentId);
   if (s && s.baoCao && s.baoCao.sourceUrl) showToast(`Đang mở ${s.baoCao.sourceUrl} (mô phỏng).`);
 }
-function allowResubmit(){
+function requestResubmitReport(){
+  const s = students.find(x => x.id === curReportStudentId);
+  if (!s || s.choPhepNopLai) return;
+  document.getElementById('rrp-reason').value = '';
+  document.getElementById('rrp-reason-err').style.display = 'none';
+  openModal('m-report-resubmit-reason');
+}
+function confirmRequestResubmitReport(){
+  const reason = document.getElementById('rrp-reason').value.trim();
+  if (!reason) { document.getElementById('rrp-reason-err').style.display = ''; return; }
   const s = students.find(x => x.id === curReportStudentId);
   if (!s) return;
-  s.baoCao = null;
-  s.daoVanNoiBo = null;
+  s.choPhepNopLai = true;
+  s.lyDoNopLai = reason;
+  closeModal('m-report-resubmit-reason');
   closeModal('m-report-info');
-  showToast(`Đã cho phép ${s.tenSV} nộp lại báo cáo.`);
+  showToast(`Đã yêu cầu ${s.tenSV} nộp lại báo cáo — báo cáo hiện tại vẫn được giữ lại.`, 'warn');
   render();
 }
 

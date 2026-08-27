@@ -21,6 +21,8 @@
     .ketluan-pill.wait{color:#d48806;background:#fffbe6;border-color:#ffe58f}
     .ketluan-pill.pass{color:#389e0d;background:#f6ffed;border-color:#b7eb8f}
     .ketluan-pill.fail{color:#cf1322;background:#fff1f0;border-color:#ffa39e}
+    .alert-error{background:#fff1f0;border-color:#ffa39e}
+    .alert-error .alert-ico,.alert-error .alert-title{color:#cf1322}
     .stat-grid8{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:20px}
     .stat-box{background:#fff;border:1px solid var(--border);border-radius:8px;padding:12px 14px;display:flex;align-items:center;gap:10px;cursor:pointer;transition:box-shadow .15s,border-color .15s}
     .stat-box:hover{box-shadow:0 4px 14px rgba(0,0,0,.08);border-color:var(--primary)}
@@ -715,7 +717,6 @@
             <tbody id="ahd-council-body"></tbody>
           </table>
         </div>
-        <div class="f-hint" id="ahd-council-hint"></div>
         <div id="ahd-sv-warning" style="margin-top:10px"></div>
       </div>
       <div class="fe" id="ahd-err" style="display:none">Vui lòng chọn hội đồng.</div>
@@ -1368,10 +1369,26 @@ const SV_BUSY_SCHEDULE = {
     { date:'2026-07-05', start:'08:00', end:'10:00', loai:'Lịch thi', ghiChu:'Thi cuối kỳ môn Mạng máy tính — Phòng B2-201' }
   ],
   'B22DCCN022': [
+    { date:'2026-07-05', start:'08:30', end:'10:30', loai:'Lịch học', ghiChu:'Học bù môn Cơ sở dữ liệu nâng cao — Phòng A1-210' },
     { date:'2026-07-06', start:'07:30', end:'09:30', loai:'Lịch học', ghiChu:'Học bù môn Kiến trúc máy tính — Phòng A1-305' }
   ],
   'B22DCCN033': [
     { date:'2026-07-07', start:'13:00', end:'15:00', loai:'Lịch hoạt động ngoại khóa', ghiChu:'Hội thao sinh viên Khoa CNTT' }
+  ],
+  'B22DCCN015': [
+    { date:'2026-07-05', start:'08:00', end:'10:00', loai:'Lịch học', ghiChu:'Học môn Phân tích thiết kế hệ thống — Phòng A1-303' }
+  ],
+  'B22DCCN047': [
+    { date:'2026-07-05', start:'09:00', end:'11:00', loai:'Lịch thi', ghiChu:'Thi giữa kỳ môn Trí tuệ nhân tạo — Phòng B2-204' }
+  ],
+  'B22DCCN058': [
+    { date:'2026-07-05', start:'07:30', end:'09:00', loai:'Lịch học', ghiChu:'Học môn Kiểm thử phần mềm — Phòng A1-306' }
+  ],
+  'B22DCCN089': [
+    { date:'2026-07-05', start:'08:00', end:'09:30', loai:'Lịch hoạt động ngoại khóa', ghiChu:'Sinh hoạt CLB Học thuật CNTT' }
+  ],
+  'B22DCCN071': [
+    { date:'2026-07-05', start:'08:30', end:'10:00', loai:'Lịch thi', ghiChu:'Thi cuối kỳ môn An toàn thông tin — Phòng B2-206' }
   ]
 };
 
@@ -2638,7 +2655,6 @@ function openAssignHoiDong(id){
   document.getElementById('ahd-f-phanloai').innerHTML = '<option value="">-- Phân loại --</option>' + plSet.map(p => `<option value="${p}">${p}</option>`).join('');
   const dvSet = [...new Set(COUNCIL_CATALOG.map(c => c.donvi))];
   document.getElementById('ahd-f-donvi').innerHTML = '<option value="">-- Đơn vị --</option>' + dvSet.map(d => `<option value="${d}">${d}</option>`).join('');
-  document.getElementById('ahd-council-hint').textContent = '';
   document.getElementById('ahd-sv-warning').innerHTML = '';
   document.getElementById('ahd-err').style.display = 'none';
   renderAhdCouncilTable();
@@ -2668,13 +2684,19 @@ function renderAhdCouncilTable(){
       <td style="font-size:12px">${c.phong}</td>
     </tr>`).join('') : `<tr><td colspan="9" style="text-align:center;color:var(--text-3);padding:16px;font-style:italic">Không có hội đồng phù hợp</td></tr>`;
 }
+let _ahdBlockedByConflict = false;
 function onAhdCouncilChange(){
   const sel = document.querySelector('input[name="ahd-council-radio"]:checked');
   const c = sel ? COUNCIL_CATALOG.find(x => x.code === sel.value) : null;
-  document.getElementById('ahd-council-hint').textContent = c ? `${c.hocKy} · ${c.donvi} · ${c.hinhThuc || ''} · ${c.ngay} ${c.gio} · ${c.phong}` : '';
 
   const warnEl = document.getElementById('ahd-sv-warning');
+  _ahdBlockedByConflict = false;
   if (!c) { warnEl.innerHTML = ''; return; }
+
+  if (c.phanLoai === 'Hội đồng chấm điểm') {
+    warnEl.innerHTML = '';
+    return;
+  }
 
   const targetStudents = students.filter(s => _assignTargetIds.includes(s.id));
   const conflicts = checkStudentScheduleConflicts(c, targetStudents);
@@ -2682,10 +2704,11 @@ function onAhdCouncilChange(){
     warnEl.innerHTML = `<div class="alert alert-success"><span class="alert-ico">✅</span><div class="alert-body"><div class="alert-title">Không có sinh viên nào trùng lịch</div></div></div>`;
     return;
   }
+  _ahdBlockedByConflict = true;
   const rows = conflicts.map(r => `<li><strong>${r.student.maSV} — ${r.student.tenSV}</strong>: trùng ${r.conflict.loai.toLowerCase()} ${r.conflict.start}-${r.conflict.end} (${r.conflict.ghiChu})</li>`).join('');
-  warnEl.innerHTML = `<div class="alert alert-warning"><span class="alert-ico">⚠️</span><div class="alert-body">
-      <div class="alert-title">${conflicts.length} sinh viên trùng lịch với khung giờ hội đồng (${c.ngay} ${c.gio})</div>
-      <div class="alert-desc">Nguồn: Lịch sinh viên (lịch học/thi/hoạt động ngoại khóa — hệ thống đào tạo). Đây chỉ là cảnh báo, vẫn có thể tiếp tục phân hội đồng.</div>
+  warnEl.innerHTML = `<div class="alert alert-error"><span class="alert-ico">⛔</span><div class="alert-body">
+      <div class="alert-title">Không thể phân hội đồng — ${conflicts.length} sinh viên trùng lịch với hội đồng ${c.code} (${c.hocKy}) — ${c.ngay} ${c.gio}</div>
+      <div class="alert-desc">Nguồn: Lịch sinh viên (lịch học/thi/hoạt động ngoại khóa — hệ thống đào tạo). Vui lòng chọn hội đồng/thời gian khác hoặc loại bỏ sinh viên trùng lịch khỏi lượt phân công này.</div>
       <ul style="margin:6px 0 0;padding-left:18px">${rows}</ul>
     </div></div>`;
 }
@@ -2694,6 +2717,10 @@ function saveAssignHoiDong(){
   const errEl = document.getElementById('ahd-err');
   if (!sel) { errEl.style.display = ''; return; }
   errEl.style.display = 'none';
+  if (_ahdBlockedByConflict) {
+    showToast('Không thể lưu — còn sinh viên trùng lịch với hội đồng đã chọn.', 'err');
+    return;
+  }
   const hoiDong = COUNCIL_CATALOG.find(c => c.code === sel.value);
   showConfirm(`Xác nhận phân hội đồng "${hoiDong.code} — ${hoiDong.name}" cho ${_assignTargetIds.length} sinh viên đã chọn?`, () => {
     _doSaveAssignHoiDong(hoiDong);

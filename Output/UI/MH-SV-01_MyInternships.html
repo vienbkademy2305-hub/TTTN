@@ -1151,6 +1151,10 @@
             <button class="btn btn-default btn-sm">🔗 Mở</button>
           </div>
         </div>
+        <div class="fi" id="dbc-history-wrap" style="display:none">
+          <label>Lịch sử nộp</label>
+          <div id="dbc-history-body" style="font-size:12px;color:var(--text-2)"></div>
+        </div>
       </div>
 
       <!-- Nếu chưa nộp hoặc được yêu cầu nộp lại (upload mode) -->
@@ -2213,11 +2217,14 @@ function renderDaklTable() {
       ? `<span class="cell-na">—</span>`
       : `<span class="ketluan-pill ${stageCfg.pillCls}" onclick="openDaklDeCuongView('${d.maDot}')" style="cursor:pointer">${stage}</span>`;
 
+    const baoCaoLan = (d.baoCaoLichSu && d.baoCaoLichSu.length) ? d.baoCaoLichSu.length + 1 : null;
     const baoCaoCell = (!d.decuong || stage !== 'Đã duyệt')
       ? `<span class="cell-na" title="Chỉ mở sau khi đề cương được duyệt">N/A</span>`
-      : (d.baoCao && !d.choPhepNopLai)
-        ? `<span class="cell-link" onclick="openDaklReport('${d.maDot}')">Chi tiết</span>`
-        : `<button class="btn btn-primary btn-sm" onclick="openDaklReport('${d.maDot}')">Nộp</button>`;
+      : d.choPhepNopLai
+        ? `<div><span class="ketluan-pill fail" style="cursor:default;margin-bottom:4px;display:inline-flex" title="${d.lyDoNopLai||''}">⚠️ Yêu cầu nộp lại</span><br><button class="btn btn-primary btn-sm" onclick="openDaklReport('${d.maDot}')">Nộp lại</button></div>`
+        : d.baoCao
+          ? `<span class="cell-link" onclick="openDaklReport('${d.maDot}')">Chi tiết${baoCaoLan ? ` (lần ${baoCaoLan})` : ''}</span>`
+          : `<button class="btn btn-primary btn-sm" onclick="openDaklReport('${d.maDot}')">Nộp</button>`;
 
     const hoiDongCell = d.hoiDong
       ? `<div style="cursor:pointer" onclick="openDaklHoiDong('${d.maDot}')" title="Xem thông tin hội đồng">
@@ -2523,6 +2530,16 @@ function openDaklReport(maDot) {
     const linkWrap = document.getElementById('dbc-link-wrap');
     if (d.baoCao.sourceUrl) { linkEl.textContent = d.baoCao.sourceUrl; linkWrap.style.display = ''; }
     else { linkWrap.style.display = 'none'; }
+    const lichSu = d.baoCaoLichSu || [];
+    const historyWrap = document.getElementById('dbc-history-wrap');
+    if (lichSu.length) {
+      historyWrap.style.display = '';
+      document.getElementById('dbc-history-body').innerHTML = lichSu.map(h =>
+        `<div style="margin-bottom:4px">Lần ${h.lan}: 📎 ${h.file} — nộp ${h.ngayNop}</div>`
+      ).join('') + `<div>Lần ${lichSu.length + 1}: 📎 ${d.baoCao.file} — nộp ${d.baoCao.ngayNop} <span style="color:var(--primary)">(hiện tại)</span></div>`;
+    } else {
+      historyWrap.style.display = 'none';
+    }
   } else {
     viewEl.style.display = 'none';
     uploadEl.style.display = '';
@@ -2564,6 +2581,10 @@ function submitDaklBaoCao() {
   const fileInput = document.getElementById('dbc-file-input');
   const d = getDaklByMaDot(curDaklMaDot);
   if (d) {
+    if (d.baoCao) {
+      const lichSu = d.baoCaoLichSu || [];
+      d.baoCaoLichSu = [...lichSu, { ...d.baoCao, lan: lichSu.length + 1 }];
+    }
     d.baoCao = {
       file: fileInput.files[0].name,
       ngayNop: new Date().toLocaleString('vi-VN'),

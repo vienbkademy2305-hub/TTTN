@@ -6,6 +6,8 @@
   <title>Quản lý ĐATN & KLTN | PĐT · GVK · Giảng viên</title>
   <link rel="stylesheet" href="_styles.css">
   <style>
+    .alert-danger{background:#fff1f0;border-color:#ffa39e}
+    .alert-danger .alert-ico,.alert-danger .alert-title{color:#cf1322}
     .bulk-bar.hidden{display:none}
     .icon-btn:disabled{opacity:.35;cursor:not-allowed}
     .icon-btn:disabled:hover{background:transparent;border-color:transparent}
@@ -372,7 +374,7 @@
                 <th style="width:150px" data-col="decuongtt">Trạng thái đề cương</th>
                 <th style="width:160px;text-align:center" data-col="ketluanhd" title="Kết luận của hội đồng chấm điểm">Kết luận</th>
                 <th style="width:170px;text-align:center" data-col="nopquyen" title="Thư viện/Khoa chuyên môn xác nhận SV đã nộp quyển — chỉ áp dụng khi Kết luận Đạt/Đạt nhưng cần chỉnh sửa">Xác nhận nộp quyển</th>
-                <th style="width:110px;text-align:center" data-col="dongbo" title="Trạng thái đồng bộ điểm sang hệ thống đào tạo">Đồng bộ điểm</th>
+                <th style="width:110px;text-align:center" data-col="dongbo" title="Trạng thái đồng bộ điểm sang Lớp học phần">Đồng bộ điểm</th>
                 <th style="width:128px" data-col="quyetdinh">Quyết định</th>
                 <th style="min-width:180px" data-col="ghichuhd">Ghi chú</th>
                 <th style="width:96px;text-align:center">Hành động</th>
@@ -1203,6 +1205,51 @@
     <div class="modal-bd" id="qd-body"></div>
     <div class="modal-ft" id="qd-footer">
       <button class="btn btn-default" data-close="m-decision">Đóng</button>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ MODAL: Lỗi đồng bộ — Lớp học phần đã khóa điểm (thông báo riêng, tách khỏi popup xác nhận) ═══ -->
+<div class="overlay hidden" id="m-sync-diem-error">
+  <div class="modal-box" style="width:460px">
+    <div class="modal-hd">
+      <span class="modal-title" style="color:#cf1322">❌ Lỗi: Lớp học phần đã khóa điểm</span>
+      <button class="modal-close" data-close="m-sync-diem-error">✕</button>
+    </div>
+    <div class="modal-bd">
+      <div class="alert alert-danger">
+        <span class="alert-ico">⚠</span>
+        <div class="alert-body">
+          <div class="alert-title">Không đồng bộ được</div>
+          <span class="alert-desc" id="sd-locked-msg"></span>
+        </div>
+      </div>
+    </div>
+    <div class="modal-ft">
+      <button class="btn btn-primary" onclick="afterSyncDiemError()">Đã hiểu</button>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ MODAL: Xác nhận Đồng bộ điểm sang Lớp học phần ═══ -->
+<div class="overlay hidden" id="m-sync-diem-confirm">
+  <div class="modal-box" style="width:480px">
+    <div class="modal-hd">
+      <span class="modal-title">🔄 Xác nhận Đồng bộ điểm</span>
+      <button class="modal-close" data-close="m-sync-diem-confirm">✕</button>
+    </div>
+    <div class="modal-bd">
+      <div class="alert alert-warning">
+        <span class="alert-ico">⚠️</span>
+        <div class="alert-body">
+          <div class="alert-title">Điểm sẽ được ghi nhận chính thức sau khi đồng bộ</div>
+          <span class="alert-desc" id="sd-confirm-msg"></span>
+        </div>
+      </div>
+    </div>
+    <div class="modal-ft">
+      <button class="btn btn-default" data-close="m-sync-diem-confirm">Hủy</button>
+      <button class="btn btn-primary" onclick="confirmSyncDiem()">🔄 Xác nhận Đồng bộ</button>
     </div>
   </div>
 </div>
@@ -2198,7 +2245,7 @@ let students = [
     qdGiaHanList:[{so:'120/QĐ-PĐT', ngay:'20/05/2026', donViBanHanh:'Phòng Đào tạo', nguoiKy:'Nguyễn Thị Lan — Trưởng phòng Đào tạo', file:'QD-120-PDT-2026.pdf', hanMoi:'15/06/2026'}],
     nxGVHD:{diem:8.5, ketLuan:'Đồng ý', noiDung:'Quyển khóa luận trình bày đầy đủ, đúng quy định, sinh viên nắm vững kiến thức chuyên môn.', ngay:'21/06/2026', file:'PhieuNhanXet_GVHD_B21DCCN076.docx', ghiChu:''},
     nxGVPB:{diem:8.0, ketLuan:'Đồng ý', noiDung:'Nội dung đáp ứng yêu cầu khóa luận, dashboard trực quan. Cần làm rõ hơn phần đánh giá hiệu năng hệ thống.', ngay:'22/06/2026', file:'PhieuNhanXet_GVPB_B21DCCN076.docx', ghiChu:'Khuyến nghị bổ sung benchmark hiệu năng ở chương 4.'},
-    diemHoiDong:8.3, diemTongKet:8.3, dongBoDiem:'Lỗi đồng bộ', dongBoLoi:'Mã sinh viên không khớp với hệ thống đào tạo (CTMS)',
+    diemHoiDong:8.3, diemTongKet:8.3, dongBoDiem:'Đã khóa', dongBoLoi:'Lớp học phần đã khóa điểm — cần phía Lớp học phần mở khóa mới đồng bộ lại được', diemKhoa:true,
     history:[
       {time:'15/03/2026', actor:'Hệ thống', action:'Công bố đợt — SV đủ điều kiện', result:'', dot:'ok'},
       {time:'20/03/2026', actor:'Bùi Văn Khải', action:'Đăng ký nguyện vọng GVHD: TS. Lê Thị Mai', result:'', dot:'ok'},
@@ -2315,7 +2362,7 @@ let students = [
     qdGiao:{so:'102/QĐ-PĐT', ngay:'05/05/2026', donViBanHanh:'Phòng Đào tạo', nguoiKy:'Nguyễn Thị Lan — Trưởng phòng Đào tạo', file:'QD-102-PDT-2026.pdf'},
     nxGVHD:{diem:8.0, ketLuan:'Đồng ý', noiDung:'Sinh viên thực hiện tốt, kết quả mô phỏng đạt yêu cầu.', ngay:'20/06/2026', file:'PhieuNhanXet_GVHD_B22DDDT001.docx', ghiChu:''},
     nxGVPB:{diem:7.5, ketLuan:'Đồng ý', noiDung:'Cần bổ sung thêm thực nghiệm trên phần cứng thực.', ngay:'21/06/2026', file:'PhieuNhanXet_GVPB_B22DDDT001.docx', ghiChu:''},
-    diemHoiDong:8.0, diemTongKet:7.9, dongBoDiem:'Chưa đồng bộ',
+    diemHoiDong:8.0, diemTongKet:7.9, dongBoDiem:'Chưa đồng bộ', diemSyncWillError:true,
     history:[
       {time:'01/03/2026', actor:'Hệ thống', action:'Công bố đợt — SV đủ điều kiện', result:'', dot:'ok'},
       {time:'10/03/2026', actor:'Đinh Thị Lan', action:'Đăng ký nguyện vọng GVHD: ThS. Nguyễn Văn Dũng', result:'', dot:'ok'},
@@ -2589,8 +2636,12 @@ function render(){
       : (s.nopQuyen && s.nopQuyen.daNop
           ? `<span class="ketluan-pill pass" onclick="openNopQuyen(${s.id})" title="${s.nopQuyen.minhChung ? '📎 ' + s.nopQuyen.minhChung : 'Chưa có minh chứng'}">✅ Đã nộp — ${s.nopQuyen.ngayXacNhan}</span>`
           : `<span class="ketluan-pill wait" onclick="openNopQuyen(${s.id})" title="Xác nhận sinh viên đã nộp quyển">⏳ Chưa xác nhận</span>`);
-    const dongBoCell = s.diemTongKet != null && s.dongBoDiem === 'Đã đồng bộ'
+    const dongBoCell = s.dongBoDiem === 'Đã đồng bộ'
       ? `<span style="font-size:12px" title="Đã đồng bộ ${s.dongBoNgay||''}">Đã đồng bộ</span>`
+      : s.dongBoDiem === 'Đã khóa'
+      ? `<span style="color:var(--error);font-size:12px;cursor:help" title="${s.dongBoLoi||'Đã khóa'}">🔒 Đã khóa</span>`
+      : s.dongBoDiem === 'Lỗi đồng bộ'
+      ? `<span style="color:var(--error);font-size:12px;cursor:help" title="${s.dongBoLoi||'Lỗi đồng bộ'}">⚠ Lỗi đồng bộ</span>`
       : `<span style="color:var(--text-3);font-size:12px">Chưa đồng bộ</span>`;
     const ghiChuHoiDongCell = (s.hoiDong && s.hoiDong.completeNote)
       ? `<span style="font-size:12px;color:var(--text-2)">${s.hoiDong.completeNote}</span>`
@@ -4130,14 +4181,59 @@ function saveBulkKetLuanHoiDong(){
 }
 
 /* ════════ CHỨC NĂNG: ĐỒNG BỘ ĐIỂM (HÀNG LOẠT) ════════ */
+// UC-DATN-PDT-009: Đồng bộ điểm hàng loạt sang Lớp học phần — SV đã có Điểm tổng kết mới được gửi
+// yêu cầu (EX-01). 2 loại thất bại, xử lý KHÁC nhau (giống MH-TTTN-01):
+//  - diemKhoa=true  ("Đã khóa"): biết TRƯỚC khi gửi → chặn bằng popup lỗi riêng, tách khỏi
+//    popup xác nhận, để GVK/PĐT có cơ hội bỏ ra trước khi đồng bộ.
+//  - diemSyncWillError=true ("Lỗi đồng bộ"): chỉ phát hiện ĐƯỢC lúc thử đồng bộ (vd lỗi kỹ
+//    thuật tạm thời) → không chặn trước, cứ gửi yêu cầu bình thường, kết quả trả thông báo
+//    (cột "Đồng bộ điểm" + toast) sau khi thử xong — không cần popup riêng.
+let _syncDiemPendingIds = [];
 function syncDiemBulk(){
   if (!selectedIds.length) { showToast('Vui lòng chọn ít nhất 1 sinh viên', 'warn'); return; }
   const list = students.filter(s => selectedIds.includes(s.id) && s.diemTongKet != null);
   if (!list.length) { showToast('Các sinh viên đã chọn chưa có điểm cuối để đồng bộ', 'warn'); return; }
+
+  const locked = list.filter(s => s.diemKhoa);
+  _syncDiemPendingIds = list.map(s => s.id);
+
+  if (locked.length) {
+    document.getElementById('sd-locked-msg').innerHTML = '<strong>Lỗi: Lớp học phần đã khóa điểm, không đồng bộ được</strong> cho ' + locked.length + ' sinh viên: ' + locked.map(s => s.maSV + ' (' + s.tenSV + ')').join(', ') + '. Cần phía Lớp học phần mở khóa trước.';
+    openModal('m-sync-diem-error');
+    return; // popup xác nhận (nếu còn SV hợp lệ) chỉ mở sau khi đóng popup lỗi — afterSyncDiemError()
+  }
+  openSyncDiemConfirmModal(list.length);
+}
+
+function openSyncDiemConfirmModal(count){
+  document.getElementById('sd-confirm-msg').innerHTML = 'Thao tác sẽ đồng bộ Điểm tổng kết cho <strong>' + count + ' sinh viên</strong> sang Lớp học phần.';
+  openModal('m-sync-diem-confirm');
+}
+
+function afterSyncDiemError(){
+  closeModal('m-sync-diem-error');
+  // Loại hẳn SV đã khóa khỏi lượt đồng bộ — lỗi đã báo riêng, không lặp lại ở toast cuối.
+  _syncDiemPendingIds = _syncDiemPendingIds.filter(id => !students.find(s => s.id === id)?.diemKhoa);
+  if (_syncDiemPendingIds.length) openSyncDiemConfirmModal(_syncDiemPendingIds.length);
+  // Toàn bộ SV đã chọn đều bị khóa → _syncDiemPendingIds rỗng, không còn gì để đồng bộ.
+}
+
+function confirmSyncDiem(){
+  closeModal('m-sync-diem-confirm');
+  const ids = _syncDiemPendingIds;
+  _syncDiemPendingIds = [];
+  if (!ids.length) return;
   const today = new Date().toLocaleDateString('vi');
-  const ids = list.map(s => s.id);
-  students = students.map(x => ids.includes(x.id) ? { ...x, dongBoDiem:'Đã đồng bộ', dongBoNgay: today } : x);
-  showToast(`Đã đồng bộ điểm cho ${list.length} sinh viên.`);
+  const errored = [], synced = [];
+  students = students.map(x => {
+    if (!ids.includes(x.id)) return x;
+    if (x.diemSyncWillError) { errored.push(x.maSV); return { ...x, dongBoDiem:'Lỗi đồng bộ', dongBoLoi:'Lỗi kết nối phân hệ Lớp học phần, vui lòng thử đồng bộ lại' }; }
+    synced.push(x.maSV);
+    return { ...x, dongBoDiem:'Đã đồng bộ', dongBoNgay: today };
+  });
+  let msg = synced.length ? `Đã đồng bộ điểm cho ${synced.length} sinh viên.` : '';
+  if (errored.length) msg += (msg ? ' ' : '') + `Lỗi đồng bộ cho ${errored.length} sinh viên (${errored.join(', ')}), vui lòng thử lại.`;
+  showToast(msg, errored.length ? 'err' : 'ok');
   render();
 }
 
@@ -4643,8 +4739,12 @@ function me_renderRow(s){
         ? `<span style="font-size:13px">${me_CONCLUSION_CFG[s.conclusion].label}</span>`
         : `<span class="conclusion-tag ${me_CONCLUSION_CFG[s.conclusion].cls}">${me_CONCLUSION_CFG[s.conclusion].label}</span>`)
     : `<span style="color:var(--text-3);font-size:12px">— Chưa kết luận —</span>`;
-  const dongBoCell = s.diemTongKet != null && s.dongBoDiem === 'Đã đồng bộ'
+  const dongBoCell = s.dongBoDiem === 'Đã đồng bộ'
     ? `<span style="font-size:12px" title="Đã đồng bộ ${s.dongBoNgay||''}">Đã đồng bộ</span>`
+    : s.dongBoDiem === 'Đã khóa'
+    ? `<span style="color:var(--error);font-size:12px;cursor:help" title="${s.dongBoLoi||'Đã khóa'}">🔒 Đã khóa</span>`
+    : s.dongBoDiem === 'Lỗi đồng bộ'
+    ? `<span style="color:var(--error);font-size:12px;cursor:help" title="${s.dongBoLoi||'Lỗi đồng bộ'}">⚠ Lỗi đồng bộ</span>`
     : `<span style="color:var(--text-3);font-size:12px">Chưa đồng bộ</span>`;
   const ghiChuCell = s.ghiChu
     ? `<span style="font-size:12px;color:var(--text-2)">${s.ghiChu}</span>`

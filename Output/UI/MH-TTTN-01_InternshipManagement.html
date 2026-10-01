@@ -56,6 +56,12 @@
     .tpd-5{background:#e6f4ff;color:#1677ff;border-color:#91caff}           /* Đang thực hiện */
     .tpd-6{background:#f6ffed;color:#389e0d;border-color:#b7eb8f}           /* Đã chấm điểm */
     .tpd-7{background:#f0f5ff;color:#2f54eb;border-color:#adc6ff}           /* Đã công bố */
+    .diem-sync-badge{display:inline-block;padding:1px 10px;border-radius:10px;font-size:12px;border:1px solid}
+    .diem-sync-chua{background:#fafafa;color:#8c8c8c;border-color:#d9d9d9}
+    .diem-sync-da{background:#f6ffed;color:#389e0d;border-color:#b7eb8f}
+    .diem-sync-khoa{background:#fff1f0;color:#cf1322;border-color:#ffa39e}
+    .alert-danger{background:#fff1f0;border-color:#ffa39e}
+    .alert-danger .alert-ico,.alert-danger .alert-title{color:#cf1322}
 
     .bulk-bar{background:#e6f4ff;border:1px solid #91caff;border-radius:6px;padding:10px 14px;display:none;align-items:center;gap:10px;margin-bottom:12px}
     .bulk-bar.show{display:flex}
@@ -302,7 +308,9 @@
       <div class="bulk-bar" id="bulk-bar">
         <span style="font-size:13px;color:var(--primary);font-weight:600"><span id="selected-count">0</span> SV đã chọn</span>
         <button class="btn btn-primary btn-sm" onclick="openBulkAssign()">👨‍🏫 Phân công GVHD hàng loạt</button>
+        <button class="btn btn-default btn-sm" onclick="openBulkAssignDN()">🏢 Phân doanh nghiệp hàng loạt</button>
         <button class="btn btn-default btn-sm" id="btn-bulk-qd" onclick="openBulkQD()">📜 Tạo Quyết định hàng loạt</button>
+        <button class="btn btn-default btn-sm" onclick="syncDiemBulk()">🔄 Đồng bộ điểm</button>
         <button class="btn btn-default btn-sm" onclick="clearSelection()">✕ Bỏ chọn tất cả</button>
       </div>
 
@@ -313,6 +321,8 @@
           <div class="colvis-panel hidden" id="func-panel">
             <button type="button" class="func-item" onclick="closeFuncPanel();openBulkQD()">✏️ Tạo quyết định</button>
             <button type="button" class="func-item" onclick="closeFuncPanel();openBulkAssign()">👥 Phân công GVHD</button>
+            <button type="button" class="func-item" onclick="closeFuncPanel();openBulkAssignDN()">🏢 Phân doanh nghiệp</button>
+            <button type="button" class="func-item" onclick="closeFuncPanel();syncDiemBulk()">🔄 Đồng bộ điểm</button>
             <button type="button" class="func-item" onclick="closeFuncPanel();syncLopHocPhan()">🔄 Đồng bộ lớp học phần</button>
             <button type="button" class="func-item" onclick="closeFuncPanel();toast('Đang xuất danh sách sinh viên ra Excel...','warning')">⬇️ Xuất excel</button>
             <button type="button" class="func-item" onclick="closeFuncPanel();toast('Đang xuất điểm TTTN...','warning')">⬇️ Xuất điểm TTTN</button>
@@ -339,6 +349,7 @@
                 <th style="text-align:center;min-width:80px">File BC</th>
                 <th style="text-align:center;min-width:110px">Điểm thành phần</th>
                 <th style="text-align:center;min-width:150px">Trạng thái</th>
+                <th style="text-align:center;min-width:130px">Trạng thái điểm</th>
                 <th style="text-align:center;min-width:130px">Quyết định</th>
                 <th style="text-align:center;min-width:100px">Hành động</th>
               </tr>
@@ -368,6 +379,7 @@
                 <td style="text-align:center"><span class="cell-link" onclick="openFileBc('B22DCCN001','Nguyễn Văn An')">Chi tiết</span></td>
                 <td style="text-align:center"><span class="cell-link" onclick="openDiemThanhPhan('B22DCCN001','Nguyễn Văn An')">Chi tiết</span></td>
                 <td style="text-align:center"><span class="tpd-7">● Đã công bố</span></td>
+                <td style="text-align:center"><span class="diem-sync-badge diem-sync-khoa">🔒 Đã khoá</span></td>
                 <td style="text-align:center"><span class="cell-link" onclick="viewQD('125/QĐ-ĐHDT')">125/QĐ-ĐHDT</span></td>
                 <td style="text-align:center;white-space:nowrap"><button class="icon-btn" disabled title="Đã công bố — chỉ xem điểm">✎</button><button class="icon-btn" onclick="openHistory('B22DCCN001','Nguyễn Văn An')" title="Xem lịch sử thao tác">📋</button><button class="icon-btn" onclick="openRequests('B22DCCN001','Nguyễn Văn An')" title="DS yêu cầu của sinh viên">📩</button></td>
               </tr>
@@ -395,6 +407,7 @@
                 <td style="text-align:center"><span class="cell-na">N/A</span></td>
                 <td style="text-align:center"><span class="cell-na" style="cursor:pointer" onclick="openDiemThanhPhan('B22DCCN015','Lê Thị Bích')">—</span></td>
                 <td style="text-align:center"><span class="tpd-3">● Yêu cầu chỉnh sửa</span></td>
+                <td style="text-align:center"><span class="diem-sync-badge diem-sync-chua">Chưa đồng bộ</span></td>
                 <td style="text-align:center;color:var(--text-3);font-size:13px">—</td>
                 <td style="text-align:center;white-space:nowrap"><button class="icon-btn" disabled title="Sinh viên chưa nộp báo cáo">✎</button><button class="icon-btn" onclick="openHistory('B22DCCN015','Lê Thị Bích')" title="Xem lịch sử thao tác">📋</button><button class="icon-btn" onclick="openRequests('B22DCCN015','Lê Thị Bích')" title="DS yêu cầu của sinh viên">📩</button></td>
               </tr>
@@ -422,6 +435,7 @@
                 <td style="text-align:center"><span class="cell-na">N/A</span></td>
                 <td style="text-align:center"><span class="cell-na">_._</span></td>
                 <td style="text-align:center"><span class="tpd-4">● Chờ Khoa/Trường duyệt</span></td>
+                <td style="text-align:center"><span class="diem-sync-badge diem-sync-chua">Chưa đồng bộ</span></td>
                 <td style="text-align:center;color:var(--text-3);font-size:13px">—</td>
                 <td style="text-align:center;white-space:nowrap"><button class="icon-btn" disabled title="Sinh viên chưa nộp báo cáo">✎</button><button class="icon-btn" onclick="openHistory('B22DCCN033','Lê Quốc Cường')" title="Xem lịch sử thao tác">📋</button><button class="icon-btn" onclick="openRequests('B22DCCN033','Lê Quốc Cường')" title="DS yêu cầu của sinh viên">📩</button></td>
               </tr>
@@ -449,6 +463,7 @@
                 <td style="text-align:center"><span class="cell-na">N/A</span></td>
                 <td style="text-align:center"><span class="cell-na">_._</span></td>
                 <td style="text-align:center"><span class="tpd-0">● Chưa phân công GVHD</span></td>
+                <td style="text-align:center"><span class="diem-sync-badge diem-sync-chua">Chưa đồng bộ</span></td>
                 <td style="text-align:center;color:var(--text-3);font-size:13px">—</td>
                 <td style="text-align:center;white-space:nowrap"><button class="icon-btn" onclick="openHistory('B22DCCN047','Phạm Thị Dung')" title="Xem lịch sử thao tác">📋</button><button class="icon-btn" onclick="openRequests('B22DCCN047','Phạm Thị Dung')" title="DS yêu cầu của sinh viên">📩</button></td>
               </tr>
@@ -474,8 +489,9 @@
                 </td>
                 <td style="text-align:center"><span class="cell-link" onclick="openDeCanvas('B22DCCN058','Hoàng Minh Đức')">Chi tiết</span></td>
                 <td style="text-align:center"><span class="cell-link" onclick="openFileBc('B22DCCN058','Hoàng Minh Đức')">Chi tiết</span></td>
-                <td style="text-align:center"><span class="cell-na" style="cursor:pointer" onclick="openDiemThanhPhan('B22DCCN058','Hoàng Minh Đức')">—</span></td>
+                <td style="text-align:center"><span class="cell-link" onclick="openDiemThanhPhan('B22DCCN058','Hoàng Minh Đức')">Chi tiết</span></td>
                 <td style="text-align:center"><span class="tpd-6">● Đã chấm điểm</span></td>
+                <td style="text-align:center"><span class="diem-sync-badge diem-sync-chua">Chưa đồng bộ</span></td>
                 <td style="text-align:center;color:var(--text-3);font-size:13px">—</td>
                 <td style="text-align:center;white-space:nowrap"><button class="icon-btn" onclick="openDiemThanhPhan('B22DCCN058','Hoàng Minh Đức')" title="Chấm điểm">✎</button><button class="icon-btn" onclick="openHistory('B22DCCN058','Hoàng Minh Đức')" title="Xem lịch sử thao tác">📋</button><button class="icon-btn" onclick="openRequests('B22DCCN058','Hoàng Minh Đức')" title="DS yêu cầu của sinh viên">📩</button></td>
               </tr>
@@ -851,6 +867,124 @@
     <div class="modal-ft">
       <button class="btn btn-default" onclick="closeModal('modal-multi-gv')">Đóng</button>
       <button class="btn btn-primary" onclick="saveMultiGV()">💾 Lưu cấu hình</button>
+    </div>
+  </div>
+</div>
+
+<!-- Modal: Phân doanh nghiệp thực tập hàng loạt -->
+<div class="overlay hidden" id="modal-bulk-dn">
+  <div class="modal-box" style="width:560px;max-height:90vh">
+    <div class="modal-hd">
+      <span class="modal-title">🏢 Phân doanh nghiệp thực tập hàng loạt</span>
+      <button class="modal-close" onclick="closeModal('modal-bulk-dn')">✕</button>
+    </div>
+    <div class="modal-bd" style="overflow-y:auto">
+      <div class="alert alert-info" style="margin-bottom:16px">
+        <span class="alert-ico">ℹ️</span>
+        <div class="alert-body"><span class="alert-desc">Áp dụng cho <strong id="bdn-count">0</strong> sinh viên đã chọn</span></div>
+      </div>
+
+      <div class="fi" style="margin-bottom:16px">
+        <label>Doanh nghiệp *</label>
+        <select class="fc" id="bdn-select" onchange="onChangeBulkDN()">
+          <option value="">-- Chọn --</option>
+        </select>
+      </div>
+
+      <!-- Thông tin DN có sẵn — read-only -->
+      <div id="bdn-info-block" style="display:none;margin-bottom:16px">
+        <div class="sec-title"><span class="sec-badge">i</span> Thông tin doanh nghiệp</div>
+        <div class="f-row col-2">
+          <div class="fi"><label>Tỉnh / Thành phố</label><input class="fc" type="text" id="bdn-info-tinh" readonly style="background:#fafafa;cursor:default"></div>
+          <div class="fi"><label>Phường / Xã</label><input class="fc" type="text" id="bdn-info-phuong" readonly style="background:#fafafa;cursor:default"></div>
+          <div class="fi" style="grid-column:1/-1"><label>Địa chỉ</label><input class="fc" type="text" id="bdn-info-addr" readonly style="background:#fafafa;cursor:default"></div>
+          <div class="fi" style="grid-column:1/-1"><label>Người liên hệ</label><input class="fc" type="text" id="bdn-info-contact" readonly style="background:#fafafa;cursor:default"></div>
+        </div>
+      </div>
+
+      <!-- Nhập tay — "Khác" -->
+      <div id="bdn-manual-block" style="display:none">
+        <div class="sec-title"><span class="sec-badge">i</span> Thông tin doanh nghiệp</div>
+        <div class="f-row col-2">
+          <div class="fi" style="grid-column:1/-1">
+            <label>Tên doanh nghiệp *</label>
+            <input class="fc" type="text" id="bdn-m-name" placeholder="VD: Công ty TNHH ABC Tech">
+          </div>
+          <div class="fi">
+            <label>Tỉnh / Thành phố *</label>
+            <select class="fc" id="bdn-m-tinh">
+              <option value="">-- Chọn --</option>
+              <option>Hà Nội</option>
+              <option>TP Hồ Chí Minh</option>
+              <option>Đà Nẵng</option>
+              <option>Khác</option>
+            </select>
+          </div>
+          <div class="fi">
+            <label>Phường / Xã *</label>
+            <input class="fc" type="text" id="bdn-m-phuong">
+          </div>
+          <div class="fi" style="grid-column:1/-1">
+            <label>Địa chỉ chi tiết</label>
+            <input class="fc" type="text" id="bdn-m-addr" placeholder="Số nhà, tên đường">
+          </div>
+          <div class="fi" style="grid-column:1/-1">
+            <label>Người liên hệ</label>
+            <input class="fc" type="text" id="bdn-m-contact" placeholder="Họ tên người liên hệ tại doanh nghiệp (không bắt buộc)">
+          </div>
+        </div>
+      </div>
+
+      <div class="fe" id="bdn-err" style="display:none">Vui lòng điền đầy đủ thông tin bắt buộc (*)</div>
+    </div>
+    <div class="modal-ft">
+      <button class="btn btn-default" onclick="closeModal('modal-bulk-dn')">Hủy</button>
+      <button class="btn btn-primary" onclick="applyBulkDN()">💾 Áp dụng</button>
+    </div>
+  </div>
+</div>
+
+<!-- Modal: Lỗi Lớp học phần đã khóa điểm (thông báo riêng, tách khỏi popup xác nhận) -->
+<div class="overlay hidden" id="modal-sync-diem-error">
+  <div class="modal-box" style="width:460px">
+    <div class="modal-hd">
+      <span class="modal-title" style="color:#cf1322">❌ Lỗi: Lớp học phần đã khóa điểm</span>
+      <button class="modal-close" onclick="closeModal('modal-sync-diem-error')">✕</button>
+    </div>
+    <div class="modal-bd">
+      <div class="alert alert-danger">
+        <span class="alert-ico">🔒</span>
+        <div class="alert-body">
+          <div class="alert-title">Không đồng bộ được</div>
+          <span class="alert-desc" id="sync-diem-locked-msg"></span>
+        </div>
+      </div>
+    </div>
+    <div class="modal-ft">
+      <button class="btn btn-primary" onclick="afterSyncDiemLockedError()">Đã hiểu</button>
+    </div>
+  </div>
+</div>
+
+<!-- Modal: Xác nhận Đồng bộ điểm -->
+<div class="overlay hidden" id="modal-sync-diem">
+  <div class="modal-box" style="width:480px">
+    <div class="modal-hd">
+      <span class="modal-title">🔄 Xác nhận Đồng bộ điểm</span>
+      <button class="modal-close" onclick="closeModal('modal-sync-diem')">✕</button>
+    </div>
+    <div class="modal-bd">
+      <div class="alert alert-warning">
+        <span class="alert-ico">⚠️</span>
+        <div class="alert-body">
+          <div class="alert-title">Sinh viên sẽ xem được điểm sau khi đồng bộ</div>
+          <span class="alert-desc" id="sync-diem-msg"></span>
+        </div>
+      </div>
+    </div>
+    <div class="modal-ft">
+      <button class="btn btn-default" onclick="closeModal('modal-sync-diem')">Hủy</button>
+      <button class="btn btn-primary" onclick="confirmSyncDiem()">🔄 Xác nhận Đồng bộ</button>
     </div>
   </div>
 </div>
@@ -2407,8 +2541,8 @@ const studentDiemThanhPhan = {
   ],
   'B22DCCN058': [
     { key:'dn',  ten:'Điểm QT (Cơ sở TT)',          trongSo:40, diem:7.5, nguoiCham:'Đại diện KMS Technology' },
-    { key:'gv1', ten:'GV Chấm 1 (GVHD)',            trongSo:30, diem:null, nguoiCham:'' },
-    { key:'gv2', ten:'GV Chấm 2 (Khoa phân công)',  trongSo:30, diem:null, nguoiCham:'' },
+    { key:'gv1', ten:'GV Chấm 1 (GVHD)',            trongSo:30, diem:7.0, nguoiCham:'ThS. Nguyễn Đình Hùng' },
+    { key:'gv2', ten:'GV Chấm 2 (Khoa phân công)',  trongSo:30, diem:7.5, nguoiCham:'TS. Lê Quốc Hùng' },
   ],
 };
 function defaultDiemThanhPhan(id) {
@@ -2563,6 +2697,84 @@ function saveDiemThanhPhan() {
   toast('Đã lưu điểm thành phần cho ' + dtpCurrent.name);
 }
 
+// --- Đồng bộ điểm sang Lớp học phần (UC-TTTN-PDT-004B/004C) ---
+// Trạng thái điểm phía Lớp học phần: 'chua' | 'da' | 'khoa'. 'khoa' chỉ được set từ phía
+// Lớp học phần (khi họ bấm "Khoá điểm") — TTTN không có hành động nào tự set 'khoa'.
+const studentDiemSyncStatus = {
+  'B22DCCN001': 'khoa',
+};
+function diemSyncBadgeHtml(status) {
+  if (status === 'khoa') return '<span class="diem-sync-badge diem-sync-khoa">🔒 Đã khoá</span>';
+  if (status === 'da')   return '<span class="diem-sync-badge diem-sync-da">Đã đồng bộ</span>';
+  return '<span class="diem-sync-badge diem-sync-chua">Chưa đồng bộ</span>';
+}
+let pendingSyncRows = [];
+function syncDiemBulk() {
+  const rows = Array.from(document.querySelectorAll('#tpane-0 .row-chk:checked')).map(chk => chk.closest('tr'));
+  if (!rows.length) { toast('Vui lòng chọn ít nhất 1 sinh viên để đồng bộ điểm.', 'error'); return; }
+
+  // BR-09B/EX-02 (kế thừa, all-or-nothing theo ĐIỂM THIẾU): chỉ cần 1 SV chưa đủ điểm
+  // thành phần thì chặn toàn bộ nhóm — không đồng bộ từng phần (BR-TTTN-004C-04).
+  const missing = rows.filter(r => diemTongKet(getRowMeta(r).id) == null).map(r => getRowMeta(r).name);
+  if (missing.length) {
+    toast('Chưa đủ điểm thành phần: ' + missing.join(', ') + '. Vui lòng chấm đủ điểm trước khi đồng bộ.', 'error');
+    return;
+  }
+
+  // SV đã "Đã khoá" phía Lớp học phần: báo lỗi riêng (popup độc lập) trước khi tới popup
+  // xác nhận — bị loại khỏi lượt đồng bộ (BR-TTTN-004C-01), không chặn các SV còn lại.
+  const lockedNames = rows.filter(r => studentDiemSyncStatus[getRowMeta(r).id] === 'khoa').map(r => getRowMeta(r).name);
+  pendingSyncRows = rows;
+
+  if (lockedNames.length) {
+    document.getElementById('sync-diem-locked-msg').innerHTML = '<strong>Lỗi: Lớp học phần đã khóa điểm, không đồng bộ được</strong> cho ' + lockedNames.length + ' sinh viên: ' + lockedNames.join(', ') + '. Các sinh viên này sẽ KHÔNG được đồng bộ và KHÔNG được công bố điểm trong lượt này — cần phía Lớp học phần mở khóa trước.';
+    document.getElementById('modal-sync-diem-error').classList.remove('hidden');
+    return; // Popup xác nhận (nếu còn SV hợp lệ) chỉ mở sau khi GVK đóng popup lỗi này — xem afterSyncDiemLockedError()
+  }
+
+  openSyncDiemConfirm(rows.length);
+}
+
+function openSyncDiemConfirm(willSyncCount) {
+  document.getElementById('sync-diem-msg').innerHTML = 'Thao tác sẽ đồng bộ điểm cho <strong>' + willSyncCount + ' sinh viên</strong> sang Lớp học phần. Sau khi đồng bộ, sinh viên xem được điểm của mình.';
+  document.getElementById('modal-sync-diem').classList.remove('hidden');
+}
+
+function afterSyncDiemLockedError() {
+  closeModal('modal-sync-diem-error');
+  // Loại hẳn SV đã khóa khỏi pendingSyncRows — lỗi đã báo riêng ở popup trước, không lặp lại ở toast cuối.
+  pendingSyncRows = pendingSyncRows.filter(r => studentDiemSyncStatus[getRowMeta(r).id] !== 'khoa');
+  if (pendingSyncRows.length > 0) openSyncDiemConfirm(pendingSyncRows.length);
+  // Toàn bộ SV đã chọn đều bị khóa → pendingSyncRows rỗng, không còn gì để đồng bộ, dừng tại đây
+}
+
+function confirmSyncDiem() {
+  const rows = pendingSyncRows;
+  pendingSyncRows = [];
+  closeModal('modal-sync-diem');
+
+  const locked = [], synced = [];
+  rows.forEach(row => {
+    const { id, name } = getRowMeta(row);
+    if (studentDiemSyncStatus[id] === 'khoa') { locked.push(name); return; }
+    const statusSpan = row.querySelector('[class^="tpd-"]');
+    if (statusSpan) { statusSpan.className = 'tpd-7'; statusSpan.textContent = '● Đã công bố'; }
+    studentDiemSyncStatus[id] = 'da';
+    const badgeCell = row.querySelector('.diem-sync-badge');
+    if (badgeCell) badgeCell.outerHTML = diemSyncBadgeHtml('da');
+    synced.push(name);
+  });
+
+  clearSelection();
+  let msg = synced.length
+    ? 'Đồng bộ điểm hoàn tất — ' + synced.length + ' sinh viên đã được công bố & đồng bộ sang Lớp học phần.'
+    : '';
+  if (locked.length) msg += (msg ? ' ' : '') + 'Lỗi: Lớp học phần đã khóa điểm, không đồng bộ được cho ' + locked.length + ' sinh viên (cần phía Lớp học phần mở khóa mới đồng bộ lại được): ' + locked.join(', ') + '.';
+  // Có SV bị khóa → báo lỗi (error) dù vẫn có SV khác đồng bộ thành công, để người dùng không lầm tưởng cả nhóm đều thành công.
+  const toastType = locked.length ? 'error' : 'success';
+  toast(msg, toastType);
+}
+
 // Checkbox / Bulk
 function toggleAll(cb) {
   document.querySelectorAll('#tpane-0 .row-chk').forEach(c => c.checked = cb.checked);
@@ -2580,6 +2792,90 @@ function clearSelection() {
 
 function syncLopHocPhan() {
   toast('Đang đồng bộ mã lớp học phần sinh viên tự đăng ký...', 'warning');
+}
+
+// --- Phân doanh nghiệp thực tập hàng loạt ---
+let dnCatalog = [
+  { ten:'FPT Software', tinh:'Hà Nội', phuong:'Dịch Vọng Hậu', addr:'Tòa nhà FPT, Phố Duy Tân, Cầu Giấy', contact:'Chị Lan Anh — HR' },
+  { ten:'Viettel IDC', tinh:'Hà Nội', phuong:'Điện Biên', addr:'Số 1 Giang Văn Minh', contact:'Anh Minh Quân — HR' },
+  { ten:'KMS Technology', tinh:'TP Hồ Chí Minh', phuong:'Phường 12', addr:'Quận 3, TP. Hồ Chí Minh', contact:'' },
+  { ten:'VNPT Technology', tinh:'Hà Nội', phuong:'Láng Hạ', addr:'Phố Láng Hạ, Ba Đình', contact:'Chị Thu Hà — HR' },
+];
+let bdnRows = [];
+
+function renderDNOptions() {
+  const sel = document.getElementById('bdn-select');
+  const keep = sel.value;
+  sel.innerHTML = '<option value="">-- Chọn --</option>'
+    + dnCatalog.map((d, i) => `<option value="${i}">${d.ten}</option>`).join('')
+    + '<option value="khac">Khác</option>';
+  sel.value = keep || '';
+}
+
+function openBulkAssignDN() {
+  const rows = Array.from(document.querySelectorAll('#tpane-0 .row-chk:checked')).map(chk => chk.closest('tr'));
+  if (!rows.length) return;
+  bdnRows = rows;
+  document.getElementById('bdn-count').textContent = rows.length;
+  renderDNOptions();
+  document.getElementById('bdn-select').value = '';
+  document.getElementById('bdn-info-block').style.display = 'none';
+  document.getElementById('bdn-manual-block').style.display = 'none';
+  document.getElementById('bdn-err').style.display = 'none';
+  ['bdn-m-name','bdn-m-phuong','bdn-m-addr','bdn-m-contact'].forEach(id => document.getElementById(id).value = '');
+  document.getElementById('bdn-m-tinh').value = '';
+  document.getElementById('modal-bulk-dn').classList.remove('hidden');
+}
+
+function onChangeBulkDN() {
+  const v = document.getElementById('bdn-select').value;
+  document.getElementById('bdn-err').style.display = 'none';
+  if (v === 'khac') {
+    document.getElementById('bdn-info-block').style.display = 'none';
+    document.getElementById('bdn-manual-block').style.display = '';
+  } else if (v !== '') {
+    const d = dnCatalog[parseInt(v)];
+    document.getElementById('bdn-info-tinh').value = d.tinh;
+    document.getElementById('bdn-info-phuong').value = d.phuong;
+    document.getElementById('bdn-info-addr').value = d.addr;
+    document.getElementById('bdn-info-contact').value = d.contact || '—';
+    document.getElementById('bdn-info-block').style.display = '';
+    document.getElementById('bdn-manual-block').style.display = 'none';
+  } else {
+    document.getElementById('bdn-info-block').style.display = 'none';
+    document.getElementById('bdn-manual-block').style.display = 'none';
+  }
+}
+
+function applyBulkDN() {
+  const v = document.getElementById('bdn-select').value;
+  let tenDN = '';
+  if (v === '') { document.getElementById('bdn-err').textContent = 'Vui lòng chọn doanh nghiệp hoặc chọn Khác'; document.getElementById('bdn-err').style.display = 'block'; return; }
+  if (v === 'khac') {
+    const name = document.getElementById('bdn-m-name').value.trim();
+    const tinh = document.getElementById('bdn-m-tinh').value;
+    const phuong = document.getElementById('bdn-m-phuong').value.trim();
+    if (!name || !tinh || !phuong) {
+      document.getElementById('bdn-err').textContent = 'Vui lòng điền đầy đủ thông tin bắt buộc (*)';
+      document.getElementById('bdn-err').style.display = 'block';
+      return;
+    }
+    tenDN = name;
+  } else {
+    tenDN = dnCatalog[parseInt(v)].ten;
+  }
+  document.getElementById('bdn-err').style.display = 'none';
+  bdnRows.forEach(row => {
+    const cell = row.querySelector('.cell-editable');
+    if (!cell) return;
+    cell.querySelector('span').textContent = tenDN;
+    cell.querySelector('input').value = tenDN;
+  });
+  const n = bdnRows.length;
+  bdnRows = [];
+  if (n > 1) clearSelection();
+  closeModal('modal-bulk-dn');
+  toast('Đã phân doanh nghiệp "' + tenDN + '" cho ' + n + ' sinh viên');
 }
 
 function toggleFuncPanel(){

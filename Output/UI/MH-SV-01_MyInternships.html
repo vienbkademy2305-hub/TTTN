@@ -542,28 +542,51 @@
       <div id="svs-alert-top" style="margin-bottom:14px"></div>
 
       <div class="sec-title"><span class="sec-badge">1</span> Thông tin Cơ sở TT</div>
+
+      <div style="font-size:12px;color:var(--text-2);margin-bottom:6px">Loại cơ sở thực tập</div>
+      <div style="display:flex;gap:16px;margin-bottom:14px">
+        <label style="display:flex;align-items:center;gap:6px;font-size:13px;cursor:pointer">
+          <input type="radio" name="svs-loai" value="dt" checked onchange="csSwitchLoai('svs','dt')"> Doanh nghiệp đối tác
+        </label>
+        <label style="display:flex;align-items:center;gap:6px;font-size:13px;cursor:pointer">
+          <input type="radio" name="svs-loai" value="khac" onchange="csSwitchLoai('svs','khac')"> Khác
+        </label>
+      </div>
+
       <div class="f-row col-2" style="margin-bottom:20px">
-        <div class="fi" style="grid-column:1/-1">
-          <label>Tên Cơ sở TT <span class="req">*</span></label>
+        <!-- Doanh nghiệp đối tác: chọn từ danh sách, thông tin còn lại tự điền (chỉ đọc) -->
+        <div class="fi cs-dt" style="grid-column:1/-1">
+          <label>Doanh nghiệp đối tác <span class="req">*</span></label>
+          <input class="fc" type="text" id="svs-dt" list="svs-dt-list" placeholder="Tìm theo tên doanh nghiệp" oninput="csPickDt('svs')">
+          <datalist id="svs-dt-list"></datalist>
+        </div>
+        <!-- Khác: SV tự nhập -->
+        <div class="fi cs-khac" style="grid-column:1/-1;display:none">
+          <label>Tên cơ sở thực tập <span class="req">*</span></label>
           <input class="fc" type="text" id="svs-dn" placeholder="Tên công ty / tổ chức thực tập">
         </div>
         <div class="fi">
-          <label>Tỉnh / Thành phố <span class="req">*</span></label>
-          <select class="fc" id="svs-tinh">
-            <option>-- Chọn --</option>
-            <option>Hà Nội</option>
-            <option>TP Hồ Chí Minh</option>
-            <option>Đà Nẵng</option>
-            <option>Khác</option>
+          <label>Tỉnh/Thành phố <span class="req cs-khac" style="display:none">*</span></label>
+          <input class="fc cs-dt" type="text" id="svs-tinh-ro" readonly style="background:#fafafa;cursor:default">
+          <select class="fc cs-khac" id="svs-tinh" style="display:none" onchange="csLoadPhuong('svs')">
+            <option value="">Chọn Tỉnh/Thành phố</option>
           </select>
         </div>
         <div class="fi">
-          <label>Phường / Xã <span class="req">*</span></label>
-          <input class="fc" type="text" id="svs-phuong" placeholder="Tên phường / xã">
+          <label>Phường/Xã <span class="req cs-khac" style="display:none">*</span></label>
+          <input class="fc cs-dt" type="text" id="svs-phuong-ro" readonly style="background:#fafafa;cursor:default">
+          <select class="fc cs-khac" id="svs-phuong" style="display:none;background:#f5f5f5" disabled>
+            <option value="">Chọn Phường/Xã</option>
+          </select>
         </div>
         <div class="fi">
-          <label>Địa chỉ chi tiết</label>
-          <input class="fc" type="text" id="svs-addr" placeholder="Số nhà, tên đường...">
+          <label class="cs-dt">Địa chỉ</label>
+          <label class="cs-khac" style="display:none">Địa chỉ chi tiết</label>
+          <input class="fc" type="text" id="svs-addr">
+        </div>
+        <div class="fi">
+          <label>Người liên hệ</label>
+          <input class="fc" type="text" id="svs-lienhe">
         </div>
         <div class="fi">
           <label>Ngày bắt đầu <span class="req">*</span></label>
@@ -796,6 +819,10 @@
           <input class="fc" type="text" id="doi-cu-addr" readonly style="background:#fafafa;cursor:default">
         </div>
         <div class="fi">
+          <label>Người liên hệ</label>
+          <input class="fc" type="text" id="doi-cu-lienhe" readonly style="background:#fafafa;cursor:default">
+        </div>
+        <div class="fi">
           <label>Ngày bắt đầu</label>
           <input class="fc" type="date" id="doi-cu-from" readonly style="background:#fafafa;cursor:default">
         </div>
@@ -806,32 +833,50 @@
       </div>
 
       <div class="sec-title" style="font-size:13px;margin-bottom:10px"><span class="sec-badge">2</span> Cơ sở TT mới đề nghị</div>
+      <div style="font-size:12px;color:var(--text-2);margin-bottom:6px">Loại cơ sở thực tập</div>
+      <div style="display:flex;gap:16px;margin-bottom:14px">
+        <label style="display:flex;align-items:center;gap:6px;font-size:13px;cursor:pointer">
+          <input type="radio" name="doi-moi-loai" value="dt" checked onchange="csSwitchLoai('doi-moi','dt')"> Doanh nghiệp đối tác
+        </label>
+        <label style="display:flex;align-items:center;gap:6px;font-size:13px;cursor:pointer">
+          <input type="radio" name="doi-moi-loai" value="khac" onchange="csSwitchLoai('doi-moi','khac')"> Khác
+        </label>
+      </div>
+
       <div class="f-row col-2" style="margin-bottom:16px">
-        <div class="fi" style="grid-column:1/-1">
-          <label>Tên Cơ sở TT mới <span class="req">*</span></label>
+        <!-- Doanh nghiệp đối tác: chọn từ danh sách, thông tin còn lại tự điền (chỉ đọc) -->
+        <div class="fi cs-dt" style="grid-column:1/-1">
+          <label>Doanh nghiệp đối tác <span class="req">*</span></label>
+          <input class="fc" type="text" id="doi-moi-dt" list="doi-moi-dt-list" placeholder="Tìm theo tên doanh nghiệp" oninput="csPickDt('doi-moi')">
+          <datalist id="doi-moi-dt-list"></datalist>
+        </div>
+        <!-- Khác: SV tự nhập -->
+        <div class="fi cs-khac" style="grid-column:1/-1;display:none">
+          <label>Tên cơ sở thực tập <span class="req">*</span></label>
           <input class="fc" type="text" id="doi-moi-dn" placeholder="Tên công ty / tổ chức thực tập mới">
         </div>
         <div class="fi">
-          <label>Tỉnh / Thành phố <span class="req">*</span></label>
-          <select class="fc" id="doi-moi-tinh">
-            <option>-- Chọn --</option>
-            <option>Hà Nội</option>
-            <option>TP Hồ Chí Minh</option>
-            <option>Đà Nẵng</option>
-            <option>Khác</option>
+          <label>Tỉnh/Thành phố <span class="req cs-khac" style="display:none">*</span></label>
+          <input class="fc cs-dt" type="text" id="doi-moi-tinh-ro" readonly style="background:#fafafa;cursor:default">
+          <select class="fc cs-khac" id="doi-moi-tinh" style="display:none" onchange="csLoadPhuong('doi-moi')">
+            <option value="">Chọn Tỉnh/Thành phố</option>
           </select>
         </div>
         <div class="fi">
-          <label>Phường / Xã <span class="req">*</span></label>
-          <input class="fc" type="text" id="doi-moi-phuong" placeholder="Tên phường / xã">
+          <label>Phường/Xã <span class="req cs-khac" style="display:none">*</span></label>
+          <input class="fc cs-dt" type="text" id="doi-moi-phuong-ro" readonly style="background:#fafafa;cursor:default">
+          <select class="fc cs-khac" id="doi-moi-phuong" style="display:none;background:#f5f5f5" disabled>
+            <option value="">Chọn Phường/Xã</option>
+          </select>
         </div>
         <div class="fi">
-          <label>Địa chỉ chi tiết</label>
-          <input class="fc" type="text" id="doi-moi-addr" placeholder="Số nhà, tên đường...">
+          <label class="cs-dt">Địa chỉ</label>
+          <label class="cs-khac" style="display:none">Địa chỉ chi tiết</label>
+          <input class="fc" type="text" id="doi-moi-addr">
         </div>
         <div class="fi">
-          <label>Người liên hệ tại cơ sở</label>
-          <input class="fc" type="text" id="doi-moi-contact" placeholder="Họ tên người hướng dẫn tại cơ sở">
+          <label>Người liên hệ</label>
+          <input class="fc" type="text" id="doi-moi-lienhe">
         </div>
       </div>
 
@@ -1703,10 +1748,23 @@ function openSvSubmitDc(maDot) {
   const alertTop = document.getElementById('svs-alert-top');
   alertTop.innerHTML = '';
 
+  csInitOptions('svs');
   if (d) {
-    document.getElementById('svs-dn').value     = d.dn     || '';
-    document.getElementById('svs-phuong').value = d.phuong || '';
-    document.getElementById('svs-addr').value   = d.addr   || '';
+    // DN có trong danh mục đối tác → chế độ "Doanh nghiệp đối tác", ngược lại → "Khác"
+    const dt = DT_DB.find(x => x.ten === d.dn);
+    if (dt) {
+      csSetLoai('svs', 'dt');
+      document.getElementById('svs-dt').value = dt.ten;
+      csPickDt('svs');
+    } else {
+      csSetLoai('svs', 'khac');
+      document.getElementById('svs-dn').value     = d.dn || '';
+      document.getElementById('svs-tinh').value   = d.tinh || '';
+      csLoadPhuong('svs');
+      document.getElementById('svs-phuong').value = d.phuong || '';
+      document.getElementById('svs-addr').value   = d.addr || '';
+      document.getElementById('svs-lienhe').value = d.lienhe || '';
+    }
     document.getElementById('svs-from').value   = d.from   || '';
     document.getElementById('svs-to').value     = d.to     || '';
     // Điền kế hoạch cũ nếu có
@@ -1725,9 +1783,7 @@ function openSvSubmitDc(maDot) {
       document.getElementById('svs-plan-body').innerHTML = rows;
     }
   } else {
-    document.getElementById('svs-dn').value     = '';
-    document.getElementById('svs-phuong').value = '';
-    document.getElementById('svs-addr').value   = '';
+    csSetLoai('svs', 'dt');
     document.getElementById('svs-from').value   = '';
     document.getElementById('svs-to').value     = '';
     document.getElementById('svs-plan-body').innerHTML = `<tr>
@@ -1768,9 +1824,83 @@ function svsReindex() {
     tr.querySelector('td:first-child').textContent = i + 1;
   });
 }
+/* ---- Loại cơ sở TT: Doanh nghiệp đối tác / Khác ---- */
+const DT_DB = [
+  {ten:'FPT Software',           tinh:'Hà Nội',         phuong:'Dịch Vọng Hậu', addr:'Tòa nhà FPT, Phố Duy Tân',     lienhe:'Nguyễn Thu Hà — 0912 345 678'},
+  {ten:'Samsung SDS Việt Nam',   tinh:'Hà Nội',         phuong:'Mỹ Đình 1',     addr:'Tầng 12, Tòa nhà HH4, Mỹ Đình', lienhe:'Park Ji-hoon — 0987 111 222'},
+  {ten:'Viettel IDC',            tinh:'Hà Nội',         phuong:'Điện Biên',     addr:'Số 1 Giang Văn Minh',          lienhe:'Trần Minh Đức — 0965 222 333'},
+  {ten:'Tập đoàn VNPT',          tinh:'Hà Nội',         phuong:'Láng Hạ',       addr:'Số 57 Huỳnh Thúc Kháng',       lienhe:'Lê Hoàng Nam — 0903 444 555'},
+  {ten:'Công ty ABC Tech',       tinh:'TP Hồ Chí Minh', phuong:'Bến Nghé',      addr:'12 Nguyễn Huệ',                lienhe:'Phạm Thị Lan — 0938 666 777'},
+  {ten:'CMC Global',             tinh:'Hà Nội',         phuong:'Dịch Vọng Hậu', addr:'Tòa CMC, 11 Duy Tân',          lienhe:'Đỗ Quang Huy — 0977 888 999'},
+];
+const PHUONG_DB = {
+  'Hà Nội':         ['Dịch Vọng Hậu','Mỹ Đình 1','Điện Biên','Láng Hạ','Cầu Giấy','Hoàn Kiếm'],
+  'TP Hồ Chí Minh': ['Bến Nghé','Bến Thành','Thảo Điền','Tân Định'],
+  'Đà Nẵng':        ['Hải Châu','Thạch Thang','An Hải Bắc'],
+  'Hải Phòng':      ['Lê Chân','Hồng Bàng','Ngô Quyền'],
+};
+/* Bộ hàm dùng chung theo tiền tố id: 'svs' (Nộp đề cương), 'doi-moi' (Đổi cơ sở TT) */
+const CS_MODAL = { 'svs':'modal-sv-submit-dc', 'doi-moi':'modal-doicstt' };
+const $cs = (p, k) => document.getElementById(`${p}-${k}`);
+function csInitOptions(p) {
+  $cs(p,'dt-list').innerHTML = DT_DB.map(x => `<option value="${x.ten}">`).join('');
+  $cs(p,'tinh').innerHTML = '<option value="">Chọn Tỉnh/Thành phố</option>'
+    + Object.keys(PHUONG_DB).map(t => `<option>${t}</option>`).join('');
+}
+function csSetLoai(p, loai) {
+  document.querySelector(`input[name="${p}-loai"][value="${loai}"]`).checked = true;
+  csSwitchLoai(p, loai);
+}
+function csSwitchLoai(p, loai) {
+  const isDt = loai === 'dt';
+  const modal = document.getElementById(CS_MODAL[p]);
+  modal.querySelectorAll('.cs-dt').forEach(el => el.style.display = isDt ? '' : 'none');
+  modal.querySelectorAll('.cs-khac').forEach(el => el.style.display = isDt ? 'none' : '');
+  // Reset toàn bộ thông tin cơ sở khi đổi loại
+  ['dt','dn','tinh-ro','phuong-ro','addr','lienhe'].forEach(k => $cs(p,k).value = '');
+  $cs(p,'tinh').value = '';
+  csLoadPhuong(p);
+  // DN đối tác: địa chỉ + người liên hệ lấy từ danh mục, chỉ đọc. Khác: tùy chọn, SV tự nhập
+  ['addr','lienhe'].forEach(k => {
+    const el = $cs(p,k);
+    el.readOnly = isDt;
+    el.style.background = isDt ? '#fafafa' : '';
+    el.style.cursor = isDt ? 'default' : '';
+    el.placeholder = isDt ? '' : 'Không bắt buộc';
+  });
+}
+function csPickDt(p) {
+  const dt = DT_DB.find(x => x.ten === $cs(p,'dt').value);
+  $cs(p,'tinh-ro').value   = dt ? dt.tinh   : '';
+  $cs(p,'phuong-ro').value = dt ? dt.phuong : '';
+  $cs(p,'addr').value      = dt ? dt.addr   : '';
+  $cs(p,'lienhe').value    = dt ? dt.lienhe : '';
+}
+function csLoadPhuong(p) {
+  const tinh = $cs(p,'tinh').value;
+  const sel  = $cs(p,'phuong');
+  sel.innerHTML = '<option value="">Chọn Phường/Xã</option>'
+    + (PHUONG_DB[tinh] || []).map(x => `<option>${x}</option>`).join('');
+  sel.disabled = !tinh;
+  sel.style.background = tinh ? '' : '#f5f5f5';
+}
+/* Trả về tên cơ sở đã chọn/nhập; null + toast nếu thiếu trường bắt buộc */
+function csValidate(p) {
+  const loai = document.querySelector(`input[name="${p}-loai"]:checked`).value;
+  if (loai === 'dt') {
+    const ten = $cs(p,'dt').value;
+    if (!DT_DB.some(x => x.ten === ten)) { toast('Vui lòng chọn Doanh nghiệp đối tác từ danh sách', 'error'); return null; }
+    return ten;
+  }
+  const ten = $cs(p,'dn').value.trim();
+  if (!ten)                  { toast('Vui lòng nhập Tên cơ sở thực tập', 'error'); return null; }
+  if (!$cs(p,'tinh').value)  { toast('Vui lòng chọn Tỉnh/Thành phố', 'error'); return null; }
+  if (!$cs(p,'phuong').value){ toast('Vui lòng chọn Phường/Xã', 'error'); return null; }
+  return ten;
+}
+
 function confirmSubmitSvDc() {
-  if (!document.getElementById('svs-dn').value.trim())     { toast('Vui lòng nhập tên Cơ sở TT', 'error'); return; }
-  if (!document.getElementById('svs-phuong').value.trim()) { toast('Vui lòng nhập Phường / Xã', 'error'); return; }
+  if (!csValidate('svs')) return;
   document.getElementById('modal-sv-confirm-dc').classList.remove('hidden');
 }
 function submitSvDc() {
@@ -1919,13 +2049,12 @@ function openYeuCauDoiCstt(maDot) {
   document.getElementById('doi-cu-tinh').value   = d ? d.tinh   : '';
   document.getElementById('doi-cu-phuong').value = d ? (d.phuong || '') : '';
   document.getElementById('doi-cu-addr').value   = d ? (d.addr   || '') : '';
+  const dtCu = d && DT_DB.find(x => x.ten === d.dn);
+  document.getElementById('doi-cu-lienhe').value = dtCu ? dtCu.lienhe : (d ? (d.lienhe || '') : '');
   document.getElementById('doi-cu-from').value   = d ? (d.from   || '') : '';
   document.getElementById('doi-cu-to').value     = d ? (d.to     || '') : '';
-  document.getElementById('doi-moi-dn').value      = '';
-  document.getElementById('doi-moi-tinh').value    = '-- Chọn --';
-  document.getElementById('doi-moi-phuong').value  = '';
-  document.getElementById('doi-moi-addr').value    = '';
-  document.getElementById('doi-moi-contact').value = '';
+  csInitOptions('doi-moi');
+  csSetLoai('doi-moi', 'dt');
   document.getElementById('doi-lydo').value        = '';
   document.getElementById('doi-file-list').innerHTML = '';
   document.getElementById('doi-file-input').value    = '';
@@ -1944,9 +2073,9 @@ function onDoiFileSelect(input) {
   </div>`;
 }
 function submitDoiCstt() {
-  if (!document.getElementById('doi-moi-dn').value.trim())     { toast('Vui lòng nhập tên Cơ sở TT mới', 'error'); return; }
-  if (document.getElementById('doi-moi-tinh').value === '-- Chọn --') { toast('Vui lòng chọn Tỉnh / Thành phố', 'error'); return; }
-  if (!document.getElementById('doi-moi-phuong').value.trim()) { toast('Vui lòng nhập Phường / Xã', 'error'); return; }
+  const tenMoi = csValidate('doi-moi');
+  if (!tenMoi) return;
+  if (tenMoi.toLowerCase() === document.getElementById('doi-cu-dn').value.trim().toLowerCase()) { toast('Cơ sở TT mới phải khác cơ sở hiện tại', 'error'); return; }
   if (!document.getElementById('doi-lydo').value.trim())       { toast('Vui lòng nhập lý do đổi cơ sở TT', 'error'); return; }
   closeModal('modal-doicstt');
   toast('Đã gửi yêu cầu đổi cơ sở TT. Chờ Phòng đào tạo xem xét.');

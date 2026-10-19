@@ -23,6 +23,8 @@
     .ketluan-pill.wait{color:#d48806;background:#fffbe6;border-color:#ffe58f}
     .ketluan-pill.pass{color:#389e0d;background:#f6ffed;border-color:#b7eb8f}
     .ketluan-pill.fail{color:#cf1322;background:#fff1f0;border-color:#ffa39e}
+    .ketluan-pill.cancel{color:#595959;background:#f0f0f0;border-color:#d9d9d9;cursor:default}
+    tr.row-huy [data-col],tr.row-huy .tbl-actions{pointer-events:none}
     .stat-grid8{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:20px}
     .stat-box{background:#fff;border:1px solid var(--border);border-radius:8px;padding:12px 14px;display:flex;align-items:center;gap:10px;cursor:pointer;transition:box-shadow .15s,border-color .15s}
     .stat-box:hover{box-shadow:0 4px 14px rgba(0,0,0,.08);border-color:var(--primary)}
@@ -341,7 +343,7 @@
               <button type="button" class="func-item" onclick="closeFuncPanel();openNopQuyen()">📚 Xác nhận nộp quyển</button>
               <button type="button" class="func-item" onclick="closeFuncPanel();syncDiemBulk()">🔄 Đồng bộ điểm</button>
               <button type="button" class="func-item" onclick="closeFuncPanel();exportDSSV()">📊 Xuất DSSV</button>
-            </div>
+              <button type="button" class="func-item" onclick="closeFuncPanel();syncLopHocPhan()">🔄 Đồng bộ lớp học phần</button>            </div>
           </div>
         </div>
 
@@ -425,6 +427,7 @@
             <option>Chờ duyệt</option>
             <option>Đã duyệt</option>
             <option>Yêu cầu chỉnh sửa</option>
+            <option>SV đã hủy</option>
           </select>
           <select class="fc" style="width:210px" id="me_f-ketluanhd" onchange="me_render()">
             <option value="">Tất cả kết luận hội đồng</option>
@@ -2432,6 +2435,55 @@ let students = [
       {time:'12/03/2026', actor:'Nguyễn Thanh Sơn', action:'Đăng ký nguyện vọng GVHD: ThS. Phạm Văn Thắng', result:'', dot:'ok'},
       {time:'15/03/2026', actor:'ThS. Phạm Văn Thắng', action:'Phê duyệt nguyện vọng & phân công đề tài', result:'', dot:'ok'},
     ]},
+
+  /* ── DỮ LIỆU TEST: SV RÚT HỌC PHẦN ── */
+  // (104) Đã hủy, LHP vẫn ghi nhận rút → đồng bộ không đổi
+  {id:104, maSV:'B22DCCN150', tenSV:'Hồ Thị Lan', lop:'INT3110_2', ctdt:'KTPM', gpa:3.0,
+    dotId:'DA-HK2-2025-2026', loaiHinh:'Đồ án tốt nghiệp',
+    topic:null, gvhd:null, donViGV:null, nguon:null, gvpb:null, baoCao:null, canManual:false,
+    status:'Đủ điều kiện', qdGiao:null, yeuCauList:[], lhp:'rut',
+    huy:{ngay:'10/06/2026', nguon:'LHP', trangThaiTruoc:'Đủ điều kiện', topicTraLai:null, gvhdTruoc:null},
+    history:[
+      {time:'01/06/2026', actor:'Hệ thống', action:'Công bố đợt — SV đủ điều kiện', result:'', dot:'ok'},
+      {time:'10/06/2026', actor:'Hệ thống (đồng bộ LHP)', action:'SV rút học phần → trạng thái "SV đã hủy"', result:'Chặn các chức năng khác', dot:'err'},
+    ]},
+
+  // (101) Đang "SV đã hủy" nhưng LHP đã khôi phục (lhp:'ok') → bấm "Đồng bộ lớp học phần" sẽ về trống
+  {id:101, maSV:'B22DCCN110', tenSV:'Bùi Quang Huy', lop:'INT3110_1', ctdt:'KTPM', gpa:2.9,
+    dotId:'DA-HK2-2025-2026', loaiHinh:'Đồ án tốt nghiệp',
+    topic:null, gvhd:null, donViGV:null, nguon:null, gvpb:null, baoCao:null, canManual:false,
+    status:'Chờ duyệt nguyện vọng', qdGiao:null, yeuCauList:[],
+    huy:{ngay:'12/06/2026', nguon:'LHP', donTu:'LHP-2026-0412', lyDo:'Sinh viên rút học phần trên LHP', trangThaiTruoc:'Chờ duyệt nguyện vọng', topicTraLai:null, gvhdTruoc:null},
+    history:[
+      {time:'01/06/2026', actor:'Hệ thống', action:'Công bố đợt — SV đủ điều kiện', result:'', dot:'ok'},
+      {time:'08/06/2026', actor:'Bùi Quang Huy', action:'Đăng ký nguyện vọng GVHD: TS. Nguyễn Minh Tuấn', result:'', dot:'ok'},
+      {time:'12/06/2026', actor:'Hệ thống (đồng bộ LHP)', action:'SV rút học phần → trạng thái "SV đã hủy"', result:'Đơn LHP-2026-0412. Sinh viên rút học phần trên LHP', dot:'err'},
+    ]},
+
+  // (102) LHP ghi nhận SV rút — đã có đề tài, CHƯA có quyết định → bấm "Đồng bộ lớp học phần" sẽ chuyển "SV đã hủy"
+  {id:102, maSV:'B22DCCN121', tenSV:'Đinh Thị Mai Anh', lop:'INT3110_2', ctdt:'KTPM', gpa:3.1,
+    dotId:'DA-HK2-2025-2026', loaiHinh:'Đồ án tốt nghiệp',
+    topic:TOPIC_CATALOG[1], gvhd:'TS. Nguyễn Minh Tuấn', donViGV:'BM. Công nghệ phần mềm', nguon:'Tự động', gvpb:null, baoCao:null, canManual:false,
+    status:'Đã phân công', lhp:'rut',
+    decuong:{trangThai:'Chờ SV nộp', noiDung:'', file:null, ngayNop:null, lanNop:0, ketQua:'', nguoiDuyet:null, ngayDuyet:null, huongNghienCuu:'', kePlan:[]},
+    qdGiao:null, yeuCauList:[],
+    history:[
+      {time:'01/06/2026', actor:'Hệ thống', action:'Công bố đợt — SV đủ điều kiện', result:'', dot:'ok'},
+      {time:'05/06/2026', actor:'TS. Nguyễn Minh Tuấn', action:'Phê duyệt nguyện vọng & phân công đề tài', result:'', dot:'ok'},
+    ]},
+
+  // (103) LHP ghi nhận SV rút — ĐÃ có quyết định → đồng bộ BỎ QUA, vẫn thao tác/chấm điểm bình thường; cán bộ tự cập nhật kết luận cuối
+  {id:103, maSV:'B22DCCN133', tenSV:'Phan Văn Tài', lop:'INT3110_1', ctdt:'KHMT', gpa:2.7,
+    dotId:'DA-HK2-2025-2026', loaiHinh:'Đồ án tốt nghiệp',
+    topic:TOPIC_CATALOG[2], gvhd:'TS. Lê Thị Mai', donViGV:'BM. Hệ thống thông tin', nguon:'Tự động', gvpb:null, baoCao:null, canManual:false,
+    status:'Đã ban hành quyết định', lhp:'rut',
+    decuong:{trangThai:'Chờ duyệt', noiDung:'Hệ thống phân tích dữ liệu bán hàng.', file:'DeCuong_B22DCCN133_v1.docx', ngayNop:'10/06/2026', lanNop:1, ketQua:'', nguoiDuyet:null, ngayDuyet:null, huongNghienCuu:'', kePlan:[]},
+    qdGiao:{so:'160/QĐ-PĐT', ngay:'08/06/2026', donViBanHanh:'Phòng Đào tạo', nguoiKy:'Nguyễn Thị Lan — Trưởng phòng Đào tạo', file:'QD-160-PDT-2026.pdf'}, yeuCauList:[],
+    history:[
+      {time:'01/06/2026', actor:'Hệ thống', action:'Công bố đợt — SV đủ điều kiện', result:'', dot:'ok'},
+      {time:'04/06/2026', actor:'TS. Lê Thị Mai', action:'Phê duyệt nguyện vọng & phân công đề tài', result:'', dot:'ok'},
+      {time:'08/06/2026', actor:'Nguyễn Thị Lan (PĐT)', action:'Ban hành Quyết định giao đề tài', result:'Số QĐ: 160/QĐ-PĐT', dot:'ok'},
+    ]},
 ];
 
 let selectedIds = [];
@@ -2517,8 +2569,10 @@ const DECUONG_TRANGTHAI_META = {
   'Chờ duyệt':          {cls:'wait'},
   'Đã duyệt':           {cls:'pass'},
   'Yêu cầu chỉnh sửa':  {cls:'fail'},
+  'SV đã hủy':          {cls:'cancel'},
 };
 function getDeCuongStage(s){
+  if (s.huy) return {key:'SV đã hủy', label:'SV đã hủy'};
   const dc = s.decuong;
   const trangThai = (dc && dc.trangThai) || 'Chờ SV nộp';
   return {key:trangThai, label:trangThai};
@@ -2593,9 +2647,9 @@ function render(){
     const decuongCell = (!s.topic || !s.decuong || !s.decuong.file)
       ? `<span style="color:var(--text-3);font-size:12px">—</span>`
       : `<span style="color:var(--primary);cursor:pointer;font-size:13px" onclick="openDeCuongInfo(${s.id})" title="Xem chi tiết đề cương & tiến độ">Chi tiết</span>`;
-    const decuongStatusCell = !s.topic
+    const decuongStatusCell = (!s.topic && !s.huy)
       ? `<span style="color:var(--text-3);font-size:12px">—</span>`
-      : `<span class="ketluan-pill ${deCuongPillCls(deCuongStage.key)}" style="cursor:default">${deCuongStage.label}</span>`;
+      : `<span class="ketluan-pill ${deCuongPillCls(deCuongStage.key)}" style="cursor:default"${s.huy ? ` title="Rút học phần ${s.huy.ngay} — ${s.huy.nguon}. ${s.huy.lyDo||''}"` : ''}>${deCuongStage.label}</span>`;
     const gvCell = s.gvhd
       ? `<div style="cursor:pointer" onclick="openGvInfo(${s.id})" title="Xem thông tin GVHD">
            ${s.gvList && s.gvList.length > 1 ? gvMultiHTML(s.gvList) : `<span style="font-size:13px;color:var(--primary)">${s.gvhd}</span>`}
@@ -2662,15 +2716,15 @@ function render(){
       : `<span style="color:var(--text-3);font-size:12px">—</span>`;
     const yeuCauList = s.yeuCauList || [];
     const daDongBo = s.dongBoDiem === 'Đã đồng bộ';
-    const actions = `
+    const actions = s.huy ? `<span style="color:var(--text-3);font-size:12px">—</span>` : `
       ${s.baoCao ? `<button class="icon-btn success-btn" title="${daDongBo ? 'Đã đồng bộ điểm — không thể sửa' : 'Nhập điểm cuối'}" onclick="openDiem(${s.id})" ${daDongBo ? 'disabled' : ''}>✏️</button>` : ''}
       ${canNopQuyen(s) ? `<button class="icon-btn" title="Xác nhận nộp quyển" onclick="openNopQuyen(${s.id})">📚</button>` : ''}
       <button class="icon-btn" title="Nhập quyết định" onclick="openCreateDecision(${s.id})">🖊️</button>
       <button class="icon-btn" title="DS các yêu cầu của sinh viên" onclick="openYeuCauSv(${s.id})" style="position:relative">📨${yeuCauList.length ? `<span style="position:absolute;top:-4px;right:-4px;background:var(--error);color:#fff;border-radius:8px;font-size:9px;line-height:1;padding:1px 4px">${yeuCauList.length}</span>` : ''}</button>
     `;
     const disqualified = isDisqualified(s);
-    return `<tr${disqualified ? ` class="row-disqualified" title="${disqualifyReason(s)}"` : ''}>
-      <td style="text-align:center"><input type="checkbox" class="row-chk" data-id="${s.id}" onchange="onRowChk()" ${selectedIds.includes(s.id)?'checked':''}></td>
+    return `<tr class="${s.huy ? 'row-huy' : ''}${disqualified ? ' row-disqualified' : ''}"${disqualified ? ` title="${disqualifyReason(s)}"` : ''}>
+      <td style="text-align:center"><input type="checkbox" class="row-chk" data-id="${s.id}" onchange="onRowChk()" ${selectedIds.includes(s.id)?'checked':''} ${s.huy?'disabled':''}></td>
       <td style="font-size:12px;color:var(--text-2)" data-col="donvi">${donViCell}</td>
       <td style="font-family:monospace;font-size:12px;white-space:nowrap">${s.maSV}</td>
       <td><span style="font-size:13px;font-weight:600;color:var(--primary);cursor:pointer" onclick="openDetail(${s.id})">${s.tenSV}</span></td>
@@ -2701,6 +2755,7 @@ function render(){
   document.getElementById('pg-info').textContent = `Hiển thị ${filtered.length} / ${students.length} sinh viên`;
   lastFiltered = filtered;
   refreshBulkBar();
+  updateLhpBanner();
 }
 
 /* ════════ ẨN/HIỆN CỘT ════════ */
@@ -2743,7 +2798,7 @@ function resetFilter(){
 }
 
 function toggleAllRows(checked){
-  document.querySelectorAll('.row-chk').forEach(chk => {
+  document.querySelectorAll('.row-chk:not(:disabled)').forEach(chk => {
     const id = parseInt(chk.getAttribute('data-id'));
     chk.checked = checked;
     if (checked && !selectedIds.includes(id)) selectedIds.push(id);
@@ -4180,6 +4235,58 @@ function saveBulkKetLuanHoiDong(){
   render();
 }
 
+/* ════════ SV RÚT HỌC PHẦN — tự cập nhật khi cán bộ bấm "Đồng bộ lớp học phần" ════════ */
+// Đối chiếu trạng thái từng SV ở Lớp học phần (s.lhp: 'rut' | 'ok') với trạng thái đang hiển thị:
+//  - LHP 'rut', CHƯA có quyết định giao đề tài → "SV đã hủy" (Trạng thái đề cương), chặn mọi chức năng khác.
+//  - LHP 'rut', ĐÃ có quyết định → BỎ QUA: không hủy, vẫn thao tác/chấm điểm bình thường; cán bộ tự cập nhật kết luận cuối.
+//  - LHP 'ok' mà đang "SV đã hủy" (SV xin không rút nữa) → về trống: xóa GVHD/đề tài; cán bộ phân công lại, SV kê khai lại.
+function selectOnly(id){ selectedIds = [id]; render(); }
+function applyHuy(id){
+  const today = new Date().toLocaleDateString('vi');
+  selectedIds = selectedIds.filter(i => i !== id);
+  students = students.map(x => {
+    if (x.id !== id) return x;
+    const topicTraLai = x.topic;
+    return { ...x, huy:{ngay:today, nguon:'LHP', trangThaiTruoc:x.status, topicTraLai, gvhdTruoc:x.gvhd}, topic:null, gvhd:null, gvList:[],
+      history:[...x.history, {time:today, actor:'Hệ thống (đồng bộ LHP)', action:'SV rút học phần → trạng thái "SV đã hủy"', result:(topicTraLai ? 'Trả đề tài ' + (topicTraLai ? topicTraLai.code : '') + ' và giải phóng chỉ tiêu GVHD ' + (x.gvhd || '') + '. ' : '') + 'Chặn các chức năng khác', dot:'err'}] };
+  });
+}
+function resetHuyStudent(id){
+  const today = new Date().toLocaleDateString('vi');
+  students = students.map(x => {
+    if (x.id !== id) return x;
+    const { huy, ...rest } = x;
+    return { ...rest, topic:null, gvhd:null, gvList:[], gvpb:null, hoiDong:null, nguon:null, canManual:false, status:'Đủ điều kiện',
+      decuong:{trangThai:'Chờ SV nộp', noiDung:'', file:null, ngayNop:null, lanNop:0, ketQua:'', nguoiDuyet:null, ngayDuyet:null, huongNghienCuu:'', kePlan:[]},
+      history:[...x.history, {time:today, actor:'Hệ thống (đồng bộ LHP)', action:'SV được LHP khôi phục → trạng thái về trống', result:'Cán bộ phân công lại GVHD, SV kê khai lại đề tài', dot:'ok'}] };
+  });
+}
+// Báo cho cán bộ biết có thay đổi trạng thái SV ở LHP chưa đồng bộ (cùng quy tắc với syncLopHocPhan)
+function updateLhpBanner(){
+  const label = s => `${s.tenSV} (${s.maSV})`;
+  const rut = students.filter(s => (s.lhp || 'ok') === 'rut' && !s.huy && !s.qdGiao).map(label);
+  const kp = students.filter(s => (s.lhp || 'ok') === 'ok' && s.huy).map(label);
+  const n = rut.length + kp.length;
+  const dot = n ? ` <span style="background:#f5222d;color:#fff;border-radius:9px;padding:0 6px;font-size:11px;margin-left:4px">${n}</span>` : '';
+  const item = [...document.querySelectorAll('#func-panel .func-item')].find(b => (b.getAttribute('onclick') || '').includes('syncLopHocPhan'));
+  if (item) item.innerHTML = '🔄 Đồng bộ lớp học phần' + dot;
+  document.getElementById('func-btn').innerHTML = '⚡ Chức năng ▾' + dot;
+}
+function syncLopHocPhan(){
+  const huy = [], reset = [];
+  students.map(s => s.id).forEach(id => {
+    const s = students.find(x => x.id === id);
+    const lhp = s.lhp || 'ok';
+    if (lhp === 'rut' && !s.huy && !s.qdGiao) { applyHuy(id); huy.push(s.tenSV); }
+    else if (lhp === 'ok' && s.huy) { resetHuyStudent(id); reset.push(s.tenSV); }
+  });
+  const parts = [];
+  if (huy.length) parts.push(huy.length + ' SV rút học phần → "SV đã hủy" (' + huy.join(', ') + ')');
+  if (reset.length) parts.push(reset.length + ' SV được khôi phục → về trống, cần phân công lại và SV kê khai lại (' + reset.join(', ') + ')');
+  showToast(parts.length ? 'Đồng bộ lớp học phần hoàn tất: ' + parts.join('; ') + '.' : 'Đồng bộ lớp học phần hoàn tất: trạng thái sinh viên đã khớp, không có thay đổi.', 'ok');
+  render();
+}
+
 /* ════════ CHỨC NĂNG: ĐỒNG BỘ ĐIỂM (HÀNG LOẠT) ════════ */
 // UC-DATN-PDT-009: Đồng bộ điểm hàng loạt sang Lớp học phần — SV đã có Điểm tổng kết mới được gửi
 // yêu cầu (EX-01). 2 loại thất bại, xử lý KHÁC nhau (giống MH-TTTN-01):
@@ -4567,6 +4674,13 @@ let me_students = [
       ]},
     ghiChu:''},
 
+  // DỮ LIỆU TEST: SV đã rút học phần (trước quyết định) — hiển thị mờ, khóa thao tác; GVHD chỉ xem
+  {id:90, maSV:'B22DCCN140', tenSV:'Mai Xuân Bách', lop:'INT3110_1', ctdt:'KTPM', dotId:'DA-HK2-2025-2026', loaiHinh:'Đồ án tốt nghiệp',
+    topic:null, gvhd:'TS. Nguyễn Minh Tuấn', gvpb:null, baoCao:null,
+    decuong:{trangThai:'Chờ SV nộp', file:null, ngayNop:null, kePlan:[]},
+    huy:{ngay:'14/06/2026', nguon:'LHP', donTu:'LHP-2026-0431', lyDo:'Sinh viên rút học phần trên LHP', trangThaiTruoc:'Đã phân công', topicTraLai:me_TOPIC_CATALOG[1]},
+    qdGiao:null, ghiChu:'SV rút học phần 14/06/2026'},
+
   {id:14, maSV:'B22DCCN104', tenSV:'Trương Gia Bảo', lop:'INT3110_2', ctdt:'KTPM', dotId:'DA-HK1-2025-2026', loaiHinh:'Đồ án tốt nghiệp',
     topic:me_TOPIC_CATALOG[3], gvhd:'TS. Lê Thị Mai', gvpb:'TS. Nguyễn Minh Tuấn',
     baoCao:{file:'BC_DATN_B22DCCN104.pdf', ngayNop:'18/06/2026 23:55', dungHan:false, sourceUrl:'github.com/truonggiabao/datn-nlp-2026'},
@@ -4627,8 +4741,10 @@ const me_DECUONG_TRANGTHAI_META = {
   'Chờ duyệt':         {cls:'wait'},
   'Đã duyệt':          {cls:'pass'},
   'Yêu cầu chỉnh sửa': {cls:'fail'},
+  'SV đã hủy':         {cls:'cancel'},
 };
 function me_getDeCuongStage(s){
+  if (s.huy) return {key:'SV đã hủy', label:'SV đã hủy'};
   const dc = s.decuong;
   const trangThai = (dc && dc.trangThai) || 'Chờ SV nộp';
   return {key:trangThai, label:trangThai};
@@ -4708,9 +4824,9 @@ function me_renderRow(s){
     : me_curTab === 'hd'
       ? `<span style="color:var(--primary);cursor:pointer;font-size:13px" onclick="me_openDeCuongApprove(${s.id})" title="Xét đề cương & tiến độ">Chi tiết</span>`
       : `<span style="color:var(--primary);cursor:pointer;font-size:13px" onclick="me_openDeCuongInfo(${s.id})" title="Xem chi tiết đề cương & tiến độ">Chi tiết</span>`;
-  const decuongStatusCell = !s.topic
+  const decuongStatusCell = (!s.topic && !s.huy)
     ? `<span style="color:var(--text-3);font-size:12px">—</span>`
-    : `<span class="ketluan-pill ${me_deCuongPillCls(deCuongStage.key)}" style="cursor:default">${deCuongStage.label}</span>`;
+    : `<span class="ketluan-pill ${me_deCuongPillCls(deCuongStage.key)}" style="cursor:default"${s.huy ? ` title="Sinh viên rút học phần ${s.huy.ngay}"` : ''}>${deCuongStage.label}</span>`;
   const gvCell = me_curTab === 'hd'
     ? `<span style="font-size:13px;color:var(--primary);cursor:pointer;text-decoration:underline;text-underline-offset:2px" onclick="me_openGvInfo(${s.id},'hd')" title="Xem thông tin GVHD">${s.gvhd}</span>`
     : (s.gvpb ? `<span style="font-size:13px;color:var(--primary);cursor:pointer;text-decoration:underline;text-underline-offset:2px" onclick="me_openGvInfo(${s.id},'pb')" title="Xem thông tin GVPB">${s.gvpb}</span>` : `<span style="color:var(--text-3);font-size:12px">—</span>`);
@@ -4760,7 +4876,7 @@ function me_renderRow(s){
       : s.baoCao
         ? `<span class="ketluan-pill wait" onclick="me_openNhanXetGvhd(${s.id})" title="Nhập nhận xét GVHD">⏳ Chưa nhận xét</span>`
         : `<span style="color:var(--text-3);font-size:12px">—</span>`;
-    actions = `<button class="icon-btn" title="Nhập nhận xét GVHD" onclick="me_openNhanXetGvhd(${s.id})" ${s.baoCao ? '' : 'disabled'}>✏️</button>
+    actions = s.huy ? `<span style="font-size:12px;color:var(--text-3)">SV đã rút HP</span>` : `<button class="icon-btn" title="Nhập nhận xét GVHD" onclick="me_openNhanXetGvhd(${s.id})" ${s.baoCao ? '' : 'disabled'}>✏️</button>
       <button class="icon-btn" title="Chấm điểm" onclick="me_openDiemInfo(${s.id})" ${s.dongBoDiem === 'Đã đồng bộ' ? 'disabled' : ''}>📊</button>`;
   } else {
     nxCell = s.nxGVPB
@@ -4772,8 +4888,8 @@ function me_renderRow(s){
       <button class="icon-btn" title="Chấm điểm" onclick="me_openDiemInfo(${s.id})" ${s.dongBoDiem === 'Đã đồng bộ' ? 'disabled' : ''}>📊</button>`;
   }
 
-  return `<tr>
-    <td style="text-align:center"><input type="checkbox" class="row-chk" data-id="${s.id}" ${me_selectedIds.has(s.id) ? 'checked' : ''} onchange="me_toggleRowSelect(${s.id},this.checked)"></td>
+  return `<tr${s.huy ? ' class="row-huy"' : ''}>
+    <td style="text-align:center"><input type="checkbox" class="row-chk" ${s.huy ? 'disabled' : ''} data-id="${s.id}" ${me_selectedIds.has(s.id) ? 'checked' : ''} onchange="me_toggleRowSelect(${s.id},this.checked)"></td>
     <td style="font-size:12px;color:var(--text-2)" data-col="donvi">${donViCell}</td>
     <td style="font-family:monospace;font-size:12px;white-space:nowrap">${s.maSV}</td>
     <td><a href="#" class="name-cell" style="font-size:13px;font-weight:600" onclick="me_openStudentInfo(${s.id});return false">${s.tenSV}</a></td>

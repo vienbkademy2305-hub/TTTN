@@ -554,5 +554,63 @@ function cancelBack() {
   window.location.href = 'MH-SV-02_TopicBrowse.html';
 }
 </script>
+<script>
+/* Sinh viên rút học phần — trạng thái "SV đã hủy" do hệ thống đồng bộ từ Lớp học phần.
+   Xem thử: ?sv=<mã SV> (dữ liệu thử bên dưới) hoặc ?trangthai=huy (SV đang đăng nhập mặc định). */
+(function () {
+  var DEF = {"hocPhan":"Đồ án tốt nghiệp HK1 2025-2026 (Đợt ĐATN HK1 2025-2026)","lop":"Lớp học phần INT3110_1","ngay":"12/06/2026","goi":"Đề tài được duyệt SV-DT-2026-001 (trả về trạng thái còn trống); GVHD TS. Nguyễn Minh Tuấn; các nguyện vọng đã gửi","chan":"Chọn đề tài, thêm nguyện vọng, gửi nguyện vọng"};
+  var TEST = {"B22DCCN150":{"ten":"Hồ Thị Lan","k":"K68","ngay":"10/06/2026","lop":"Lớp học phần INT3110_2","goi":"Các nguyện vọng đã gửi (chưa có đề tài được duyệt)"},"B22DCCN121":{"ten":"Đinh Thị Mai Anh","k":"K68","ngay":"12/06/2026","lop":"Lớp học phần INT3110_2","goi":"Đề tài DT-2026-0002 (trả về trạng thái còn trống); GVHD TS. Nguyễn Minh Tuấn; các nguyện vọng đã gửi"}};
+  var q = new URLSearchParams(location.search);
+  var ma = q.get('sv');
+  var sv = ma ? TEST[ma] : null;
+  if (!sv && q.get('trangthai') !== 'huy') return;
+  var d = {};
+  Object.keys(DEF).forEach(function (k) { d[k] = (sv && sv[k]) || DEF[k]; });
+  var main = document.querySelector('main.content');
+  if (!main) return;
+  var st = document.createElement('style');
+  st.textContent = 'main.content.sv-huy > *:not(.sv-huy-banner){pointer-events:none;opacity:.55;user-select:none}';
+  document.head.appendChild(st);
+  main.classList.add('sv-huy');
+  // Đổi thông tin sinh viên ở thanh bên theo SV thử
+  var user = document.querySelector('.sb-user');
+  var info = user && user.querySelector(':scope > div:not(.av)');
+  if (sv && info && info.children.length >= 2) {
+    info.children[0].textContent = sv.ten;
+    info.children[1].textContent = ma + ' · ' + sv.k;
+  }
+  var badgeHtml = '<div class="sv-huy-status" style="display:inline-block;white-space:nowrap;margin-top:4px;padding:1px 10px;border-radius:10px;font-size:12px;font-weight:600;background:#f0f0f0;color:#595959;border:1px solid #d9d9d9">● SV đã hủy</div>';
+  if (info) info.insertAdjacentHTML('beforeend', badgeHtml);
+  function row(k, v) { return '<tr><td style="padding:5px 12px 5px 0;color:#8c0a1a;white-space:nowrap;vertical-align:top;font-weight:600">' + k + '</td><td style="padding:5px 0">' + v + '</td></tr>'; }
+  main.insertAdjacentHTML('afterbegin',
+    '<div class="sv-huy-banner" style="background:#fff1f0;border:1px solid #ffa39e;color:#a8071a;border-radius:8px;padding:14px 18px;margin:0 0 16px;line-height:1.55">' +
+    '<div style="font-weight:700;font-size:15px;margin-bottom:6px">🚫 Trạng thái của bạn: SV đã hủy</div>' +
+    '<div style="margin-bottom:8px">Bạn đã rút học phần. Hệ thống đã tự cập nhật trạng thái và bạn không thể kê khai hay thao tác thêm.</div>' +
+    '<table style="border-collapse:collapse;font-size:13px;color:#434343">' +
+    row('Học phần đã rút', d.hocPhan) +
+    row('Nguồn ghi nhận', d.lop + ' — hệ thống tự đồng bộ') +
+    row('Ngày rút', d.ngay) +
+    row('Đã gỡ khỏi bạn', d.goi) +
+    row('Đang bị chặn', d.chan) +
+    row('Nếu rút nhầm', 'Liên hệ Phòng Đào tạo / Khoa. Khi học phần được khôi phục, bạn sẽ phải kê khai lại từ đầu (GVHD, đề tài, cơ sở thực tập do cán bộ phân công lại).') +
+    '</table></div>');
+  main.querySelectorAll('button, input, select, textarea').forEach(function (el) { el.disabled = true; });
+})();
+</script>
+<script id="sv-demo-picker">
+/* Dữ liệu thử: chọn sinh viên để xem trạng thái "SV đã hủy" (bỏ khi dev) */
+(function () {
+  var OPTS = [["","SV bình thường"],["B22DCCN150","B22DCCN150 – Hồ Thị Lan (đã hủy)"],["B22DCCN121","B22DCCN121 – Đinh Thị Mai Anh (đã hủy)"]];
+  var cur = new URLSearchParams(location.search).get('sv') || '';
+  var box = document.createElement('div');
+  box.id = 'sv-demo-picker-box';
+  box.style.cssText = 'position:fixed;left:12px;bottom:12px;z-index:9998;background:#fff;border:1px dashed #faad14;border-radius:8px;padding:6px 10px;font-size:12px;box-shadow:0 2px 8px rgba(0,0,0,.12);color:#595959';
+  box.innerHTML = 'Dữ liệu thử (bỏ khi dev): <select style="font-size:12px;margin-left:4px">' + OPTS.map(function (o) { return '<option value="' + o[0] + '"' + (o[0] === cur ? ' selected' : '') + '>' + o[1] + '</option>'; }).join('') + '</select>';
+  document.body.appendChild(box);
+  box.querySelector('select').addEventListener('change', function () {
+    location.href = location.pathname + (this.value ? '?sv=' + this.value : '') + location.hash;
+  });
+})();
+</script>
 </body>
 </html>

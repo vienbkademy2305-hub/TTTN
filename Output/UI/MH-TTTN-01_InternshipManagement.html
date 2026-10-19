@@ -56,7 +56,8 @@
     .tpd-5{background:#e6f4ff;color:#1677ff;border-color:#91caff}           /* Đang thực hiện */
     .tpd-6{background:#f6ffed;color:#389e0d;border-color:#b7eb8f}           /* Đã chấm điểm */
     .tpd-7{background:#f0f5ff;color:#2f54eb;border-color:#adc6ff}           /* Đã công bố */
-    .diem-sync-badge{display:inline-block;padding:1px 10px;border-radius:10px;font-size:12px;border:1px solid}
+    .tpd-8{background:#f0f0f0;color:#595959;border-color:#d9d9d9}           /* SV đã hủy (rút học phần) */
+    tr.row-huy .cell-link,tr.row-huy .cell-gv,tr.row-huy .cell-editable,tr.row-huy .gv-multi,tr.row-huy .cell-na{pointer-events:none}    .diem-sync-badge{display:inline-block;padding:1px 10px;border-radius:10px;font-size:12px;border:1px solid}
     .diem-sync-chua{background:#fafafa;color:#8c8c8c;border-color:#d9d9d9}
     .diem-sync-da{background:#f6ffed;color:#389e0d;border-color:#b7eb8f}
     .diem-sync-khoa{background:#fff1f0;color:#cf1322;border-color:#ffa39e}
@@ -291,6 +292,7 @@
           <option>Đang thực hiện</option>
           <option>Đã chấm điểm</option>
           <option>Đã công bố</option>
+          <option>SV đã hủy</option>
         </select>
         <select class="fc" style="width:165px">
           <option>Tất cả GVHD</option>
@@ -324,7 +326,6 @@
             <button type="button" class="func-item" onclick="closeFuncPanel();openBulkAssignDN()">🏢 Phân doanh nghiệp</button>
             <button type="button" class="func-item" onclick="closeFuncPanel();syncDiemBulk()">🔄 Đồng bộ điểm</button>
             <button type="button" class="func-item" onclick="closeFuncPanel();syncLopHocPhan()">🔄 Đồng bộ lớp học phần</button>
-            <button type="button" class="func-item" onclick="closeFuncPanel();toast('Đang xuất danh sách sinh viên ra Excel...','warning')">⬇️ Xuất excel</button>
             <button type="button" class="func-item" onclick="closeFuncPanel();toast('Đang xuất điểm TTTN...','warning')">⬇️ Xuất điểm TTTN</button>
           </div>
         </div>
@@ -356,8 +357,8 @@
             </thead>
             <tbody>
 
-              <!-- Row 1 — Đã hoàn thành -->
-              <tr>
+              <!-- Row 1 — Đã hoàn thành (đã có quyết định; LHP ghi rút → đồng bộ bỏ qua) -->
+              <tr data-lhp="rut">
                 <td style="text-align:center"><input type="checkbox" class="row-chk" onchange="onRowCheck()"></td>
                 <td><strong>B22DCCN001</strong></td>
                 <td><span class="sv-name-link" onclick="openSVInfo('B22DCCN001')">Nguyễn Văn An</span></td>
@@ -496,6 +497,66 @@
                 <td style="text-align:center;white-space:nowrap"><button class="icon-btn" onclick="openDiemThanhPhan('B22DCCN058','Hoàng Minh Đức')" title="Chấm điểm">✎</button><button class="icon-btn" onclick="openHistory('B22DCCN058','Hoàng Minh Đức')" title="Xem lịch sử thao tác">📋</button><button class="icon-btn" onclick="openRequests('B22DCCN058','Hoàng Minh Đức')" title="DS yêu cầu của sinh viên">📩</button></td>
               </tr>
 
+              <!-- Row 6 — SV đã hủy (rút học phần, chưa chấm điểm) -->
+              <tr class="row-huy" data-sv="B22DCCN061" data-lhp="ok" data-name="Trần Quang Vinh" data-prev-cls="tpd-2" data-prev-txt="Chờ GVHD duyệt">
+                <td style="text-align:center"><input type="checkbox" class="row-chk" onchange="onRowCheck()"></td>
+                <td><strong>B22DCCN061</strong></td>
+                <td>Trần Quang Vinh</td>
+                <td style="font-size:13px;color:var(--text-2)">KTPM</td>
+                <td style="font-size:13px;color:var(--text-2)">TTTN-HK1-2526</td>
+                <td style="font-size:13px;color:var(--text-2)">TTTN.D22.02</td>
+                <td>Công ty CP Misa</td>
+                <td style="display:none">Quận Hà Đông, HN</td>
+                <td></td>
+                <td style="text-align:center"><span class="cell-na">—</span></td>
+                <td style="text-align:center"><span class="cell-na">N/A</span></td>
+                <td style="text-align:center"><span class="cell-na">_._</span></td>
+                <td style="text-align:center" class="td-status"><span class="tpd-8" title="Rút học phần 12/09/2025 — đồng bộ từ LHP">● SV đã hủy</span></td>
+                <td style="text-align:center"><span class="diem-sync-badge diem-sync-chua">Chưa đồng bộ</span></td>
+                <td style="text-align:center;color:var(--text-3);font-size:13px">—</td>
+                <td style="text-align:center;white-space:nowrap" class="td-action"><button class="icon-btn" onclick="openHistory('B22DCCN061','Trần Quang Vinh')" title="Xem lịch sử thao tác">📋</button></td>
+              </tr>
+
+              <!-- Row 7 — SV đã hủy (đã có điểm quá trình nháp) -->
+              <tr class="row-huy" data-sv="B22DCCN072" data-lhp="rut" data-name="Nguyễn Hải Yến" data-prev-cls="tpd-5" data-prev-txt="Đang thực hiện">
+                <td style="text-align:center"><input type="checkbox" class="row-chk" onchange="onRowCheck()"></td>
+                <td><strong>B22DCCN072</strong></td>
+                <td>Nguyễn Hải Yến</td>
+                <td style="font-size:13px;color:var(--text-2)">HTTT</td>
+                <td style="font-size:13px;color:var(--text-2)">TTTN-HK1-2526</td>
+                <td style="font-size:13px;color:var(--text-2)">TTTN.D22.03</td>
+                <td>Tập đoàn FPT</td>
+                <td style="display:none">Cầu Giấy, HN</td>
+                <td></td>
+                <td style="text-align:center"><span class="cell-na">—</span></td>
+                <td style="text-align:center"><span class="cell-na">N/A</span></td>
+                <td style="text-align:center"><span class="cell-na" title="Điểm quá trình nháp 7.0 — giữ ở chế độ chỉ xem, không đồng bộ">7.0 (nháp)</span></td>
+                <td style="text-align:center" class="td-status"><span class="tpd-8" title="Rút học phần 20/10/2025 — Hủy thủ công, đơn 245/ĐT-2025">● SV đã hủy</span></td>
+                <td style="text-align:center"><span class="diem-sync-badge diem-sync-chua">Chưa đồng bộ</span></td>
+                <td style="text-align:center;color:var(--text-3);font-size:13px">—</td>
+                <td style="text-align:center;white-space:nowrap" class="td-action"><button class="icon-btn" onclick="openHistory('B22DCCN072','Nguyễn Hải Yến')" title="Xem lịch sử thao tác">📋</button></td>
+              </tr>
+
+              <!-- Row 8 — LHP đã ghi nhận SV rút học phần: bấm "Đồng bộ lớp học phần" sẽ chuyển sang SV đã hủy -->
+              <tr data-sv="B22DCCN083" data-lhp="rut" data-name="Vũ Đức Mạnh">
+                <td style="text-align:center"><input type="checkbox" class="row-chk" onchange="onRowCheck()"></td>
+                <td><strong>B22DCCN083</strong></td>
+                <td>Vũ Đức Mạnh</td>
+                <td style="font-size:13px;color:var(--text-2)">KTPM</td>
+                <td style="font-size:13px;color:var(--text-2)">TTTN-HK1-2526</td>
+                <td style="font-size:13px;color:var(--text-2)">TTTN.D22.01</td>
+                <td>VNG Corporation</td>
+                <td style="display:none">Quận 7, TP.HCM</td>
+                <td><span class="gv-single">TS. Trần Triệu Long</span></td>
+                <td style="text-align:center"><span class="cell-na">—</span></td>
+                <td style="text-align:center"><span class="cell-na">N/A</span></td>
+                <td style="text-align:center"><span class="cell-na">_._</span></td>
+                <td style="text-align:center" class="td-status"><span class="tpd-5">● Đang thực hiện</span></td>
+                <td style="text-align:center"><span class="diem-sync-badge diem-sync-chua">Chưa đồng bộ</span></td>
+                <td style="text-align:center;color:var(--text-3);font-size:13px">—</td>
+                <td style="text-align:center;white-space:nowrap" class="td-action"><button class="icon-btn" disabled title="Sinh viên chưa nộp báo cáo">✎</button><button class="icon-btn" onclick="openHistory('B22DCCN083','Vũ Đức Mạnh')" title="Xem lịch sử thao tác">📋</button></td>
+              </tr>
+
             </tbody>
           </table>
         </div>
@@ -535,6 +596,7 @@
           <option>Đang thực hiện</option>
           <option>Đã chấm điểm</option>
           <option>Đã công bố</option>
+          <option>SV đã hủy</option>
         </select>
         <select class="fc" style="width:165px">
           <option>Tất cả GVHD</option>
@@ -692,6 +754,24 @@
                 <td style="text-align:center"><span class="tpd-6">● Đã chấm điểm</span></td>
                 <td style="text-align:center"><span class="cell-na">—</span></td>
                 <td style="text-align:center;white-space:nowrap"><button class="icon-btn" onclick="gv_openDiemThanhPhan('B22DCCN058','Hoàng Minh Đức')" title="Chấm điểm">✏️</button><button class="icon-btn" onclick="gv_openHistory('B22DCCN058','Hoàng Minh Đức')" title="Xem lịch sử thao tác">📋</button><button class="icon-btn" onclick="gv_openRequests('B22DCCN058','Hoàng Minh Đức')" title="DS yêu cầu của sinh viên">📩</button></td>
+              </tr>
+
+              <!-- Row 6 — SV đã hủy (GVHD chỉ xem) -->
+              <tr class="row-huy" data-sv="B22DCCN072" data-lhp="rut" data-name="Nguyễn Hải Yến" data-prev-cls="tpd-5" data-prev-txt="Đang thực hiện">
+                <td style="text-align:center"><input type="checkbox" class="row-chk" onchange="gv_onRowCheck()"></td>
+                <td><strong>B22DCCN072</strong></td>
+                <td>Nguyễn Hải Yến</td>
+                <td style="font-size:13px;color:var(--text-2)">HTTT</td>
+                <td style="font-size:13px;color:var(--text-2)">TTTN-HK1-2526</td>
+                <td style="font-size:13px;color:var(--text-2)">INT3110_3</td>
+                <td>Tập đoàn FPT</td>
+                <td></td>
+                <td style="text-align:center"><span class="cell-na">—</span></td>
+                <td style="text-align:center"><span class="cell-na">N/A</span></td>
+                <td style="text-align:center"><span class="cell-na" title="Điểm quá trình nháp 7.0 — chỉ xem">7.0 (nháp)</span></td>
+                <td style="text-align:center" class="td-status"><span class="tpd-8" title="Sinh viên đã rút học phần">● SV đã hủy</span></td>
+                <td style="text-align:center"><span class="cell-na">—</span></td>
+                <td style="text-align:center;white-space:nowrap" class="td-action"><button class="icon-btn" disabled title="Sinh viên đã rút học phần — không thể chấm điểm">✏️</button><button class="icon-btn" onclick="gv_openHistory('B22DCCN072','Nguyễn Hải Yến')" title="Xem lịch sử thao tác">📋</button></td>
               </tr>
 
             </tbody>
@@ -2777,7 +2857,7 @@ function confirmSyncDiem() {
 
 // Checkbox / Bulk
 function toggleAll(cb) {
-  document.querySelectorAll('#tpane-0 .row-chk').forEach(c => c.checked = cb.checked);
+  document.querySelectorAll('#tpane-0 .row-chk:not(:disabled)').forEach(c => c.checked = cb.checked);
   onRowCheck();
 }
 function onRowCheck() {
@@ -2788,10 +2868,6 @@ function onRowCheck() {
 function clearSelection() {
   document.querySelectorAll('#tpane-0 .row-chk, #chk-all').forEach(c => c.checked = false);
   onRowCheck();
-}
-
-function syncLopHocPhan() {
-  toast('Đang đồng bộ mã lớp học phần sinh viên tự đăng ký...', 'warning');
 }
 
 // --- Phân doanh nghiệp thực tập hàng loạt ---
@@ -3040,6 +3116,127 @@ function saveBulkQD() {
   closeModal('modal-bulk-qd');
   toast('Đã ban hành quyết định ' + document.getElementById('bqd-so').value + ' — ' + bqdSVList.length + ' sinh viên');
 }
+
+/* ════════ SV RÚT HỌC PHẦN — tự cập nhật khi cán bộ bấm "Đồng bộ lớp học phần" ════════ */
+// Hệ thống đối chiếu trạng thái từng SV ở Lớp học phần (data-lhp: 'rut' | 'ok') với trạng thái đang hiển thị:
+//  - LHP 'rut' mà chưa hủy  → "SV đã hủy": chặn mọi thao tác khác (GVHD, cơ sở TT, đề cương, điểm, quyết định, chọn hàng loạt).
+//  - LHP 'ok' mà đang hủy (SV xin không rút nữa) → về trống: xóa GVHD, cơ sở TT; cán bộ phân công lại, SV kê khai lại.
+//  - SV đã có quyết định: BỎ QUA, không hủy; vẫn thao tác/chấm điểm bình thường.
+function addHistTttn(id, actor, action, result) {
+  historyData[id] = historyData[id] || [];
+  historyData[id].push({ time: new Date().toLocaleString('vi'), actor, result, action });
+}
+function rowsOfSv(id) {
+  return [...document.querySelectorAll('#tpane-0 tbody tr, #tpane-1 tbody tr')].filter(tr => tr.cells[1] && tr.cells[1].textContent.trim() === id);
+}
+function huyActionsHtml(inGv, id, name) {
+  return `<button class="icon-btn" onclick="${inGv ? 'gv_openHistory' : 'openHistory'}('${id}','${name}')" title="Xem lịch sử thao tác">📋</button>`;
+}
+function huyRow(tr) {
+  const inGv = !!tr.closest('#tpane-1');
+  const st = tr.querySelector('.td-status span');
+  if (!st || tr.classList.contains('row-huy')) return;
+  st.className = 'tpd-8';
+  st.textContent = '● SV đã hủy';
+  st.title = 'Sinh viên đã rút học phần (đồng bộ từ lớp học phần)';
+  tr.classList.add('row-huy');
+  tr.cells[tr.closest('#tpane-1') ? 7 : 8].innerHTML = ''; // giải phóng chỉ tiêu GVHD
+  const chk = tr.querySelector('.row-chk');
+  if (chk) { chk.checked = false; chk.disabled = true; }
+  const id = tr.cells[1].textContent.trim();
+  tr.querySelector('.td-action').innerHTML = huyActionsHtml(inGv, id, tr.dataset.name || tr.cells[2].textContent.trim());
+}
+function resetRow(tr) {
+  const inGv = !!tr.closest('#tpane-1');
+  const p = inGv ? 'gv_' : '';
+  const blankEdit = ph => `<span style="color:var(--text-3);font-style:italic">Chưa đăng ký</span><input class="cell-edit-input" placeholder="${ph}" onblur="${p}endEdit(this)" onkeydown="if(event.key==='Enter')${p}endEdit(this)">`;
+  const idx = inGv ? { coso:6, gv:7, dc:8, bc:9, diem:10, st:11, qd:12, ac:13 } : { coso:6, dia:7, gv:8, dc:9, bc:10, diem:11, st:12, ttd:13, qd:14, ac:15 };
+  const c = tr.cells;
+  c[idx.coso].innerHTML = blankEdit('Nhập tên cơ sở TT...');
+  if (!inGv) c[idx.dia].innerHTML = blankEdit('Nhập địa điểm...');
+  c[idx.gv].className = 'cell-gv';
+  c[idx.gv].setAttribute('onclick', p + 'openGVPicker(this)');
+  c[idx.gv].innerHTML = '<span class="gv-unassigned">— Click để phân công GV</span>';
+  c[idx.dc].innerHTML = '<span class="cell-na">N/A</span>';
+  c[idx.bc].innerHTML = '<span class="cell-na">N/A</span>';
+  c[idx.diem].innerHTML = '<span class="cell-na">_._</span>';
+  c[idx.st].innerHTML = '<span class="tpd-0">● Chưa phân công GVHD</span>';
+  if (!inGv) c[idx.ttd].innerHTML = '<span class="diem-sync-badge diem-sync-chua">Chưa đồng bộ</span>';
+  c[idx.qd].innerHTML = '—';
+  tr.classList.remove('row-huy');
+  const chk = tr.querySelector('.row-chk');
+  if (chk) chk.disabled = false;
+  const id = c[1].textContent.trim();
+  const name = tr.dataset.name || c[2].textContent.trim();
+  c[idx.ac].innerHTML = inGv
+    ? `<button class="icon-btn" disabled title="Sinh viên chưa nộp báo cáo">✏️</button><button class="icon-btn" onclick="gv_openHistory('${id}','${name}')" title="Xem lịch sử thao tác">📋</button>`
+    : `<button class="icon-btn" onclick="openHistory('${id}','${name}')" title="Xem lịch sử thao tác">📋</button>`;
+}
+function syncLopHocPhan() {
+  const huy = [], reset = [];
+  const seen = new Set();
+  document.querySelectorAll('#tpane-0 tbody tr').forEach(tr0 => {
+    const id = tr0.cells[1].textContent.trim();
+    if (seen.has(id)) return;
+    seen.add(id);
+    const lhp = tr0.dataset.lhp || 'ok';
+    const isHuy = tr0.classList.contains('row-huy');
+    const name = tr0.dataset.name || tr0.cells[2].textContent.trim();
+    const qd = tr0.cells[14] ? tr0.cells[14].textContent.trim() : '';
+    const daCoQD = qd !== '' && qd !== '—';
+    if (lhp === 'rut' && !isHuy) {
+      if (daCoQD) return; // đã có quyết định → bỏ qua, vẫn thao tác/chấm điểm bình thường
+      rowsOfSv(id).forEach(huyRow);
+      addHistTttn(id, 'Hệ thống (đồng bộ LHP)', 'SV rút học phần → trạng thái "SV đã hủy"; chặn các chức năng khác', 'warn');
+      huy.push(name);
+    } else if (lhp === 'ok' && isHuy) {
+      rowsOfSv(id).forEach(resetRow);
+      addHistTttn(id, 'Hệ thống (đồng bộ LHP)', 'SV được LHP khôi phục → trạng thái về trống; cán bộ phân công lại GVHD, SV kê khai lại', 'ok');
+      reset.push(name);
+    }
+  });
+  onRowCheck();
+  updateLhpBanner();
+  const parts = [];
+  if (huy.length) parts.push(huy.length + ' SV rút học phần → "SV đã hủy" (' + huy.join(', ') + ')');
+  if (reset.length) parts.push(reset.length + ' SV được khôi phục → về trống, cần phân công GVHD lại và SV kê khai lại (' + reset.join(', ') + ')');
+  toast(parts.length ? 'Đồng bộ lớp học phần hoàn tất: ' + parts.join('; ') + '.' : 'Đồng bộ lớp học phần hoàn tất: trạng thái sinh viên đã khớp, không có thay đổi.', 'success');
+}
+// Báo cho cán bộ biết có thay đổi trạng thái SV ở LHP chưa đồng bộ (cùng quy tắc với syncLopHocPhan)
+function lhpPending() {
+  const rut = [], khoiPhuc = [], seen = new Set();
+  document.querySelectorAll('#tpane-0 tbody tr').forEach(tr => {
+    const id = tr.cells[1].textContent.trim();
+    if (seen.has(id)) return;
+    seen.add(id);
+    const lhp = tr.dataset.lhp || 'ok';
+    const isHuy = tr.classList.contains('row-huy');
+    const qd = tr.cells[14] ? tr.cells[14].textContent.trim() : '';
+    const label = (tr.dataset.name || tr.cells[2].textContent.trim()) + ' (' + id + ')';
+    if (lhp === 'rut' && !isHuy && (qd === '' || qd === '—')) rut.push(label);
+    else if (lhp === 'ok' && isHuy) khoiPhuc.push(label);
+  });
+  return { rut, khoiPhuc };
+}
+function updateLhpBanner() {
+  const p = lhpPending(), n = p.rut.length + p.khoiPhuc.length;
+  const item =[...document.querySelectorAll('#func-panel .func-item')].find(b => b.getAttribute('onclick') && b.getAttribute('onclick').includes('syncLopHocPhan'));
+  const dot = n ? ' <span style="background:#f5222d;color:#fff;border-radius:9px;padding:0 6px;font-size:11px;margin-left:4px">' + n + '</span>' : '';
+  if (item) item.innerHTML = '🔄 Đồng bộ lớp học phần' + dot;
+  const fb = document.getElementById('func-btn');
+  if (fb) fb.innerHTML = '⚡ Chức năng ▾' + dot;
+}
+// Gắn class cho ô Trạng thái / Hành động; khóa chọn hàng loạt với SV đã hủy
+function tagHuyCells() {
+  [[0, 12, 15], [1, 11, 13]].forEach(([pane, stIdx, acIdx]) => {
+    document.querySelectorAll('#tpane-' + pane + ' tbody tr').forEach(tr => {
+      if (tr.cells[stIdx]) tr.cells[stIdx].classList.add('td-status');
+      if (tr.cells[acIdx]) tr.cells[acIdx].classList.add('td-action');
+      if (tr.classList.contains('row-huy')) { const chk = tr.querySelector('.row-chk'); if (chk) chk.disabled = true; }
+    });
+  });
+}
+window.addEventListener('load', () => { tagHuyCells(); updateLhpBanner(); });
 
 // Lịch sử phê duyệt
 const historyData = {
@@ -4036,7 +4233,7 @@ function gv_saveDiem() {
 }
 
 function gv_toggleAll(cb) {
-  document.querySelectorAll('#tpane-1 .row-chk').forEach(c => c.checked = cb.checked);
+  document.querySelectorAll('#tpane-1 .row-chk:not(:disabled)').forEach(c => c.checked = cb.checked);
   gv_onRowCheck();
 }
 function gv_onRowCheck() {

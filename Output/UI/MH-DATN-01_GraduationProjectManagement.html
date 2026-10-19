@@ -4130,7 +4130,7 @@ function exportDSSV(){
 
   const rows = list.map(s => {
     const dotName = (ROUNDS.find(r => r.id === s.dotId)||{}).name || s.dotId;
-    const deCuongStage = s.topic ? getDeCuongStage(s) : null;
+    const deCuongStage = (s.topic || s.huy) ? getDeCuongStage(s) : null;
     const conclLabel = s.conclusion ? CONCLUSION_CFG[s.conclusion].label : 'Chưa kết luận';
     const nopQuyenLabel = !canNopQuyen(s) ? '' : (s.nopQuyen && s.nopQuyen.daNop ? `Đã nộp — ${s.nopQuyen.ngayXacNhan}` : 'Chưa xác nhận');
     return [

@@ -346,7 +346,7 @@
                 <th style="min-width:155px">Cơ sở TT</th>
                 <th style="min-width:165px;display:none">Địa điểm TT</th>
                 <th style="min-width:170px">Giảng viên hướng dẫn</th>
-                <th style="text-align:center;min-width:85px">Đề cương</th>
+                <th style="text-align:center;min-width:110px">Tiến độ TTTN</th>
                 <th style="text-align:center;min-width:80px">File BC</th>
                 <th style="text-align:center;min-width:110px">Điểm thành phần</th>
                 <th style="text-align:center;min-width:150px">Trạng thái</th>
@@ -631,7 +631,7 @@
                 <th style="min-width:130px">Lớp học phần</th>
                 <th style="min-width:155px">Cơ sở TT</th>
                 <th style="min-width:170px">Giảng viên hướng dẫn</th>
-                <th style="text-align:center;min-width:85px">Đề cương</th>
+                <th style="text-align:center;min-width:110px">Tiến độ TTTN</th>
                 <th style="text-align:center;min-width:80px">File BC</th>
                 <th style="text-align:center;min-width:110px">Điểm thành phần</th>
                 <th style="text-align:center;min-width:150px">Trạng thái</th>
@@ -1069,11 +1069,11 @@
   </div>
 </div>
 
-<!-- Modal: Đề cương / Kế hoạch (PDT view — read-only + phê duyệt) -->
+<!-- Modal: Tiến độ TTTN (PDT view — read-only + phê duyệt) -->
 <div class="overlay hidden" id="modal-decanvas">
   <div class="modal-box" style="width:860px;max-height:90vh">
     <div class="modal-hd">
-      <span class="modal-title">📄 Xem xét Đề cương / Kế hoạch — <span id="dc-sv">Nguyễn Văn An (B22DCCN001)</span> - KTPM</span>
+      <span class="modal-title">📄 Xem xét Tiến độ TTTN — <span id="dc-sv">Nguyễn Văn An (B22DCCN001)</span> - KTPM</span>
       <button class="modal-close" onclick="closeModal('modal-decanvas')">✕</button>
     </div>
     <div class="modal-bd">
@@ -1098,11 +1098,11 @@
           <input class="fc" type="text" id="dc-addr" value="Tòa nhà FPT, Phố Duy Tân, Cầu Giấy" readonly style="background:#fafafa;cursor:default">
         </div>
         <div class="fi">
-          <label>Ngày bắt đầu</label>
+          <label>Ngày bắt đầu <span class="text-muted text-sm">(theo lớp học phần)</span></label>
           <input class="fc" type="date" id="dc-from" value="2025-09-01" readonly style="background:#fafafa;cursor:default">
         </div>
         <div class="fi">
-          <label>Ngày kết thúc</label>
+          <label>Ngày kết thúc <span class="text-muted text-sm">(theo lớp học phần)</span></label>
           <input class="fc" type="date" id="dc-to" value="2025-12-31" readonly style="background:#fafafa;cursor:default">
         </div>
       </div>
@@ -1151,7 +1151,7 @@
         <span class="alert-ico">ℹ️</span>
         <div class="alert-body">
           <div class="alert-title">Chờ phê duyệt</div>
-          <span class="alert-desc">Sinh viên đã nộp đề cương — đang chờ Giáo vụ xem xét và phê duyệt.</span>
+          <span class="alert-desc">Sinh viên đã nộp Tiến độ TTTN — đang chờ Giáo vụ xem xét và phê duyệt.</span>
         </div>
       </div>
 
@@ -1182,7 +1182,7 @@
         <label>File báo cáo chính thức</label>
         <div style="display:flex;gap:8px;align-items:center">
           <span style="font-size:13px;color:var(--primary)">📎 BaoCao_B22DCCN001.pdf</span>
-          <button class="btn btn-default btn-sm">👁️ Xem</button>
+          <button class="btn btn-default btn-sm" onclick="openBcPreview(this)">👁️ Xem trước</button>
           <button class="btn btn-default btn-sm">⬇️ Tải</button>
         </div>
         <div class="f-hint">Nộp lúc: 20/11/2025 09:15 — <span style="color:var(--success)">đúng hạn</span></div>
@@ -1732,11 +1732,11 @@
   </div>
 </div>
 
-<!-- Modal: Đề cương / Kế hoạch -->
+<!-- Modal: Tiến độ TTTN -->
 <div class="overlay hidden" id="gv_modal-decanvas">
   <div class="modal-box" style="width:860px;max-height:90vh">
     <div class="modal-hd">
-      <span class="modal-title">📄 Xem xét Đề cương / Kế hoạch — <span id="gv_dc-sv">Nguyễn Văn An (B22DCCN001)</span> - KTPM</span>
+      <span class="modal-title">📄 Xem xét Tiến độ TTTN — <span id="gv_dc-sv">Nguyễn Văn An (B22DCCN001)</span> - KTPM</span>
       <button class="modal-close" onclick="gv_closeModal('gv_modal-decanvas')">✕</button>
     </div>
     <div class="modal-bd">
@@ -1755,19 +1755,19 @@
           <input class="fc" type="text" id="gv_dc-addr" value="Tòa nhà FPT, Phố Duy Tân, Cầu Giấy" readonly style="background:#fafafa;cursor:default">
         </div>
         <div class="fi">
-          <label>Ngày bắt đầu</label>
+          <label>Ngày bắt đầu <span class="text-muted text-sm">(theo lớp học phần)</span></label>
           <input class="fc" type="date" id="gv_dc-from" value="2025-09-01" readonly style="background:#fafafa;cursor:default">
         </div>
         <div class="fi">
-          <label>Ngày kết thúc</label>
+          <label>Ngày kết thúc <span class="text-muted text-sm">(theo lớp học phần)</span></label>
           <input class="fc" type="date" id="gv_dc-to" value="2025-12-31" readonly style="background:#fafafa;cursor:default">
         </div>
       </div>
-      <div class="sec-title"><span class="sec-badge">2</span> File Đề cương (PDF)</div>
+      <div class="sec-title"><span class="sec-badge">2</span> File Tiến độ TTTN (PDF)</div>
       <div style="display:flex;align-items:center;gap:10px;padding:10px 12px;border:1px solid var(--border);border-radius:6px;background:#fafafa;margin-bottom:20px">
         <span style="font-size:18px">📄</span>
         <div style="flex:1">
-          <div style="font-size:13px;font-weight:500" id="gv_dc-filename">DeCuong_B22DCCN001_TTTN2526.pdf</div>
+          <div style="font-size:13px;font-weight:500" id="gv_dc-filename">TienDoTTTN_B22DCCN001_TTTN2526.pdf</div>
           <div class="text-muted text-sm" id="gv_dc-submitted">Nộp lúc: 05/09/2025 14:32 — đúng hạn</div>
         </div>
         <button class="btn btn-default btn-sm">👁️ Xem</button>
@@ -1814,7 +1814,7 @@
         <span class="alert-ico">ℹ️</span>
         <div class="alert-body">
           <div class="alert-title">Chờ phê duyệt</div>
-          <span class="alert-desc">Sinh viên đã nộp đề cương — đang chờ Giáo vụ xem xét và phê duyệt.</span>
+          <span class="alert-desc">Sinh viên đã nộp Tiến độ TTTN — đang chờ Giáo vụ xem xét và phê duyệt.</span>
         </div>
       </div>
     </div>
@@ -1826,7 +1826,7 @@
   </div>
 </div>
 
-<!-- Modal: Xác nhận Từ chối Đề cương -->
+<!-- Modal: Xác nhận Từ chối Tiến độ TTTN -->
 <div class="overlay hidden" id="gv_modal-reject-dc">
   <div class="modal-box" style="width:480px">
     <div class="modal-hd">
@@ -1837,8 +1837,8 @@
       <div class="alert alert-warning" style="margin-bottom:16px">
         <span class="alert-ico">⚠️</span>
         <div class="alert-body">
-          <div class="alert-title">Xác nhận từ chối đề cương</div>
-          <span class="alert-desc">Sinh viên sẽ nhận được thông báo yêu cầu chỉnh sửa và phải nộp lại đề cương. Hành động này không thể hoàn tác.</span>
+          <div class="alert-title">Xác nhận từ chối Tiến độ TTTN</div>
+          <span class="alert-desc">Sinh viên sẽ nhận được thông báo yêu cầu chỉnh sửa và phải nộp lại Tiến độ TTTN. Hành động này không thể hoàn tác.</span>
         </div>
       </div>
       <div class="fi">
@@ -1866,7 +1866,7 @@
         <label>File báo cáo chính thức</label>
         <div style="display:flex;gap:8px;align-items:center">
           <span style="font-size:13px;color:var(--primary)">📎 BaoCao_B22DCCN001.pdf</span>
-          <button class="btn btn-default btn-sm">👁️ Xem</button>
+          <button class="btn btn-default btn-sm" onclick="openBcPreview(this)">👁️ Xem trước</button>
           <button class="btn btn-default btn-sm">⬇️ Tải</button>
         </div>
         <div class="f-hint">Nộp lúc: 20/11/2025 09:15 — <span style="color:var(--success)">đúng hạn</span></div>
@@ -2559,8 +2559,25 @@ function saveMultiGV() {
     : 'Đã lưu cấu hình GVHD');
 }
 
-// Đề cương / Kế hoạch
+// Tiến độ TTTN
+// Tiến độ TTTN: SV nộp không kèm kế hoạch tuần (CR-20261103-003 — kế hoạch tuần không bắt buộc)
+const DC_NO_PLAN = ['B22DCCN033'];
+function dcTogglePlan(bodyId, id) {
+  const tbl = document.getElementById(bodyId).closest('table');
+  let empty = tbl.parentNode.querySelector('.dc-plan-empty');
+  if (!empty) {
+    empty = document.createElement('div');
+    empty.className = 'dc-plan-empty text-muted';
+    empty.style.cssText = 'padding:14px;border:1px dashed var(--border);border-radius:6px;text-align:center;font-size:13px';
+    empty.textContent = 'Chưa kê khai kế hoạch công việc theo tuần';
+    tbl.parentNode.appendChild(empty);
+  }
+  const noPlan = DC_NO_PLAN.includes(id);
+  tbl.style.display   = noPlan ? 'none' : '';
+  empty.style.display = noPlan ? '' : 'none';
+}
 function openDeCanvas(id, name) {
+  dcTogglePlan('dc-plan-body', id);
   document.getElementById('dc-sv').textContent = name + ' (' + id + ')';
   // Điền dữ liệu từ DC_DB nếu có (dùng chung dữ liệu với màn SV)
   const dcMap = {
@@ -2586,7 +2603,7 @@ function openDeCanvas(id, name) {
 }
 function approveDC() {
   closeModal('modal-decanvas');
-  toast('Đã phê duyệt đề cương');
+  toast('Đã phê duyệt Tiến độ TTTN');
 }
 function rejectDC() {
   const fi = document.getElementById('fi-reason-dc');
@@ -3242,7 +3259,7 @@ window.addEventListener('load', () => { tagHuyCells(); updateLhpBanner(); });
 const historyData = {
   'B22DCCN001': [
     { time: '01/09/2025 08:30', actor: 'Nguyễn Thị Lan',      result: 'ok',   action: 'Xác nhận đủ điều kiện → Thêm vào danh sách đợt TTTN HK1 2025-2026' },
-    { time: '05/09/2025 14:32', actor: 'Nguyễn Thị Lan',      result: 'ok',   action: 'Phê duyệt đề cương / kế hoạch thực tập' },
+    { time: '05/09/2025 14:32', actor: 'Nguyễn Thị Lan',      result: 'ok',   action: 'Phê duyệt Tiến độ TTTN' },
     { time: '10/09/2025 09:00', actor: 'Nguyễn Thị Lan',      result: 'ok',   action: 'Phân công GVHD → TS. Trần Triệu Long' },
     { time: '20/11/2025 09:15', actor: 'Hệ thống',            result: 'ok',   action: 'Ghi nhận nộp báo cáo cuối kỳ — đúng hạn' },
     { time: '25/11/2025 16:00', actor: 'TS. Trần Triệu Long (GV Chấm 1)',  result: 'ok', action: 'Nhập điểm báo cáo — GV Chấm 1: 9.0' },
@@ -3251,13 +3268,13 @@ const historyData = {
   ],
   'B22DCCN015': [
     { time: '01/09/2025 08:30', actor: 'Nguyễn Thị Lan',      result: 'ok',   action: 'Xác nhận đủ điều kiện → Thêm vào danh sách đợt TTTN HK1 2025-2026' },
-    { time: '06/09/2025 10:10', actor: 'Nguyễn Thị Lan',      result: 'warn', action: 'Trả lại đề cương — yêu cầu chỉnh sửa mục kế hoạch tuần 2' },
-    { time: '08/09/2025 11:00', actor: 'Nguyễn Thị Lan',      result: 'ok',   action: 'Phê duyệt đề cương lần 2 sau khi SV chỉnh sửa' },
+    { time: '06/09/2025 10:10', actor: 'Nguyễn Thị Lan',      result: 'warn', action: 'Trả lại Tiến độ TTTN — yêu cầu chỉnh sửa mục kế hoạch tuần 2' },
+    { time: '08/09/2025 11:00', actor: 'Nguyễn Thị Lan',      result: 'ok',   action: 'Phê duyệt Tiến độ TTTN lần 2 sau khi SV chỉnh sửa' },
     { time: '12/09/2025 14:00', actor: 'Nguyễn Thị Lan',      result: 'warn', action: 'Phân công đa GVHD (TS. Trần Triệu Long + ThS. Nguyễn Đình Hùng) — chưa cấu hình trọng số' },
   ],
   'B22DCCN033': [
     { time: '01/09/2025 08:30', actor: 'Nguyễn Thị Lan',      result: 'ok',   action: 'Xác nhận đủ điều kiện → Thêm vào danh sách đợt TTTN HK1 2025-2026' },
-    { time: '07/09/2025 09:45', actor: 'Nguyễn Thị Lan',      result: 'ok',   action: 'Phê duyệt đề cương / kế hoạch thực tập' },
+    { time: '07/09/2025 09:45', actor: 'Nguyễn Thị Lan',      result: 'ok',   action: 'Phê duyệt Tiến độ TTTN' },
     { time: '11/09/2025 10:00', actor: 'Nguyễn Thị Lan',      result: 'ok',   action: 'Phân công GVHD → TS. Phạm Văn Đức' },
     { time: '21/11/2025 10:30', actor: 'Hệ thống',            result: 'ok',   action: 'Ghi nhận nộp báo cáo cuối kỳ — đúng hạn' },
   ],
@@ -3266,7 +3283,7 @@ const historyData = {
   ],
   'B22DCCN058': [
     { time: '01/09/2025 08:30', actor: 'Nguyễn Thị Lan',        result: 'ok', action: 'Xác nhận đủ điều kiện → Thêm vào danh sách đợt TTTN HK1 2025-2026' },
-    { time: '06/09/2025 15:20', actor: 'Nguyễn Thị Lan',        result: 'ok', action: 'Phê duyệt đề cương / kế hoạch thực tập' },
+    { time: '06/09/2025 15:20', actor: 'Nguyễn Thị Lan',        result: 'ok', action: 'Phê duyệt Tiến độ TTTN' },
     { time: '12/09/2025 11:00', actor: 'Nguyễn Thị Lan',        result: 'ok', action: 'Phân công GVHD → ThS. Nguyễn Đình Hùng' },
     { time: '22/11/2025 08:50', actor: 'Hệ thống',              result: 'ok', action: 'Ghi nhận nộp báo cáo cuối kỳ — đúng hạn' },
     { time: '26/11/2025 14:00', actor: 'ThS. Nguyễn Đình Hùng (GV Chấm 1)', result: 'ok', action: 'Nhập điểm quá trình (Cơ sở TT): QT = 7.5 · Điểm BC chưa chấm (chờ GV Chấm 1 và GV Chấm 2)' },
@@ -3892,11 +3909,12 @@ function gv_saveMultiGV() {
 }
 
 function gv_openDeCanvas(id, name) {
+  dcTogglePlan('gv_dc-plan-body', id);
   document.getElementById('gv_dc-sv').textContent = name + ' (' + id + ')';
-  document.getElementById('gv_dc-filename').textContent = 'DeCuong_' + id + '_TTTN2526.pdf';
+  document.getElementById('gv_dc-filename').textContent = 'TienDoTTTN_' + id + '_TTTN2526.pdf';
   document.getElementById('gv_modal-decanvas').classList.remove('hidden');
 }
-function gv_approveDC() { gv_closeModal('gv_modal-decanvas'); gv_toast('Đã phê duyệt đề cương'); }
+function gv_approveDC() { gv_closeModal('gv_modal-decanvas'); gv_toast('Đã phê duyệt Tiến độ TTTN'); }
 function gv_rejectDC() {
   const svText = document.getElementById('gv_dc-sv').textContent;
   document.getElementById('gv_rdc-sv').textContent = svText;
@@ -4249,7 +4267,7 @@ function gv_clearSelection() {
 const gv_historyData = {
   'B22DCCN001': [
     { time: '01/09/2025 08:30', actor: 'Trần Thị Minh Châu', result: 'ok',   action: 'Xác nhận đủ điều kiện → Thêm vào danh sách đợt TTTN HK1 2025-2026' },
-    { time: '05/09/2025 14:32', actor: 'Trần Thị Minh Châu', result: 'ok',   action: 'Phê duyệt đề cương / kế hoạch thực tập' },
+    { time: '05/09/2025 14:32', actor: 'Trần Thị Minh Châu', result: 'ok',   action: 'Phê duyệt Tiến độ TTTN' },
     { time: '10/09/2025 09:00', actor: 'Trần Thị Minh Châu', result: 'ok',   action: 'Phân công GVHD → TS. Trần Triệu Long' },
     { time: '20/11/2025 09:15', actor: 'Hệ thống',           result: 'ok',   action: 'Ghi nhận nộp báo cáo cuối kỳ — đúng hạn' },
     { time: '25/11/2025 16:00', actor: 'TS. Trần Triệu Long',result: 'ok',   action: 'Cập nhật điểm: QT = 8.5 · BC = 9.0 · Tổng kết = 8.8' },
@@ -4257,12 +4275,12 @@ const gv_historyData = {
   ],
   'B22DCCN015': [
     { time: '01/09/2025 08:30', actor: 'Trần Thị Minh Châu', result: 'ok',   action: 'Xác nhận đủ điều kiện → Thêm vào danh sách đợt TTTN HK1 2025-2026' },
-    { time: '06/09/2025 10:10', actor: 'Trần Thị Minh Châu', result: 'warn', action: 'Trả lại đề cương — yêu cầu chỉnh sửa mục kế hoạch tuần 2' },
+    { time: '06/09/2025 10:10', actor: 'Trần Thị Minh Châu', result: 'warn', action: 'Trả lại Tiến độ TTTN — yêu cầu chỉnh sửa mục kế hoạch tuần 2' },
     { time: '12/09/2025 14:00', actor: 'Trần Thị Minh Châu', result: 'ok', action: 'Phân công đa GVHD: TS. Nguyễn Minh Tuấn (Khoa CNTT, 70%) + PGS.TS. Lê Văn Bình (ĐHQG TP.HCM, 30%) — đã cấu hình trọng số' },
   ],
   'B22DCCN033': [
     { time: '01/09/2025 08:30', actor: 'Trần Thị Minh Châu', result: 'ok',   action: 'Xác nhận đủ điều kiện → Thêm vào danh sách đợt TTTN HK1 2025-2026' },
-    { time: '07/09/2025 09:45', actor: 'Trần Thị Minh Châu', result: 'ok',   action: 'Phê duyệt đề cương / kế hoạch thực tập' },
+    { time: '07/09/2025 09:45', actor: 'Trần Thị Minh Châu', result: 'ok',   action: 'Phê duyệt Tiến độ TTTN' },
     { time: '11/09/2025 10:00', actor: 'Trần Thị Minh Châu', result: 'ok',   action: 'Phân công GVHD → TS. Phạm Văn Đức' },
     { time: '21/11/2025 10:30', actor: 'Hệ thống',           result: 'ok',   action: 'Ghi nhận nộp báo cáo cuối kỳ — đúng hạn' },
   ],
@@ -4271,7 +4289,7 @@ const gv_historyData = {
   ],
   'B22DCCN058': [
     { time: '01/09/2025 08:30', actor: 'Trần Thị Minh Châu', result: 'ok',   action: 'Xác nhận đủ điều kiện → Thêm vào danh sách đợt TTTN HK1 2025-2026' },
-    { time: '06/09/2025 15:20', actor: 'Trần Thị Minh Châu', result: 'ok',   action: 'Phê duyệt đề cương / kế hoạch thực tập' },
+    { time: '06/09/2025 15:20', actor: 'Trần Thị Minh Châu', result: 'ok',   action: 'Phê duyệt Tiến độ TTTN' },
     { time: '12/09/2025 11:00', actor: 'Trần Thị Minh Châu', result: 'ok',   action: 'Phân công GVHD → ThS. Nguyễn Đình Hùng' },
     { time: '22/11/2025 08:50', actor: 'Hệ thống',           result: 'ok',   action: 'Ghi nhận nộp báo cáo cuối kỳ — đúng hạn' },
     { time: '26/11/2025 14:00', actor: 'ThS. Nguyễn Đình Hùng', result: 'ok', action: 'Cập nhật điểm quá trình: QT = 7.5 · Điểm BC chưa nhập' },
@@ -4579,6 +4597,56 @@ function gv_openRequests(id, name) {
 
 // Init: trạng thái mặc định — Tab 1 (PĐT & Giáo vụ Khoa).
 updateHeaderIdentity();
+</script>
+<!-- ======================== POPUP: XEM TRƯỚC BÁO CÁO (CR-20261103-004 / US-TTTN-20) ======================== -->
+<div class="overlay hidden" id="modal-bc-preview" style="z-index:1200">
+  <div class="modal-box" style="width:760px;max-width:95vw">
+    <div class="modal-hd">
+      <span class="modal-title">👁️ Xem trước báo cáo — <span id="bcp-filename"></span></span>
+      <button class="modal-close" onclick="closeBcPreview()">✕</button>
+    </div>
+    <div class="modal-bd" style="background:#f0f0f0;padding:16px">
+      <div id="bcp-page" style="background:#fff;width:100%;max-width:560px;height:62vh;margin:0 auto;box-shadow:0 1px 4px rgba(0,0,0,.15);padding:40px 48px;overflow:auto;font-family:'Times New Roman',serif;font-size:14px;line-height:1.6"></div>
+      <div style="display:flex;justify-content:center;align-items:center;gap:12px;margin-top:12px">
+        <button class="btn btn-default btn-sm" id="bcp-prev" onclick="bcPreviewGo(-1)">◀ Trang trước</button>
+        <span style="font-size:13px">Trang <strong id="bcp-cur">1</strong> / <span id="bcp-total"></span></span>
+        <button class="btn btn-default btn-sm" id="bcp-next" onclick="bcPreviewGo(1)">Trang sau ▶</button>
+      </div>
+    </div>
+    <div class="modal-ft">
+      <button class="btn btn-default" onclick="closeBcPreview()">Đóng</button>
+      <button class="btn btn-default" onclick="bcPreviewDownload()">⬇️ Tải</button>
+    </div>
+  </div>
+</div>
+<script>
+/* Xem trước báo cáo SV đã nộp, không cần tải về (CR-20261103-004 / US-TTTN-20). Nội dung trang là mô phỏng. */
+var BCP_PAGES = [
+  '<div style="text-align:center;margin-top:60px"><div style="font-weight:700">TRƯỜNG ĐẠI HỌC</div><div style="margin:80px 0 20px;font-size:20px;font-weight:700">BÁO CÁO CUỐI KỲ</div><div>Sinh viên thực hiện: ...</div><div>Giảng viên hướng dẫn: ...</div></div>',
+  '<div style="font-weight:700;text-align:center;margin-bottom:16px">MỤC LỤC</div><div>Lời cảm ơn</div><div>Chương 1. Giới thiệu</div><div>Chương 2. Nội dung thực hiện</div><div>Chương 3. Kết quả đạt được</div><div>Kết luận</div><div>Tài liệu tham khảo</div>',
+  '<div style="font-weight:700;margin-bottom:12px">CHƯƠNG 1. GIỚI THIỆU</div><p>1.1. Lý do chọn đề tài ...</p><p>1.2. Mục tiêu ...</p><p>1.3. Phạm vi ...</p>'
+];
+var bcpCur = 0;
+function openBcPreview(btn) {
+  var fileEl = btn.parentNode.querySelector('span');
+  var name = fileEl ? fileEl.textContent.replace(/^📎\s*/, '').trim() : '';
+  document.getElementById('bcp-filename').textContent = name;
+  document.getElementById('bcp-total').textContent = BCP_PAGES.length;
+  bcpCur = 0; bcPreviewGo(0);
+  document.getElementById('modal-bc-preview').classList.remove('hidden');
+}
+function bcPreviewGo(step) {
+  bcpCur = Math.max(0, Math.min(BCP_PAGES.length - 1, bcpCur + step));
+  document.getElementById('bcp-page').innerHTML = BCP_PAGES[bcpCur];
+  document.getElementById('bcp-cur').textContent = bcpCur + 1;
+  document.getElementById('bcp-prev').disabled = bcpCur === 0;
+  document.getElementById('bcp-next').disabled = bcpCur === BCP_PAGES.length - 1;
+}
+function closeBcPreview() { document.getElementById('modal-bc-preview').classList.add('hidden'); }
+function bcPreviewDownload() {
+  var msg = 'Đang tải ' + document.getElementById('bcp-filename').textContent + ' (mô phỏng)';
+  if (typeof showToast === 'function') showToast(msg); else if (typeof toast === 'function') toast(msg);
+}
 </script>
 </body>
 </html>

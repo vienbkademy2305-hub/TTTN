@@ -1463,7 +1463,7 @@
         <label>File báo cáo chính thức</label>
         <div style="display:flex;gap:8px;align-items:center">
           <span style="font-size:13px;color:var(--primary)" id="bc-file"></span>
-          <button class="btn btn-default btn-sm" onclick="showToast('Đang xem báo cáo (mô phỏng)')">👁️ Xem</button>
+          <button class="btn btn-default btn-sm" onclick="openBcPreview(this)">👁️ Xem trước</button>
           <button class="btn btn-default btn-sm" onclick="showToast('Đang tải báo cáo (mô phỏng)')">⬇️ Tải</button>
         </div>
         <div class="f-hint" id="bc-submitinfo"></div>
@@ -1835,7 +1835,7 @@
       <div style="font-size:13px;color:var(--text-2);margin-bottom:8px">File báo cáo hiện tại</div>
       <div style="display:flex;align-items:center;gap:8px;margin-bottom:16px">
         <span id="me_rp-file-name" style="font-family:monospace;color:#fa8c16"></span>
-        <button class="btn btn-default btn-sm" onclick="me_viewReportFile()">👁️ Xem</button>
+        <button class="btn btn-default btn-sm" onclick="openBcPreview(this)">👁️ Xem trước</button>
         <button class="btn btn-default btn-sm" onclick="me_downloadReportFile()">⬇️ Tải</button>
       </div>
       <div style="font-size:13px;color:var(--text-2);margin-bottom:8px">Mã nguồn / Sản phẩm</div>
@@ -5557,6 +5557,56 @@ document.getElementById('me_f-donvi').innerHTML += Object.values(me_CTDT_DONVI).
 document.getElementById('me_f-ctdt').innerHTML += Object.keys(me_CTDT_DONVI).map(c => `<option value="${c}">${c}</option>`).join('');
 me_switchSecTab('hd');
 
+</script>
+<!-- ======================== POPUP: XEM TRƯỚC BÁO CÁO (CR-20261103-004 / US-TTTN-20) ======================== -->
+<div class="overlay hidden" id="modal-bc-preview" style="z-index:1200">
+  <div class="modal-box" style="width:760px;max-width:95vw">
+    <div class="modal-hd">
+      <span class="modal-title">👁️ Xem trước báo cáo — <span id="bcp-filename"></span></span>
+      <button class="modal-close" onclick="closeBcPreview()">✕</button>
+    </div>
+    <div class="modal-bd" style="background:#f0f0f0;padding:16px">
+      <div id="bcp-page" style="background:#fff;width:100%;max-width:560px;height:62vh;margin:0 auto;box-shadow:0 1px 4px rgba(0,0,0,.15);padding:40px 48px;overflow:auto;font-family:'Times New Roman',serif;font-size:14px;line-height:1.6"></div>
+      <div style="display:flex;justify-content:center;align-items:center;gap:12px;margin-top:12px">
+        <button class="btn btn-default btn-sm" id="bcp-prev" onclick="bcPreviewGo(-1)">◀ Trang trước</button>
+        <span style="font-size:13px">Trang <strong id="bcp-cur">1</strong> / <span id="bcp-total"></span></span>
+        <button class="btn btn-default btn-sm" id="bcp-next" onclick="bcPreviewGo(1)">Trang sau ▶</button>
+      </div>
+    </div>
+    <div class="modal-ft">
+      <button class="btn btn-default" onclick="closeBcPreview()">Đóng</button>
+      <button class="btn btn-default" onclick="bcPreviewDownload()">⬇️ Tải</button>
+    </div>
+  </div>
+</div>
+<script>
+/* Xem trước báo cáo SV đã nộp, không cần tải về (CR-20261103-004 / US-TTTN-20). Nội dung trang là mô phỏng. */
+var BCP_PAGES = [
+  '<div style="text-align:center;margin-top:60px"><div style="font-weight:700">TRƯỜNG ĐẠI HỌC</div><div style="margin:80px 0 20px;font-size:20px;font-weight:700">BÁO CÁO CUỐI KỲ</div><div>Sinh viên thực hiện: ...</div><div>Giảng viên hướng dẫn: ...</div></div>',
+  '<div style="font-weight:700;text-align:center;margin-bottom:16px">MỤC LỤC</div><div>Lời cảm ơn</div><div>Chương 1. Giới thiệu</div><div>Chương 2. Nội dung thực hiện</div><div>Chương 3. Kết quả đạt được</div><div>Kết luận</div><div>Tài liệu tham khảo</div>',
+  '<div style="font-weight:700;margin-bottom:12px">CHƯƠNG 1. GIỚI THIỆU</div><p>1.1. Lý do chọn đề tài ...</p><p>1.2. Mục tiêu ...</p><p>1.3. Phạm vi ...</p>'
+];
+var bcpCur = 0;
+function openBcPreview(btn) {
+  var fileEl = btn.parentNode.querySelector('span');
+  var name = fileEl ? fileEl.textContent.replace(/^📎\s*/, '').trim() : '';
+  document.getElementById('bcp-filename').textContent = name;
+  document.getElementById('bcp-total').textContent = BCP_PAGES.length;
+  bcpCur = 0; bcPreviewGo(0);
+  document.getElementById('modal-bc-preview').classList.remove('hidden');
+}
+function bcPreviewGo(step) {
+  bcpCur = Math.max(0, Math.min(BCP_PAGES.length - 1, bcpCur + step));
+  document.getElementById('bcp-page').innerHTML = BCP_PAGES[bcpCur];
+  document.getElementById('bcp-cur').textContent = bcpCur + 1;
+  document.getElementById('bcp-prev').disabled = bcpCur === 0;
+  document.getElementById('bcp-next').disabled = bcpCur === BCP_PAGES.length - 1;
+}
+function closeBcPreview() { document.getElementById('modal-bc-preview').classList.add('hidden'); }
+function bcPreviewDownload() {
+  var msg = 'Đang tải ' + document.getElementById('bcp-filename').textContent + ' (mô phỏng)';
+  if (typeof showToast === 'function') showToast(msg); else if (typeof toast === 'function') toast(msg);
+}
 </script>
 </body>
 </html>

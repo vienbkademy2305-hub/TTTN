@@ -269,7 +269,7 @@
                   <th style="min-width:130px">CTĐT</th>
                   <th style="min-width:150px">Cơ sở TT</th>
                   <th style="min-width:170px">Giảng viên HD</th>
-                  <th style="text-align:center;min-width:130px">Kế hoạch</th>
+                  <th style="text-align:center;min-width:130px">Tiến độ TTTN</th>
                   <th style="text-align:center;min-width:110px">File Báo cáo</th>
                   <th style="text-align:center;min-width:110px">Điểm thành phần</th>
                   <th style="text-align:center;min-width:170px">Trạng thái</th>
@@ -279,7 +279,7 @@
               </thead>
               <tbody>
 
-                <!-- Dòng 1: Chờ GVHD duyệt đề cương -->
+                <!-- Dòng 1: Chờ GVHD duyệt Tiến độ TTTN -->
                 <tr>
                   <td style="text-align:center;color:var(--text-3)">1</td>
                   <td>
@@ -293,7 +293,7 @@
                     <span class="cell-link" onclick="openSvDeCanvas('TTTN_2526_K1')">Chi tiết</span>
                   </td>
                   <td style="text-align:center">
-                    <span class="cell-na" title="Chỉ mở sau khi đề cương được duyệt">N/A</span>
+                    <span class="cell-na" title="Chỉ mở sau khi Tiến độ TTTN được duyệt">N/A</span>
                   </td>
                   <td style="text-align:center"><span class="cell-score-empty">_._</span></td>
                   <td style="text-align:center"><span class="tpd-2">● Chờ GVHD duyệt</span></td>
@@ -306,7 +306,7 @@
                   </td>
                 </tr>
 
-                <!-- Dòng 2: Yêu cầu chỉnh sửa đề cương -->
+                <!-- Dòng 2: Yêu cầu chỉnh sửa Tiến độ TTTN -->
                 <tr class="row-fail">
                   <td style="text-align:center;color:var(--text-3)">2</td>
                   <td>
@@ -317,10 +317,10 @@
                   <td style="font-size:13px">Viettel IDC</td>
                   <td style="font-size:12px;color:var(--text-2)">TS. Trần Triệu Long<br><span style="color:var(--text-3)">ThS. Nguyễn Đình Hùng</span></td>
                   <td style="text-align:center">
-                    <button class="btn btn-sm" style="background:var(--warning);color:#fff;border-color:var(--warning);font-size:11px" onclick="openSvSubmitDc('TTTN_2425_K2')">📤 Nộp</button>
+                    <button class="btn btn-sm" style="background:var(--warning);color:#fff;border-color:var(--warning);font-size:11px" onclick="openSvSubmitDc('TTTN_2425_K2')">📤 Nộp lại</button>
                   </td>
                   <td style="text-align:center">
-                    <span class="cell-na" title="Chỉ mở sau khi đề cương được duyệt">N/A</span>
+                    <span class="cell-na" title="Chỉ mở sau khi Tiến độ TTTN được duyệt">N/A</span>
                   </td>
                   <td style="text-align:center"><span class="cell-score-empty">_._</span></td>
                   <td style="text-align:center"><span class="tpd-3">● Yêu cầu chỉnh sửa</span></td>
@@ -349,7 +349,7 @@
                     <span class="cell-link" onclick="openSvKetQua('TTTN_2425_K1')">Chi tiết</span>
                   </td>
                   <td style="text-align:center">
-                    <span class="cell-na" title="Chỉ mở sau khi kết thúc đợt thực tập">Chưa mở</span>
+                    <button class="btn btn-primary btn-sm" onclick="openSvFileBc('TTTN_2425_K1')">📎 Nộp BC</button>
                   </td>
                   <td style="text-align:center"><span class="cell-score-empty">_._</span></td>
                   <td style="text-align:center"><span class="tpd-5">● Đang thực hiện</span></td>
@@ -522,18 +522,22 @@
   </div>
 </div>
 
-<!-- ======================== POPUP: XEM ĐỀ CƯƠNG (SV — read-only) ======================== -->
+<!-- ======================== POPUP: XEM TIẾN ĐỘ TTTN (SV — read-only) ======================== -->
 <div class="overlay hidden" id="modal-sv-decanvas">
   <div class="modal-box" style="width:860px;max-height:92vh">
     <div class="modal-hd">
-      <span class="modal-title">📄 Xem Đề cương / Kế hoạch — <span id="svdc-dot"></span></span>
+      <span class="modal-title">📄 Xem Tiến độ TTTN — <span id="svdc-dot"></span></span>
       <button class="modal-close" onclick="closeModal('modal-sv-decanvas')">✕</button>
     </div>
     <div class="modal-bd" style="overflow-y:auto">
 
       <div class="sec-title"><span class="sec-badge">1</span> Thông tin Cơ sở TT</div>
       <div class="f-row col-2" style="margin-bottom:20px">
-        <div class="fi" style="grid-column:1/-1">
+        <div class="fi">
+          <label>Loại cơ sở thực tập</label>
+          <input class="fc" type="text" id="svdc-loai" readonly style="background:#fafafa;cursor:default">
+        </div>
+        <div class="fi">
           <label>Tên Cơ sở TT</label>
           <input class="fc" type="text" id="svdc-dn" readonly style="background:#fafafa;cursor:default">
         </div>
@@ -550,11 +554,15 @@
           <input class="fc" type="text" id="svdc-addr" readonly style="background:#fafafa;cursor:default">
         </div>
         <div class="fi">
-          <label>Ngày bắt đầu</label>
+          <label>Người liên hệ</label>
+          <input class="fc" type="text" id="svdc-lienhe" readonly style="background:#fafafa;cursor:default">
+        </div>
+        <div class="fi">
+          <label>Ngày bắt đầu <span class="text-muted text-sm">(theo lớp học phần)</span></label>
           <input class="fc" type="date" id="svdc-from" readonly style="background:#fafafa;cursor:default">
         </div>
         <div class="fi">
-          <label>Ngày kết thúc</label>
+          <label>Ngày kết thúc <span class="text-muted text-sm">(theo lớp học phần)</span></label>
           <input class="fc" type="date" id="svdc-to" readonly style="background:#fafafa;cursor:default">
         </div>
       </div>
@@ -573,6 +581,7 @@
           </thead>
           <tbody id="svdc-plan-body"></tbody>
         </table>
+        <div id="svdc-plan-empty" class="text-muted" style="display:none;padding:14px;border:1px dashed var(--border);border-radius:6px;text-align:center;font-size:13px">Chưa kê khai kế hoạch công việc theo tuần</div>
       </div>
 
       <div id="svdc-alert"></div>
@@ -583,11 +592,11 @@
   </div>
 </div>
 
-<!-- ======================== POPUP: NỘP / NỘP LẠI ĐỀ CƯƠNG (SV) ======================== -->
+<!-- ======================== POPUP: NỘP / NỘP LẠI TIẾN ĐỘ TTTN (SV) ======================== -->
 <div class="overlay hidden" id="modal-sv-submit-dc">
   <div class="modal-box" style="width:860px;max-height:92vh">
     <div class="modal-hd">
-      <span class="modal-title">📤 Nộp Đề cương / Kế hoạch — <span id="svsdot"></span></span>
+      <span class="modal-title">📤 <span id="svs-title">Nộp Tiến độ TTTN</span> — <span id="svsdot"></span></span>
       <button class="modal-close" onclick="closeModal('modal-sv-submit-dc')">✕</button>
     </div>
     <div class="modal-bd" style="overflow-y:auto">
@@ -642,23 +651,23 @@
           <input class="fc" type="text" id="svs-lienhe">
         </div>
         <div class="fi">
-          <label>Ngày bắt đầu <span class="req">*</span></label>
-          <input class="fc" type="date" id="svs-from">
+          <label>Ngày bắt đầu <span class="text-muted text-sm">(theo lớp học phần)</span></label>
+          <input class="fc" type="date" id="svs-from" readonly style="background:#fafafa;cursor:default">
         </div>
         <div class="fi">
-          <label>Ngày kết thúc <span class="req">*</span></label>
-          <input class="fc" type="date" id="svs-to">
+          <label>Ngày kết thúc <span class="text-muted text-sm">(theo lớp học phần)</span></label>
+          <input class="fc" type="date" id="svs-to" readonly style="background:#fafafa;cursor:default">
         </div>
       </div>
 
-      <div class="sec-title"><span class="sec-badge">2</span> Kế hoạch Công việc theo Tuần</div>
+      <div class="sec-title"><span class="sec-badge">2</span> Kế hoạch Công việc theo Tuần <span class="text-muted text-sm" style="font-weight:400">(không bắt buộc)</span></div>
       <div style="overflow-x:auto;margin-bottom:8px">
         <table class="plan-tbl" id="svs-plan-table">
           <thead>
             <tr>
               <th style="width:36px;text-align:center">#</th>
-              <th style="width:80px">Tuần <span class="req">*</span></th>
-              <th style="min-width:220px">Nhiệm vụ / Công việc <span class="req">*</span></th>
+              <th style="width:80px">Tuần</th>
+              <th style="min-width:220px">Nhiệm vụ / Công việc</th>
               <th style="min-width:200px">Kết quả đạt được</th>
               <th style="min-width:120px">Ghi chú</th>
               <th style="width:40px"></th>
@@ -683,16 +692,16 @@
     </div>
     <div class="modal-ft">
       <button class="btn btn-default" onclick="closeModal('modal-sv-submit-dc')">Hủy</button>
-      <button class="btn btn-primary" onclick="confirmSubmitSvDc()">🚀 Gửi Đề cương</button>
+      <button class="btn btn-primary" onclick="confirmSubmitSvDc()">🚀 Gửi Tiến độ TTTN</button>
     </div>
   </div>
 </div>
 
-<!-- ======================== POPUP: XÁC NHẬN GỬI ĐỀ CƯƠNG (SV) ======================== -->
+<!-- ======================== POPUP: XÁC NHẬN GỬI TIẾN ĐỘ TTTN (SV) ======================== -->
 <div class="overlay hidden" id="modal-sv-confirm-dc" style="z-index:1100">
   <div class="confirm-box">
-    <div class="confirm-title">Xác nhận gửi đề cương?</div>
-    <div class="confirm-desc">Sau khi gửi, đề cương sẽ chuyển sang trạng thái "Chờ GVHD duyệt" và bạn không thể tự chỉnh sửa cho đến khi có phản hồi. Bạn chắc chắn muốn gửi?</div>
+    <div class="confirm-title">Xác nhận gửi Tiến độ TTTN?</div>
+    <div class="confirm-desc">Sau khi gửi, Tiến độ TTTN sẽ chuyển sang trạng thái "Chờ GVHD duyệt" và bạn không thể tự chỉnh sửa cho đến khi có phản hồi. Bạn chắc chắn muốn gửi?</div>
     <div class="confirm-actions">
       <button class="btn btn-default" onclick="closeModal('modal-sv-confirm-dc')">Hủy</button>
       <button class="btn btn-primary" onclick="submitSvDc()">Xác nhận gửi</button>
@@ -737,6 +746,9 @@
         <div class="alert alert-info" style="margin-bottom:14px">
           <span class="alert-ico">ℹ️</span>
           <div class="alert-body"><span class="alert-desc">Chỉ được nộp <strong>1 lần</strong>. Đảm bảo file đúng định dạng và đầy đủ nội dung trước khi gửi.</span></div>
+        </div>
+        <div class="fi" id="svbc-guide" style="display:none">
+          <a href="files/Huong-dan-TTTN.docx" download="Hướng dẫn TTTN.docx" style="font-size:13px;color:var(--primary)">📥 Hướng dẫn</a>
         </div>
         <div class="fi">
           <label>File Báo cáo <span class="req">*</span> &nbsp;<span style="font-weight:400;color:var(--text-3)">(PDF · tối đa 20MB)</span></label>
@@ -1025,7 +1037,7 @@
 <div class="overlay hidden" id="modal-sv-ketqua">
   <div class="modal-box" style="width:860px;max-height:92vh">
     <div class="modal-hd">
-      <span class="modal-title">📋 Chi tiết Kế hoạch & Kết quả — <span id="svkq-dot"></span></span>
+      <span class="modal-title">📋 Tiến độ TTTN — <span id="svkq-dot"></span></span>
       <button class="modal-close" onclick="closeModal('modal-sv-ketqua')">✕</button>
     </div>
     <div class="modal-bd" style="overflow-y:auto">
@@ -1054,11 +1066,11 @@
           <input class="fc" type="text" id="svkq-addr" readonly style="background:#fafafa;cursor:default">
         </div>
         <div class="fi">
-          <label>Ngày bắt đầu</label>
+          <label>Ngày bắt đầu <span class="text-muted text-sm">(theo lớp học phần)</span></label>
           <input class="fc" type="date" id="svkq-from" readonly style="background:#fafafa;cursor:default">
         </div>
         <div class="fi">
-          <label>Ngày kết thúc</label>
+          <label>Ngày kết thúc <span class="text-muted text-sm">(theo lớp học phần)</span></label>
           <input class="fc" type="date" id="svkq-to" readonly style="background:#fafafa;cursor:default">
         </div>
       </div>
@@ -1260,6 +1272,9 @@
         <div class="alert alert-info" style="margin-bottom:14px" id="dbc-upload-alert">
           <span class="alert-ico">ℹ️</span>
           <div class="alert-body"><span class="alert-desc">Đảm bảo file đúng định dạng và đầy đủ nội dung trước khi gửi.</span></div>
+        </div>
+        <div class="fi">
+          <a href="files/Huong-dan-DAKLTN.docx" download="Hướng dẫn ĐAKLTN.docx" style="font-size:13px;color:var(--primary)">📥 Hướng dẫn</a>
         </div>
         <div class="fi">
           <label>File Báo cáo <span class="req">*</span> &nbsp;<span style="font-weight:400;color:var(--text-3)">(PDF · tối đa 30MB)</span></label>
@@ -1708,20 +1723,32 @@ function openCondPopup(maDot) {
 
 function closeModal(id) { document.getElementById(id).classList.add('hidden'); }
 
-/* ---- Dữ liệu đề cương theo đợt ---- */
+/* ---- Thời gian lớp học phần TTTN của SV theo đợt (US-TTTN-16) ----
+   Ngày bắt đầu / kết thúc của Tiến độ TTTN luôn lấy theo đây; SV không nhập.
+   null = lớp học phần chưa có thời gian, hoặc SV chưa được gắn lớp học phần → chặn gửi. */
+const LHP_TG_DB = {
+  'TTTN_2526_K1': { lhp:'TTTN.D22.01', from:'2025-09-01', to:'2025-12-31' },
+  'TTTN_2425_K1': { lhp:'TTTN.D21.03', from:'2024-09-02', to:'2025-01-10' },
+  'TTTN_2425_K2': { lhp:'TTTN.D21.05', from:'2025-02-03', to:'2025-06-30' },
+  'TTTN_2324_K1': { lhp:'TTTN.D20.02', from:'2023-09-01', to:'2023-12-31' },
+};
+const LHP_TG_MISSING_MSG = 'Lớp học phần chưa có thời gian thực tập, chưa thể nộp Tiến độ TTTN. Vui lòng chờ Phòng Đào tạo cập nhật.';
+function lhpTg(maDot, d) {
+  if (maDot in LHP_TG_DB) return LHP_TG_DB[maDot];
+  // Đợt không phải TTTN (vd Kiến tập): giữ ngày đã kê khai
+  return d ? { from:d.from, to:d.to } : null;
+}
+
+/* ---- Dữ liệu Tiến độ TTTN theo đợt ---- */
 const DC_DB = {
   'TTTN_2526_K1': {
     dn:'FPT Software', tinh:'Hà Nội', quan:'Cầu Giấy', phuong:'Dịch Vọng Hậu', addr:'Tòa nhà FPT, Phố Duy Tân', from:'2025-09-01', to:'2025-12-31',
-    status:'wait', statusMsg:'Đề cương đang chờ GVHD phê duyệt.',
-    plan:[
-      {tuan:'Tuần 1', cv:'Tìm hiểu quy trình phát triển phần mềm Agile tại FPT', kq:'', gc:''},
-      {tuan:'Tuần 2', cv:'Tham gia sprint planning và thiết kế CSDL module A', kq:'', gc:''},
-      {tuan:'Tuần 3', cv:'Coding backend API RESTful cho module quản lý người dùng', kq:'', gc:''},
-    ]
+    status:'wait', statusMsg:'Tiến độ TTTN đang chờ GVHD phê duyệt.',
+    plan:[]
   },
   'TTTN_2425_K1': {
     dn:'Samsung SDS Việt Nam', tinh:'Hà Nội', quan:'Nam Từ Liêm', phuong:'Mỹ Đình 1', addr:'Tầng 12, Tòa nhà HH4, Mỹ Đình', from:'2024-09-02', to:'2025-01-10',
-    status:'approved', statusMsg:'Kế hoạch đã được GVHD phê duyệt ngày 02/09/2024.',
+    status:'approved', statusMsg:'Tiến độ TTTN đã được GVHD phê duyệt ngày 02/09/2024.',
     plan:[
       {tuan:'Tuần 1–2', cv:'Tìm hiểu kiến trúc hệ thống CI/CD tại Samsung SDS', kq:'Hoàn thành báo cáo tổng quan kiến trúc CI/CD (4 trang). Tham dự 2 buổi onboarding.', gc:''},
       {tuan:'Tuần 3–4', cv:'Hỗ trợ viết script automation test cho module đặt hàng', kq:'Viết 12 test case tự động, tỷ lệ pass đạt 92%. Ghi nhận 3 bug mới.', gc:''},
@@ -1731,8 +1758,8 @@ const DC_DB = {
     ]
   },
   'TTTN_2425_K2': {
-    dn:'Viettel IDC', tinh:'Hà Nội', quan:'Ba Đình', phuong:'Điện Biên', addr:'Số 1 Giang Văn Minh', from:'2025-02-01', to:'2025-06-30',
-    status:'reject', statusMsg:'Đề cương bị yêu cầu chỉnh sửa.', rejectReason:'Bổ sung chi tiết Tuần 3-4. Kiểm tra lại mục tiêu công việc.',
+    dn:'Viettel IDC', tinh:'Hà Nội', quan:'Ba Đình', phuong:'Điện Biên', addr:'Số 1 Giang Văn Minh', from:'2025-02-05', to:'2025-06-25',
+    status:'reject', statusMsg:'Tiến độ TTTN bị yêu cầu chỉnh sửa.', rejectReason:'Bổ sung chi tiết Tuần 3-4. Kiểm tra lại mục tiêu công việc.',
     plan:[
       {tuan:'Tuần 1', cv:'Nghiên cứu hệ thống hạ tầng Viettel IDC', kq:'', gc:''},
       {tuan:'Tuần 2', cv:'Thiết kế mô hình dữ liệu cho module giám sát', kq:'', gc:''},
@@ -1751,7 +1778,7 @@ const DC_DB = {
   },
   'TTTN_2324_K1': {
     dn:'Công ty ABC Tech', tinh:'TP Hồ Chí Minh', quan:'Quận 1', phuong:'Bến Nghé', addr:'12 Nguyễn Huệ', from:'2023-09-01', to:'2023-12-31',
-    status:'approved', statusMsg:'Đề cương đã được phê duyệt. Đợt đã hoàn thành.',
+    status:'approved', statusMsg:'Tiến độ TTTN đã được phê duyệt. Đợt đã hoàn thành.',
     plan:[
       {tuan:'Tuần 1', cv:'Khảo sát yêu cầu hệ thống quản lý kho', kq:'Tài liệu yêu cầu', gc:''},
       {tuan:'Tuần 2', cv:'Thiết kế cơ sở dữ liệu', kq:'ERD hoàn chỉnh', gc:''},
@@ -1763,25 +1790,33 @@ const DC_DB = {
 
 function openSvDeCanvas(maDot) {
   const d = DC_DB[maDot];
+  const dt = DT_DB.find(x => x.ten === d.dn);
+  const dash = v => (v && String(v).trim()) ? v : '—';
+  const tg = lhpTg(maDot, d) || {};
   document.getElementById('svdc-dot').textContent = maDot;
-  document.getElementById('svdc-dn').value     = d.dn;
-  document.getElementById('svdc-tinh').value   = d.tinh;
-  document.getElementById('svdc-phuong').value = d.phuong || '';
-  document.getElementById('svdc-addr').value   = d.addr;
-  document.getElementById('svdc-from').value   = d.from;
-  document.getElementById('svdc-to').value     = d.to;
+  document.getElementById('svdc-loai').value   = dt ? 'Doanh nghiệp đối tác' : 'Khác';
+  document.getElementById('svdc-dn').value     = dash(d.dn);
+  document.getElementById('svdc-tinh').value   = dash(d.tinh);
+  document.getElementById('svdc-phuong').value = dash(d.phuong);
+  document.getElementById('svdc-addr').value   = dash(d.addr);
+  document.getElementById('svdc-lienhe').value = dash(d.lienhe || (dt && dt.lienhe));
+  document.getElementById('svdc-from').value   = tg.from || '';
+  document.getElementById('svdc-to').value     = tg.to   || '';
 
   let rows = '';
   d.plan.forEach((r, i) => {
     rows += `<tr>
       <td style="text-align:center;color:var(--text-3)">${i+1}</td>
-      <td><input class="fc" value="${r.tuan}" readonly style="background:#fafafa;cursor:default"></td>
-      <td><textarea class="fc" readonly style="background:#fafafa;cursor:default;height:52px">${r.cv}</textarea></td>
-      <td><textarea class="fc" readonly style="background:#fafafa;cursor:default;height:52px">${r.kq}</textarea></td>
-      <td><input class="fc" value="${r.gc}" readonly style="background:#fafafa;cursor:default"></td>
+      <td><input class="fc" value="${dash(r.tuan)}" readonly style="background:#fafafa;cursor:default"></td>
+      <td><textarea class="fc" readonly style="background:#fafafa;cursor:default;height:52px">${dash(r.cv)}</textarea></td>
+      <td><textarea class="fc" readonly style="background:#fafafa;cursor:default;height:52px">${dash(r.kq)}</textarea></td>
+      <td><input class="fc" value="${dash(r.gc)}" readonly style="background:#fafafa;cursor:default"></td>
     </tr>`;
   });
   document.getElementById('svdc-plan-body').innerHTML = rows;
+  const noPlan = !d.plan.length;
+  document.getElementById('svdc-plan-body').closest('table').style.display = noPlan ? 'none' : '';
+  document.getElementById('svdc-plan-empty').style.display = noPlan ? '' : 'none';
 
   const alertMap = {
     wait:     `<div class="alert alert-info"><span class="alert-ico">⏳</span><div class="alert-body"><div class="alert-title">Chờ phê duyệt</div><span class="alert-desc">${d.statusMsg}</span></div></div>`,
@@ -1792,14 +1827,19 @@ function openSvDeCanvas(maDot) {
   document.getElementById('modal-sv-decanvas').classList.remove('hidden');
 }
 
-/* ---- Nộp / Nộp lại Đề cương ---- */
+/* ---- Nộp / Nộp lại Tiến độ TTTN ---- */
 function openSvSubmitDc(maDot) {
   const d = DC_DB[maDot];
   document.getElementById('svsdot').textContent = maDot;
 
-  // Nếu là nộp lại (reject) → điền sẵn dữ liệu cũ
+  document.getElementById('svs-title').textContent = d ? 'Nộp lại Tiến độ TTTN' : 'Nộp Tiến độ TTTN';
+
+  // Ngày bắt đầu / kết thúc lấy theo lớp học phần (cả nộp mới và nộp lại); LHP chưa có thời gian → chặn gửi
   const alertTop = document.getElementById('svs-alert-top');
-  alertTop.innerHTML = '';
+  const tg = lhpTg(maDot, d);
+  const hasTg = !!(tg && tg.from && tg.to);
+  alertTop.innerHTML = hasTg ? '' : `<div class="alert" style="border-color:#ffa39e;background:#fff1f0"><span class="alert-ico">⛔</span><div class="alert-body"><span class="alert-desc">${LHP_TG_MISSING_MSG}</span></div></div>`;
+  document.getElementById('modal-sv-submit-dc').dataset.lhpOk = hasTg ? '1' : '';
 
   csInitOptions('svs');
   if (d) {
@@ -1818,8 +1858,6 @@ function openSvSubmitDc(maDot) {
       document.getElementById('svs-addr').value   = d.addr || '';
       document.getElementById('svs-lienhe').value = d.lienhe || '';
     }
-    document.getElementById('svs-from').value   = d.from   || '';
-    document.getElementById('svs-to').value     = d.to     || '';
     // Điền kế hoạch cũ nếu có
     if (d.plan && d.plan.length) {
       let rows = '';
@@ -1827,18 +1865,18 @@ function openSvSubmitDc(maDot) {
         rows += `<tr>
           <td style="text-align:center;color:var(--text-3)">${i+1}</td>
           <td><input class="fc" type="text" value="${r.tuan}" placeholder="Tuần ${i+1}"></td>
-          <td><textarea class="fc" style="height:52px;resize:none">${r.cv}</textarea></td>
+          <td><textarea class="fc" style="height:52px;resize:none" placeholder="Mô tả nhiệm vụ...">${r.cv}</textarea></td>
           <td><textarea class="fc" style="height:52px;resize:none" placeholder="Kết quả đạt được...">${r.kq || ''}</textarea></td>
           <td><input class="fc" type="text" value="${r.gc}" placeholder="Ghi chú..."></td>
           <td style="text-align:center"><button class="btn btn-link" style="color:var(--error)" onclick="svsPlanDel(this)">🗑️</button></td>
         </tr>`;
       });
       document.getElementById('svs-plan-body').innerHTML = rows;
+    } else {
+      document.getElementById('svs-plan-body').innerHTML = '';
     }
   } else {
     csSetLoai('svs', 'dt');
-    document.getElementById('svs-from').value   = '';
-    document.getElementById('svs-to').value     = '';
     document.getElementById('svs-plan-body').innerHTML = `<tr>
       <td style="text-align:center;color:var(--text-3)">1</td>
       <td><input class="fc" type="text" placeholder="Tuần 1"></td>
@@ -1848,6 +1886,8 @@ function openSvSubmitDc(maDot) {
       <td style="text-align:center"><button class="btn btn-link" style="color:var(--error)" onclick="svsPlanDel(this)">🗑️</button></td>
     </tr>`;
   }
+  document.getElementById('svs-from').value = hasTg ? tg.from : '';
+  document.getElementById('svs-to').value   = hasTg ? tg.to   : '';
   document.getElementById('modal-sv-submit-dc').classList.remove('hidden');
 }
 
@@ -1867,8 +1907,7 @@ function svsPlanAdd() {
   svsReindex();
 }
 function svsPlanDel(btn) {
-  const rows = document.querySelectorAll('#svs-plan-body tr');
-  if (rows.length <= 1) { toast('Cần ít nhất 1 tuần', 'warning'); return; }
+  // Kế hoạch tuần không bắt buộc → được xóa hết các dòng
   btn.closest('tr').remove();
   svsReindex();
 }
@@ -1892,7 +1931,7 @@ const PHUONG_DB = {
   'Đà Nẵng':        ['Hải Châu','Thạch Thang','An Hải Bắc'],
   'Hải Phòng':      ['Lê Chân','Hồng Bàng','Ngô Quyền'],
 };
-/* Bộ hàm dùng chung theo tiền tố id: 'svs' (Nộp đề cương), 'doi-moi' (Đổi cơ sở TT) */
+/* Bộ hàm dùng chung theo tiền tố id: 'svs' (Nộp Tiến độ TTTN), 'doi-moi' (Đổi cơ sở TT) */
 const CS_MODAL = { 'svs':'modal-sv-submit-dc', 'doi-moi':'modal-doicstt' };
 const $cs = (p, k) => document.getElementById(`${p}-${k}`);
 function csInitOptions(p) {
@@ -1953,13 +1992,20 @@ function csValidate(p) {
 }
 
 function confirmSubmitSvDc() {
+  if (!document.getElementById('modal-sv-submit-dc').dataset.lhpOk) { toast(LHP_TG_MISSING_MSG, 'error'); return; }
   if (!csValidate('svs')) return;
   document.getElementById('modal-sv-confirm-dc').classList.remove('hidden');
 }
 function submitSvDc() {
+  // Dòng kế hoạch để trống hoàn toàn không được lưu; dòng nhập dở lưu đúng như đã nhập
+  document.querySelectorAll('#svs-plan-body tr').forEach(tr => {
+    const filled = [...tr.querySelectorAll('input, textarea')].some(el => el.value.trim());
+    if (!filled) tr.remove();
+  });
+  svsReindex();
   closeModal('modal-sv-confirm-dc');
   closeModal('modal-sv-submit-dc');
-  toast('Đã gửi đề cương thành công. Chờ Giảng viên HD phê duyệt.');
+  toast('Đã gửi Tiến độ TTTN thành công. Chờ Giảng viên HD phê duyệt.');
 }
 
 /* ---- Dữ liệu file BC theo đợt ---- */
@@ -1997,6 +2043,8 @@ function openSvFileBc(maDot) {
     document.getElementById('svbc-file-list').innerHTML = '';
     document.getElementById('svbc-link-input').value = '';
     document.getElementById('svbc-file-input').value = '';
+    // CR-20261103-004: link Hướng dẫn chỉ cho đợt TTTN (Kiến tập / Thực tập chưa có file)
+    document.getElementById('svbc-guide').style.display = maDot.startsWith('TTTN') ? '' : 'none';
   }
   document.getElementById('modal-sv-filebc').classList.remove('hidden');
 }
@@ -2201,8 +2249,9 @@ function openSvKetQua(maDot) {
   document.getElementById('svkq-tinh').value       = d.tinh   || '';
   document.getElementById('svkq-phuong').value     = d.phuong || '';
   document.getElementById('svkq-addr').value       = d.addr   || '';
-  document.getElementById('svkq-from').value       = d.from   || '';
-  document.getElementById('svkq-to').value         = d.to     || '';
+  const tg = lhpTg(maDot, d) || {};
+  document.getElementById('svkq-from').value       = tg.from  || '';
+  document.getElementById('svkq-to').value         = tg.to    || '';
 
   let rows = '';
   d.plan.forEach((r, i) => {

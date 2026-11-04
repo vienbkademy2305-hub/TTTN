@@ -1522,13 +1522,77 @@ initFromHash();
       <p>Thời gian làm ĐAKLTN: từ ${F(fmt(v.ngay_bat_dau))} đến ${F(fmt(v.ngay_ket_thuc))}</p>
       <p>Lý do xin bảo vệ sớm: ${F(v.ly_do)}</p>${v.minh_chung ? `<p>Minh chứng kèm theo: ${F(v.minh_chung)}</p>` : ''}${sign}</div>`;
   }
-  function downloadDoc(c){
-    const html = `<html><head><meta charset="utf-8"><style>.c{text-align:center}.b{font-weight:bold}.crd-sign{display:flex;justify-content:space-around;text-align:center;font-weight:bold;margin-top:20px}.crd-sign span{display:block;font-weight:normal;font-style:italic}</style></head><body style="font-family:'Times New Roman';font-size:14pt">${docHtml(c).replace(/class="fill"/g,'')}</body></html>`;
+  // ---------- Tải đơn: tạo file Word .docx thật từ nội dung đơn đang hiển thị ----------
+  const xmlEsc = t => String(t).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+  const wRun = (t, b, i) => t ? `<w:r><w:rPr>${b ? '<w:b/>' : ''}${i ? '<w:i/>' : ''}</w:rPr><w:t xml:space="preserve">${xmlEsc(t)}</w:t></w:r>` : '';
+  function wRuns(node, b, i){
+    return [...node.childNodes].map(n => {
+      if(n.nodeType === 3) return wRun(n.textContent.replace(/\s+/g, ' '), b, i);
+      if(n.nodeType !== 1) return '';
+      if(n.tagName === 'BR') return '<w:r><w:br/></w:r>';
+      return wRuns(n, b || n.tagName === 'B' || n.classList.contains('b'), i || n.tagName === 'I' || n.style.fontStyle === 'italic');
+    }).join('');
+  }
+  function wPara(p){
+    const jc = p.classList.contains('c') ? 'center' : p.style.textAlign === 'right' ? 'right' : '';
+    const ml = parseInt(p.style.marginLeft) || 0;
+    const pr = `<w:pPr><w:spacing w:after="40"/>${ml ? `<w:ind w:left="${ml * 15}"/>` : ''}${jc ? `<w:jc w:val="${jc}"/>` : ''}</w:pPr>`;
+    return `<w:p>${pr}${wRuns(p, p.classList.contains('b'), p.style.fontStyle === 'italic')}</w:p>`;
+  }
+  function wSign(d){
+    const cols = [...d.children], w = Math.floor(9000 / cols.length);
+    const cells = cols.map(c => {
+      const sub = c.querySelector('span'), head = [...c.childNodes].filter(n => n.nodeType === 3).map(n => n.textContent).join('').trim();
+      return `<w:tc><w:tcPr><w:tcW w:w="${w}" w:type="dxa"/></w:tcPr><w:p><w:pPr><w:jc w:val="center"/></w:pPr>${wRun(head, true)}</w:p><w:p><w:pPr><w:jc w:val="center"/></w:pPr>${wRun(sub ? sub.textContent : '', false, true)}</w:p><w:p/></w:tc>`;
+    }).join('');
+    return `<w:tbl><w:tblPr><w:tblW w:w="9000" w:type="dxa"/></w:tblPr><w:tblGrid>${cols.map(() => `<w:gridCol w:w="${w}"/>`).join('')}</w:tblGrid><w:tr>${cells}</w:tr></w:tbl><w:p><w:pPr><w:spacing w:after="0"/></w:pPr></w:p>`;
+  }
+  function crc32(u8){
+    let c, crc = -1;
+    for(let i = 0; i < u8.length; i++){ c = (crc ^ u8[i]) & 255; for(let k = 0; k < 8; k++) c = c & 1 ? (c >>> 1) ^ 0xEDB88320 : c >>> 1; crc = (crc >>> 8) ^ c; }
+    return (crc ^ -1) >>> 0;
+  }
+  function zipStore(files){   // file ZIP không nén, đủ để Word mở
+    const enc = new TextEncoder(), parts = [], central = [];
+    let off = 0;
+    const le = (n, b) => { const a = []; for(let i = 0; i < b; i++) a.push((n >>> (8 * i)) & 255); return a; };
+    files.forEach(([name, text]) => {
+      const nm = enc.encode(name), data = enc.encode(text), crc = crc32(data);
+      const common = [...le(20, 2), ...le(0x0800, 2), ...le(0, 2), ...le(0, 2), ...le(0x5A21, 2), ...le(crc, 4), ...le(data.length, 4), ...le(data.length, 4), ...le(nm.length, 2), ...le(0, 2)];
+      const head = new Uint8Array([...le(0x04034b50, 4), ...common, ...nm]);
+      parts.push(head, data);
+      central.push(new Uint8Array([...le(0x02014b50, 4), ...le(20, 2), ...common, ...le(0, 2), ...le(0, 2), ...le(0, 2), ...le(0, 4), ...le(off, 4), ...nm]));
+      off += head.length + data.length;
+    });
+    const size = central.reduce((n, c) => n + c.length, 0);
+    return new Blob([...parts, ...central, new Uint8Array([...le(0x06054b50, 4), 0, 0, 0, 0, ...le(files.length, 2), ...le(files.length, 2), ...le(size, 4), ...le(off, 4), 0, 0])],
+      { type:'application/vnd.openxmlformats-officedocument.wordprocessingml.document' });
+  }
+  function docxBlob(root){
+    const body = [...root.children].map(n => n.tagName === 'P' ? wPara(n) : (n.classList.contains('crd-sign') || n.classList.contains('cr5-sign')) ? wSign(n) : wPara(n)).join('');
+    const NS = 'xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main"';
+    return zipStore([
+      ['[Content_Types].xml', '<?xml version="1.0" encoding="UTF-8" standalone="yes"?><Types xmlns="http://schemas.openxmlformats.org/package/2006/content-types"><Default Extension="rels" ContentType="application/vnd.openxmlformats-package.relationships+xml"/><Default Extension="xml" ContentType="application/xml"/><Override PartName="/word/document.xml" ContentType="application/vnd.openxmlformats-officedocument.wordprocessingml.document.main+xml"/><Override PartName="/word/styles.xml" ContentType="application/vnd.openxmlformats-officedocument.wordprocessingml.styles+xml"/></Types>'],
+      ['_rels/.rels', '<?xml version="1.0" encoding="UTF-8" standalone="yes"?><Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships"><Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/officeDocument" Target="word/document.xml"/></Relationships>'],
+      ['word/_rels/document.xml.rels', '<?xml version="1.0" encoding="UTF-8" standalone="yes"?><Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships"><Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/styles" Target="styles.xml"/></Relationships>'],
+      ['word/styles.xml', `<?xml version="1.0" encoding="UTF-8" standalone="yes"?><w:styles ${NS}><w:docDefaults><w:rPrDefault><w:rPr><w:rFonts w:ascii="Times New Roman" w:hAnsi="Times New Roman" w:cs="Times New Roman"/><w:sz w:val="25"/></w:rPr></w:rPrDefault></w:docDefaults></w:styles>`],
+      ['word/document.xml', `<?xml version="1.0" encoding="UTF-8" standalone="yes"?><w:document ${NS}><w:body>${body}<w:sectPr><w:pgSz w:w="11906" w:h="16838"/><w:pgMar w:top="1134" w:right="1134" w:bottom="1134" w:left="1418" w:header="708" w:footer="708" w:gutter="0"/></w:sectPr></w:body></w:document>`],
+    ]);
+  }
+  function saveDocx(root, name){
     const a = document.createElement('a');
-    a.href = URL.createObjectURL(new Blob(['﻿' + html], { type:'application/msword' }));
-    a.download = ({ doidetai:'Don_doi_de_tai_', giahan_da:'Don_gia_han_DAKLTN_', baove:'Don_bao_ve_som_' })[c.loai] + (c.id || 'nhap') + '.doc';
+    a.href = URL.createObjectURL(docxBlob(root));
+    a.download = name + '.docx';
     a.click();
   }
+  function downloadDoc(c){
+    const box = document.createElement('div');
+    box.innerHTML = docHtml(c);
+    saveDocx(box.firstElementChild, ({ doidetai:'Don_doi_de_tai_', giahan_da:'Don_gia_han_DAKLTN_', baove:'Don_bao_ve_som_' })[c.loai] + (c.id || 'nhap'));
+  }
+  // Đơn TTTN (CR-005): tải cùng định dạng Word, lấy nội dung từ ô xem đơn đang có
+  const cr5Name = c => (c.loai === 'giahan' ? 'Don_gia_han_TTTN_' : 'Don_doi_co_so_TTTN_') + c.id;
+  window.CRD_DOCX = { docxBlob };
   // Khối thông tin đề tài mới / đơn dùng ở chi tiết MH-SV-05, MH-GV-02
   function topicSummary(c){
     const m = c.data.de_tai_moi; if(!m) return '';
@@ -1710,8 +1774,15 @@ initFromHash();
     $('modal-cr5-don').classList.remove('hidden');
   };
   CR5GV.downloadCur = function(){
-    const c = crdOf(this.cur); if(!c) return _dl.call(this);
-    downloadDoc(c); toast('Đang tải đơn ' + c.id);
+    const c = crdOf(this.cur);
+    if(c){ downloadDoc(c); toast('Đang tải đơn ' + c.id); return; }
+    // Đơn TTTN: dựng nội dung đơn rồi tải Word .docx
+    const r = (REQUESTS.find(x => x.id === this.cur) || {}).cr5; if(!r) return _dl.call(this);
+    const modal = $('modal-cr5-don'), shown = !modal.classList.contains('hidden');
+    _view.call(this, this.cur);
+    if(!shown) modal.classList.add('hidden');
+    saveDocx($('cr5-don-doc').firstElementChild, cr5Name(r));
+    toast('Đang tải đơn ' + r.id);
   };
 
   // Quy trình phê duyệt: bước không chạy tới hiện "Bỏ qua"

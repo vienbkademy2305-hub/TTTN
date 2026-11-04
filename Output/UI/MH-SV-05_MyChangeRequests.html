@@ -764,5 +764,291 @@ function toast(msg,type='success'){
 renderTable('tt');
 renderTable('dt');
 </script>
+<!-- ═══════════════════════════════════════════════════════════════════════
+     CR-20261103-005 — DS yêu cầu: Gia hạn (M05) / Đổi cơ sở (M04)
+     Khối mở rộng gắn thêm, KHÔNG sửa code gốc phía trên (US-TTTN-25, 26):
+       - Đọc đơn SV đã nộp ở MH-SV-01 (localStorage cr005_requests) + 3 đơn mẫu
+       - Trạng thái: Chờ GVHD duyệt / Chờ Khoa duyệt / Đã duyệt / Từ chối / Không thành công
+       - "Không thành công" (node Kiểm tra thời gian nộp không đạt): lý do ở cột Lý do
+       - Chi tiết: tiến trình xử lý (chỉ các bước người duyệt), Xem đơn / Tải đơn
+     ═══════════════════════════════════════════════════════════════════════ -->
+<div class="overlay hidden" id="modal-cr5-don" style="z-index:1150">
+  <div class="modal-box" style="width:760px;max-width:95vw">
+    <div class="modal-hd">
+      <span class="modal-title" id="cr5-don-title">Xem đơn</span>
+      <button class="modal-close" onclick="document.getElementById('modal-cr5-don').classList.add('hidden')">✕</button>
+    </div>
+    <div class="modal-bd" style="background:#f0f0f0;max-height:70vh;overflow:auto">
+      <div id="cr5-don-doc" style="background:#fff;max-width:620px;margin:0 auto;padding:36px 44px;font-family:'Times New Roman',serif;font-size:14px;line-height:1.55;box-shadow:0 1px 4px rgba(0,0,0,.15)"></div>
+    </div>
+    <div class="modal-ft">
+      <button class="btn btn-default" onclick="document.getElementById('modal-cr5-don').classList.add('hidden')">Đóng</button>
+      <button class="btn btn-primary" onclick="CR5SV5.downloadCur()">⬇️ Tải đơn</button>
+    </div>
+  </div>
+</div>
+<style>
+  .cr5-doc p{margin:0 0 6px}
+  .cr5-doc .c{text-align:center}
+  .cr5-doc .b{font-weight:700}
+  .cr5-doc .fill{border-bottom:1px dotted #555;padding:0 4px;font-style:italic;color:#0958d9}
+  .cr5-sign{display:flex;justify-content:space-around;text-align:center;margin-top:24px;font-weight:700}
+  .cr5-sign div span{display:block;font-weight:400;font-style:italic}
+  .cr5-fail{display:inline-block;padding:4px 8px;border:1px solid #ffa39e;background:#fff2f0;border-radius:4px;color:#cf1322}
+  .cr5-steps{width:100%;border-collapse:collapse;font-size:12.5px}
+  .cr5-steps th,.cr5-steps td{border:1px solid var(--border);padding:6px 8px;text-align:left}
+  .cr5-steps th{background:#fafafa;font-weight:600}
+</style>
+<script>
+(function(){
+  const LS_REQ = 'cr005_requests';
+  const DOT_LABEL = { TTTN_2526_K1:'TTTN HK1 2025-2026', TTTN_2425_K1:'TTTN HK1 2024-2025', TTTN_2425_K2:'TTTN HK2 2024-2025' };
+  const SV = { ho_ten:'Nguyễn Văn An', ma_sv:'B22DCCN001', ngay_sinh:'2004-03-15', lop:'D22CQCN01-B', khoa_hoc:'2022-2026',
+    nganh:'Kỹ thuật phần mềm', dien_thoai:'0912 000 001', email:'an.nv@stu.phenikaa-uni.edu.vn', khoa:'Khoa Công nghệ Thông tin' };
+  const fmt = iso => iso ? iso.split('-').reverse().join('/') : '…';
+  const $ = id => document.getElementById(id);
+
+  // Đơn mẫu (đã qua quy trình) — bổ sung cho đơn SV vừa nộp ở MH-SV-01
+  const SAMPLES = [
+    { id:'YC-DC-092', loai:'doicoso', maDot:'TTTN_2526_K1', ngayNop:'2025-08-04', hanChot:'2025-08-25', status:'cho_khoa', lyDoKhongDat:'',
+      data:{ ...SV, gvhd:'TS. Nguyễn Minh Tuấn', co_so_hien_tai:'FPT Software', dia_chi_co_so_hien_tai:'Tòa nhà FPT, Phố Duy Tân, Dịch Vọng Hậu, Hà Nội', tinh_hien_tai:'Hà Nội', phuong_hien_tai:'Dịch Vọng Hậu', dia_chi_ct_hien_tai:'Tòa nhà FPT, Phố Duy Tân',
+        ngay_bat_dau:'2025-09-01', ngay_ket_thuc:'2025-12-31',
+        co_so_moi:{ loai:'Doanh nghiệp đối tác', ten:'Tập đoàn FPT Telecom', tinh:'Hà Nội', phuong:'Mỹ Đình', dia_chi_chi_tiet:'Số 89 Phạm Hùng',
+          dia_chi:'Số 89 Phạm Hùng, Mỹ Đình, Hà Nội', nguoi_lien_he:'Nguyễn Thị Lan (HR)' },
+        ly_do:'FPT Software tạm dừng nhận thực tập sinh do tái cơ cấu nội bộ từ tháng 9/2025.', don_da_ky:'Don_doi_co_so_da_ky_B22DCCN001.pdf' },
+      steps:[ { buoc:'GVHD duyệt', nguoi:'TS. Nguyễn Minh Tuấn', nhan:'2025-08-04', xuly:'2025-08-05', kq:'Đồng ý', lydo:'' },
+              { buoc:'Khoa duyệt', nguoi:'Trưởng khoa CNTT', nhan:'2025-08-05', xuly:'', kq:'Đang chờ', lydo:'' } ] },
+    { id:'YC-GH-091', loai:'giahan', maDot:'TTTN_2425_K2', ngayNop:'2025-04-20', hanChot:'2025-04-28', status:'approved', lyDoKhongDat:'',
+      data:{ ...SV, coso:'Viettel IDC', gvhd:'ThS. Phạm Thu Hà', loai_qd:'Cử đi thực tập', so_qd:'0155/QĐ-ĐHP-ĐT', ngay_qd:'2025-01-27',
+        ngay_kt_hien_tai:'2025-05-05', ngay_kt_de_nghi:'2025-05-26', ly_do:'Dự án tại cơ sở kéo dài thêm 3 tuần do phát sinh yêu cầu từ khách hàng.',
+        minh_chung:'XacNhan_ViettelIDC_GiaHan.pdf' },
+      ketQua:'Ngày kết thúc thực tập đã cập nhật: 05/05/2025 → 26/05/2025',
+      steps:[ { buoc:'GVHD duyệt', nguoi:'ThS. Phạm Thu Hà', nhan:'2025-04-20', xuly:'2025-04-21', kq:'Đồng ý', lydo:'' },
+              { buoc:'Khoa duyệt', nguoi:'Trưởng khoa CNTT', nhan:'2025-04-21', xuly:'2025-04-23', kq:'Đồng ý', lydo:'' } ] },
+    { id:'YC-GH-090', loai:'giahan', maDot:'TTTN_2425_K1', ngayNop:'2024-12-12', hanChot:'2024-12-08', status:'khong_thanh_cong',
+      lyDoKhongDat:'Quá hạn chót 08/12/2024',
+      data:{ ...SV, coso:'Samsung SDS Việt Nam', gvhd:'TS. Lê Văn Hùng', loai_qd:'Cử đi thực tập', so_qd:'0820/QĐ-ĐHP-ĐT', ngay_qd:'2024-08-26',
+        ngay_kt_hien_tai:'2024-12-15', ngay_kt_de_nghi:'2025-01-05', ly_do:'Cần thêm thời gian hoàn thiện báo cáo theo góp ý của cơ sở.',
+        minh_chung:'XacNhan_Samsung.pdf' },
+      steps:[] },
+  ];
+
+  Object.assign(STATUS_MAP, {
+    cho_gvhd:         { icon:'⏳', text:'Chờ GVHD duyệt',   tagClass:'tag-warning' },
+    cho_khoa:         { icon:'⏳', text:'Chờ Khoa duyệt',   tagClass:'tag-warning' },
+    khong_thanh_cong: { icon:'⛔', text:'Không thành công', tagClass:'tag-error' },
+  });
+  const GROUP = { pending:['pending','cho_gvhd','cho_khoa'], approved:['approved'], rejected:['rejected','khong_thanh_cong'] };
+  const inGroup = (st, g) => !g || (GROUP[g] || [g]).includes(st);
+
+  // Đơn CR-005 → dạng bản ghi của màn gốc
+  function toRow(c){
+    const d = c.data || {}, gh = c.loai === 'giahan', m = d.co_so_moi || {};
+    const files = [gh ? d.minh_chung : d.don_da_ky].filter(Boolean);
+    const lastRej = (c.steps || []).find(s => s.kq === 'Từ chối');
+    return { id:c.id, cr5:c, dot:DOT_LABEL[c.maDot] || c.maDot, ctdtChung:'KTPM', lhp:'INT3110_1', thoiGianHoc:'—',
+      type: gh ? 'extend' : 'change', date: fmt(c.ngayNop), status:c.status, reason:d.ly_do || '', files,
+      feedback: c.status === 'khong_thanh_cong' ? c.lyDoKhongDat : (lastRej ? lastRej.lydo : (c.ketQua || '')),
+      ghToCu:d.ngay_kt_hien_tai, ghToMoi:d.ngay_kt_de_nghi,
+      cuDn:d.co_so_hien_tai, cuAddr:d.dia_chi_ct_hien_tai || d.dia_chi_co_so_hien_tai, cuTinh:d.tinh_hien_tai || '—', cuPhuong:d.phuong_hien_tai || '—', cuFrom:d.ngay_bat_dau, cuTo:d.ngay_ket_thuc,
+      moiDn:m.ten, moiTinh:m.tinh, moiPhuong:m.phuong, moiAddr:m.dia_chi_chi_tiet, moiContact:m.nguoi_lien_he };
+  }
+  let stored = [];
+  try { stored = JSON.parse(localStorage.getItem(LS_REQ)) || []; } catch(e) {}
+  const all = [...stored, ...SAMPLES.filter(s => !stored.some(x => x.id === s.id))];
+  REQUESTS.unshift(...all.map(toRow));
+
+  // Bộ lọc: thêm đợt + trạng thái mới
+  const selDot = $('f-dot-tt');
+  Object.values(DOT_LABEL).forEach(l => { if(![...selDot.options].some(o => o.value === l)) selDot.add(new Option(l, l)); });
+  $('f-status-tt').add(new Option('Không thành công', 'khong_thanh_cong'));
+  [...$('f-type-tt').options].forEach(o => { if(o.value === 'change') o.text = 'Đổi cơ sở thực tập'; });
+  TYPE_LABEL_MAP.change.text = 'Đổi cơ sở TT';
+
+  renderStats = function(){
+    const g = REQUESTS.filter(r => TAB_TYPES[currentTab].includes(r.type));
+    $('stat-all').textContent      = g.length;
+    $('stat-pending').textContent  = g.filter(r => inGroup(r.status,'pending')).length;
+    $('stat-approved').textContent = g.filter(r => inGroup(r.status,'approved')).length;
+    $('stat-rejected').textContent = g.filter(r => inGroup(r.status,'rejected')).length;
+  };
+
+  renderTable = function(tab){
+    const fDot = $('f-dot-' + tab).value, fType = $('f-type-' + tab).value, fStatus = $('f-status-' + tab).value;
+    const rows = REQUESTS.filter(r => TAB_TYPES[tab].includes(r.type)
+      && (!fDot || r.dot === fDot) && (!fType || r.type === fType) && inGroup(r.status, fStatus));
+    if (tab === currentTab) renderStats();
+    const tbody = $('req-tbody-' + tab);
+    if (!rows.length) { tbody.innerHTML = `<tr><td colspan="12" style="text-align:center;padding:32px;color:var(--text-3)">Không có yêu cầu nào phù hợp bộ lọc.</td></tr>`; return; }
+    tbody.innerHTML = rows.map((r, i) => {
+      const t = TYPE_LABEL_MAP[r.type], s = STATUS_MAP[r.status], fail = r.status === 'khong_thanh_cong';
+      const idA = r.cr5 ? `'${r.id}'` : r.id;
+      const files = r.files && r.files.length
+        ? `<button class="btn btn-link text-link" style="font-size:12px;padding:0" onclick="openDetailFiles(${idA})">📎 Xem (${r.files.length} file)</button>`
+        : `<span style="color:var(--text-3);font-size:12px">—</span>`;
+      const lyDo = fail ? `<span class="cr5-fail">${r.feedback}</span>`
+        : (r.status === 'rejected' && r.feedback ? r.feedback : '<span style="color:var(--text-3)">—</span>');
+      const tip = fail ? ` title="Hệ thống không tiếp nhận: ${r.feedback}"` : '';
+      return `<tr>
+        <td style="text-align:center;color:var(--text-3)">${i + 1}</td>
+        <td style="font-size:12px;white-space:nowrap">${r.dot}${r.cr5 ? `<div style="color:var(--text-3);font-size:11px">${r.id}</div>` : ''}</td>
+        <td style="font-size:13px;color:var(--text-2)">${r.ctdtChung || '—'}</td>
+        <td style="font-size:12px;font-weight:500">${r.lhp || '—'}</td>
+        <td style="font-size:12px;white-space:nowrap">${r.thoiGianHoc || '—'}</td>
+        <td><span class="tag ${t.tagClass}">${t.icon} ${t.text}</span></td>
+        <td style="font-size:12px;white-space:nowrap">${r.date}</td>
+        <td style="font-size:12px">${r.reason.length > 70 ? r.reason.slice(0,70) + '...' : r.reason}</td>
+        <td>${files}</td>
+        <td><span class="tag ${s.tagClass}"${tip}>${s.text}</span></td>
+        <td style="font-size:12px;color:var(--error)">${lyDo}</td>
+        <td style="text-align:center;white-space:nowrap">
+          <button class="icon-btn" onclick="openDetail(${idA})" title="Xem chi tiết">👁️</button>
+          ${r.cr5 ? `<button class="icon-btn" onclick="CR5SV5.qt('${r.id}')" title="Quy trình phê duyệt">🔀</button>` : ''}
+        </td>
+      </tr>`;
+    }).join('');
+  };
+
+  // ---------- Chi tiết: tiến trình xử lý + Xem/Tải đơn ----------
+  const bd = document.querySelector('#modal-detail .modal-bd');
+  const box = document.createElement('div');
+  box.id = 'cr5-detail';
+  box.style.display = 'none';
+  bd.insertBefore(box, bd.firstChild);
+  const ft = document.querySelector('#modal-detail .modal-ft');
+  ft.insertAdjacentHTML('afterbegin', `<span id="cr5-detail-ft" style="display:none;margin-right:auto">
+    <button class="btn btn-default" onclick="CR5SV5.viewDon(CR5SV5.cur)">📄 Xem đơn</button>
+    <button class="btn btn-default" onclick="CR5SV5.downloadCur()">⬇️ Tải đơn</button></span>`);
+
+  const _openDetail = openDetail;
+  openDetail = function(id){
+    const r = REQUESTS.find(x => x.id === id);
+    _openDetail(id);
+    box.style.display = r.cr5 ? '' : 'none';
+    $('cr5-detail-ft').style.display = r.cr5 ? '' : 'none';
+    if(!r.cr5) return;
+    const c = r.cr5, d = c.data;
+    CR5SV5.cur = c.id;
+    $('d-title').textContent = c.loai === 'giahan' ? '📅 ĐƠN XIN GIA HẠN THỜI GIAN TTTN (M05)' : '🔄 ĐƠN XIN THAY ĐỔI ĐỊA ĐIỂM TTTN (M04)';
+    const info = c.loai === 'giahan'
+      ? `Số QĐ: <b>${d.so_qd}</b> (${d.loai_qd}, ngày ${fmt(d.ngay_qd)}) · Cơ sở: <b>${d.coso}</b> · GVHD: <b>${d.gvhd}</b>`
+      : `GVHD: <b>${d.gvhd}</b> · Thời gian thực tập: ${fmt(d.ngay_bat_dau)} – ${fmt(d.ngay_ket_thuc)}`;
+    box.innerHTML = `
+      <div style="background:#f0f5ff;border:1px solid #adc6ff;border-radius:8px;padding:12px 16px;margin-bottom:16px;font-size:13px;line-height:1.8">
+        <div style="display:flex;justify-content:space-between;align-items:center">
+          <div><b>${c.id}</b> · Đợt <b>${c.maDot}</b> · Ngày nộp ${fmt(c.ngayNop)}</div>
+          <span class="tag ${STATUS_MAP[c.status].tagClass}">${STATUS_MAP[c.status].text}</span>
+        </div>
+        <div>${info}</div>
+      </div>
+      ${c.status === 'khong_thanh_cong' ? `<div class="alert" style="background:#fff2f0;border-color:#ffa39e"><span class="alert-ico">⛔</span>
+        <div class="alert-body"><div class="alert-title" style="color:#cf1322">Yêu cầu không được tiếp nhận</div>
+        <span class="alert-desc">Ngày nộp ${fmt(c.ngayNop)} sau hạn chót ${fmt(c.hanChot)} (${c.loai === 'giahan' ? 'Ngày kết thúc' : 'Ngày bắt đầu'} thực tập ${fmt(c.loai === 'giahan' ? d.ngay_kt_hien_tai : d.ngay_bat_dau)} − 7 ngày). Đơn không được chuyển sang người duyệt; bạn có thể liên hệ Khoa nếu có trường hợp đặc biệt.</span></div></div>` : ''}
+      `;
+    // Khối kết quả gốc: chỉ hiện khi đã có kết quả từ người duyệt
+    const done = $('d-done-block');
+    if(c.status === 'approved' || c.status === 'rejected'){
+      done.style.display = '';
+      $('d-done-status').textContent = STATUS_MAP[c.status].text;
+      $('d-done-feedback').textContent = r.feedback || '';
+    } else done.style.display = 'none';
+  };
+
+  // ---------- Popup "Quy trình phê duyệt" (icon 🔀 ở cột Thao tác) ----------
+  document.body.insertAdjacentHTML('beforeend', `<div class="overlay hidden" id="modal-cr5-qt" style="z-index:1150">
+    <div class="modal-box" style="width:1100px;max-width:96vw">
+      <div class="modal-hd"><span class="modal-title" id="cr5-qt-title">Quy trình phê duyệt</span>
+        <button class="modal-close" onclick="document.getElementById('modal-cr5-qt').classList.add('hidden')">✕</button></div>
+      <div class="modal-bd" style="overflow-x:auto"><div id="cr5-qt-body"></div></div>
+      <div class="modal-ft"><button class="btn btn-default" onclick="document.getElementById('modal-cr5-qt').classList.add('hidden')">Đóng</button></div>
+    </div></div>`);
+  // Các bước người duyệt theo quy trình mẫu TTTN (cấu hình ở MH-ADMIN-26)
+  const QT_STEPS = [
+    { buoc:'GVHD duyệt', ten:'Chờ người duyệt', donVi:'Khoa Công nghệ Thông tin', vaiTro:'Giảng viên hướng dẫn', phanCong:'GVHD của sinh viên' },
+    { buoc:'Khoa duyệt', ten:'Chờ người duyệt', donVi:'Khoa Công nghệ Thông tin', vaiTro:'Trưởng khoa', phanCong:'Chức vụ tại đơn vị quản lý trực tiếp' },
+  ];
+  const QT_TAG = { 'Đã nộp':'tag-blue', 'Đồng ý':'tag-success', 'Từ chối':'tag-error', 'Đang chờ':'tag-warning' };
+  function qtHtml(c){
+    const done = ['approved','rejected','khong_thanh_cong'].includes(c.status);
+    const rows = [{ ten:'Nộp biểu mẫu', donVi:'', vaiTro:'Sinh viên', phanCong:'', nguoi:c.data.ho_ten, nhan:c.ngayNop, xuly:c.ngayNop, kq:'Đã nộp', lydo:'' }];
+    QT_STEPS.forEach(t => {
+      const s = (c.steps || []).find(x => x.buoc === t.buoc);
+      rows.push(s ? { ...t, nguoi:s.nguoi, nhan:s.nhan, xuly:s.xuly, kq:s.kq, lydo:s.lydo }
+                  : { ...t, nguoi:'', nhan:'', xuly:'', kq: done ? 'Không thực hiện' : 'Chưa đến lượt', lydo:'' });
+    });
+    const td = x => `<td>${x || ''}</td>`;
+    return `${c.status === 'khong_thanh_cong' ? `<div class="alert" style="background:#fff2f0;border-color:#ffa39e"><span class="alert-ico">⛔</span><div class="alert-body">
+        <div class="alert-title" style="color:#cf1322">Không thành công — ${c.lyDoKhongDat}</div>
+        <span class="alert-desc">Hệ thống kiểm tra thời gian nộp không đạt, đơn không được chuyển sang người duyệt.</span></div></div>` : ''}
+      <table class="cr5-steps" style="min-width:1000px"><thead><tr><th>STT</th><th>Bước</th><th>Đơn vị duyệt</th><th>Vai trò duyệt</th><th>Phân công</th>
+        <th>Người xử lý</th><th>Thời gian nhận</th><th>Thời gian xử lý</th><th>Trạng thái</th><th>Lý do</th></tr></thead><tbody>
+      ${rows.map((r, i) => `<tr><td style="text-align:center">${i + 1}</td>${td(r.ten)}${td(r.donVi)}${td(r.vaiTro)}${td(r.phanCong)}${td(r.nguoi)}
+        ${td(r.nhan && fmt(r.nhan))}${td(r.xuly && fmt(r.xuly))}<td><span class="tag ${QT_TAG[r.kq] || 'tag-default'}">${r.kq}</span></td>${td(r.lydo)}</tr>`).join('')}
+      </tbody></table>`;
+  }
+  function openQt(id){
+    const c = (REQUESTS.find(r => r.id === id) || {}).cr5; if(!c) return;
+    $('cr5-qt-title').textContent = 'Quy trình phê duyệt — ' + c.id;
+    $('cr5-qt-body').innerHTML = qtHtml(c);
+    $('modal-cr5-qt').classList.remove('hidden');
+  }
+
+  // ---------- Đơn Word (mô phỏng theo mẫu M04 / M05 — giống MH-SV-01) ----------
+  const F = x => `<span class="fill">${x || '…………'}</span>`;
+  function docHtml(c){
+    const v = c.data;
+    const head = `<p class="c b">CỘNG HÒA XÃ HỘI CHỦ NGHĨA VIỆT NAM</p><p class="c b">Độc lập – Tự do – Hạnh phúc</p>`;
+    const sv = `<p>Tên em là: ${F(v.ho_ten)} &nbsp; Mã sinh viên: ${F(v.ma_sv)} &nbsp; Ngày sinh: ${F(fmt(v.ngay_sinh))}</p>
+      <p>Lớp: ${F(v.lop)} &nbsp; Khóa: ${F(v.khoa_hoc)} &nbsp; Ngành: ${F(v.nganh)}</p>
+      <p>Điện thoại: ${F(v.dien_thoai)} &nbsp; Email: ${F(v.email)}</p>`;
+    const kg = `<p style="margin-left:60px">Kính gửi: - Ban Giám hiệu trường Đại học Phenikaa;<br><span style="margin-left:66px">- Phòng Đào tạo;</span><br><span style="margin-left:66px">- ${F(v.khoa)}</span></p>`;
+    const date = `<p style="text-align:right;font-style:italic">Hà Nội, ngày ${F(fmt(c.ngayNop))}</p>`;
+    if(c.loai === 'giahan') return `<div class="cr5-doc"><p style="text-align:right;font-style:italic">Mẫu QT.ĐT.18.M05</p>${head}
+      <p class="c b" style="margin:18px 0">ĐƠN XIN GIA HẠN THỜI GIAN THỰC TẬP TỐT NGHIỆP</p>${kg}${sv}
+      <p>Theo Quyết định số: ${F(v.so_qd)} ngày ${F(fmt(v.ngay_qd))} của Hiệu trưởng trường Đại học Phenikaa, em được đi thực tập tốt nghiệp tại cơ sở: ${F(v.coso)}</p>
+      <p>Giảng viên hướng dẫn: ${F(v.gvhd)}</p><p>Lý do xin gia hạn: ${F(v.ly_do)}</p>
+      <p>Với lý do trình bày trên đây, em kính đề nghị Lãnh đạo nhà trường, Phòng Đào tạo, ${F(v.khoa)} cho phép em được gia hạn thời gian thực tập tốt nghiệp và tự nguyện nộp lệ phí theo quy định của Nhà trường.</p>
+      <p>Thời gian gia hạn: từ ${F(fmt(v.ngay_kt_hien_tai))} đến ${F(fmt(v.ngay_kt_de_nghi))} <i>(không quá 4 tuần)</i>.</p>
+      ${date}<div class="cr5-sign"><div>Xác nhận của Khoa<span>(Ký, ghi rõ họ tên)</span></div><div>Giảng viên hướng dẫn<span>(Ký, ghi rõ họ tên)</span></div><div>Người làm đơn<span>(Ký, ghi rõ họ tên)</span></div></div></div>`;
+    const m = v.co_so_moi || {};
+    return `<div class="cr5-doc"><p style="text-align:right;font-style:italic">Mẫu QT.ĐT.18.M04</p>${head}${date}
+      <p class="c b" style="margin:18px 0">ĐƠN XIN THAY ĐỔI ĐỊA ĐIỂM THỰC TẬP TỐT NGHIỆP</p>${kg}${sv}<p>Khoa: ${F(v.khoa)}</p>
+      <p>Theo Quyết định của Nhà trường, em được phân công thực tập tốt nghiệp tại ${F(v.co_so_hien_tai)}</p><p>Địa chỉ: ${F(v.dia_chi_co_so_hien_tai)}</p>
+      <p>Em làm đơn này kính đề nghị Lãnh đạo nhà trường, Phòng Đào tạo, ${F(v.khoa)} cho phép em được đổi địa điểm thực tập đến ${F(m.ten)}</p>
+      <p>Địa chỉ: ${F(m.dia_chi)}</p><p>(từ ngày ${F(fmt(v.ngay_bat_dau))} đến ngày ${F(fmt(v.ngay_ket_thuc))}).</p><p>Lý do: ${F(v.ly_do)}</p>
+      <p>Sau khi đổi sang đơn vị thực tập mới, em xin đảm bảo trong khoảng thời gian thực tập còn lại, hoàn thành được nội dung của học phần và tuân thủ mọi nội quy, quy định của đơn vị cũng như của Nhà trường.</p>
+      <div class="cr5-sign"><div>Ý kiến của GVHD<span>(Ký, ghi rõ họ tên)</span></div><div>Người làm đơn<span>(Ký, ghi rõ họ tên)</span></div></div>
+      <div class="cr5-sign"><div>Xác nhận của Khoa<span>(Ký, ghi rõ họ tên)</span></div><div>Xác nhận của cơ sở TT cũ<span>(Ký, ghi rõ họ tên)</span></div></div>
+      <div class="cr5-sign"><div>Ý kiến tiếp nhận của cơ sở TT mới<span>(Ký, ghi rõ họ tên)</span></div></div></div>`;
+  }
+  const byId = id => (REQUESTS.find(r => r.id === id) || {}).cr5;
+
+  window.CR5SV5 = {
+    cur:null,
+    qt:openQt,
+    viewDon(id){
+      const c = byId(id); if(!c) return;
+      this.cur = id;
+      $('cr5-don-title').textContent = 'Xem đơn ' + c.id;
+      $('cr5-don-doc').innerHTML = docHtml(c);
+      $('modal-cr5-don').classList.remove('hidden');
+    },
+    downloadCur(){
+      const c = byId(this.cur); if(!c) return;
+      const html = `<html><head><meta charset="utf-8"><style>.c{text-align:center}.b{font-weight:bold}.cr5-sign{display:flex;justify-content:space-around;text-align:center;font-weight:bold;margin-top:20px}.cr5-sign span{display:block;font-weight:normal;font-style:italic}</style></head><body style="font-family:'Times New Roman';font-size:14pt">${docHtml(c).replace(/class="fill"/g,'')}</body></html>`;
+      const a = document.createElement('a');
+      a.href = URL.createObjectURL(new Blob(['﻿' + html], { type:'application/msword' }));
+      a.download = (c.loai === 'giahan' ? 'Don_gia_han_TTTN_' : 'Don_doi_co_so_TTTN_') + c.id + '.doc';
+      a.click();
+      toast('Đang tải đơn ' + c.id);
+    },
+  };
+
+  // Mở chi tiết khi đi từ MH-SV-01 (?yc=YC-…)
+  renderTable('tt');
+  const q = new URLSearchParams(location.search).get('yc');
+  if(q && REQUESTS.some(r => r.id === q)) openDetail(q);
+})();
+</script>
 </body>
 </html>

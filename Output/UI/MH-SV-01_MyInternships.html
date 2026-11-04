@@ -3473,5 +3473,501 @@ function toast(msg, type = 'success') {
   };
 })();
 </script>
+<!-- CRDAKL-START -->
+<!-- ═══════════════════════════════════════════════════════════════════════
+     CR-20261104-001 — SV gửi đơn Đổi đề tài (M05) / Gia hạn (M06) / Bảo vệ sớm ĐA-KLTN
+     Khối mở rộng gắn thêm, KHÔNG sửa code gốc phía trên (US-DAKL-12, 16, 18):
+       - Nút 🔄 ⏰ ⏩: khóa + tooltip khi đang có đơn cùng loại đang xử lý
+       - Form theo biểu mẫu, [Hủy] [Lưu nháp] [Xem trước] [Nộp], báo kết quả kiểm tra ngay
+       - Dữ liệu dùng chung với MH-SV-05, MH-GV-02 (localStorage crdakl_*)
+     ═══════════════════════════════════════════════════════════════════════ -->
+<div class="overlay hidden" id="modal-crd-preview" style="z-index:1150">
+  <div class="modal-box" style="width:760px;max-width:95vw">
+    <div class="modal-hd">
+      <span class="modal-title" id="crd-pv-title">Xem trước đơn</span>
+      <button class="modal-close" onclick="closeModal('modal-crd-preview')">✕</button>
+    </div>
+    <div class="modal-bd" style="background:#f0f0f0;max-height:70vh;overflow:auto">
+      <div id="crd-pv-doc" style="background:#fff;max-width:620px;margin:0 auto;padding:36px 44px;font-family:'Times New Roman',serif;font-size:14px;line-height:1.55;box-shadow:0 1px 4px rgba(0,0,0,.15)"></div>
+    </div>
+    <div class="modal-ft">
+      <button class="btn btn-default" onclick="closeModal('modal-crd-preview')">Đóng</button>
+      <button class="btn btn-primary" onclick="CRDSV.download()">⬇️ Tải đơn</button>
+    </div>
+  </div>
+</div>
+<div class="overlay hidden" id="modal-crd-baove">
+  <div class="modal-box" style="width:620px;max-height:92vh">
+    <div class="modal-hd">
+      <span class="modal-title">Đơn xin bảo vệ sớm đồ án, khóa luận</span>
+      <button class="modal-close" onclick="closeModal('modal-crd-baove')">✕</button>
+    </div>
+    <div class="modal-bd" style="overflow-y:auto">
+      <div class="alert alert-info" style="margin-bottom:14px"><span class="alert-ico">ℹ️</span>
+        <div class="alert-body"><span class="alert-desc" id="crd-bv-alert"></span></div></div>
+      <div id="crd-bv-sv"></div>
+      <div class="sec-title" style="font-size:13px;margin-bottom:10px"><span class="sec-badge">1</span> Thông tin đề tài</div>
+      <div class="f-row col-2" style="margin-bottom:16px">
+        <div class="fi"><label>Mã đợt</label><input class="fc crd-ro" id="crd-bv-dot" readonly></div>
+        <div class="fi"><label>Ngày quyết định</label><input class="fc crd-ro" id="crd-bv-ngayqd" readonly></div>
+        <div class="fi"><label>Loại quyết định <span class="req">*</span></label><select class="fc" id="crd-bv-loaiqd" onchange="CRDSV.fillSo('bv')"></select></div>
+        <div class="fi"><label>Số quyết định <span class="req">*</span></label><select class="fc" id="crd-bv-soqd" onchange="CRDSV.fillNgay('bv')"></select></div>
+        <div class="fi" style="grid-column:1/-1"><label>Tên đề tài</label><textarea class="fc crd-ro" id="crd-bv-ten" readonly style="height:52px;resize:none"></textarea></div>
+        <div class="fi" style="grid-column:1/-1"><label>Giảng viên hướng dẫn</label><input class="fc crd-ro" id="crd-bv-gvhd" readonly></div>
+        <div class="fi"><label>Ngày bắt đầu làm ĐAKLTN</label><input class="fc crd-ro" id="crd-bv-from" readonly></div>
+        <div class="fi"><label>Ngày kết thúc làm ĐAKLTN</label><input class="fc crd-ro" id="crd-bv-to" readonly></div>
+      </div>
+      <div class="sec-title" style="font-size:13px;margin-bottom:10px"><span class="sec-badge">2</span> Lý do xin bảo vệ sớm</div>
+      <div class="fi" style="margin-bottom:16px"><textarea class="fc" id="crd-bv-lydo" style="height:80px;resize:none" placeholder="Nêu rõ lý do xin bảo vệ sớm..."></textarea></div>
+      <div class="sec-title" style="font-size:13px;margin-bottom:10px"><span class="sec-badge">3</span> Minh chứng / sản phẩm đã hoàn thành</div>
+      <div class="fi"><input type="file" class="fc" id="crd-bv-file" accept=".pdf,.doc,.docx,.zip" style="padding:5px 10px">
+        <div class="f-hint" style="font-size:11px;color:var(--text-3);margin-top:3px">Bắt buộc hay không theo cấu hình của PĐT (mô phỏng: không bắt buộc) · PDF / Word / ZIP · tối đa 5 MB</div></div>
+    </div>
+    <div class="modal-ft">
+      <button class="btn btn-default" onclick="closeModal('modal-crd-baove')">Hủy</button>
+      <button class="btn btn-default" onclick="CRDSV.draft('baove')">💾 Lưu nháp</button>
+      <button class="btn btn-default" onclick="CRDSV.preview('baove')">👁️ Xem trước</button>
+      <button class="btn btn-primary" onclick="CRDSV.submit('baove')">Nộp</button>
+    </div>
+  </div>
+</div>
+<style>
+  .crd-demo{display:flex;align-items:center;gap:10px;flex-wrap:wrap;padding:10px 20px;background:#fffbe6;border-bottom:1px solid #ffe58f;font-size:12.5px}
+  .crd-demo input{width:auto}
+  .crd-ro{background:#fafafa !important;cursor:default}
+  #crd-tip{display:none;position:fixed;z-index:2000;max-width:300px;padding:6px 10px;border-radius:6px;background:rgba(0,0,0,.85);color:#fff;font-size:12px;line-height:1.45;pointer-events:none}
+  .crd-doc p{margin:0 0 6px}
+  .crd-doc .c{text-align:center}
+  .crd-doc .b{font-weight:700}
+  .crd-doc .fill{border-bottom:1px dotted #555;padding:0 4px;font-style:italic;color:#0958d9}
+  .crd-sign{display:flex;justify-content:space-around;text-align:center;margin-top:24px;font-weight:700}
+  .crd-sign div span{display:block;font-weight:400;font-style:italic}
+</style>
+<script>
+(function(){
+  const LS_REQ = 'crdakl_requests', LS_HS = 'crdakl_hoso', LS_TP = 'crdakl_topics';
+  const fmt = iso => iso ? iso.split('-').reverse().join('/') : '…';
+  const $ = id => document.getElementById(id);
+  const load = (k, dft) => { try { return JSON.parse(localStorage.getItem(k)) || dft; } catch(e) { return dft; } };
+  const save = (k, v) => localStorage.setItem(k, JSON.stringify(v));
+  const addDays = (iso, n) => { const [y,m,dd] = iso.split('-').map(Number); return new Date(Date.UTC(y, m-1, dd + n)).toISOString().slice(0,10); };
+  const LOAI_LABEL = { doidetai:'Đổi đề tài ĐA/KLTN', giahan_da:'Gia hạn thời gian làm ĐA/KLTN', baove:'Xin bảo vệ sớm ĐA/KLTN' };
+  const NGUON_GV = 'Đề tài giảng viên', NGUON_SV = 'Sinh viên tự đề xuất';
+
+  // ---------- Đơn theo mẫu QT.ĐT.19 (M05, M06); Bảo vệ sớm: bản tóm tắt (chưa có mẫu Word) ----------
+  const F = x => `<span class="fill">${x || '…………'}</span>`;
+  function docHtml(c){
+    const v = c.data;
+    const head = `<p class="c b">CỘNG HÒA XÃ HỘI CHỦ NGHĨA VIỆT NAM</p><p class="c b">Độc lập – Tự do – Hạnh phúc</p>`;
+    const date = `<p style="text-align:right;font-style:italic">Hà Nội, ngày ${F(fmt(c.ngayNop))}</p>`;
+    const kg = `<p style="margin-left:60px">Kính gửi: - Ban Giám hiệu trường Đại học Phenikaa;<br><span style="margin-left:66px">- Phòng Đào tạo;</span><br><span style="margin-left:66px">- ${F(v.khoa)}</span></p>`;
+    const sv = `<p>Tên em là: ${F(v.ho_ten)} &nbsp; Ngày sinh: ${F(fmt(v.ngay_sinh))}</p>
+      <p>Mã sinh viên: ${F(v.ma_sv)} &nbsp; Lớp: ${F(v.lop)} &nbsp; Khóa: ${F(v.khoa_hoc)}</p>
+      <p>Ngành học: ${F(v.nganh)}</p><p>Điện thoại: ${F(v.dien_thoai)} &nbsp; Email: ${F(v.email)}</p>`;
+    const qd = `Theo Quyết định số: ${F(v.so_qd)} ngày ${F(fmt(v.ngay_qd))} của Hiệu trưởng trường Đại học Phenikaa`;
+    const sign = `<div class="crd-sign"><div>Ý kiến của GVHD<span>(Ký, ghi rõ họ tên)</span></div><div>Người làm đơn<span>(Ký, ghi rõ họ tên)</span></div></div>
+      <div class="crd-sign"><div>Xác nhận của Khoa<span>(Ký, ghi rõ họ tên)</span></div></div>`;
+    if(c.loai === 'doidetai') return `<div class="crd-doc"><p style="text-align:right;font-style:italic">Mẫu QT.ĐT.19.M05</p>${head}${date}
+      <p class="c b" style="margin:18px 0 0">ĐƠN ĐỀ NGHỊ</p><p class="c b" style="margin-bottom:18px">CHỈNH SỬA/THAY ĐỔI ĐỀ TÀI ĐỒ ÁN/KHÓA LUẬN TỐT NGHIỆP</p>${kg}${sv}
+      <p>Giảng viên hướng dẫn: ${F(v.gvhd)}</p>
+      <p>${qd}, em được giao thực hiện đề tài đồ án/khóa luận tốt nghiệp:</p>
+      <p>1. Tên đề tài theo Quyết định: ${F(v.ten_de_tai_hien_tai)}</p>
+      <p>2. Tên đề tài đề nghị chỉnh sửa/thay đổi: ${F(v.de_tai_moi.ten)}</p>
+      <p>3. Lý do đề nghị chỉnh sửa/thay đổi: ${F(v.ly_do)}</p>
+      <p>Sau khi chỉnh sửa/thay đổi đề tài đồ án/khóa luận tốt nghiệp, em xin đảm bảo trong khoảng thời gian làm ĐAKLTN còn lại, hoàn thành được nội dung và tuân thủ các Quy định làm ĐAKLTN.</p>
+      <p>Em xin chân thành cảm ơn./.</p>${sign}</div>`;
+    if(c.loai === 'giahan_da') return `<div class="crd-doc"><p style="text-align:right;font-style:italic">Mẫu QT.ĐT.19.M06</p>${head}${date}
+      <p class="c b" style="margin:18px 0">ĐƠN XIN GIA HẠN THỜI GIAN LÀM ĐỒ ÁN/KHÓA LUẬN TỐT NGHIỆP</p>${kg}${sv}
+      <p>${qd}, em được giao thực hiện đề tài đồ án/khóa luận tốt nghiệp với tên đề tài: ${F(v.ten_de_tai)}</p>
+      <p>Giảng viên hướng dẫn: ${F(v.gvhd)}</p><p>Lý do xin gia hạn: ${F(v.ly_do)}</p>
+      <p>Với lý do trình bày trên đây, em kính đề nghị Lãnh đạo nhà trường, Phòng Đào tạo, ${F(v.khoa)} cho phép em được gia hạn thời gian thực hiện đồ án/khóa luận tốt nghiệp và tự nguyện nộp lệ phí theo quy định của Nhà trường.</p>
+      <p>Thời gian gia hạn: từ ${F(fmt(v.ngay_kt_hien_tai))} đến ${F(fmt(v.ngay_kt_de_nghi))} <i>(không quá 4 tuần)</i>.</p>
+      <p>Em xin chân thành cảm ơn và cam đoan về những nội dung trình bày của mình tại đơn này là chính xác.</p>
+      <p><i>(Đơn nộp kèm minh chứng cho lý do gia hạn, VD bệnh án, xác nhận của gia đình, địa phương, …).</i></p>${sign}</div>`;
+    return `<div class="crd-doc"><div style="background:#fffbe6;border:1px solid #ffe58f;padding:6px 10px;font:12.5px Arial;margin-bottom:12px">Bản tóm tắt nội dung đơn — chưa có mẫu Word, PĐT sẽ gắn mẫu sau.</div>${head}${date}
+      <p class="c b" style="margin:18px 0">ĐƠN XIN BẢO VỆ SỚM ĐỒ ÁN/KHÓA LUẬN TỐT NGHIỆP</p>${kg}${sv}
+      <p>${qd}, em được giao thực hiện đề tài: ${F(v.ten_de_tai)}</p>
+      <p>Giảng viên hướng dẫn: ${F(v.gvhd)}</p>
+      <p>Thời gian làm ĐAKLTN: từ ${F(fmt(v.ngay_bat_dau))} đến ${F(fmt(v.ngay_ket_thuc))}</p>
+      <p>Lý do xin bảo vệ sớm: ${F(v.ly_do)}</p>${v.minh_chung ? `<p>Minh chứng kèm theo: ${F(v.minh_chung)}</p>` : ''}${sign}</div>`;
+  }
+  function downloadDoc(c){
+    const html = `<html><head><meta charset="utf-8"><style>.c{text-align:center}.b{font-weight:bold}.crd-sign{display:flex;justify-content:space-around;text-align:center;font-weight:bold;margin-top:20px}.crd-sign span{display:block;font-weight:normal;font-style:italic}</style></head><body style="font-family:'Times New Roman';font-size:14pt">${docHtml(c).replace(/class="fill"/g,'')}</body></html>`;
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(new Blob(['﻿' + html], { type:'application/msword' }));
+    a.download = ({ doidetai:'Don_doi_de_tai_', giahan_da:'Don_gia_han_DAKLTN_', baove:'Don_bao_ve_som_' })[c.loai] + (c.id || 'nhap') + '.doc';
+    a.click();
+  }
+  // Khối thông tin đề tài mới / đơn dùng ở chi tiết MH-SV-05, MH-GV-02
+  function topicSummary(c){
+    const m = c.data.de_tai_moi; if(!m) return '';
+    const row = (k, x) => x ? `<div><span style="color:var(--text-3)">${k}:</span> ${x}</div>` : '';
+    return `<div style="border-top:1px dashed var(--border);margin-top:8px;padding-top:8px">
+      ${row('Nguồn đề tài', `<b>${m.nguon}</b>`)}${row('Chương trình đào tạo', m.ctdt)}${row('Loại đề tài', m.loai)}${row('Lĩnh vực', m.linh_vuc)}${row('Tóm tắt', m.tom_tat)}${row('Sản phẩm / Kết quả', m.san_pham)}${row('Công nghệ', m.cong_nghe)}${row('Tài liệu', m.tai_lieu)}</div>`;
+  }
+  const hanLabel = c => c.loai === 'doidetai' ? `Được nộp ${fmt(c.data.ngay_bat_dau)} – ${fmt(c.hanChot)}`
+    : c.loai === 'baove' ? `Được nộp ${fmt(c.ngayDuocNop)} – ${fmt(c.hanChot)}` : `Hạn chót ${fmt(c.hanChot)}`;
+  const LS_DRAFT = 'crdakl_drafts';
+  const SV = { ho_ten:'Nguyễn Văn An', ma_sv:'B22DCCN001', ngay_sinh:'2004-03-15', lop:'D22CQCN01-B', khoa_hoc:'2022-2026',
+    nganh:'Kỹ thuật phần mềm', dien_thoai:'0912 000 001', email:'an.nv@stu.phenikaa-uni.edu.vn', khoa:'Khoa Công nghệ Thông tin' };
+  // Thời gian theo Lớp học phần (mô phỏng)
+  const LHP = { 'DA-HK1-2025-2026':{ from:'2026-03-02', to:'2026-06-14' }, 'DA-HK2-2025-2026':{ from:'2026-03-02', to:'2026-06-14' },
+    'DA-HK2-2024-2025':{ from:'2025-02-10', to:'2025-05-25' }, 'DA-HK1-2024-2025':{ from:'2024-09-02', to:'2024-12-15' }, 'KL-HK2-2025-2026':{ from:'2026-03-02', to:'2026-06-14' } };
+  // Nhóm GVHD (mô phỏng SV có nhiều GVHD): GV chính đứng đầu; ngoai = GV ngoài trường, không có tài khoản
+  const NHOM = { 'DA-HK1-2025-2026':[{ ten:'TS. Nguyễn Minh Tuấn' }, { ten:'ThS. Lê Thu Hoa' }],
+    'DA-HK2-2025-2026':[{ ten:'TS. Nguyễn Minh Tuấn' }, { ten:'ThS. Lê Thu Hoa' }, { ten:'Ông Trần Văn Bình', ngoai:'Công ty X' }] };
+  const QD_DB = { 'DA-HK1-2025-2026':[{ loai:'Giao đề tài', so:'1234/QĐ-ĐHP-ĐT', ngay:'2026-02-20' }],
+    'DA-HK2-2025-2026':[{ loai:'Thay đổi đề tài', so:'1402/QĐ-ĐHP-ĐT', ngay:'2026-03-05' }, { loai:'Giao đề tài', so:'1235/QĐ-ĐHP-ĐT', ngay:'2026-02-20' }],
+    'DA-HK2-2024-2025':[{ loai:'Giao đề tài', so:'0456/QĐ-ĐHP-ĐT', ngay:'2025-02-01' }], 'DA-HK1-2024-2025':[{ loai:'Giao đề tài', so:'0812/QĐ-ĐHP-ĐT', ngay:'2024-08-25' }], 'KL-HK2-2025-2026':[{ loai:'Giao đề tài', so:'1236/QĐ-ĐHP-ĐT', ngay:'2026-02-20' }] };
+  const LINH_VUC = ['Phát triển phần mềm','Trí tuệ nhân tạo & Dữ liệu','Hệ thống thông tin & IoT','An toàn thông tin','Mạng & Hạ tầng'];
+  // Bổ sung đề tài để thử lọc theo nhóm GVHD + nội dung tự điền của đề tài giảng viên
+  DDT2_TOPIC_LIST.push(
+    { ma:'DT-2026-0011', ten:'Xây dựng chatbot hỗ trợ tư vấn tuyển sinh bằng mô hình ngôn ngữ', gv:'ThS. Lê Thu Hoa', type:'ĐATN', ctdt:'KTPM', maxQty:1, taken:0 },
+    { ma:'DT-2026-0012', ten:'Phân tích cảm xúc phản hồi sinh viên trên mạng xã hội', gv:'TS. Nguyễn Minh Tuấn', type:'ĐATN', ctdt:'KTPM', maxQty:2, taken:2 });
+  const TOPIC_INFO = {
+    'DT-2026-0004':{ linhVuc:'An toàn thông tin', tomTat:'Thu thập, phân tích log hệ thống và dùng mô hình AI phát hiện hành vi xâm nhập mạng bất thường.', sanPham:'Hệ thống phân tích log + mô hình phát hiện xâm nhập + báo cáo đánh giá.', congNghe:'Python, ELK Stack, Scikit-learn', file:'DeCuong_PhanTichLog_DT2026_0004.pdf' },
+    'DT-2026-0011':{ linhVuc:'Trí tuệ nhân tạo & Dữ liệu', tomTat:'Xây dựng chatbot trả lời câu hỏi tuyển sinh dựa trên tài liệu của trường.', sanPham:'Chatbot trên web + bộ dữ liệu hỏi đáp + báo cáo đánh giá.', congNghe:'Python, LangChain, React', file:'DeCuong_Chatbot_DT2026_0011.pdf' },
+    'DT-2026-0012':{ linhVuc:'Trí tuệ nhân tạo & Dữ liệu', tomTat:'Phân tích cảm xúc phản hồi của sinh viên trên mạng xã hội.', sanPham:'Mô hình phân tích + dashboard.', congNghe:'Python, PhoBERT', file:'' },
+  };
+  const TYPE_FULL = { ĐATN:'Đồ án tốt nghiệp', KLTN:'Khóa luận tốt nghiệp', ĐACS:'Đồ án cơ sở', ĐALN:'Đồ án liên ngành', TTTN:'Thực tập tốt nghiệp' };
+
+  const ngayNop = () => $('crd-ngaynop').value;
+  const nhomOf = maDot => { const d = getDaklByMaDot(maDot); return NHOM[maDot] || (d && d.gvhd ? [{ ten:d.gvhd }] : []); };
+  const gvhdText = maDot => nhomOf(maDot).map((g, i) => i === 0 ? g.ten : g.ngoai ? `${g.ten} — ${g.ngoai} (đồng HD ngoài trường)` : `${g.ten} (đồng HD)`).join('; ');
+  const hoSo = () => load(LS_HS, {});
+  function tg(maDot){   // ngày theo LHP; ngày kết thúc đã tính gia hạn (lấy ngày muộn hơn)
+    const l = LHP[maDot] || { from:'', to:'' }, h = hoSo()[maDot] || {};
+    return { from:l.from, to: h.ngayKt && h.ngayKt > l.to ? h.ngayKt : l.to };
+  }
+  function ngayDuocNop(from, to, tu, mau){   // đã qua tỷ lệ số tuần, làm tròn lên ở cả 2 bước
+    const so = Math.round((Date.parse(to) - Date.parse(from)) / 864e5) + 1;
+    const tuan = Math.ceil(so / 7), qua = Math.ceil(tu * tuan / mau);
+    return { tuan, qua, ngay:addDays(from, qua * 7) };
+  }
+  const tyLe = () => ({ tu:+$('crd-tu').value || 2, mau:+$('crd-mau').value || 3 });
+  const openOf = (maDot, loai) => load(LS_REQ, []).find(r => r.maDot === maDot && r.loai === loai && (r.status === 'cho_gvhd' || r.status === 'cho_khoa'));
+
+  // ---------- Áp kết quả node cập nhật (MH-GV-02 ghi crdakl_hoso) ----------
+  function applyHoSo(){
+    const hs = hoSo();
+    DAKL_DATA.forEach(d => {
+      const h = hs[d.maDot];
+      if(!h || !h.topic || d._crdSeq === h.seq) return;
+      d._crdSeq = h.seq; d.topic = h.topic; d.decuong = null; d.baoCao = null;
+      d.ghiChu = '🔄 Đã đổi đề tài. Vui lòng nộp lại Tiến độ cho đề tài mới.';
+    });
+    const tp = load(LS_TP, {});
+    DDT2_TOPIC_LIST.forEach(t => { if(tp[t.ma] !== undefined) t.taken = tp[t.ma]; });
+  }
+
+  // ---------- Thanh mô phỏng ----------
+  const card = document.querySelector('#tab-do-an-kl .card');
+  const demo = document.createElement('div');
+  demo.className = 'crd-demo';
+  demo.innerHTML = `<b>CR-20261104-001 · Mô phỏng</b> Ngày nộp: <input class="fc" type="date" id="crd-ngaynop" value="2026-03-10">
+    <span>Tỷ lệ bảo vệ sớm (cấu hình trên node):</span>
+    <input class="fc" type="number" min="1" id="crd-tu" value="2" style="width:58px"> / <input class="fc" type="number" min="2" id="crd-mau" value="3" style="width:58px">
+    <a href="MH-SV-05_MyChangeRequests.html#dt" style="margin-left:auto">Xem đơn đã gửi (MH-SV-05) →</a>
+    <a href="MH-GV-02_ChangeRequestApproval.html#dt">Duyệt đơn (MH-GV-02) →</a>
+    <button class="btn btn-default btn-sm" onclick="CRDSV.reset()">Xóa dữ liệu mô phỏng</button>`;
+  card.insertBefore(demo, card.firstChild);
+
+  // ---------- Nút thao tác trên dòng ----------
+  const _render = renderDaklTable;
+  const TIP = { doidetai:'đổi đề tài', giahan_da:'gia hạn', baove:'bảo vệ sớm' };
+  function actBtn(icon, fn, maDot, loai, baseOk, baseTip, tipOk){
+    const o = openOf(maDot, loai);
+    const ok = baseOk && !o;
+    const tip = o ? `Bạn đang có yêu cầu ${TIP[loai]} đang xử lý (${o.id}). Chờ có kết quả rồi tạo đơn mới` : (baseOk ? tipOk : baseTip);
+    return `<span data-tip="${tip}" style="display:inline-flex;cursor:${ok ? 'pointer' : 'not-allowed'}"><button class="btn btn-link btn-sm" data-crd="${loai}" onclick="${fn}('${maDot}')" style="font-size:16px;padding:2px 4px;${ok ? '' : 'opacity:.35;pointer-events:none'}" ${ok ? '' : 'disabled'}>${icon}</button></span>`;
+  }
+  renderDaklTable = function(){
+    _render();
+    [...$('dakl-tbody').rows].forEach((tr, i) => {
+      const d = DAKL_DATA[i], box = tr.cells[tr.cells.length - 1].querySelector('div');
+      if(!d || !box) return;
+      const eye = box.querySelector('button');
+      const has = !!d.topic && !d.huy, duyet = daklDeCuongStage(d) === 'Đã duyệt';
+      box.innerHTML = eye.outerHTML
+        + actBtn('🔄', 'openDaklDoiDeTai', d.maDot, 'doidetai', has, 'Chưa có đề tài', 'Tạo đơn đề nghị đổi đề tài')
+        + actBtn('⏰', 'openDaklGiaHan', d.maDot, 'giahan_da', has, 'Chưa có đề tài', 'Tạo đơn xin gia hạn')
+        + actBtn('⏩', 'CRDSV.openBaoVe', d.maDot, 'baove', has && duyet, has ? 'Chỉ gửi được khi Tiến độ đã được GVHD duyệt' : 'Chưa có đề tài', 'Tạo đơn xin bảo vệ sớm');
+    });
+  };
+
+  // Tooltip hiện ngay khi hover (kể cả nút đang khóa); dùng vị trí cố định để không bị bảng cắt
+  const tipBox = document.createElement('div');
+  tipBox.id = 'crd-tip';
+  document.body.appendChild(tipBox);
+  $('dakl-tbody').addEventListener('mouseover', e => {
+    const el = e.target.closest('[data-tip]');
+    if(!el){ tipBox.style.display = 'none'; return; }
+    tipBox.textContent = el.dataset.tip;
+    tipBox.style.display = 'block';
+    const r = el.getBoundingClientRect(), w = tipBox.offsetWidth, h = tipBox.offsetHeight;
+    tipBox.style.left = Math.max(8, Math.min(r.left + r.width / 2 - w / 2, innerWidth - w - 8)) + 'px';
+    tipBox.style.top = (r.top - h - 8 > 8 ? r.top - h - 8 : r.bottom + 8) + 'px';
+  });
+  $('dakl-tbody').addEventListener('mouseleave', () => { tipBox.style.display = 'none'; });
+  document.addEventListener('scroll', () => { tipBox.style.display = 'none'; }, true);
+
+  // ---------- Khối dùng chung trong form ----------
+  const svInfo = () => `<div class="sec-title" style="font-size:13px;margin-bottom:10px">Thông tin sinh viên</div>
+    <div class="f-row col-2" style="margin-bottom:16px">
+      ${[['Họ tên', SV.ho_ten], ['Mã sinh viên', SV.ma_sv], ['Ngày sinh', fmt(SV.ngay_sinh)], ['Lớp', SV.lop], ['Khóa', SV.khoa_hoc], ['Ngành', SV.nganh], ['Khoa', SV.khoa], ['Điện thoại', SV.dien_thoai], ['Email', SV.email]]
+        .map(([l, v]) => `<div class="fi"><label>${l}</label><input class="fc crd-ro" readonly value="${v}"></div>`).join('')}
+    </div>`;
+  const qdFields = p => `
+    <div class="fi"><label>Loại quyết định <span class="req">*</span></label><select class="fc" id="crd-${p}-loaiqd" onchange="CRDSV.fillSo('${p}')"></select></div>
+    <div class="fi"><label>Số quyết định <span class="req">*</span></label><select class="fc" id="crd-${p}-soqd" onchange="CRDSV.fillNgay('${p}')"></select></div>
+    <div class="fi"><label>Ngày quyết định</label><input class="fc crd-ro" id="crd-${p}-ngayqd" readonly></div>`;
+  const footer = (m, loai) => `<button class="btn btn-default" onclick="closeModal('${m}')">Hủy</button>
+    <button class="btn btn-default" onclick="CRDSV.draft('${loai}')">💾 Lưu nháp</button>
+    <button class="btn btn-default" onclick="CRDSV.preview('${loai}')">👁️ Xem trước</button>
+    <button class="btn btn-primary" onclick="CRDSV.submit('${loai}')">Nộp</button>`;
+  function initQd(p, maDot){
+    const list = (QD_DB[maDot] || []).slice().sort((a,b) => b.ngay.localeCompare(a.ngay));
+    const loais = [...new Set(list.map(q => q.loai))];
+    $(`crd-${p}-loaiqd`).innerHTML = loais.map(l => `<option>${l}</option>`).join('') || '<option value="">Chưa có quyết định</option>';
+    CRDSV.fillSo(p);
+  }
+
+  // ---------- Form Đổi đề tài (M05) ----------
+  const ddBd = document.querySelector('#modal-dakl-doidetai .modal-bd');
+  const ddSv = document.createElement('div'); ddSv.innerHTML = svInfo();
+  ddBd.insertBefore(ddSv, ddBd.querySelector('.sec-title'));
+  $('ddt2-soqd').closest('.fi').style.display = 'none';
+  $('ddt2-gvhd').closest('.fi').style.gridColumn = '1/-1';
+  $('ddt2-gvhd').closest('.fi').insertAdjacentHTML('afterend', qdFields('dd') + `<div class="fi"><label>Ngày bắt đầu làm ĐAKLTN</label><input class="fc crd-ro" id="crd-dd-from" readonly></div>`);
+  const radios = document.querySelector('input[name="ddt2-mode"]').closest('label').parentElement;
+  radios.insertAdjacentHTML('beforebegin', '<label style="display:block;font-size:13px;font-weight:500;margin-bottom:6px">Nguồn đề tài <span class="req">*</span></label>');
+  radios.querySelectorAll('label').forEach((l, i) => { l.lastChild.textContent = ' ' + (i === 0 ? NGUON_GV : NGUON_SV); });
+  $('ddt2-list-q').placeholder = 'Tìm mã, tên đề tài...';
+  $('ddt2-tende-moi').closest('.fi').insertAdjacentHTML('afterend', `<div class="f-row col-2" id="crd-auto" style="margin-bottom:16px;display:none">
+    <div class="fi"><label>Chương trình đào tạo</label><input class="fc crd-ro" id="crd-a-ctdt" readonly></div>
+    <div class="fi"><label>Loại đề tài</label><input class="fc crd-ro" id="crd-a-loai" readonly></div>
+    <div class="fi"><label>Lĩnh vực</label><input class="fc crd-ro" id="crd-a-linhvuc" readonly></div>
+    <div class="fi" style="grid-column:1/-1"><label>Tóm tắt đề tài</label><textarea class="fc crd-ro" id="crd-a-tomtat" readonly style="height:60px;resize:none"></textarea></div>
+    <div class="fi" style="grid-column:1/-1"><label>Sản phẩm / Kết quả dự kiến</label><textarea class="fc crd-ro" id="crd-a-sanpham" readonly style="height:52px;resize:none"></textarea></div>
+    <div class="fi"><label>Công nghệ / Công cụ</label><input class="fc crd-ro" id="crd-a-congnghe" readonly></div>
+    <div class="fi"><label>Tài liệu đính kèm</label><input class="fc crd-ro" id="crd-a-tailieu" readonly></div></div>`);
+  $('ddt2-p-loai').closest('.fi').insertAdjacentHTML('afterend', `<div class="fi"><label>Lĩnh vực <span class="req">*</span></label>
+    <select class="fc" id="crd-p-linhvuc"><option value="">-- Chọn lĩnh vực --</option>${LINH_VUC.map(l => `<option>${l}</option>`).join('')}</select></div>`);
+  document.querySelector('#modal-dakl-doidetai .modal-ft').innerHTML = footer('modal-dakl-doidetai', 'doidetai');
+
+  ddt2RenderList = function(){
+    const q = ($('ddt2-list-q').value || '').toLowerCase(), type = $('ddt2-list-type').value;
+    const nhom = nhomOf(curDaklMaDot).map(g => g.ten), cur = (getDaklByMaDot(curDaklMaDot) || {}).topic || {};
+    const list = DDT2_TOPIC_LIST.filter(t => nhom.includes(t.gv) && t.ma !== cur.ma && (!type || t.type === type)
+      && (!q || t.ma.toLowerCase().includes(q) || t.ten.toLowerCase().includes(q)));
+    $('ddt2-list-body').innerHTML = list.length ? list.map(t => {
+      const full = t.taken >= t.maxQty;
+      return `<tr style="${full ? 'opacity:.6' : ''}" onclick="${full ? '' : `ddt2SelectTopic('${t.ma}')`}">
+        <td style="text-align:center"><input type="radio" name="ddt2-radio" ${ddt2SelectedMa === t.ma ? 'checked' : ''} ${full ? 'disabled' : ''}></td>
+        <td style="font-family:monospace;font-size:12px;color:var(--primary)">${t.ma}</td>
+        <td style="font-size:13px">${t.ten}${full ? ' <span class="tag tag-error" style="font-size:11px">Đã đủ SV</span>' : ''}</td>
+        <td style="font-size:12px;color:var(--text-2)">${t.gv}</td>
+        <td style="text-align:center;font-size:12px">${t.taken}/${t.maxQty}</td></tr>`;
+    }).join('') : `<tr><td colspan="5" style="text-align:center;color:var(--text-3);padding:20px">Không có đề tài phù hợp</td></tr>`;
+  };
+  const topicOf = ma => { const t = DDT2_TOPIC_LIST.find(x => x.ma === ma); return t && { ...t, ...(TOPIC_INFO[t.ma] || {}) }; };
+  const _select = ddt2SelectTopic;
+  ddt2SelectTopic = function(ma){
+    _select(ma);
+    const t = topicOf(ddt2SelectedMa); if(!t) return;
+    $('crd-auto').style.display = '';
+    $('crd-a-ctdt').value = t.ctdt || '—'; $('crd-a-loai').value = TYPE_FULL[t.type] || t.type; $('crd-a-linhvuc').value = t.linhVuc || '—';
+    $('crd-a-tomtat').value = t.tomTat || '—'; $('crd-a-sanpham').value = t.sanPham || '—';
+    $('crd-a-congnghe').value = t.congNghe || '—'; $('crd-a-tailieu').value = t.file || '—';
+  };
+  const _switch = ddt2SwitchMode;
+  ddt2SwitchMode = function(mode){   // đổi nguồn đề tài → xóa trắng các trường con
+    _switch(mode);
+    ddt2SelectedMa = null; $('ddt2-tende-moi').value = ''; $('crd-auto').style.display = 'none';
+    ['ddt2-p-ten','ddt2-p-tomtat','ddt2-p-sanpham','ddt2-p-congnghe','crd-p-linhvuc'].forEach(i => { $(i).value = ''; });
+    ddt2RenderList();
+  };
+  const _openDd = openDaklDoiDeTai;
+  openDaklDoiDeTai = function(maDot){
+    _openDd(maDot);
+    const t = tg(maDot), han = t.from ? addDays(t.from, 14) : '';
+    $('crd-dd-from').value = fmt(t.from);
+    $('ddt2-gvhd').value = gvhdText(maDot);
+    $('ddt2-tende-cu').previousElementSibling.textContent = 'Tên đề tài theo Quyết định';
+    ddBd.querySelector('.alert-desc').textContent = `Đơn theo mẫu QT.ĐT.19.M05. Chỉ được gửi trong 2 tuần kể từ ngày bắt đầu làm ĐAKLTN: từ ${fmt(t.from)} đến ${fmt(han)}. Đổi đề tài được duyệt thì Tiến độ phải nộp lại.`;
+    initQd('dd', maDot);
+    $('crd-auto').style.display = 'none'; $('crd-p-linhvuc').value = '';
+    const dr = load(LS_DRAFT, {})['doidetai|' + maDot];
+    if(dr){
+      document.querySelector(`input[name="ddt2-mode"][value="${dr.mode}"]`).checked = true; ddt2SwitchMode(dr.mode);
+      $('ddt2-lydo').value = dr.lydo || '';
+      if(dr.mode === 'list' && dr.ma) ddt2SelectTopic(dr.ma);
+      else { $('ddt2-p-ma').value = dr.pma || $('ddt2-p-ma').value; $('ddt2-p-ten').value = dr.ten || ''; $('ddt2-p-tomtat').value = dr.tomtat || ''; $('ddt2-p-sanpham').value = dr.sanpham || ''; $('ddt2-p-congnghe').value = dr.congnghe || ''; $('crd-p-linhvuc').value = dr.linhvuc || ''; }
+    }
+  };
+
+  // ---------- Form Gia hạn (M06) ----------
+  const ghBd = document.querySelector('#modal-dakl-giahan .modal-bd');
+  const ghSv = document.createElement('div'); ghSv.innerHTML = svInfo();
+  ghBd.insertBefore(ghSv, ghBd.querySelector('.sec-title'));
+  $('dgh-soqd').closest('.fi').style.display = 'none';
+  $('dgh-gvhd').closest('.fi').style.gridColumn = '1/-1';
+  $('dgh-gvhd').closest('.fi').insertAdjacentHTML('afterend', qdFields('gh'));
+  $('dgh-to-cu').previousElementSibling.textContent = 'Thời gian gia hạn từ (Ngày kết thúc hiện tại)';
+  $('dgh-to-moi').previousElementSibling.innerHTML = 'Thời gian gia hạn đến <span class="req">*</span>';
+  $('dgh-to-moi').insertAdjacentHTML('afterend', '<div class="f-hint" id="crd-gh-range" style="font-size:11px;color:var(--text-3);margin-top:3px"></div>');
+  [...ghBd.querySelectorAll('label')].find(l => l.textContent.includes('Không bắt buộc')).textContent =
+    'Bắt buộc hay không theo cấu hình của PĐT (mô phỏng: không bắt buộc) · Đơn nộp kèm minh chứng cho lý do gia hạn (VD bệnh án, xác nhận của gia đình, địa phương…)';
+  document.querySelector('#modal-dakl-giahan .modal-ft').innerHTML = footer('modal-dakl-giahan', 'giahan_da');
+  const _openGh = openDaklGiaHan;
+  openDaklGiaHan = function(maDot){
+    _openGh(maDot);
+    const t = tg(maDot), han = t.to ? addDays(t.to, -7) : '';
+    $('dgh-to-cu').value = t.to; $('dgh-gvhd').value = gvhdText(maDot);
+    if(t.to){ $('dgh-to-moi').min = addDays(t.to, 1); $('dgh-to-moi').max = addDays(t.to, 28);
+      $('crd-gh-range').textContent = `Sau ${fmt(t.to)} và không quá ${fmt(addDays(t.to, 28))} (4 tuần)`; }
+    ghBd.querySelector('.alert-desc').textContent = `Đơn theo mẫu QT.ĐT.19.M06. Ngày kết thúc theo Lớp học phần (đã tính gia hạn). Gửi chậm nhất 7 ngày trước ngày kết thúc: hạn chót ${fmt(han)}.`;
+    initQd('gh', maDot);
+    const dr = load(LS_DRAFT, {})['giahan_da|' + maDot];
+    if(dr){ $('dgh-to-moi').value = dr.to_moi || ''; $('dgh-lydo').value = dr.lydo || ''; }
+  };
+
+  // ---------- Thu thập + kiểm tra ----------
+  function base(maDot){
+    const t = tg(maDot), d = getDaklByMaDot(maDot);
+    return { maDot, loaiHinh:d.loaiHinh, ...SV, gvhd:gvhdText(maDot), gvhd_list:nhomOf(maDot).filter(g => !g.ngoai).map(g => g.ten),
+      ngay_bat_dau:t.from, ngay_ket_thuc:t.to, ten_de_tai:`${d.topic.ma} — ${d.topic.ten}`, ten_de_tai_hien_tai:`${d.topic.ma} — ${d.topic.ten}`, ma_de_tai_cu:d.topic.ma };
+  }
+  const qdOf = p => ({ loai_qd:$(`crd-${p}-loaiqd`).value, so_qd:$(`crd-${p}-soqd`).value, ngay_qd:(($(`crd-${p}-ngayqd`).value || '').split('/').reverse().join('-')) });
+  function collect(loai){
+    const maDot = loai === 'baove' ? $('crd-bv-dot').value : curDaklMaDot;
+    const v = base(maDot);
+    if(loai === 'doidetai'){
+      Object.assign(v, qdOf('dd'), { ly_do:$('ddt2-lydo').value.trim() });
+      const mode = document.querySelector('input[name="ddt2-mode"]:checked').value;
+      if(mode === 'list'){
+        const t = topicOf(ddt2SelectedMa);
+        v.de_tai_moi = t ? { nguon:NGUON_GV, ma:t.ma, ctdt:t.ctdt, loai:TYPE_FULL[t.type] || t.type, linh_vuc:t.linhVuc, ten:t.ten, tom_tat:t.tomTat, san_pham:t.sanPham, cong_nghe:t.congNghe, tai_lieu:t.file, gv:t.gv, toi_da:t.maxQty } : { nguon:NGUON_GV };
+      } else {
+        const f = $('ddt2-p-file-input').files[0];
+        v.de_tai_moi = { nguon:NGUON_SV, ma:$('ddt2-p-ma').value, ctdt:$('ddt2-p-ctdt').value, loai:$('ddt2-p-loai').value, linh_vuc:$('crd-p-linhvuc').value,
+          ten:$('ddt2-p-ten').value.trim(), tom_tat:$('ddt2-p-tomtat').value.trim(), san_pham:$('ddt2-p-sanpham').value.trim(), cong_nghe:$('ddt2-p-congnghe').value.trim(), tai_lieu:f ? f.name : '' };
+      }
+    } else if(loai === 'giahan_da'){
+      const f = $('dgh-file-input').files[0];
+      Object.assign(v, qdOf('gh'), { ngay_kt_hien_tai:v.ngay_ket_thuc, ngay_kt_de_nghi:$('dgh-to-moi').value, ly_do:$('dgh-lydo').value.trim(), minh_chung:f ? f.name : '' });
+    } else {
+      const f = $('crd-bv-file').files[0];
+      Object.assign(v, qdOf('bv'), { ly_do:$('crd-bv-lydo').value.trim(), minh_chung:f ? f.name : '' });
+    }
+    return v;
+  }
+  function missing(loai, v){
+    if(!v.so_qd) return 'Chưa có quyết định';
+    if(loai === 'doidetai'){
+      const m = v.de_tai_moi;
+      if(m.nguon === NGUON_GV && !m.ma) return 'Vui lòng chọn một đề tài đề nghị thay đổi';
+      if(m.nguon === NGUON_SV && (!m.ten || !m.tom_tat || !m.san_pham || !m.linh_vuc)) return 'Vui lòng điền đầy đủ các trường bắt buộc (*)';
+      if(!v.ly_do) return 'Vui lòng nhập lý do đề nghị';
+    } else if(loai === 'giahan_da'){
+      if(!v.ngay_kt_de_nghi) return 'Vui lòng chọn ngày kết thúc đề nghị';
+      if(v.ngay_kt_de_nghi <= v.ngay_kt_hien_tai) return 'Ngày kết thúc đề nghị phải sau ngày kết thúc hiện tại';
+      const max = addDays(v.ngay_kt_hien_tai, 28);
+      if(v.ngay_kt_de_nghi > max) return `Chỉ được gia hạn tối đa đến ${fmt(max)} (4 tuần kể từ ngày kết thúc hiện tại ${fmt(v.ngay_kt_hien_tai)})`;
+      if(!v.ly_do) return 'Vui lòng nhập lý do xin gia hạn';
+    } else if(!v.ly_do) return 'Vui lòng nhập lý do xin bảo vệ sớm';
+    return '';
+  }
+  // Giả lập node: Kiểm tra thời gian nộp (đổi đề tài, gia hạn) / Kiểm tra thời gian bảo vệ sớm
+  function kiemTra(loai, v){
+    const nop = ngayNop();
+    if(loai === 'doidetai'){
+      if(!v.ngay_bat_dau) return { dat:false, ly:'Chưa có Ngày bắt đầu làm ĐAKLTN' };
+      const han = addDays(v.ngay_bat_dau, 14);
+      if(nop < v.ngay_bat_dau) return { dat:false, han, ly:`Chưa đến ngày được nộp ${fmt(v.ngay_bat_dau)}` };
+      if(nop > han) return { dat:false, han, ly:`Ngày nộp ${fmt(nop)} sau hạn chót ${fmt(han)} (Ngày bắt đầu ${fmt(v.ngay_bat_dau)} + 14 ngày)` };
+      return { dat:true, han };
+    }
+    if(loai === 'giahan_da'){
+      if(!v.ngay_kt_hien_tai) return { dat:false, ly:'Chưa có Ngày kết thúc làm ĐAKLTN' };
+      const han = addDays(v.ngay_kt_hien_tai, -7);
+      return nop <= han ? { dat:true, han } : { dat:false, han, ly:`Ngày nộp ${fmt(nop)} sau hạn chót ${fmt(han)} (Ngày kết thúc ${fmt(v.ngay_kt_hien_tai)} − 7 ngày)` };
+    }
+    if(!v.ngay_bat_dau || !v.ngay_ket_thuc) return { dat:false, ly:`Chưa có ${v.ngay_bat_dau ? 'Ngày kết thúc' : 'Ngày bắt đầu'} làm ĐAKLTN` };
+    const { tu, mau } = tyLe(), r = ngayDuocNop(v.ngay_bat_dau, v.ngay_ket_thuc, tu, mau), han = addDays(v.ngay_ket_thuc, -1);
+    if(nop < r.ngay) return { dat:false, han, duoc:r.ngay, ly:`Chưa đến ngày được nộp ${fmt(r.ngay)} (đã qua ${tu}/${mau} số tuần: ${r.qua}/${r.tuan} tuần)` };
+    if(nop > han) return { dat:false, han, duoc:r.ngay, ly:`Quá hạn chót ${fmt(han)}` };
+    return { dat:true, han, duoc:r.ngay };
+  }
+
+  const MODAL = { doidetai:'modal-dakl-doidetai', giahan_da:'modal-dakl-giahan', baove:'modal-crd-baove' };
+  const PFX = { doidetai:'YC-DT', giahan_da:'YC-GHDA', baove:'YC-BVS' };
+  let pending = null;
+
+  window.CRDSV = {
+    fillSo(p){
+      const maDot = p === 'bv' ? $('crd-bv-dot').value : curDaklMaDot, loai = $(`crd-${p}-loaiqd`).value;
+      const list = (QD_DB[maDot] || []).filter(q => q.loai === loai).sort((a,b) => b.ngay.localeCompare(a.ngay));
+      $(`crd-${p}-soqd`).innerHTML = list.map(q => `<option value="${q.so}">${q.so} · ${fmt(q.ngay)}</option>`).join('') || '<option value="">Chưa có</option>';
+      this.fillNgay(p);
+    },
+    fillNgay(p){
+      const maDot = p === 'bv' ? $('crd-bv-dot').value : curDaklMaDot;
+      const q = (QD_DB[maDot] || []).find(x => x.so === $(`crd-${p}-soqd`).value);
+      $(`crd-${p}-ngayqd`).value = q ? fmt(q.ngay) : '';
+    },
+    openBaoVe(maDot){
+      const d = getDaklByMaDot(maDot); if(!d || !d.topic) return;
+      curDaklMaDot = maDot;
+      const t = tg(maDot), { tu, mau } = tyLe();
+      const r = t.from && t.to ? ngayDuocNop(t.from, t.to, tu, mau) : null;
+      $('crd-bv-sv').innerHTML = svInfo();
+      $('crd-bv-dot').value = maDot; $('crd-bv-ten').value = `${d.topic.ma} — ${d.topic.ten}`; $('crd-bv-gvhd').value = gvhdText(maDot);
+      $('crd-bv-from').value = fmt(t.from); $('crd-bv-to').value = fmt(t.to);
+      $('crd-bv-alert').textContent = r ? `Chưa có mẫu Word, xem trước hiện bản tóm tắt. Chỉ được gửi khi đã qua ${tu}/${mau} số tuần làm ĐAKLTN (${r.qua}/${r.tuan} tuần) và trước ngày kết thúc: từ ${fmt(r.ngay)} đến ${fmt(addDays(t.to, -1))}.` : 'Chưa có thời gian làm ĐAKLTN.';
+      initQd('bv', maDot);
+      const dr = load(LS_DRAFT, {})['baove|' + maDot];
+      $('crd-bv-lydo').value = dr ? dr.lydo || '' : ''; $('crd-bv-file').value = '';
+      $('modal-crd-baove').classList.remove('hidden');
+    },
+    draft(loai){
+      const v = collect(loai), dr = load(LS_DRAFT, {}), m = v.de_tai_moi || {};
+      dr[loai + '|' + v.maDot] = loai === 'doidetai'
+        ? { mode:m.nguon === NGUON_GV ? 'list' : 'propose', ma:m.nguon === NGUON_GV ? m.ma : '', pma:m.nguon === NGUON_SV ? m.ma : '', ten:m.ten, tomtat:m.tom_tat, sanpham:m.san_pham, congnghe:m.cong_nghe, linhvuc:m.linh_vuc, lydo:v.ly_do }
+        : loai === 'giahan_da' ? { to_moi:v.ngay_kt_de_nghi, lydo:v.ly_do } : { lydo:v.ly_do };
+      save(LS_DRAFT, dr);
+      toast('Đã lưu nháp. Mở lại đơn ở đợt ' + v.maDot + ' để tiếp tục.');
+    },
+    preview(loai){
+      const v = collect(loai), e = missing(loai, v);
+      if(e){ toast(e, 'error'); return; }
+      pending = { loai, ngayNop:ngayNop(), data:v };
+      $('crd-pv-title').textContent = 'Xem trước đơn — ' + LOAI_LABEL[loai];
+      $('crd-pv-doc').innerHTML = docHtml(pending);
+      $('modal-crd-preview').classList.remove('hidden');
+    },
+    download(){ if(pending){ downloadDoc(pending); toast('Đang tải đơn'); } },
+    submit(loai){
+      const v = collect(loai), e = missing(loai, v);
+      if(e){ toast(e, 'error'); return; }
+      const nop = ngayNop(), kq = kiemTra(loai, v), reqs = load(LS_REQ, []);
+      const id = PFX[loai] + '-' + (reqs.length + 101);
+      reqs.unshift({ id, loai, maDot:v.maDot, ngayNop:nop, hanChot:kq.han || '', ngayDuocNop:kq.duoc || '', status:kq.dat ? 'cho_gvhd' : 'khong_thanh_cong', lyDoKhongDat:kq.dat ? '' : kq.ly, data:v,
+        steps:kq.dat ? [{ buoc:'GVHD duyệt', nguoi:v.gvhd_list.join('; ') || 'GVHD', nhan:nop, xuly:'', kq:'Đang chờ', lydo:'' }] : [] });
+      save(LS_REQ, reqs);
+      const dr = load(LS_DRAFT, {}); delete dr[loai + '|' + v.maDot]; save(LS_DRAFT, dr);
+      closeModal(MODAL[loai]); pending = null; renderDaklTable();
+      if(kq.dat) toast('Đã gửi yêu cầu, chờ GVHD duyệt (mã ' + id + ')');
+      else toast('Yêu cầu không được tiếp nhận: ' + kq.ly, 'error');
+    },
+    reset(){ [LS_REQ, LS_DRAFT, LS_HS, LS_TP].forEach(k => localStorage.removeItem(k)); location.reload(); },
+  };
+
+  applyHoSo();
+  renderDaklTable();
+  window.addEventListener('storage', () => { applyHoSo(); renderDaklTable(); });
+})();
+</script>
+<!-- CRDAKL-END -->
 </body>
 </html>

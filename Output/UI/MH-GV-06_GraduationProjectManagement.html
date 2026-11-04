@@ -1657,5 +1657,55 @@ document.getElementById('f-donvi').innerHTML += Object.values(CTDT_DONVI).map(d 
 document.getElementById('f-ctdt').innerHTML += Object.keys(CTDT_DONVI).map(c => `<option value="${c}">${c}</option>`).join('');
 switchSecTab('hd');
 </script>
+<!-- CRDAKL-START -->
+<!-- ═══════════════════════════════════════════════════════════════════════
+     CR-20261104-001 — Sau khi duyệt đơn, màn cán bộ thấy ngay đề tài mới / ngày kết thúc mới
+     (hạng mục Dev #12). Đọc kết quả từ localStorage crdakl_hoso do MH-GV-02 ghi.
+     Khối mở rộng gắn thêm, KHÔNG sửa code gốc phía trên.
+     ═══════════════════════════════════════════════════════════════════════ -->
+<script>
+(function(){
+  const GV_CHINH = 'TS. Nguyễn Minh Tuấn', MA_SV = 'B22DCCN001';
+  const DE_TAI_GOC = { ma:'DT-2026-0009', ten:'Xây dựng hệ thống chatbot hỗ trợ tư vấn tuyển sinh bằng NLP', loai:'Đồ án tốt nghiệp', ctdt:'KTPM', linhVuc:'Trí tuệ nhân tạo & Dữ liệu', soLuong:1, tomTat:'', yeuCau:'', sanPham:'', congNghe:'' };
+  const load = k => { try { return JSON.parse(localStorage.getItem(k)) || {}; } catch(e) { return {}; } };
+  function catalogOf(t){
+    let c = TOPIC_CATALOG.find(x => x.code === t.ma);
+    if(!c){
+      c = { code:t.ma, name:t.ten, ctdt:[t.ctdt], types:[t.loai], field:t.linhVuc, qty:t.soLuong || 1, status:'Đã công bố', active:'Mở', gvhdDeXuat:GV_CHINH,
+        desc:t.tomTat, req:t.yeuCau, output:t.sanPham, tech:t.congNghe, file:t.file };
+      TOPIC_CATALOG.push(c);
+    }
+    return c;
+  }
+  const choNop = () => ({ trangThai:'Chờ SV nộp', noiDung:'', file:null, ngayNop:null, lanNop:0, ketQua:'', nguoiDuyet:null, ngayDuyet:null, kePlan:[] });
+  const daDuyet = tgTo => ({ trangThai:'Đã duyệt', noiDung:'', file:'DeCuong_B22DCCN001_v1.docx', ngayNop:'05/03/2026', lanNop:1, ketQua:'Hợp lệ', nguoiDuyet:GV_CHINH, ngayDuyet:'08/03/2026', tgFrom:'2026-03-02', tgTo, kePlan:[] });
+  const fmt = iso => iso ? iso.split('-').reverse().join('/') : '';
+
+  function apply(){
+    const hs = load('crdakl_hoso');
+    let changed = false;
+    Object.keys(hs).forEach((maDot, i) => {
+      const h = hs[maDot], key = (h.seq || 0) + '|' + (h.ngayKt || '');
+      let s = students.find(x => x.maSV === MA_SV && x.dotId === maDot);
+      if(s && s._crd === key) return;
+      if(!s){
+        s = { id:900 + i, maSV:MA_SV, tenSV:'Nguyễn Văn An', lop:'INT3110_1', ctdt:'KTPM', gpa:3.2, dotId:maDot, loaiHinh:maDot.startsWith('KL') ? 'Khóa luận tốt nghiệp' : 'Đồ án tốt nghiệp', history:[] };
+        students.unshift(s);
+      }
+      const t = h.topic || DE_TAI_GOC;
+      // Đổi đề tài: Tiến độ về Chờ SV nộp. Chỉ gia hạn: Tiến độ giữ nguyên, ngày kết thúc mới
+      Object.assign(s, { _crd:key, topic:catalogOf(t), gvhd:GV_CHINH, donViGV:'BM. Công nghệ phần mềm', nguon:s.nguon || 'Duyệt theo nguyện vọng', canManual:false,
+        status:'Đã ban hành quyết định', baoCao:null,
+        decuong:h.topic ? choNop() : daDuyet(h.ngayKt),
+        ghiChu:h.topic ? 'Đã đổi đề tài, chờ sinh viên nộp lại Tiến độ.' : `Đã gia hạn đến ${fmt(h.ngayKt)}.` });
+      changed = true;
+    });
+    return changed;
+  }
+  if(apply()) render();
+  window.addEventListener('storage', () => { if(apply()) render(); });
+})();
+</script>
+<!-- CRDAKL-END -->
 </body>
 </html>

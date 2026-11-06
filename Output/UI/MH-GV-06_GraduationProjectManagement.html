@@ -192,7 +192,7 @@
               <label class="colvis-item"><input type="checkbox" checked onchange="onColVisToggle('loai',this.checked)"> Loại hình</label>
               <label class="colvis-item"><input type="checkbox" checked onchange="onColVisToggle('dot',this.checked)"> Đợt</label>
               <label class="colvis-item"><input type="checkbox" checked onchange="onColVisToggle('detai',this.checked)"> Đề tài</label>
-              <label class="colvis-item"><input type="checkbox" checked onchange="onColVisToggle('decuong',this.checked)"> Đề cương</label>
+              <label class="colvis-item"><input type="checkbox" checked onchange="onColVisToggle('decuong',this.checked)"> Tiến độ ĐA/KLTN</label>
               <label class="colvis-item"><input type="checkbox" checked onchange="onColVisToggle('baocao',this.checked)"> Báo cáo</label>
               <label class="colvis-item"><input type="checkbox" checked onchange="onColVisToggle('daovan',this.checked)"> Đạo văn</label>
               <label class="colvis-item"><input type="checkbox" checked onchange="onColVisToggle('gv',this.checked)"> <span id="colvis-lbl-gv">GVHD</span></label>
@@ -221,7 +221,7 @@
                 <th style="width:88px" data-col="loai">Loại hình</th>
                 <th style="width:120px" data-col="dot">Đợt</th>
                 <th style="min-width:180px" data-col="detai">Đề tài</th>
-                <th style="width:150px" data-col="decuong">Đề cương</th>
+                <th style="width:150px" data-col="decuong">Tiến độ ĐA/KLTN</th>
                 <th style="width:90px;text-align:center" data-col="baocao">Báo cáo</th>
                 <th style="width:100px;text-align:center" data-col="daovan" title="Tỷ lệ trùng lặp / đạo văn">Đạo văn</th>
                 <th style="min-width:130px" data-col="gv">GVHD</th>
@@ -253,7 +253,7 @@
                 <th style="width:88px" data-col="loai">Loại hình</th>
                 <th style="width:120px" data-col="dot">Đợt</th>
                 <th style="min-width:180px" data-col="detai">Đề tài</th>
-                <th style="width:150px" data-col="decuong">Đề cương</th>
+                <th style="width:150px" data-col="decuong">Tiến độ ĐA/KLTN</th>
                 <th style="width:90px;text-align:center" data-col="baocao">Báo cáo</th>
                 <th style="width:100px;text-align:center" data-col="daovan" title="Tỷ lệ trùng lặp / đạo văn">Đạo văn</th>
                 <th style="min-width:130px" data-col="gv">GVPB</th>
@@ -390,7 +390,7 @@
 <div class="overlay hidden" id="m-decuong-approve">
   <div class="modal-box w700" style="max-height:90vh">
     <div class="modal-hd">
-      <h4 class="modal-title" id="dca-title">Xét đề cương / Kế hoạch</h4>
+      <h4 class="modal-title" id="dca-title">Tiến độ ĐA/KLTN</h4>
       <button class="modal-close" data-close="m-decuong-approve">✕</button>
     </div>
     <div class="modal-bd" style="overflow-y:auto">
@@ -516,7 +516,7 @@
 <div class="overlay hidden" id="m-decuong-info">
   <div class="modal-box w700" style="max-height:90vh">
     <div class="modal-hd">
-      <h4 class="modal-title" id="dci-title">📝 Đề cương &amp; Tiến độ</h4>
+      <h4 class="modal-title" id="dci-title">Tiến độ ĐA/KLTN</h4>
       <button class="modal-close" data-close="m-decuong-info">✕</button>
     </div>
     <div class="modal-bd" style="overflow-y:auto">
@@ -751,7 +751,7 @@ const HD_ROLE_LABEL = {ct:'Chủ tịch', tk:'Thư ký', uv:'Ủy viên', gc:'GV
 let students = [
   {id:6, maSV:'B22DCCN058', tenSV:'Hoàng Minh Đức', lop:'INT3110_1', ctdt:'HTTT', dotId:'DA-HK2-2025-2026', loaiHinh:'Đồ án tốt nghiệp',
     topic:TOPIC_CATALOG[2], gvhd:'TS. Nguyễn Minh Tuấn', gvpb:null, baoCao:null,
-    decuong:{trangThai:'Chờ duyệt', file:'DeCuong_B22DCCN058_v1.docx', ngayNop:'08/06/2026',
+    decuong:{trangThai:'Chờ duyệt', file:null, ngayNop:'08/06/2026',
       kePlan:[
         {tuan:1, nhiemVu:'Khảo sát nghiệp vụ quản lý kho hàng, thu thập yêu cầu', ketQua:'Tài liệu yêu cầu nghiệp vụ (BRD)', ghiChu:'', trangThai:'Chờ duyệt'},
         {tuan:2, nhiemVu:'Thiết kế CSDL & kiến trúc hệ thống', ketQua:'', ghiChu:'', trangThai:'Chờ duyệt'},
@@ -923,11 +923,11 @@ function renderRow(s){
        <div class="tbl-truncate" style="font-size:12px;color:var(--text-2);margin-top:2px" title="${s.topic.name}">${s.topic.name}</div>`
     : `<span style="color:var(--text-3);font-size:12px">—</span>`;
   const deCuongStage = getDeCuongStage(s);
-  const decuongCell = (!s.topic || !s.decuong || !s.decuong.file)
+  const decuongCell = (!s.topic || !s.decuong || (!s.decuong.file && !s.decuong.ngayNop))
     ? `<span style="color:var(--text-3);font-size:12px">—</span>`
     : curTab === 'hd'
-      ? `<span style="color:var(--primary);cursor:pointer;font-size:13px" onclick="openDeCuongApprove(${s.id})" title="Xét đề cương & tiến độ">Chi tiết</span>`
-      : `<span style="color:var(--primary);cursor:pointer;font-size:13px" onclick="openDeCuongInfo(${s.id})" title="Xem chi tiết đề cương & tiến độ">Chi tiết</span>`;
+      ? `<span style="color:var(--primary);cursor:pointer;font-size:13px" onclick="openDeCuongApprove(${s.id})" title="Xem chi tiết Tiến độ ĐA/KLTN">Chi tiết</span>`
+      : `<span style="color:var(--primary);cursor:pointer;font-size:13px" onclick="openDeCuongInfo(${s.id})" title="Xem chi tiết Tiến độ ĐA/KLTN">Chi tiết</span>`;
   const decuongStatusCell = !s.topic
     ? `<span style="color:var(--text-3);font-size:12px">—</span>`
     : `<span class="ketluan-pill ${deCuongPillCls(deCuongStage.key)}" style="cursor:default">${deCuongStage.label}</span>`;
@@ -1120,7 +1120,7 @@ function openTopicInfo(code){
     ['Lĩnh vực', t.field],
     ['Số SV tối đa', `${t.qty} sinh viên`],
     ['Trạng thái', `<span class="tag ${TOPIC_STATUS_CLR[t.status]||'tag-default'}">${t.status}</span>`],
-    ['Hoạt động', activeBadge],
+    ['Nhận sinh viên', activeBadge],
     ['Tóm tắt', t.desc],
     ['Yêu cầu SV', t.req],
     ['Sản phẩm DK', t.output],
@@ -1243,7 +1243,7 @@ function deleteDcaFile(){
 function openDeCuongInfo(id){
   const s = students.find(x => x.id === id);
   if (!s || !s.topic) return;
-  document.getElementById('dci-title').textContent = `Xét đề cương / Kế hoạch`;
+  document.getElementById('dci-title').textContent = `Tiến độ ĐA/KLTN`;
   const dc = s.decuong || {};
   const topicRows = buildTopicRows(s, false);
   document.getElementById('dci-topic-body').innerHTML = topicRows.map(([l,v]) => `<tr><th style="width:170px">${l}</th><td>${v}</td></tr>`).join('');
@@ -1270,7 +1270,7 @@ function openDeCuongApprove(id){
   const s = students.find(x => x.id === id);
   if (!s || !s.topic) return;
   _dcaTargetId = id;
-  document.getElementById('dca-title').textContent = `Xét đề cương / Kế hoạch`;
+  document.getElementById('dca-title').textContent = `Tiến độ ĐA/KLTN`;
   const topicRows = buildTopicRows(s, true);
   document.getElementById('dca-topic-body').innerHTML = topicRows.map(([l,v]) => `<tr><th style="width:170px">${l}</th><td>${v}</td></tr>`).join('');
 
@@ -1281,10 +1281,10 @@ function openDeCuongApprove(id){
 }
 function renderDcaFooter(s){
   const dc = s.decuong || {};
-  const hasFile = !!dc.file;
+  const daNop = !!(dc.file || dc.ngayNop);
   const daXuLy = dc.trangThai === 'Đã duyệt' || dc.trangThai === 'Yêu cầu chỉnh sửa';
-  document.getElementById('dca-tong-reject-btn').disabled = !hasFile || daXuLy;
-  document.getElementById('dca-tong-approve-btn').disabled = !hasFile || daXuLy;
+  document.getElementById('dca-tong-reject-btn').disabled = !daNop || daXuLy;
+  document.getElementById('dca-tong-approve-btn').disabled = !daNop || daXuLy;
 }
 function renderDcaPlanBody(s){
   const plan = (s.decuong && s.decuong.kePlan) || [];

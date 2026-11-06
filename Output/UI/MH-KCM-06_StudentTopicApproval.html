@@ -253,6 +253,7 @@
     <div class="modal-bd" id="gvhd-body"></div>
     <div class="modal-ft">
       <button class="btn btn-default" data-close="m-gvhd">Đóng</button>
+      <button class="btn btn-primary" id="gvhd-save" style="display:none" onclick="saveGvDraft()">💾 Lưu</button>
     </div>
   </div>
 </div>
@@ -326,7 +327,7 @@
       </div>
 
       <div id="rv-gvngoai-wrap" style="display:none;margin-top:12px;background:#fff7e6;border:1px solid #ffd591;border-radius:8px;padding:12px 16px">
-        <div style="font-weight:600;font-size:12px;color:#874d00;margin-bottom:6px">🏛️ Giảng viên ngoài trường đồng hướng dẫn <span style="font-weight:400">(do SV kê khai — cần xác minh trước khi phê duyệt)</span></div>
+        <div style="font-weight:600;font-size:12px;color:#874d00;margin-bottom:6px">🏛️ Giảng viên ngoài trường đồng hướng dẫn <span style="font-weight:400">(cần xác minh trước khi phê duyệt)</span></div>
         <div id="rv-gvngoai-list" style="font-size:13px;line-height:1.7;color:var(--text-1)"></div>
       </div>
 
@@ -442,14 +443,21 @@ const topics = [
 ];
 
 /* ── GV slot capacity per đợt ── */
-const gvSlots = [
-  { gv:'TS. Nguyễn Minh Tuấn', dot:'HK2-2025-2026', max:5 },
-  { gv:'TS. Nguyễn Minh Tuấn', dot:'HK1-2025-2026', max:5 },
-  { gv:'TS. Lê Thị Mai',       dot:'HK2-2025-2026', max:3 },
-  { gv:'TS. Lê Thị Mai',       dot:'HK1-2025-2026', max:3 },
-  { gv:'ThS. Trần Văn Hùng',   dot:'HK2-2025-2026', max:2 },
-  { gv:'ThS. Trần Văn Hùng',   dot:'HK1-2025-2026', max:2 },
-];
+// Mức của GV theo cấu hình đợt (CR-20261105-003). Danh hiệu thật đồng bộ từ HR; mockup suy từ tên GV.
+const MUC_THEO_DOT = {
+  'HK2-2025-2026': {GS:20, PGS:20, TSKH:20, 'Giảng viên cao cấp':20, TS:15, 'Giảng viên chính':15, ThS:10},
+  'HK1-2025-2026': {GS:20, PGS:20, TSKH:20, 'Giảng viên cao cấp':20, TS:15, 'Giảng viên chính':15, ThS:10},
+};
+const MUC_MAC_DINH = {GS:20, PGS:20, TSKH:20, 'Giảng viên cao cấp':20, TS:15, 'Giảng viên chính':15, ThS:10};
+function _danhHieu(gv){
+  const prefix = String(gv).split(' ')[0];
+  return prefix.replace(/\.$/, '').split('.');
+}
+function gvMuc(gv, dot){
+  const bang = MUC_THEO_DOT[dot] || MUC_MAC_DINH;
+  const muc = _danhHieu(gv).map(d => bang[d]).filter(v => v != null);
+  return muc.length ? Math.max(...muc) : null;
+}
 
 /* ── Wishes data ── */
 let wishes = [
@@ -560,18 +568,24 @@ let _qrId = null;
 /* ── GV capacity helpers ──
    Chỉ tính SV ở trạng thái 'Đã duyệt': với đề tài SV tự đề xuất, hệ thống chỉ ghi nhận
    phân công (và do đó tính vào chỉ tiêu của GV) SAU KHI Khoa phê duyệt. */
-function _gvCapacity(gvChinh, dot) {
-  const slot = gvSlots.find(s => s.gv === gvChinh && s.dot === dot);
-  if (!slot) return null;
-  const used = wishes.filter(x => x.gvChinh === gvChinh && x.dot === dot && x.status === 'Đã duyệt').length;
-  return { used, max: slot.max };
+function _gvCapacity(gv, dot) {
+  const max = gvMuc(gv, dot);
+  if (max == null) return null;
+  const used = wishes.filter(x => x.dot === dot && x.status === 'Đã duyệt'
+    && (x.gvChinh === gv || (x.gvDong||[]).some(g => (g.ten||g) === gv))).length;
+  return { used, max };
 }
-function _gvCapHtml(gvChinh, dot) {
-  const cap = _gvCapacity(gvChinh, dot);
-  if (!cap) return '';
+function _gvNoiBo(w){ return [w.gvChinh, ...(w.gvDong||[]).map(g => g.ten||g)]; }
+function _gvCapText(gv, dot){
+  const cap = _gvCapacity(gv, dot);
+  if (!cap) return `<span style="color:var(--text-3);font-weight:400">Chưa có mức</span>`;
   const { used, max } = cap;
   const color = used >= max ? 'var(--error)' : used / max >= 0.7 ? 'var(--warning)' : 'var(--success)';
-  return `<div style="font-size:11px;font-weight:600;color:${color};margin-top:4px">${used}/${max} SV</div>`;
+  return `<span style="color:${color}">${used}/${max} SV</span>`;
+}
+function _gvCapHtml(w) {
+  return `<div style="font-size:11px;font-weight:600;margin-top:4px">` + _gvNoiBo(w).map(g =>
+    `<div style="white-space:nowrap">${_gvNoiBo(w).length > 1 ? `<span style="color:var(--text-3);font-weight:400">${g}: </span>` : ''}${_gvCapText(g, w.dot)}</div>`).join('') + `</div>`;
 }
 
 /* ── Render ── */
@@ -630,8 +644,7 @@ function render() {
       ...gvDongList.map(g=>({ ten:g.ten, trongSo:g.trongSo, isNgoai:false })),
       ...gvNgoaiList.map(g=>({ ten:g.ten, trongSo:g.trongSo, isNgoai:true })),
     ];
-    const maxTSCell = Math.max(...allGVsCell.map(g=>g.trongSo||0));
-    const gvMainCell = allGVsCell.find(g=>g.trongSo===maxTSCell) || allGVsCell[0];
+    const gvMainCell = allGVsCell.find(g=>g.ten===w.gvChinh) || allGVsCell[0];
     const gvRestCell = allGVsCell.filter(g=>g!==gvMainCell);
     const allNames = [
       `<span style="color:var(--primary)">${gvMainCell.ten||'—'}</span>`,
@@ -658,7 +671,7 @@ function render() {
       <td style="font-size:12px;color:var(--text-2)">${w.gvChinhDonVi||'—'}</td>
       <td style="font-size:12px;color:var(--text-2);white-space:nowrap">
         <div style="font-family:monospace">${w.dot||'—'}</div>
-        ${_gvCapHtml(w.gvChinh, w.dot)}
+        ${_gvCapHtml(w)}
       </td>
       <td>${topicDisplay}</td>
       <td><span class="tag tag-blue" style="font-size:11px">${w.loai === 'Đề xuất mới' ? 'Sinh viên' : 'Giảng viên'}</span></td>
@@ -779,7 +792,7 @@ function openTopicDetail(wishId) {
     ['Lĩnh vực',     t ? v(t.field) : ''],
     ['Số SV tối đa', t ? `${t.qty} sinh viên` : ''],
     ['Trạng thái',   t ? `<span class="tag ${TOPIC_STATUS_CLR[t.status]||'tag-default'}">${t.status}</span>` : ''],
-    ['Hoạt động',    t ? `<span style="display:inline-flex;align-items:center;gap:6px"><span style="width:8px;height:8px;border-radius:50%;background:${t.hoatDong==='Mở'?'var(--success)':'#bfbfbf'}"></span><span style="font-size:13px">${t.hoatDong||''}</span></span>` : ''],
+    ['Nhận sinh viên',    t ? `<span style="display:inline-flex;align-items:center;gap:6px"><span style="width:8px;height:8px;border-radius:50%;background:${t.hoatDong==='Mở'?'var(--success)':'#bfbfbf'}"></span><span style="font-size:13px">${t.hoatDong||''}</span></span>` : ''],
     ['Tóm tắt',      t ? v(t.desc) : v(w.moTa)],
     ['Yêu cầu SV',   t ? v(t.req)  : ''],
     ['Sản phẩm DK',  t ? v(t.output) : v(w.svOutput)],
@@ -797,8 +810,15 @@ function openTopicDetail(wishId) {
 }
 
 /* ── Modal: GVHD & Trọng số ── */
-function openGVDetail(wishId) {
-  const w = wishes.find(x => x.id === wishId);
+let _gvDraft = null;
+function openGVDetail(wishId, keepDraft) {
+  const w0 = wishes.find(x => x.id === wishId);
+  if (!keepDraft) _gvDraft = { id:wishId, gvChinhTrongSo:w0.gvChinhTrongSo??100,
+    gvDong:(w0.gvDong||[]).map(g => typeof g==='string'?{ten:g,trongSo:0}:{...g}),
+    gvNgoaiTruong:(w0.gvNgoaiTruong||[]).map(g => ({...g})) };
+  const w = { ...w0, ..._gvDraft };
+  const coTheSua = w0.status === 'Chờ Khoa duyệt';
+  document.getElementById('gvhd-save').style.display = coTheSua ? '' : 'none';
   document.getElementById('gvhd-title').textContent = `GV Hướng dẫn — ${w.tenSV} (${w.maSV})`;
 
   const gvDongList = (w.gvDong||[]).map(g => typeof g==='string'?{ten:g,trongSo:0}:g);
@@ -808,9 +828,8 @@ function openGVDetail(wishId) {
     ...gvDongList.map(g=>({ ten:g.ten, trongSo:g.trongSo, thuocTruong:true, donVi:g.donVi||'' })),
     ...gvNgoaiList.map(g=>({ ...g, thuocTruong:false, donVi:g.noiCongTac||g.truong||'' })),
   ];
-  const maxTS = Math.max(...allGVs.map(g=>g.trongSo||0));
   allGVs.forEach(gv => {
-    gv.loai = gv.trongSo === maxTS ? 'chinh' : (gv.thuocTruong ? 'dong' : 'ngoai');
+    gv.loai = gv.ten === w.gvChinh ? 'chinh' : (gv.thuocTruong ? 'dong' : 'ngoai');
   });
   const total = allGVs.reduce((s,g)=>s+(g.trongSo||0), 0);
   const totalOk = total === 100;
@@ -829,10 +848,13 @@ function openGVDetail(wishId) {
         <div>
           <div style="font-size:13px;font-weight:${isChiif?700:500};color:${isChiif?'var(--text-1)':'var(--text-2)'}">${gv.ten}</div>
           ${gv.donVi?`<div style="font-size:11px;color:var(--text-3);margin-top:2px">🏛️ ${gv.donVi}</div>`:''}
+          ${gv.thuocTruong?`<div style="font-size:11px;font-weight:600;margin-top:2px"><span style="color:var(--text-3);font-weight:400">Chỉ tiêu: </span>${_gvCapText(gv.ten, w.dot)}</div>`:''}
         </div>
         <div>${locationTag}</div>
-        <div style="font-size:14px;font-weight:700;color:var(--primary);text-align:right">${gv.trongSo}%</div>
-        <div style="text-align:center"><button disabled title="Không có quyền xóa" style="background:none;border:none;cursor:not-allowed;font-size:15px;color:#d9d9d9;opacity:.5">🗑</button></div>
+        <div style="font-size:14px;font-weight:700;color:var(--primary);text-align:right">${coTheSua ? `<input class="fc" type="number" min="0" max="100" value="${gv.trongSo}" style="width:62px;text-align:right;padding:2px 6px" onchange="_gvDraftWeight('${gv.ten}',this.value)">` : `${gv.trongSo}%`}</div>
+        <div style="text-align:center">${coTheSua && !isChiif
+          ? `<button title="Xóa khỏi nhóm GVHD" onclick="_gvDraftRemove('${gv.ten}')" style="background:none;border:none;cursor:pointer;font-size:15px">🗑</button>`
+          : `<button disabled title="${isChiif ? 'Không thể xóa giảng viên của đề tài' : 'Không có quyền xóa'}" style="background:none;border:none;cursor:not-allowed;font-size:15px;color:#d9d9d9;opacity:.5">🗑</button>`}</div>
       </div>`;
     }).join('')}
   </div>
@@ -898,14 +920,46 @@ function openGVDetail(wishId) {
   openModal('m-gvhd');
 }
 
+function _gvDraftWeight(ten, val){
+  const v = parseInt(val)||0;
+  const w0 = wishes.find(x => x.id === _gvDraft.id);
+  if (ten === w0.gvChinh) _gvDraft.gvChinhTrongSo = v;
+  [..._gvDraft.gvDong, ..._gvDraft.gvNgoaiTruong].forEach(g => { if (g.ten === ten) g.trongSo = v; });
+  openGVDetail(_gvDraft.id, true);
+}
+function _gvDraftRemove(ten){
+  _gvDraft.gvDong = _gvDraft.gvDong.filter(g => g.ten !== ten);
+  _gvDraft.gvNgoaiTruong = _gvDraft.gvNgoaiTruong.filter(g => g.ten !== ten);
+  openGVDetail(_gvDraft.id, true);
+}
+function saveGvDraft(){
+  const total = _gvDraft.gvChinhTrongSo + [..._gvDraft.gvDong, ..._gvDraft.gvNgoaiTruong].reduce((t,g) => t + (g.trongSo||0), 0);
+  if (total !== 100) { showToast('Tổng trọng số hướng dẫn phải đạt chính xác 100%!', 'warn'); return; }
+  const today = new Date().toLocaleDateString('vi');
+  wishes = wishes.map(x => x.id !== _gvDraft.id ? x : { ...x, gvChinhTrongSo:_gvDraft.gvChinhTrongSo, gvDong:_gvDraft.gvDong, gvNgoaiTruong:_gvDraft.gvNgoaiTruong,
+    history:[...(x.history||[]), {action:'Khoa sắp lại nhóm GVHD', date:today, result:'Cập nhật nhóm GVHD và trọng số', dot:'ok'}] });
+  closeModal('m-gvhd');
+  showToast('Đã lưu nhóm GVHD');
+  render();
+}
+// Trả về câu báo lỗi nếu nhóm GVHD có GV đã đủ chỉ tiêu
+function _gvApproveError(w){
+  for (const gv of _gvNoiBo(w)) {
+    const cap = _gvCapacity(gv, w.dot);
+    if (!cap || cap.used < cap.max) continue;
+    return gv === w.gvChinh
+      ? `${gv} đã đạt giới hạn ${cap.max} SV. Không thể phê duyệt.`
+      : `${gv} đã đạt giới hạn ${cap.max} SV. Vui lòng xóa giảng viên này khỏi nhóm GVHD và sắp lại trọng số.`;
+  }
+  return null;
+}
+
 /* ── Quick: Duyệt / Từ chối nguyện vọng ── */
 function quickApprove(id) {
   const w   = wishes.find(x => x.id === id);
   const cap = _gvCapacity(w.gvChinh, w.dot);
-  if (cap && cap.used >= cap.max) {
-    showToast(`GV ${w.gvChinh} đã đạt giới hạn ${cap.max} SV trong đợt ${w.dot||'này'}. Không thể phê duyệt thêm.`, 'warn');
-    return;
-  }
+  const capErr = _gvApproveError(w);
+  if (capErr) { showToast(capErr, 'warn'); return; }
   const lastSlotNote = cap && cap.used === cap.max - 1
     ? `\n⚠️ Đây là chỗ cuối cùng của ${w.gvChinh} trong đợt này (${cap.used+1}/${cap.max}).`
     : '';
@@ -978,16 +1032,14 @@ function openReview(id, rejectMode) {
   document.getElementById('rv-gvdate').textContent = w.ngayGVDuyet||'—';
   document.getElementById('rv-gvnote').textContent = w.nhanXetGV||'Không có nhận xét';
 
-  const cap = _gvCapacity(w.gvChinh, w.dot);
-  if (cap) {
+  document.getElementById('rv-gvcap').innerHTML = _gvNoiBo(w).map(gv => {
+    const cap = _gvCapacity(gv, w.dot);
+    if (!cap) return `<div>${gv}: Chưa có mức</div>`;
     const after = cap.used + 1;
-    const overLimit = after > cap.max;
-    document.getElementById('rv-gvcap').innerHTML = overLimit
-      ? `<span style="color:var(--error);font-weight:700">${cap.used}/${cap.max} SV</span> <span style="font-size:11px;color:var(--error)">— đã đủ chỉ tiêu, không thể phê duyệt thêm</span>`
-      : `<span style="font-weight:700">${cap.used}/${cap.max} SV</span> <span style="font-size:11px;color:var(--text-3)">(sau khi duyệt: ${after}/${cap.max})</span>`;
-  } else {
-    document.getElementById('rv-gvcap').textContent = '—';
-  }
+    return after > cap.max
+      ? `<div>${gv}: <span style="color:var(--error);font-weight:700">${cap.used}/${cap.max} SV</span> <span style="font-size:11px;color:var(--error)">— đã đủ chỉ tiêu</span></div>`
+      : `<div>${gv}: <span style="font-weight:700">${cap.used}/${cap.max} SV</span> <span style="font-size:11px;color:var(--text-3)">(sau khi duyệt: ${after}/${cap.max})</span></div>`;
+  }).join('');
 
   const gvNgoaiList = w.gvNgoaiTruong || [];
   const gvNgoaiWrap = document.getElementById('rv-gvngoai-wrap');
@@ -1055,9 +1107,9 @@ function _cancelReject() {
 
 function confirmApprove(id) {
   const w   = wishes.find(x => x.id === id);
-  const cap = _gvCapacity(w.gvChinh, w.dot);
-  if (cap && cap.used >= cap.max) {
-    showToast(`GV ${w.gvChinh} đã đạt giới hạn ${cap.max} SV trong đợt ${w.dot||'này'}. Không thể phê duyệt thêm.`, 'warn');
+  const capErr = _gvApproveError(w);
+  if (capErr) {
+    showToast(capErr, 'warn');
     closeModal('m-review');
     render();
     return;

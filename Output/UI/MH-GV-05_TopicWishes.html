@@ -375,15 +375,40 @@ const CTDT_MAP = {
 };
 
 /* ── Capacity per batch ── */
-const dotCapacity = {
-  'HK1 2025-2026': 5,
-  'HK2 2024-2025': 3,
+// Mức của GV theo cấu hình đợt (CR-20261105-003). Danh hiệu thật đồng bộ từ HR; mockup suy từ tên GV.
+const MUC_THEO_DOT = {
+  'HK1 2025-2026': {GS:20, PGS:20, TSKH:20, 'Giảng viên cao cấp':20, TS:15, 'Giảng viên chính':15, ThS:10},
+  'HK2 2024-2025': {GS:20, PGS:20, TSKH:20, 'Giảng viên cao cấp':20, TS:15, 'Giảng viên chính':15, ThS:10},
 };
+const MUC_MAC_DINH = {GS:20, PGS:20, TSKH:20, 'Giảng viên cao cấp':20, TS:15, 'Giảng viên chính':15, ThS:10};
+function _danhHieu(gv){
+  const prefix = String(gv).split(' ')[0];
+  return prefix.replace(/\.$/, '').split('.');
+}
+function gvMuc(gv, dot){
+  const bang = MUC_THEO_DOT[dot] || MUC_MAC_DINH;
+  const muc = _danhHieu(gv).map(d => bang[d]).filter(v => v != null);
+  return muc.length ? Math.max(...muc) : null;
+}
 
-function getUsed(dot) {
-  return wishes.filter(w =>
-    w.dot === dot && ['Đã duyệt', 'Chờ Khoa duyệt'].includes(w.status)
-  ).length;
+function getUsed(gv, dot) {
+  return wishes.filter(w => w.dot === dot && w.status === 'Đã duyệt'
+    && (w.gvChinh === gv || (w.gvDong||[]).some(g => (g.ten||g) === gv))).length;
+}
+// CR-20261106-002: slot đã dùng cộng dồn tất cả các kỳ, nguyện vọng đang chờ chưa tính
+function topicUsed(t) { return wishes.filter(w => w.topicId === t.id && w.status === 'Đã duyệt').length; }
+// Trả về câu báo lỗi nếu nhóm GVHD có GV đã đủ chỉ tiêu
+function approveCapError(w) {
+  const tp = topics.find(x => x.id === w.topicId);
+  if (tp && topicUsed(tp) >= tp.qty) return 'Đề tài đã hết slot';
+  for (const gv of [w.gvChinh, ...(w.gvDong||[]).map(g => g.ten||g)]) {
+    const max = gvMuc(gv, w.dot);
+    if (max == null || getUsed(gv, w.dot) < max) continue;
+    return gv === w.gvChinh
+      ? `${gv} đã đạt giới hạn ${max} SV. Không thể duyệt thêm.`
+      : `${gv} đã đạt giới hạn ${max} SV. Vui lòng xóa giảng viên này khỏi nhóm GVHD và sắp lại trọng số.`;
+  }
+  return null;
 }
 
 let wishes = [
@@ -574,8 +599,7 @@ function render() {
       ...gvDongList.map(g=>({ ten:g.ten, trongSo:g.trongSo, isNgoai:false })),
       ...gvNgoaiList.map(g=>({ ten:g.ten, trongSo:g.trongSo, isNgoai:true })),
     ];
-    const maxTSCell = Math.max(...allGVsCell.map(g=>g.trongSo||0));
-    const gvMainCell = allGVsCell.find(g=>g.trongSo===maxTSCell) || allGVsCell[0];
+    const gvMainCell = allGVsCell.find(g=>g.ten===w.gvChinh) || allGVsCell[0];
     const gvRestCell = allGVsCell.filter(g=>g!==gvMainCell);
     const allNames = [
       `<span style="color:var(--primary)">${gvMainCell.ten||'—'}</span>`,
@@ -600,9 +624,9 @@ function render() {
       <td style="font-size:12px;color:var(--text-2)">${w.ctdt}</td>
       <td style="font-size:12px;color:var(--text-2)">${w.donVi}</td>
       <td style="white-space:nowrap">${(() => {
-        const max  = dotCapacity[w.dot];
-        if (max === undefined) return `<span style="font-size:12px;color:var(--text-2)">${w.dot}</span>`;
-        const used = getUsed(w.dot);
+        const max  = gvMuc(w.gvChinh, w.dot);
+        if (max == null) return `<span style="font-size:12px;color:var(--text-2)">${w.dot}</span><div style="margin-top:3px;font-size:11px;color:var(--text-3)">Chưa có mức</div>`;
+        const used = getUsed(w.gvChinh, w.dot);
         const full = used >= max;
         const ratio = used / max;
         const capColor = full ? 'var(--error)' : ratio >= 0.8 ? 'var(--warning)' : 'var(--success)';
@@ -699,13 +723,9 @@ function openNVOrder(wishId) {
 /* ── Quick approve (từ bảng) ── */
 function quickApproveWish(id) {
   const w    = wishes.find(x => x.id === id);
-  const max  = dotCapacity[w.dot];
-  const used = getUsed(w.dot);
-  const full = max !== undefined && used >= max;
-  const msg  = full
-    ? `⚠️ Đợt ${w.dot} đã đủ hạn mức (${used}/${max} SV).\nVẫn muốn duyệt nguyện vọng của ${w.tenSV}?`
-    : `Duyệt nguyện vọng của ${w.tenSV}?`;
-  showConfirm(msg, () => approveWish(id), full ? 'Vẫn duyệt' : 'Duyệt', 'btn-primary');
+  const capErr = approveCapError(w);
+  if (capErr) { showToast(capErr, 'warn'); return; }
+  showConfirm(`Duyệt nguyện vọng của ${w.tenSV}?`, () => approveWish(id), 'Duyệt', 'btn-primary');
 }
 
 /* ── Quick reject (từ bảng) ── */
@@ -734,6 +754,8 @@ function submitQuickReject() {
 /* ── Duyệt nguyện vọng ── */
 function approveWish(id) {
   const w = wishes.find(x => x.id === id);
+  const capErr = approveCapError(w);
+  if (capErr) { showToast(capErr, 'warn'); return; }
   const newStatus = w.loai === 'Đề xuất mới' ? 'Chờ Khoa duyệt' : 'Đã duyệt';
   wishes = wishes.map(x => x.id === id ? {
     ...x, status: newStatus, gvDuyetDate: new Date().toLocaleDateString('vi'),
@@ -746,6 +768,8 @@ function approveWish(id) {
       dot     : 'ok',
     }],
   } : x);
+  const tpDuyet = topics.find(x => x.id === w.topicId);
+  if (tpDuyet && topicUsed(tpDuyet) >= tpDuyet.qty) tpDuyet.hoatDong = 'Đóng';
   showToast(newStatus === 'Chờ Khoa duyệt'
     ? 'Đã duyệt — đề tài mới chuyển Khoa xét duyệt 🏫'
     : 'Đã duyệt nguyện vọng — SV được phân công đề tài ✅');
@@ -824,7 +848,7 @@ function openTopicDetail(wishId) {
                   :                           {l:'Chờ duyệt',c:'tag-warning'};
           return `<span class="tag ${s.c}">${s.l}</span>`;
         })()],
-    ['Hoạt động',     t
+    ['Nhận sinh viên',     t
       ? `<span style="display:inline-flex;align-items:center;gap:6px">
            <span style="width:8px;height:8px;border-radius:50%;background:${t.hoatDong==='Mở'?'var(--success)':'#bfbfbf'}"></span>
            <span style="font-size:13px">${t.hoatDong || ''}</span>
@@ -895,6 +919,7 @@ function renderGVHDBody() {
         <div>
           <div style="font-size:13px;font-weight:${gv.isPrimary?700:500};color:${gv.isPrimary?'var(--text-1)':'var(--text-2)'}">${gv.name}${gv.isPrimary?' <span class="you-label">Bạn</span>':''}</div>
           ${gv.donVi?`<div style="font-size:11px;color:var(--text-3);margin-top:2px">🏛️ ${gv.donVi}</div>`:''}
+          ${gv.type==='internal'?`<div style="font-size:11px;margin-top:2px;color:var(--text-3)">Chỉ tiêu: ${gvCapLabel(gv.name)}</div>`:''}
         </div>
         <div>${locationTag}</div>
         <div style="display:flex;align-items:center;justify-content:flex-end;gap:2px">
@@ -1043,12 +1068,22 @@ function openAddGVHDPanel() {
   populateGVHDInternalSelect();
   setAddGVHDType('internal');
 }
+function gvCapLabel(gv) {
+  const dot = wishes.find(x => x.id === gvhdWishId).dot;
+  const max = gvMuc(gv, dot);
+  return max == null ? 'Chưa có mức' : `${getUsed(gv, dot)}/${max} SV`;
+}
 function populateGVHDInternalSelect() {
   const sel = document.getElementById('gvhd-add-select');
   const used = gvhdCards.map(c => c.name);
   const opts = KHOA_GV_LIST.filter(n => !used.includes(n));
   sel.innerHTML = '<option value="">-- Chọn giảng viên trong trường --</option>' +
-    opts.map(n => `<option value="${n}">${n}</option>`).join('');
+    opts.map(n => {
+      const dot = wishes.find(x => x.id === gvhdWishId).dot;
+      const max = gvMuc(n, dot);
+      const full = max != null && getUsed(n, dot) >= max;
+      return `<option value="${n}" ${full?'disabled':''}>${n} (${max == null ? 'Chưa có mức' : getUsed(n, dot) + '/' + max}${full?' — đủ chỉ tiêu':''})</option>`;
+    }).join('');
 }
 function setAddGVHDType(type) {
   gvhdAddType = type;

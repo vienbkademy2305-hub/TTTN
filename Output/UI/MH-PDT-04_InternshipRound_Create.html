@@ -249,34 +249,24 @@
               <div class="fi" id="fi-svgvhd-simple">
                 <label>Số SV tối đa / GVHD <span class="req">*</span></label>
                 <input class="fc" type="number" min="1" value="10">
-                <div class="f-hint">Áp dụng chung cho mọi GVHD trong đợt Thực tập</div>
+                <div class="f-hint">Áp dụng chung cho mọi GVHD trong đợt</div>
               </div>
             </div>
 
             <div class="fi" id="fi-svgvhd-detail" style="display:none;margin-bottom:24px">
-              <label>Số SV tối đa / GVHD theo học vị, chức danh <span class="req">*</span></label>
+              <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px">
+                <label style="margin-bottom:0">Số SV tối đa / GVHD theo học hàm, học vị, chức danh <span class="req">*</span></label>
+                <button class="btn btn-default btn-sm" onclick="openPickerCap()">➕ Thêm dòng</button>
+              </div>
               <div class="tbl-wrap">
                 <table class="cond-tbl">
                   <thead>
-                    <tr><th style="text-align:left">Học vị / Chức danh GVHD</th><th style="width:180px">Số SV tối đa</th></tr>
+                    <tr><th style="text-align:left">Học hàm / Học vị / Chức danh</th><th style="width:180px">Số SV tối đa</th><th style="width:44px"></th></tr>
                   </thead>
-                  <tbody>
-                    <tr data-id="cap-cao-cap">
-                      <td>PGS, GS, TSKH, GVCC</td>
-                      <td><input class="fc" type="number" min="1" max="20" value="20"></td>
-                    </tr>
-                    <tr data-id="cap-chinh">
-                      <td>TS, GV chính</td>
-                      <td><input class="fc" type="number" min="1" max="15" value="15"></td>
-                    </tr>
-                    <tr data-id="cap-thac-si">
-                      <td>Thạc sĩ</td>
-                      <td><input class="fc" type="number" min="1" max="10" value="10"></td>
-                    </tr>
-                  </tbody>
+                  <tbody id="cap-body"></tbody>
                 </table>
               </div>
-              <div class="f-hint">Chỉ áp dụng cho Đồ án / Khóa luận tốt nghiệp — số SV tối đa không vượt mức quy định theo học vị, chức danh GVHD</div>
+              <div id="cap-empty" class="cond-empty" style="display:none">Chưa có dòng nào, nhấn <strong>➕ Thêm dòng</strong> để chọn.</div>
             </div>
 
             <!-- 3.2 -->
@@ -356,7 +346,7 @@
                 <button class="btn btn-link btn-sm" style="color:var(--danger)" onclick="removeCond33(this)">✕</button>
               </div>
               <div class="sys-cond-row" data-id="khong-huy-dk" style="display:flex;align-items:center;justify-content:space-between;padding:9px 12px;border:1px solid var(--border);border-radius:6px;font-size:13px;background:#fff">
-                <span>🔒 Chưa từng hủy đăng ký ĐAKLTN</span>
+                <span>🔒 Lần đầu đăng ký đồ án, khóa luận tốt nghiệp</span>
                 <button class="btn btn-link btn-sm" style="color:var(--danger)" onclick="removeCond33(this)">✕</button>
               </div>
             </div>
@@ -394,6 +384,24 @@
     <div class="modal-ft">
       <button class="btn btn-default" onclick="closeModal('modal-picker-creator')">Hủy</button>
       <button class="btn btn-primary" onclick="confirmPickerCreator()">➕ Thêm vào danh sách</button>
+    </div>
+  </div>
+</div>
+
+<!-- ===== PICKER 3.1: Học hàm, học vị, chức danh ===== -->
+<div class="overlay hidden" id="modal-picker-cap">
+  <div class="modal-box" style="width:520px">
+    <div class="modal-hd">
+      <span class="modal-title">➕ Thêm học hàm, học vị, chức danh</span>
+      <button class="modal-close" onclick="closeModal('modal-picker-cap')">✕</button>
+    </div>
+    <div class="modal-bd">
+      <div class="f-hint" style="margin-bottom:12px">Chọn từ danh mục HR. Mục đã có trong bảng được hiển thị mờ.</div>
+      <div class="picker-list" id="picker-cap-list"></div>
+    </div>
+    <div class="modal-ft">
+      <button class="btn btn-default" onclick="closeModal('modal-picker-cap')">Hủy</button>
+      <button class="btn btn-primary" onclick="confirmPickerCap()">➕ Thêm vào đợt</button>
     </div>
   </div>
 </div>
@@ -466,8 +474,9 @@ function onLoaiHinhChange() {
   const v = document.getElementById('f-loai').value;
   const show = v.includes('Đồ án')||v.includes('Khóa luận');
   document.getElementById('fi-nv').style.display = show?'':'none';
-  document.getElementById('fi-svgvhd-simple').style.display = show?'none':'';
-  document.getElementById('fi-svgvhd-detail').style.display = show?'':'none';
+  const theoDanhHieu = v==='Đồ án tốt nghiệp'||v==='Khóa luận tốt nghiệp';
+  document.getElementById('fi-svgvhd-simple').style.display = theoDanhHieu?'none':'';
+  document.getElementById('fi-svgvhd-detail').style.display = theoDanhHieu?'':'none';
 }
 
 function toggleCond(cb) {
@@ -486,6 +495,7 @@ function toast(msg,type='success'){
 }
 
 function saveForm(){
+  if(!validateCap()) return;
   const start=document.getElementById('f-start').value;
   toast('Đợt đăng ký đã được tạo thành công. Hệ thống sẽ tự động mở lúc '+
     (start ? new Date(start).toLocaleString('vi-VN') : '(chưa cấu hình)'));
@@ -547,6 +557,73 @@ function confirmPickerCreator(){
 
 renderCreatorChips();
 
+// ───── 3.1 Số SV tối đa / GVHD theo học hàm, học vị, chức danh ─────
+const POOL_CAP = [
+  { id:'gs',    label:'GS',                 goiY:20 },
+  { id:'pgs',   label:'PGS',                goiY:20 },
+  { id:'tskh',  label:'TSKH',               goiY:20 },
+  { id:'gvcc',  label:'Giảng viên cao cấp', goiY:20 },
+  { id:'ts',    label:'TS',                 goiY:15 },
+  { id:'gvc',   label:'Giảng viên chính',   goiY:15 },
+  { id:'ths',   label:'ThS',                goiY:10 },
+  { id:'gv',    label:'Giảng viên' },
+  { id:'cn',    label:'Cử nhân' },
+];
+
+function getAddedCap(){ return [...document.querySelectorAll('#cap-body tr')].map(r=>r.dataset.id); }
+
+function addCapRow(cfg, value){
+  const tr = document.createElement('tr');
+  tr.dataset.id = cfg.id;
+  tr.innerHTML = `
+    <td>${cfg.label}</td>
+    <td><input class="fc" type="number" min="1" step="1" value="${value==null?'':value}" placeholder="VD: 10"></td>
+    <td style="text-align:center"><button class="btn btn-link btn-sm" style="color:var(--danger)" onclick="removeCapRow(this)" title="Xóa">✕</button></td>`;
+  document.getElementById('cap-body').appendChild(tr);
+  syncCapEmpty();
+}
+
+function syncCapEmpty(){
+  document.getElementById('cap-empty').style.display = getAddedCap().length ? 'none' : '';
+}
+
+function removeCapRow(btn){
+  btn.closest('tr').remove();
+  syncCapEmpty();
+}
+
+function openPickerCap(){
+  const added = getAddedCap();
+  document.getElementById('picker-cap-list').innerHTML = POOL_CAP.map(c=>`
+    <label class="picker-item${added.includes(c.id)?' added':''}" data-id="${c.id}">
+      <input type="checkbox" ${added.includes(c.id)?'checked disabled':''}>
+      <span style="flex:1">${c.label}</span>
+      ${added.includes(c.id)?'<span style="font-size:11px;color:var(--success)">Đã thêm</span>':''}
+    </label>`).join('');
+  document.getElementById('modal-picker-cap').classList.remove('hidden');
+}
+
+function confirmPickerCap(){
+  document.querySelectorAll('#picker-cap-list .picker-item:not(.added) input:checked').forEach(cb=>{
+    const cfg = POOL_CAP.find(c=>c.id===cb.closest('.picker-item').dataset.id);
+    if(cfg) addCapRow(cfg);
+  });
+  closeModal('modal-picker-cap');
+}
+
+function validateCap(){
+  if(document.getElementById('fi-svgvhd-detail').style.display==='none') return true;
+  const inputs = [...document.querySelectorAll('#cap-body input')];
+  if(!inputs.length){ toast('Vui lòng thêm ít nhất 1 dòng Số SV tối đa.','error'); return false; }
+  if(inputs.some(i=>!Number.isInteger(Number(i.value)) || i.value==='' || Number(i.value)<1)){
+    toast('Vui lòng nhập Số SV tối đa từ 1 trở lên cho tất cả các dòng.','error');
+    return false;
+  }
+  return true;
+}
+
+POOL_CAP.filter(c=>c.goiY).forEach(c=>addCapRow(c, c.goiY));
+
 // ───── 3.2 Tiêu chí tham số ─────
 const POOL32 = [
   { id:'gpa',       label:'GPA',                  type:'decimal', placeholder:'VD: 2.5', min:0, max:4,  step:0.1 },
@@ -600,7 +677,7 @@ const POOL33 = [
   { id:'ky-luat-hs',  label:'Không bị kỷ luật hình sự' },
   { id:'hoc-phi',     label:'Không nợ học phí trong kỳ' },
   { id:'tttn-hp',     label:'Hoàn thành học phần thực tập tốt nghiệp' },
-  { id:'khong-huy-dk',label:'Chưa từng hủy đăng ký ĐAKLTN' },
+  { id:'khong-huy-dk',label:'Lần đầu đăng ký đồ án, khóa luận tốt nghiệp' },
 ];
 
 function getAdded33(){ return [...document.querySelectorAll('#cond33-list .sys-cond-row')].map(r=>r.dataset.id); }

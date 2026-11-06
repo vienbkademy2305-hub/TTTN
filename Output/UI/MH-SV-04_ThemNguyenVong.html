@@ -135,7 +135,6 @@
               <select class="fc" style="width:160px" id="q-slots">
                 <option value="">Tất cả tình trạng</option>
                 <option value="ok">Còn chỗ</option>
-                <option value="full">Đã đủ chỗ</option>
               </select>
             </div>
             <div class="tbl-wrap">
@@ -242,7 +241,7 @@ const TOPICS_DB = {
     { id:102, code:'DT-2026-0002', name:'Nghiên cứu và triển khai giải pháp bảo mật Zero Trust cho doanh nghiệp',    gv:'PGS. Lê Thị Hoa',      field:'Mạng & Bảo mật',    approved:0, maxQty:1 },
     { id:103, code:'DT-2026-0003', name:'Ứng dụng Blockchain trong quản lý chuỗi cung ứng thực phẩm',                gv:'ThS. Nguyễn Thu Hà',   field:'Công nghệ PM',       approved:1, maxQty:2 },
     { id:104, code:'DT-2026-0004', name:'Xây dựng hệ thống phân tích log và phát hiện xâm nhập mạng bằng AI',       gv:'TS. Nguyễn Minh Tuấn', field:'Mạng & Bảo mật',    approved:0, maxQty:1 },
-    { id:105, code:'DT-2026-0005', name:'Nghiên cứu tối ưu hóa hiệu năng truy vấn cơ sở dữ liệu phân tán',         gv:'TS. Trần Văn Bình',    field:'Công nghệ PM',       approved:0, maxQty:2 },
+    { id:105, code:'DT-2026-0005', nhanSV:'Đóng', name:'Nghiên cứu tối ưu hóa hiệu năng truy vấn cơ sở dữ liệu phân tán',         gv:'TS. Trần Văn Bình',    field:'Công nghệ PM',       approved:0, maxQty:2 },
     { id:106, code:'DT-2026-0006', name:'Xây dựng hệ thống giám sát IoT trong nông nghiệp thông minh',              gv:'ThS. Lê Minh Đức',     field:'Công nghệ PM',       approved:1, maxQty:3 },
     { id:107, code:'DT-2026-0007', name:'Phát triển ứng dụng di động hỗ trợ người khiếm thị nhận diện môi trường',  gv:'TS. Phạm Quốc Hùng',   field:'Trí tuệ nhân tạo', approved:2, maxQty:2 },
   ],
@@ -356,7 +355,7 @@ function renderTopicTable() {
   const list = topics.filter(t =>
     (!q  || t.name.toLowerCase().includes(q) || t.gv.toLowerCase().includes(q)) &&
     (!qf || t.field === qf) &&
-    (!qs || (qs === 'ok' && !isFull(t)) || (qs === 'full' && isFull(t)))
+    t.nhanSV !== 'Đóng' && !isFull(t)
   );
 
   const tbody = document.getElementById('topic-tbody');
@@ -373,8 +372,6 @@ function renderTopicTable() {
     let action;
     if (already) {
       action = `<span class="tbl-added">✓ Đã chọn</span>`;
-    } else if (full) {
-      action = `<button class="btn btn-default btn-sm" disabled title="Đã đủ sinh viên">Đủ chỗ</button>`;
     } else {
       action = `<button class="btn btn-primary btn-sm" onclick="addTopic(${t.id})">＋ Chọn</button>`;
     }
@@ -401,6 +398,7 @@ function addTopic(topicId) {
   }
   const t = topics.find(x => x.id === topicId);
   if (!t) return;
+  if (t.nhanSV === 'Đóng' || isFull(t)) { showToast('Đề tài đã ngừng nhận sinh viên', 'warn'); return; }
   selList.push({ id: 'gv_' + Date.now(), type: 'gv',
     topicId: t.id, topicCode: t.code, topicName: t.name, gvName: t.gv });
   renderTopicTable();

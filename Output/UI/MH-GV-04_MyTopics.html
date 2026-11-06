@@ -162,7 +162,7 @@
                 <th style="width:60px;text-align:center">SL SV</th>
                 <th style="width:110px">Lĩnh vực</th>
                 <th style="width:110px">Trạng thái</th>
-                <th style="width:90px;text-align:center">Hoạt động</th>
+                <th style="width:110px;text-align:center">Nhận sinh viên</th>
                 <th style="width:100px">Ngày gửi</th>
                 <th style="width:200px">Ghi chú</th>
                 <th style="width:110px">Hành động</th>
@@ -405,21 +405,29 @@ function syncSelectAll(tbodyId, chkAllId) {
   el.indeterminate = done.length > 0 && done.length < all.length;
 }
 
-/* ── Toggle active status ── */
-function toggleActive(id, sel) {
-  const val = sel.value;
-  topics = topics.map(t => t.id === id ? {...t, active: val} : t);
-  sel.className = 'active-sel ' + (val === 'Mở' ? 'is-open' : 'is-closed');
-  showToast(val === 'Mở' ? 'Đã mở nhận đăng ký đề tài' : 'Đã đóng nhận đăng ký đề tài');
-}
+/* CR-20261106-002: slot đã dùng cộng dồn tất cả các kỳ (dữ liệu mẫu) */
+topics[0].used = 1;
+topics.push(
+  { ...topics[0], id:11, code:'DT-2026-0011', name:'Xây dựng hệ thống quản lý phòng thí nghiệm dùng chung', used:2, active:'Đóng' },
+  { ...topics[0], id:12, code:'DT-2026-0012', name:'Phân tích dữ liệu học tập để cảnh báo sớm sinh viên', used:1, active:'Đóng' },
+  { ...topics[0], id:13, code:'DT-2026-0013', name:'Ứng dụng nhận dạng giọng nói tiếng Việt trong điểm danh', used:0, active:'Mở' }
+);
 
-function updateActiveFromView(id, sel) {
-  const val = sel.value;
-  topics = topics.map(t => t.id === id ? {...t, active: val} : t);
+/* ── Đổi Nhận sinh viên: hết slot thì không mở được (CR-20261106-002) ── */
+function _doiNhanSV(id, sel) {
+  const val = sel.value, t = topics.find(x => x.id === id);
+  if (val === 'Mở' && (t.used || 0) >= t.qty) {
+    sel.value = 'Đóng';
+    showToast('Đã hết slot', 'err');
+    return false;
+  }
+  topics = topics.map(x => x.id === id ? {...x, active: val} : x);
   sel.className = 'active-sel ' + (val === 'Mở' ? 'is-open' : 'is-closed');
-  showToast(val === 'Mở' ? 'Đã mở nhận đăng ký đề tài' : 'Đã đóng nhận đăng ký đề tài');
-  render();
+  showToast('Đổi trạng thái thành công');
+  return true;
 }
+function toggleActive(id, sel) { _doiNhanSV(id, sel); }
+function updateActiveFromView(id, sel) { if (_doiNhanSV(id, sel)) render(); }
 
 /* ── Render Table ── */
 function render() {
@@ -451,7 +459,7 @@ function render() {
         <div style="font-size:12px;color:var(--text-3)">${t.field}</div>
       </td>
       <td><ul class="type-list">${typeList}</ul></td>
-      <td style="text-align:center;font-weight:600">${t.qty}</td>
+      <td style="text-align:center;font-weight:600${t.status==='Đã duyệt' && (t.used||0)>=t.qty?';color:var(--error)':''}">${t.status==='Đã duyệt' ? (t.used||0)+'/'+t.qty : t.qty}</td>
       <td style="font-size:12px;color:var(--text-2)">${t.field}</td>
       <td><span class="tag ${STATUS_CLR[t.status]}">${t.status}</span></td>
       <td style="text-align:center">${activeCell}</td>
@@ -669,7 +677,7 @@ function viewTopic(id) {
   _currentTopicId = id;
 
   const activeRow = t.status==='Đã duyệt'
-    ? `<tr><th>Hoạt động</th><td>
+    ? `<tr><th>Nhận sinh viên</th><td>
         <select class="active-sel ${t.active==='Mở'?'is-open':'is-closed'}" onchange="updateActiveFromView(${t.id},this)">
           <option value="Mở"  ${t.active==='Mở' ?'selected':''}>🟢 Mở</option>
           <option value="Đóng"${t.active!=='Mở'  ?'selected':''}>🔴 Đóng</option>

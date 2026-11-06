@@ -96,7 +96,7 @@
         <a href="MH-KCM-03_TopicApproval.html" class="btn btn-default btn-sm">← Quay lại</a>
         <div>
           <div style="font-weight:600;font-size:14px">Danh sách Sinh viên — Xét Điều kiện</div>
-          <div class="text-muted text-sm">Đợt: TTTN HK1 2025-2026 &nbsp;|&nbsp; K68, K69 &nbsp;|&nbsp; Khoa CNTT</div>
+          <div class="text-muted text-sm">Đợt: <select id="dot-xem" style="font-size:12px;border:1px solid var(--border);border-radius:4px;padding:0 4px" onchange="location.search=this.value"><option value="">TTTN HK1 2025-2026</option><option value="?dot=da">Đồ án tốt nghiệp HK1 2026-2027</option></select> &nbsp;|&nbsp; K68, K69 &nbsp;|&nbsp; Khoa CNTT</div>
         </div>
       </div>
       <div class="h-right">
@@ -359,6 +359,61 @@ function openDetailPopup(id, name) {
   document.getElementById('d-sv-name').textContent = name;
   document.getElementById('modal-detail').classList.remove('hidden');
 }
+</script>
+<script>
+/* CR-20261106-001 (US-DAKL-29, US-DAKL-30): popup Chi tiết điều kiện của đợt đồ án, khóa luận.
+   Dòng không đạt ghi rõ nguyên nhân ngay trong cột Giá trị thực tế. Xem thử: chọn đợt Đồ án ở đầu trang (?dot=da). */
+(function () {
+  if (new URLSearchParams(location.search).get('dot') !== 'da') return;
+  document.getElementById('dot-xem').value = '?dot=da';
+  const LAN_DAU = 'Lần đầu đăng ký đồ án, khóa luận tốt nghiệp';
+  const KTGDCN = 'Hoàn thành các học phần bắt buộc khối kiến thức giáo dục chuyên nghiệp';
+  const HP_TTTN = 'Hoàn thành học phần thực tập tốt nghiệp';
+  const nhom = g => g.map((x, i) => '<div style="font-weight:600">' + (i + 1) + '. ' + x.cat + '</div>' + x.courses.map(c => '<div style="padding-left:14px">' + c + '</div>').join('')).join('');
+  const D = (o) => [
+    ['GPA', '>= 2.50', o.gpa, parseFloat(o.gpa) >= 2.5],
+    ['Số tín chỉ tích lũy', '>= 90', o.tc, parseInt(o.tc) >= 90],
+    [KTGDCN, '= Đạt', o.ktgdcn || 'Đạt', !o.ktgdcn],
+    ['Trạng thái đang học', '= Đang học', o.tthoc || 'Đang học', !o.tthoc],
+    ['Không bị kỷ luật hình sự', '= Không', 'Không', true],
+    ['Không nợ học phí trong kỳ', '= Không nợ', o.hocphi || 'Không nợ', !o.hocphi],
+    [HP_TTTN, '= Đạt', o.tttn || 'Đạt', !o.tttn],
+    [LAN_DAU, '= Lần đầu', o.landau || 'Lần đầu', !o.landau]
+  ];
+  const DA = {
+    B22DCCN001: { gpa:'3.20', tc:'95', landau:'Đã từng đăng ký đồ án tại đợt Đồ án tốt nghiệp HK hè 2025-2026' },
+    B22DCCN015: { gpa:'2.10', tc:'88', tttn:'Chưa học Thực tập tốt nghiệp (INT3110)' },
+    B22DCCN033: { gpa:'2.80', tc:'76', tthoc:'Bảo lưu', hocphi:'Nợ', tttn:'Đã học nhưng chưa Đạt Thực tập tốt nghiệp (INT3110), lần gần nhất: Không đạt' },
+    B22DCCN047: { gpa:'3.40', tc:'102' },
+    B22DCCN058: { gpa:'2.60', tc:'68', hocphi:'Nợ', ktgdcn: nhom([
+      { cat:'Khối kiến thức cơ sở', courses:['PHI1001 - Triết học Mác - Lênin', 'PHI1002 - Kinh tế chính trị Mác - Lênin'] },
+      { cat:'Học phần chuyên ngành', courses:['INT1154 - Cấu trúc dữ liệu và giải thuật'] }
+    ]) }
+  };
+  const goc = openDetailPopup;
+  openDetailPopup = function (id, name) {
+    const o = DA[id];
+    if (!o) return goc(id, name);
+    document.getElementById('d-sv-id').textContent = id;
+    document.getElementById('d-sv-name').textContent = name;
+    document.getElementById('modal-detail').classList.remove('hidden');
+    document.querySelector('#modal-detail tbody').innerHTML = D(o).map(r => '<tr><td>' + r[0] + '</td><td style="white-space:nowrap">' + r[1] + '</td>' +
+      '<td' + (r[3] ? '' : ' style="color:var(--error)"') + '>' + r[2] + '</td><td style="text-align:center;white-space:nowrap"><span class="tag ' + (r[3] ? 'tag-success">Đạt' : 'tag-error">Không đạt') + '</span></td></tr>').join('');
+  };
+  // Dòng trên bảng theo đợt đồ án
+  const hang = id => Array.from(document.querySelectorAll('main.content tbody tr')).find(tr => tr.textContent.indexOf(id) >= 0);
+  const an = hang('B22DCCN001');
+  if (an) {
+    an.classList.add('row-fail');
+    Array.from(an.cells).find(c => c.textContent.indexOf('Đủ điều kiện') >= 0).innerHTML = '<span class="tag tag-error">✗ Không đủ ĐK</span>';
+  }
+  if (document.querySelector('th.col-reason')) {
+    const lyDo = (id, t) => { const tr = hang(id); if (tr) { tr.cells[12].style.cssText = 'font-size:12px'; tr.cells[12].textContent = t; } };
+    lyDo('B22DCCN001', DA.B22DCCN001.landau);
+    lyDo('B22DCCN015', DA.B22DCCN015.tttn);
+    lyDo('B22DCCN033', DA.B22DCCN033.tttn);
+  }
+})();
 </script>
 </body>
 </html>

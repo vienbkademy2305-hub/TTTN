@@ -153,7 +153,6 @@
           <select class="fc" style="width:155px;display:none" id="f-status">
             <option value="">Tất cả tình trạng</option>
             <option value="open">Còn chỗ đăng ký</option>
-            <option value="full">Đã đủ chỗ</option>
           </select>
         </div>
 
@@ -267,7 +266,7 @@ const TOPICS = [
     products:'Smart contract, ứng dụng web truy xuất nguồn gốc, tài liệu kỹ thuật',
     requirements:'JavaScript, kiến thức cơ bản về Blockchain',
   },
-  { id:104, code:'DT-2026-0004',
+  { id:104, code:'DT-2026-0004', nhanSV:'Đóng',
     name:'Xây dựng hệ thống phân tích log và phát hiện xâm nhập mạng bằng AI',
     gv:'TS. Nguyễn Minh Tuấn', type:'ĐATN', ctdt:'CT001', dvql:'KHCNTT', maxQty:1, taken:0,
     domain:'An toàn thông tin', submittedDate:'05/05/2026',
@@ -395,7 +394,7 @@ function filtered() {
   const type = document.getElementById('f-type')?.value   || '';
   return TOPICS.filter(t =>
     t.dvql === STUDENT_DVQL &&
-    !isFull(t) &&
+    !isFull(t) && t.nhanSV !== 'Đóng' &&
     (!q    || t.name.toLowerCase().includes(q) || t.gv.toLowerCase().includes(q) || t.code.toLowerCase().includes(q)) &&
     (!ctdt || t.ctdt === ctdt) &&
     (!type || t.type === type)
@@ -500,7 +499,7 @@ function openDetail(topicId) {
         <td>${statusTag}</td>
       </tr>
       <tr>
-        <th>Hoạt động</th>
+        <th>Nhận sinh viên</th>
         <td>${activeTag}</td>
       </tr>
       <tr>

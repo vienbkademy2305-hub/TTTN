@@ -2659,8 +2659,8 @@ function openDaklDeCuongView(maDot) {
   const tg = daklTg(maDot);
   const coTg = !!(tg.from && tg.to);
   dcLhpOk = coTg || !editable;
-  document.getElementById('dc-tg-from').value = tg.from || dc.tgFrom || '';
-  document.getElementById('dc-tg-to').value = tg.to || dc.tgTo || '';
+  document.getElementById('dc-tg-from').value = coTg ? tg.from : '';
+  document.getElementById('dc-tg-to').value = coTg ? tg.to : '';
   document.getElementById('dc-tg-from').disabled = true;
   document.getElementById('dc-tg-to').disabled = true;
 

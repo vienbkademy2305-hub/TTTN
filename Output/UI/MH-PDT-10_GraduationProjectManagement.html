@@ -726,86 +726,6 @@
   </div>
 </div>
 
-<!-- ═══ MODAL: NHẬN XÉT & KẾT LUẬN — GVHD (độc lập, không hiển thị cùng GVPB) ═══ -->
-<div class="overlay hidden" id="m-nhanxet-gvhd">
-  <div class="modal-box w640" style="max-height:90vh">
-    <div class="modal-hd">
-      <span class="modal-title">📝 Nhận xét & Kết luận — GVHD</span>
-      <button class="modal-close" data-close="m-nhanxet-gvhd">✕</button>
-    </div>
-    <div class="modal-bd" style="overflow-y:auto">
-      <div class="fi">
-        <label>Kết luận <span class="req">*</span></label>
-        <select class="fc" id="nx-gvhd-ketluan">
-          <option value="">-- Chọn kết luận --</option>
-          <option value="Đồng ý">✅ Đồng ý cho bảo vệ</option>
-          <option value="Không đồng ý">⛔ Không đồng ý cho bảo vệ</option>
-        </select>
-      </div>
-      <div class="fi">
-        <label>Tài liệu nhận xét (phiếu nhận xét GVHD) <span class="req">*</span>
-          <a href="#" onclick="downloadNxTemplate('gvhd');return false" style="font-size:12px;font-weight:400;margin-left:8px">📥 Tải file mẫu (.docx)</a>
-        </label>
-        <div style="display:flex;gap:8px;align-items:center">
-          <input type="file" id="nx-gvhd-file-input" accept=".doc,.docx,.pdf" style="display:none" onchange="onNxFileSelect(this,'gvhd')">
-          <button type="button" class="btn btn-default btn-sm" onclick="document.getElementById('nx-gvhd-file-input').click()">📎 Chọn file</button>
-          <span style="font-size:12px;color:var(--text-2)" id="nx-gvhd-file-name">Chưa có file</span>
-          <button type="button" class="btn btn-default btn-sm" id="nx-gvhd-file-clear" style="display:none;color:var(--error)" onclick="clearNxFile('gvhd')">✕</button>
-        </div>
-      </div>
-      <div class="fi">
-        <label>Ghi chú</label>
-        <textarea class="fc" id="nx-gvhd-ghichu" rows="2" placeholder="Ghi chú thêm về điểm/nhận xét (không bắt buộc)"></textarea>
-      </div>
-      <div class="fe" id="nx-gvhd-err" style="display:none">Vui lòng chọn kết luận và tải lên tài liệu nhận xét của GVHD.</div>
-    </div>
-    <div class="modal-ft">
-      <button class="btn btn-default" data-close="m-nhanxet-gvhd">Hủy</button>
-      <button class="btn btn-primary" onclick="saveNhanXetGvhd()">Lưu</button>
-    </div>
-  </div>
-</div>
-
-<!-- ═══ MODAL: NHẬN XÉT & KẾT LUẬN — GVPB (độc lập, không hiển thị cùng GVHD) ═══ -->
-<div class="overlay hidden" id="m-nhanxet-gvpb">
-  <div class="modal-box w640" style="max-height:90vh">
-    <div class="modal-hd">
-      <span class="modal-title">📃 Nhận xét & Kết luận — GVPB</span>
-      <button class="modal-close" data-close="m-nhanxet-gvpb">✕</button>
-    </div>
-    <div class="modal-bd" style="overflow-y:auto">
-      <div class="fi">
-        <label>Kết luận <span class="req">*</span></label>
-        <select class="fc" id="nx-gvpb-ketluan">
-          <option value="">-- Chọn kết luận --</option>
-          <option value="Đồng ý">✅ Đồng ý cho bảo vệ</option>
-          <option value="Không đồng ý">⛔ Không đồng ý cho bảo vệ</option>
-        </select>
-      </div>
-      <div class="fi">
-        <label>Tài liệu nhận xét (phiếu nhận xét GVPB) <span class="req">*</span>
-          <a href="#" onclick="downloadNxTemplate('gvpb');return false" style="font-size:12px;font-weight:400;margin-left:8px">📥 Tải file mẫu (.docx)</a>
-        </label>
-        <div style="display:flex;gap:8px;align-items:center">
-          <input type="file" id="nx-gvpb-file-input" accept=".doc,.docx,.pdf" style="display:none" onchange="onNxFileSelect(this,'gvpb')">
-          <button type="button" class="btn btn-default btn-sm" onclick="document.getElementById('nx-gvpb-file-input').click()">📎 Chọn file</button>
-          <span style="font-size:12px;color:var(--text-2)" id="nx-gvpb-file-name">Chưa có file</span>
-          <button type="button" class="btn btn-default btn-sm" id="nx-gvpb-file-clear" style="display:none;color:var(--error)" onclick="clearNxFile('gvpb')">✕</button>
-        </div>
-      </div>
-      <div class="fi">
-        <label>Ghi chú</label>
-        <textarea class="fc" id="nx-gvpb-ghichu" rows="2" placeholder="Ghi chú thêm về điểm/nhận xét (không bắt buộc)"></textarea>
-      </div>
-      <div class="fe" id="nx-gvpb-err" style="display:none">Vui lòng chọn kết luận và tải lên tài liệu nhận xét của GVPB.</div>
-    </div>
-    <div class="modal-ft">
-      <button class="btn btn-default" data-close="m-nhanxet-gvpb">Hủy</button>
-      <button class="btn btn-primary" onclick="saveNhanXetGvpb()">Lưu</button>
-    </div>
-  </div>
-</div>
-
 <!-- ═══ MODAL: CẬP NHẬT KẾT LUẬN BẢO VỆ THỦ CÔNG ═══ -->
 <div class="overlay hidden" id="m-ketluan-override">
   <div class="modal-box w640">
@@ -1096,6 +1016,7 @@
 <div class="toast-box" id="toast-box"></div>
 
 <script src="_utils.js"></script>
+<script src="_phieu-nhan-xet.js"></script>
 <script>
 /* ════════ DỮ LIỆU MẪU ════════ */
 const ROUNDS = [
@@ -1831,14 +1752,14 @@ function render(){
       ? `<span style="font-size:12px;color:var(--text-2)">${s.hoiDong.completeNote}</span>`
       : `<span style="color:var(--text-3);font-size:12px">—</span>`;
     const nxGvhdCell = s.nxGVHD
-      ? `<span class="tag ${s.nxGVHD.ketLuan==='Đồng ý'?'tag-success':'tag-error'}" style="cursor:pointer" onclick="openNhanXetGvhd(${s.id})" title="Xem/sửa nhận xét GVHD">${s.nxGVHD.ketLuan==='Đồng ý'?'✅':'⛔'} ${s.nxGVHD.ketLuan} cho BV</span>`
+      ? `<span class="tag ${s.nxGVHD.ketLuan==='Đồng ý'?'tag-success':'tag-error'}" style="cursor:pointer" onclick="openNhanXetGvhd(${s.id})" title="Xem phiếu nhận xét GVHD">${s.nxGVHD.ketLuan==='Đồng ý'?'✅':'⛔'} ${s.nxGVHD.ketLuan} cho BV</span>`
       : s.baoCao
-        ? `<span class="ketluan-pill wait" onclick="openNhanXetGvhd(${s.id})" title="Nhập nhận xét GVHD">⏳ Chưa nhận xét</span>`
+        ? (pnxPhieu(s,'gvhd') ? `<span class="ketluan-pill wait" onclick="openNhanXetGvhd(${s.id})" title="Xem phiếu nhận xét GVHD">⏳ Chưa nhận xét</span>` : `<span class="ketluan-pill wait" style="cursor:default">⏳ Chưa nhận xét</span>`)
         : `<span style="color:var(--text-3);font-size:12px">—</span>`;
     const nxGvpbCell = s.nxGVPB
-      ? `<span class="tag ${s.nxGVPB.ketLuan==='Đồng ý'?'tag-success':'tag-error'}" style="cursor:pointer" onclick="openNhanXetGvpb(${s.id})" title="Xem/sửa nhận xét GVPB">${s.nxGVPB.ketLuan==='Đồng ý'?'✅':'⛔'} ${s.nxGVPB.ketLuan} cho BV</span>`
+      ? `<span class="tag ${s.nxGVPB.ketLuan==='Đồng ý'?'tag-success':'tag-error'}" style="cursor:pointer" onclick="openNhanXetGvpb(${s.id})" title="Xem phiếu nhận xét GVPB">${s.nxGVPB.ketLuan==='Đồng ý'?'✅':'⛔'} ${s.nxGVPB.ketLuan} cho BV</span>`
       : s.baoCao
-        ? `<span class="ketluan-pill wait" onclick="openNhanXetGvpb(${s.id})" title="Nhập nhận xét GVPB">⏳ Chưa nhận xét</span>`
+        ? (pnxPhieu(s,'gvpb') ? `<span class="ketluan-pill wait" onclick="openNhanXetGvpb(${s.id})" title="Xem phiếu nhận xét GVPB">⏳ Chưa nhận xét</span>` : `<span class="ketluan-pill wait" style="cursor:default">⏳ Chưa nhận xét</span>`)
         : `<span style="color:var(--text-3);font-size:12px">—</span>`;
     const qdTotalCount = countDecisions(s);
     const qdCell = qdTotalCount
@@ -2007,7 +1928,8 @@ function openDetail(id){
   }
   extra += `<button class="btn btn-primary" onclick="closeModal('m-detail');openAssignGvpb(${s.id})">🧑‍⚖️ Phân công GVPB</button>`;
   extra += `<button class="btn btn-primary" onclick="closeModal('m-detail');openAssignHoiDong(${s.id})">🏛️ Phân hội đồng</button>`;
-  if (s.baoCao) extra += `<button class="btn btn-primary" onclick="closeModal('m-detail');openNhanXetGvhd(${s.id})">📝 Nhận xét GVHD</button><button class="btn btn-primary" onclick="closeModal('m-detail');openNhanXetGvpb(${s.id})">📃 Nhận xét GVPB</button>`;
+  if (pnxPhieu(s,'gvhd')) extra += `<button class="btn btn-default" onclick="closeModal('m-detail');openNhanXetGvhd(${s.id})">📝 Xem phiếu nhận xét GVHD</button>`;
+  if (pnxPhieu(s,'gvpb')) extra += `<button class="btn btn-default" onclick="closeModal('m-detail');openNhanXetGvpb(${s.id})">📃 Xem phiếu nhận xét GVPB</button>`;
   if (ketLuan === 'Đủ điều kiện bảo vệ' && s.hoiDong) extra += `<button class="btn btn-primary" onclick="closeModal('m-detail');openDiem(${s.id})">🏆 Nhập điểm cuối</button>`;
   if (countDecisions(s)) extra += `<button class="btn btn-default" onclick="closeModal('m-detail');openDecision(${s.id})">📑 Xem quyết định</button>`;
   ft.innerHTML = `<button class="btn btn-default" data-close="m-detail">Đóng</button>${extra}`;
@@ -2581,107 +2503,11 @@ function _doSaveAssignHoiDong(hoiDong){
   render();
 }
 
-/* ════════ MODAL: NHẬN XÉT & KẾT LUẬN BẢO VỆ — GVHD và GVPB chấm độc lập, không xem được nhận xét/điểm của nhau ════════ */
+/* ════════ PHIẾU NHẬN XÉT GVHD, GVPB (CR-20261109-002) — Khoa, PĐT chỉ xem phiếu đã nộp ════════ */
 const CURRENT_USER = 'TS. Trần Văn Bình (Khoa)';
-let _nxTargetId = null;
-let _nxFiles = {gvhd:null, gvpb:null};
-const NX_TEMPLATE_FILE = {gvhd:'Mau_PhieuNhanXet_GVHD.docx', gvpb:'Mau_PhieuNhanXet_GVPB.docx'};
-function downloadNxTemplate(who){
-  showToast(`Đang tải xuống file mẫu ${NX_TEMPLATE_FILE[who]} (mô phỏng).`, 'ok');
-}
-function onNxFileSelect(input, who){
-  if (input.files && input.files[0]) {
-    _nxFiles[who] = input.files[0].name;
-    document.getElementById(`nx-${who}-file-name`).textContent = '📎 ' + _nxFiles[who];
-    document.getElementById(`nx-${who}-file-name`).style.color = 'var(--primary)';
-    document.getElementById(`nx-${who}-file-clear`).style.display = '';
-  }
-}
-function clearNxFile(who){
-  _nxFiles[who] = null;
-  document.getElementById(`nx-${who}-file-input`).value = '';
-  document.getElementById(`nx-${who}-file-name`).textContent = 'Chưa có file';
-  document.getElementById(`nx-${who}-file-name`).style.color = 'var(--text-2)';
-  document.getElementById(`nx-${who}-file-clear`).style.display = 'none';
-}
-function _nxLoadFile(who, s){
-  const nx = who === 'gvhd' ? s.nxGVHD : s.nxGVPB;
-  _nxFiles[who] = (nx && nx.file) || null;
-  document.getElementById(`nx-${who}-file-input`).value = '';
-  document.getElementById(`nx-${who}-file-name`).textContent = _nxFiles[who] ? '📎 ' + _nxFiles[who] : 'Chưa có file';
-  document.getElementById(`nx-${who}-file-name`).style.color = _nxFiles[who] ? 'var(--primary)' : 'var(--text-2)';
-  document.getElementById(`nx-${who}-file-clear`).style.display = _nxFiles[who] ? '' : 'none';
-}
-function _nxAppendSystemGate(s, today){
-  if (!s.nxGVHD) return s.history;
-  const passGate = s.nxGVHD.ketLuan === 'Đồng ý';
-  return [...s.history, {time:today, actor:'Hệ thống', action: passGate ? 'Đủ điều kiện bảo vệ' : 'Không đủ điều kiện bảo vệ', result: passGate ? 'GVHD đồng ý cho bảo vệ' : 'GVHD không đồng ý cho bảo vệ', dot: passGate?'ok':'err'}];
-}
-function openNhanXetGvhd(id){
-  const s = students.find(x => x.id === id);
-  _nxTargetId = id;
-  document.getElementById('nx-gvhd-ketluan').value = s.nxGVHD ? s.nxGVHD.ketLuan : '';
-  document.getElementById('nx-gvhd-ghichu').value = (s.nxGVHD && s.nxGVHD.ghiChu) || '';
-  _nxLoadFile('gvhd', s);
-  document.getElementById('nx-gvhd-err').style.display = 'none';
-  openModal('m-nhanxet-gvhd');
-}
-function saveNhanXetGvhd(){
-  const ketLuan = document.getElementById('nx-gvhd-ketluan').value;
-  const ghiChu = document.getElementById('nx-gvhd-ghichu').value.trim();
-  const errEl = document.getElementById('nx-gvhd-err');
-  if (!ketLuan || !_nxFiles.gvhd) { errEl.style.display = ''; return; }
-  errEl.style.display = 'none';
-  const today = new Date().toLocaleDateString('vi');
-  students = students.map(s => {
-    if (s.id !== _nxTargetId) return s;
-    const next = { ...s, nxGVHD: {...(s.nxGVHD||{}), ketLuan, ngay:today, file:_nxFiles.gvhd, ghiChu} };
-    next.history = [...s.history, {time:today, actor:CURRENT_USER, action:'Nhận xét & kết luận của GVHD', result:`${ketLuan} cho bảo vệ`, dot: ketLuan==='Đồng ý'?'ok':'err'}];
-    next.history = _nxAppendSystemGate(next, today);
-    // GVHD không đồng ý cho bảo vệ → tự động chuyển Kết luận thành "Không đạt",
-    // chặn phân GVPB/Hội đồng (xem openAssignGvpb/openAssignHoiDong), dòng bị xám (xem renderTable).
-    if (ketLuan === 'Không đồng ý') {
-      if (s.conclusion !== 'khongdat') next.khongDatDoGvhd = true;
-      next.conclusion = 'khongdat';
-      next.history = [...next.history, {time:today, actor:'Hệ thống', action:'Tự động cập nhật Kết luận', result:'GVHD không đồng ý cho bảo vệ → Kết luận: Không đạt', dot:'err'}];
-    } else if (s.khongDatDoGvhd) {
-      // CR-20261106-003: GVHD đổi sang Đồng ý thì tự bỏ Không đạt do GVHD không đồng ý trước đó
-      next.conclusion = null;
-      next.khongDatDoGvhd = false;
-      next.history = [...next.history, {time:today, actor:'Hệ thống', action:'Tự động cập nhật Kết luận', result:'GVHD đồng ý cho bảo vệ → Bỏ Kết luận Không đạt', dot:'ok'}];
-    }
-    return next;
-  });
-  closeModal('m-nhanxet-gvhd');
-  showToast('Đã lưu nhận xét & kết luận của GVHD');
-  render();
-}
-function openNhanXetGvpb(id){
-  const s = students.find(x => x.id === id);
-  _nxTargetId = id;
-  document.getElementById('nx-gvpb-ketluan').value = s.nxGVPB ? s.nxGVPB.ketLuan : '';
-  document.getElementById('nx-gvpb-ghichu').value = (s.nxGVPB && s.nxGVPB.ghiChu) || '';
-  _nxLoadFile('gvpb', s);
-  document.getElementById('nx-gvpb-err').style.display = 'none';
-  openModal('m-nhanxet-gvpb');
-}
-function saveNhanXetGvpb(){
-  const ketLuan = document.getElementById('nx-gvpb-ketluan').value;
-  const ghiChu = document.getElementById('nx-gvpb-ghichu').value.trim();
-  const errEl = document.getElementById('nx-gvpb-err');
-  if (!ketLuan || !_nxFiles.gvpb) { errEl.style.display = ''; return; }
-  errEl.style.display = 'none';
-  const today = new Date().toLocaleDateString('vi');
-  students = students.map(s => {
-    if (s.id !== _nxTargetId) return s;
-    const next = { ...s, nxGVPB: {...(s.nxGVPB||{}), ketLuan, ngay:today, file:_nxFiles.gvpb, ghiChu} };
-    next.history = [...s.history, {time:today, actor:CURRENT_USER, action:'Nhận xét & kết luận của GVPB', result:`${ketLuan} cho bảo vệ`, dot: ketLuan==='Đồng ý'?'ok':'err'}];
-    return next;
-  });
-  closeModal('m-nhanxet-gvpb');
-  showToast('Đã lưu nhận xét & kết luận của GVPB');
-  render();
-}
+pnxChuanHoa(students);
+function openNhanXetGvhd(id){ const s = students.find(x => x.id === id); if (pnxPhieu(s, 'gvhd')) pnxMo({ s, who:'gvhd', mode:'view' }); }
+function openNhanXetGvpb(id){ const s = students.find(x => x.id === id); if (pnxPhieu(s, 'gvpb')) pnxMo({ s, who:'gvpb', mode:'view' }); }
 
 /* ════════ MODAL: CẬP NHẬT KẾT LUẬN BẢO VỆ THỦ CÔNG ════════ */
 let _kloTargetId = null;
@@ -2928,6 +2754,25 @@ function planTrangThaiPill(trangThai){
   if (trangThai === 'Từ chối') return '<span class="tag tag-error">⛔ Từ chối</span>';
   return '<span class="tag tag-warning">⏳ Chờ duyệt</span>';
 }
+/* CR-20261109-001: Thời gian Tiến độ ĐA/KLTN lấy theo Lớp học phần (mô phỏng), không ai sửa tay.
+   Đơn gia hạn đã duyệt (MH-GV-02 ghi crdakl_hoso cho SV mô phỏng B22DCCN001) thì ngày kết thúc lấy theo đơn. */
+const LHP_TG_DAKL = {
+  'DA-HK1-2025-2026': { from:'2026-03-02', to:'2026-06-14' },
+  'DA-HK2-2025-2026': { from:'2026-03-02', to:'2026-06-14' },
+  'KL-HK2-2025-2026': { from:'2026-03-02', to:'2026-06-14' },
+};
+function tgTienDo(s){
+  const l = LHP_TG_DAKL[s.dotId] || { from:'', to:'' };
+  if (!l.from || !l.to) return { from:'', to:'' };
+  let hs = {};
+  try { hs = JSON.parse(localStorage.getItem('crdakl_hoso')) || {}; } catch (e) {}
+  const h = s.maSV === 'B22DCCN001' ? hs[s.dotId] : null;
+  return { from:l.from, to:(h && h.ngayKt) ? h.ngayKt : l.to };
+}
+function tgTienDoCell(s){
+  const t = tgTienDo(s);
+  return t.from ? `${fmtDateVN(t.from)} — ${fmtDateVN(t.to)}` : '<span style="color:var(--text-3)">—</span>';
+}
 function fmtDateVN(iso){
   if (!iso) return '';
   const [y,m,d] = iso.split('-');
@@ -2952,7 +2797,7 @@ function openDeCuongInfo(id){
     ['Tên đề tài', s.topic.name],
     ['Số lượng sinh viên', `${slDaDuyet} / ${s.topic.qty}`],
     ['Phân công nhiệm vụ', huongNghienCuuCell],
-    ['Thời gian thực hiện', (dc.tgFrom && dc.tgTo) ? `${fmtDateVN(dc.tgFrom)} — ${fmtDateVN(dc.tgTo)}` : '<span style="color:var(--text-3)">—</span>'],
+    ['Thời gian thực hiện', tgTienDoCell(s)],
     ['File đề cương', dc.file ? `<a href="#" onclick="return false" title="Xem/tải file đề cương">📎 ${dc.file}</a>` : '<span style="color:var(--text-3)">Chưa nộp</span>'],
   ];
   document.getElementById('dci-topic-body').innerHTML = topicRows.map(([l,v]) => `<tr><th style="width:170px">${l}</th><td>${v}</td></tr>`).join('');

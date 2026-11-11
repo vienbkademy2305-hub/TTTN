@@ -1,0 +1,286 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Cấu hình phiếu chấm | Phòng Đào tạo</title>
+  <link rel="stylesheet" href="_styles.css">
+  <style>
+    .icon-btn:disabled{opacity:.35;cursor:not-allowed}
+    .icon-btn:disabled:hover{background:transparent;border-color:transparent}
+    .grid2{display:grid;grid-template-columns:1fr 1fr;gap:0 16px}
+    .grid3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:0 16px}
+    .sec{font-weight:600;font-size:13px;margin:16px 0 8px;padding-bottom:6px;border-bottom:1px solid var(--border)}
+    .tc-tbl td{vertical-align:middle;padding:6px 8px}
+    .tc-tbl textarea{resize:vertical;min-height:34px}
+    .tc-stt{width:52px;text-align:center;padding:4px;display:inline-block}
+    .tc-tien-to{font-size:12px;color:var(--text-2);margin-right:2px}
+    .tc-cha textarea{font-weight:600}
+    .tong-ok{color:var(--success,#52c41a);font-weight:700}
+    .tong-lech{color:var(--warning,#faad14);font-weight:700}
+    .ma-chip{font-family:monospace;font-size:12px;background:#f5f5f5;border:1px solid var(--border);border-radius:4px;padding:1px 6px;cursor:pointer}
+    .td-row{display:grid;grid-template-columns:1fr 1fr 32px;gap:8px;margin-bottom:6px;align-items:center}
+    .note{font-size:12px;color:var(--text-2);background:#f6f8ff;border:1px solid #d6e4ff;border-radius:6px;padding:8px 12px;margin-bottom:14px}
+  </style>
+</head>
+<body>
+<div class="app">
+
+  <!-- ═══ SIDEBAR ═══ -->
+  <nav class="sidebar">
+    <div class="sb-logo">
+      <div class="sb-logo-icon">🎓</div>
+      <div><div class="sb-logo-text">HTQT Đại học</div><div class="text-muted text-sm">Phòng Đào tạo</div></div>
+    </div>
+    <div class="sb-user">
+      <div class="av" style="background:#1677ff">PĐT</div>
+      <div><div style="font-size:13px;font-weight:600">Nguyễn Thị Lan</div><span class="tag tag-blue" style="font-size:11px">Phòng Đào tạo</span></div>
+    </div>
+    <ul class="sb-menu">
+      <li><a href="MH-PDT-00_Dashboard.html">🏠&nbsp; Trang chủ</a></li>
+      <li>
+        <span class="mn-group">📅&nbsp; Quản lý đợt &nbsp;▾</span>
+        <ul class="sb-sub open">
+          <li><a href="MH-PDT-01_InternshipRound.html">Danh sách đợt</a></li>
+          <li><a href="MH-PDT-05_StudentEligibility.html">DS Xét điều kiện</a></li>
+        </ul>
+      </li>
+      <li>
+        <span class="mn-group">📋&nbsp; Đề tài &nbsp;▾</span>
+        <ul class="sb-sub open">
+          <li><a href="MH-PDT-08_StudentTopicApproval.html">DS nguyện vọng đề tài</a></li>
+          <li><a href="MH-KCM-03_TopicApproval.html">Xét duyệt đề tài GV</a></li>
+        </ul>
+      </li>
+      <li class="active">
+        <span class="mn-group">👨‍🏫&nbsp; Hướng dẫn &nbsp;▾</span>
+        <ul class="sb-sub open">
+          <li><a href="MH-PDT-10_GraduationProjectManagement.html">Quản lý ĐATN &amp; KLTN</a></li>
+          <li><a href="MH-TTTN-01_InternshipManagement.html">QL DS thực tập</a></li>
+          <li><a href="MH-GV-02_ChangeRequestApproval.html">Quản lý yêu cầu thay đổi</a></li>
+          <li class="active"><a href="MH-PDT-12_ScoreSheetConfig.html">Cấu hình phiếu chấm</a></li>
+        </ul>
+      </li>
+      <li>
+        <span class="mn-group">⚖️&nbsp; Hội đồng &nbsp;▾</span>
+        <ul class="sb-sub open">
+          <li><a href="MH-PDT-07_CouncilManagement.html">Quản lý hội đồng</a></li>
+          <li><a href="MH-PDT-09_DecisionTemplateManagement.html">Mẫu quyết định</a></li>
+        </ul>
+      </li>
+    </ul>
+  </nav>
+
+  <!-- ═══ MAIN ═══ -->
+  <div class="main">
+    <header class="app-header">
+      <span class="h-breadcrumb">Hướng dẫn &gt; Cấu hình phiếu chấm</span>
+      <div class="h-right">
+        <div class="bw"><button class="btn btn-link" style="font-size:18px">🔔</button><span class="bc">3</span></div>
+        <div class="av" style="background:#1677ff">PĐT</div>
+      </div>
+    </header>
+
+    <main class="content">
+      <div class="card">
+        <div class="note">Mỗi loại hội đồng chỉ có <b>1 mẫu Đang dùng</b>. Bật mẫu mới thì mẫu cũ cùng loại tự chuyển Ngừng dùng. Hội đồng chấm theo mẫu đang dùng; mẫu được chốt cho hội đồng ở lần lưu điểm đầu tiên. Loại hội đồng chưa có mẫu đang dùng thì thành viên nhập 1 ô điểm. ( bỏ khi dev)</div>
+        <div class="filter-bar">
+          <div class="input-search" style="width:260px">
+            <input type="text" class="fc" id="q" placeholder="Tìm mã, tên mẫu..." oninput="render()">
+          </div>
+          <select class="fc" style="width:190px" id="f-loai" onchange="render()">
+            <option value="">Tất cả loại hội đồng</option>
+            <option value="danhgia">Hội đồng Đánh giá</option>
+            <option value="chamdiem">Hội đồng Chấm điểm</option>
+            <option value="phanbien">Hội đồng Phản biện</option>
+          </select>
+          <select class="fc" style="width:150px" id="f-tt" onchange="render()">
+            <option value="">Tất cả trạng thái</option>
+            <option value="dung">Đang dùng</option>
+            <option value="ngung">Ngừng dùng</option>
+          </select>
+          <div style="margin-left:auto"><button class="btn btn-primary" onclick="openMau()">＋ Thêm mẫu phiếu chấm</button></div>
+        </div>
+        <div class="tbl-wrap">
+          <table class="tbl">
+            <thead><tr>
+              <th style="width:50px">STT</th><th style="width:140px">Mã mẫu</th><th>Tên mẫu</th>
+              <th style="width:170px">Loại hội đồng</th><th style="width:90px;text-align:center">Số tiêu chí</th><th style="width:120px">Trạng thái</th>
+              <th style="width:100px">Cập nhật</th><th style="width:130px">Thao tác</th>
+            </tr></thead>
+            <tbody id="tbody"></tbody>
+          </table>
+        </div>
+      </div>
+    </main>
+  </div>
+</div>
+
+<!-- ═══ MODAL: THÊM / SỬA MẪU PHIẾU CHẤM ═══ -->
+<div class="overlay hidden" id="m-mau">
+  <div class="modal-box w960" style="max-height:92vh">
+    <div class="modal-hd"><span class="modal-title" id="mm-title">Thêm mẫu phiếu chấm</span><button class="modal-close" data-close="m-mau">✕</button></div>
+    <div class="modal-bd" style="overflow-y:auto">
+      <div class="note" id="mm-lock" style="display:none">🔒 Mẫu này đã có hội đồng chấm theo nên không sửa được. Muốn đổi, hãy tạo mẫu mới rồi bật mẫu mới.</div>
+      <div class="grid2">
+        <div class="fi"><label>Mã mẫu <span class="req">*</span></label><input class="fc" id="mm-ma" placeholder="VD: QT.ĐT.19.M17"></div>
+        <div class="fi"><label>Loại hội đồng <span class="req">*</span></label>
+          <select class="fc" id="mm-loai"><option value="danhgia">Hội đồng Đánh giá</option><option value="chamdiem">Hội đồng Chấm điểm</option><option value="phanbien" disabled>Hội đồng Phản biện (chưa có bố cục phiếu)</option></select></div>
+      </div>
+      <div class="fi"><label>Tên mẫu <span class="req">*</span></label><input class="fc" id="mm-ten" placeholder="VD: Phiếu chấm ĐA/KLTN của giảng viên chấm"></div>
+
+      <div class="sec">II. Đánh giá — bảng tiêu chí</div>
+      <table class="tbl tc-tbl">
+        <thead><tr><th style="width:130px">STT</th><th>Nội dung đánh giá <span class="req">*</span></th><th style="width:110px;text-align:center">Điểm tối đa <span class="req">*</span></th><th style="width:80px">Thao tác</th></tr></thead>
+        <tbody id="mm-tc"></tbody>
+      </table>
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-top:8px">
+        <button class="btn btn-default btn-sm" onclick="themTieuChi()">＋ Thêm tiêu chí</button>
+        <span style="font-size:13px">Tổng điểm tối đa: <span id="mm-tong"></span></span>
+      </div>
+
+    </div>
+    <div class="modal-ft">
+      <button class="btn btn-default" data-close="m-mau">Hủy</button>
+      <button class="btn btn-primary" id="mm-luu" onclick="luuMau()">Lưu</button>
+    </div>
+  </div>
+</div>
+
+<script src="_utils.js"></script>
+<script src="_phieu-cham.js"></script>
+<script>
+let dsMau = pchDsMau();
+let _sua = null;          // id mẫu đang sửa, null = thêm mới
+let _tc = [];             // tiêu chí đang soạn
+
+function render(){
+  const q = document.getElementById('q').value.trim().toLowerCase();
+  const loai = document.getElementById('f-loai').value, tt = document.getElementById('f-tt').value;
+  const daDung = pchDaDung();
+  const list = dsMau.filter(m => (!q || (m.ma + ' ' + m.ten).toLowerCase().includes(q)) && (!loai || m.loaiHD === loai) && (!tt || m.trangThai === tt));
+  document.getElementById('tbody').innerHTML = list.length ? list.map((m, i) => {
+    const khoa = daDung.includes(m.id);
+    return `<tr>
+      <td>${i + 1}</td><td style="font-family:monospace;font-size:12px">${pchEsc(m.ma)}</td>
+      <td><a href="#" onclick="openMau('${m.id}');return false" style="font-weight:600">${pchEsc(m.ten)}</a>${khoa ? ' <span title="Đã có hội đồng chấm theo mẫu này">🔒</span>' : ''}</td>
+      <td>${PCH_LOAI_HD[m.loaiHD]}</td><td style="text-align:center">${pchLa(m).length}</td>
+      <td>${m.trangThai === 'dung' ? '<span class="tag tag-success">Đang dùng</span>' : '<span class="tag">Ngừng dùng</span>'}</td>
+      <td style="font-size:12px;color:var(--text-2)">${pchEsc(m.capNhat)}</td>
+      <td class="tbl-actions">
+        <button class="icon-btn" title="${khoa ? 'Xem (đã có hội đồng chấm, không sửa được)' : 'Sửa'}" onclick="openMau('${m.id}')">${khoa ? '👁' : '✏️'}</button>
+        <button class="icon-btn" title="${m.trangThai === 'dung' ? 'Tắt (chuyển Ngừng dùng)' : 'Bật (chuyển Đang dùng)'}" onclick="doiTrangThai('${m.id}')">${m.trangThai === 'dung' ? '⏸' : '▶️'}</button>
+        <button class="icon-btn" title="Nhân bản thành mẫu mới" onclick="nhanBan('${m.id}')">📄</button>
+      </td></tr>`;
+  }).join('') : '<tr><td colspan="8" class="tbl-empty">Chưa có mẫu phiếu chấm.</td></tr>';
+}
+
+function luuDs(){ pchLuuDsMau(dsMau); render(); }
+function homNay(){ return new Date().toLocaleDateString('vi', {day:'2-digit', month:'2-digit', year:'numeric'}); }
+
+/* Bật mẫu: mẫu đang dùng khác cùng loại hội đồng tự chuyển Ngừng dùng */
+function doiTrangThai(id){
+  const m = dsMau.find(x => x.id === id);
+  if (m.trangThai === 'dung') {
+    showConfirm(`Tắt mẫu ${m.ma}? Hội đồng ${PCH_LOAI_HD[m.loaiHD]} chưa chấm sẽ nhập 1 ô điểm cho đến khi có mẫu đang dùng.`, () => {
+      m.trangThai = 'ngung'; m.capNhat = homNay(); luuDs(); showToast(`Đã tắt mẫu ${m.ma}`);
+    }, 'Tắt');
+    return;
+  }
+  const cu = dsMau.find(x => x.id !== id && x.loaiHD === m.loaiHD && x.trangThai === 'dung');
+  showConfirm(cu ? `Bật mẫu ${m.ma}? Mẫu ${cu.ma} đang dùng cho ${PCH_LOAI_HD[m.loaiHD]} sẽ chuyển Ngừng dùng.` : `Bật mẫu ${m.ma} cho ${PCH_LOAI_HD[m.loaiHD]}?`, () => {
+    if (cu) { cu.trangThai = 'ngung'; cu.capNhat = homNay(); }
+    m.trangThai = 'dung'; m.capNhat = homNay(); luuDs(); showToast(`Đã bật mẫu ${m.ma}`);
+  }, 'Bật');
+}
+
+function nhanBan(id){
+  const m = dsMau.find(x => x.id === id);
+  const moi = JSON.parse(JSON.stringify(m));
+  moi.id = 'pch-' + Date.now(); moi.ma = m.ma + ' (bản sao)'; moi.trangThai = 'ngung'; moi.capNhat = homNay();
+  dsMau.unshift(moi); luuDs(); openMau(moi.id);
+  showToast('Đã nhân bản mẫu, trạng thái Ngừng dùng. Sửa xong bấm Bật để áp dụng.');
+}
+
+/* ── Popup thêm / sửa ── */
+function openMau(id){
+  _sua = id || null;
+  const m = id ? dsMau.find(x => x.id === id) : {
+    ma:'', ten:'', loaiHD:'danhgia', tieuChi:[{nd:'', max:''}] };
+  const khoa = !!id && pchDaDung().includes(id);
+  document.getElementById('mm-title').textContent = !id ? 'Thêm mẫu phiếu chấm' : khoa ? 'Xem mẫu phiếu chấm' : 'Sửa mẫu phiếu chấm';
+  document.getElementById('mm-lock').style.display = khoa ? '' : 'none';
+  document.getElementById('mm-luu').style.display = khoa ? 'none' : '';
+  const set = (i, v) => document.getElementById(i).value = v;
+  set('mm-ma', m.ma); set('mm-ten', m.ten); set('mm-loai', m.loaiHD);
+  _tc = JSON.parse(JSON.stringify(m.tieuChi));
+  veTieuChi();
+  document.querySelectorAll('#m-mau .modal-bd input, #m-mau .modal-bd select, #m-mau .modal-bd textarea').forEach(el => { if (khoa) el.setAttribute('disabled', ''); else el.removeAttribute('disabled'); });
+  document.querySelectorAll('#m-mau .modal-bd button').forEach(b => b.style.display = khoa ? 'none' : '');
+  openModal('m-mau');
+}
+/* Bảng tiêu chí nhiều cấp (tối đa PCH_SO_CAP cấp). Đường dẫn dòng: "0", "0.1", "0.1.2" (chỉ số trong từng cấp) */
+function nutTai(duong){ const ps = duong.split('.').map(Number); let ds = _tc, t = null; ps.forEach((i, k) => { t = ds[i]; if (k < ps.length - 1) ds = t.con; }); return t; }
+function anhEm(duong){ const ps = duong.split('.').map(Number); ps.pop(); let ds = _tc; ps.forEach(i => { ds = ds[i].con; }); return ds; }
+function veDong(ds, tienTo, duongCha, cap){
+  return ds.map((t, i) => {
+    const duong = duongCha === '' ? String(i) : duongCha + '.' + i;
+    const stt = (tienTo ? tienTo + '.' : '') + (i + 1);
+    const coCon = !!(t.con && t.con.length);
+    return `<tr class="${coCon ? 'tc-cha' : ''}">
+    <td style="white-space:nowrap;padding-left:${8 + (cap - 1) * 18}px">${tienTo ? `<span class="tc-tien-to">${tienTo}.</span>` : ''}<input type="number" class="fc tc-stt" min="1" max="${ds.length}" step="1" value="${i + 1}" title="Nhập số thứ tự mới để đổi vị trí trong cùng cấp" onchange="doiSTT('${duong}', this.value)"></td>
+    <td style="padding-left:${8 + (cap - 1) * 18}px"><textarea class="fc" rows="1" placeholder="${cap > 1 ? 'Tiêu chí con ' + stt : 'Tiêu chí ' + stt}" oninput="nutTai('${duong}').nd=this.value">${pchEsc(t.nd)}</textarea></td>
+    <td style="text-align:center">${coCon
+      ? `<b title="Tự cộng từ tiêu chí con">${pchSo(pchMaxNut(t))}</b>`
+      : `<input type="number" class="fc" min="0" max="10" step="0.1" value="${t.max}" oninput="nutTai('${duong}').max=this.value===''?'':+this.value;veTong()" onchange="veTieuChi()" style="text-align:center">`}</td>
+    <td style="white-space:nowrap">${cap < PCH_SO_CAP ? `<button class="icon-btn" title="Thêm tiêu chí con" onclick="themCon('${duong}')">＋</button>` : ''}<button class="icon-btn" title="Xóa" onclick="xoaTC('${duong}')" ${cap === 1 && _tc.length === 1 ? 'disabled' : ''}>🗑</button></td>
+  </tr>` + (coCon ? veDong(t.con, stt, duong, cap + 1) : '');
+  }).join('');
+}
+function veTieuChi(){
+  document.getElementById('mm-tc').innerHTML = veDong(_tc, '', '', 1);
+  veTong();
+}
+function veTong(){
+  const tong = Math.round(_tc.reduce((a, t) => a + pchMaxNut(t), 0) * 10) / 10;
+  const el = document.getElementById('mm-tong');
+  el.textContent = pchSo(tong) + (tong === 10 ? ' ✓' : ' (khác 10)');
+  el.className = tong === 10 ? 'tong-ok' : 'tong-lech';
+}
+function themTieuChi(){ _tc.push({nd:'', max:''}); veTieuChi(); }
+/* Thêm tiêu chí con: tiêu chí cha không còn nhập điểm tối đa, tự cộng từ con */
+function themCon(duong){ const t = nutTai(duong); t.con = t.con || []; t.con.push({nd:'', max:''}); delete t.max; veTieuChi(); }
+function xoaTC(duong){
+  const ds = anhEm(duong), i = +duong.split('.').pop(), t = ds[i];
+  const lam = () => { ds.splice(i, 1); veTieuChi(); };
+  if (t.con && t.con.length) showConfirm(`Xóa tiêu chí này cùng ${t.con.length} tiêu chí con?`, lam, 'Xóa', 'btn-danger');
+  else lam();
+}
+/* Cột STT nhập được: đổi số thứ tự thì tiêu chí (kèm tiêu chí con) chuyển đến vị trí mới trong cùng cấp */
+function doiSTT(duong, v){
+  const ds = anhEm(duong), i = +duong.split('.').pop();
+  const j = Math.min(Math.max(parseInt(v, 10) || i + 1, 1), ds.length) - 1;
+  if (j !== i) { const [t] = ds.splice(i, 1); ds.splice(j, 0, t); }
+  veTieuChi();
+}
+function chuanTC(ds){ return ds.map(t => (t.con && t.con.length) ? { nd:String(t.nd).trim(), con:chuanTC(t.con) } : { nd:String(t.nd).trim(), max:+t.max }); }
+function tcHopLe(ds){ return ds.every(t => t.nd && ((t.con && t.con.length) ? tcHopLe(t.con) : t.max > 0)); }
+function docForm(nhap){
+  const v = i => document.getElementById(i).value.trim();
+  return { ma:v('mm-ma'), ten:v('mm-ten'), loaiHD:v('mm-loai'),
+    tieuChi:chuanTC(_tc) };
+}
+function luuMau(){
+  const f = docForm();
+  if (!f.ma || !f.ten) { showToast('Vui lòng nhập đủ các ô bắt buộc (*).', 'err'); return; }
+  if (!tcHopLe(f.tieuChi)) { showToast('Mỗi tiêu chí cần có nội dung và điểm tối đa lớn hơn 0.', 'err'); return; }
+  if (dsMau.some(m => m.id !== _sua && m.ma === f.ma)) { showToast(`Mã mẫu ${f.ma} đã tồn tại.`, 'err'); return; }
+  if (_sua) Object.assign(dsMau.find(x => x.id === _sua), f, { capNhat: homNay() });
+  else dsMau.unshift({ id:'pch-' + Date.now(), ...f, trangThai:'ngung', capNhat: homNay() });
+  closeModal('m-mau'); luuDs();
+  showToast(_sua ? `Đã lưu mẫu ${f.ma}` : `Đã thêm mẫu ${f.ma} (Ngừng dùng). Bấm Bật để áp dụng.`);
+}
+render();
+</script>
+</body>
+</html>

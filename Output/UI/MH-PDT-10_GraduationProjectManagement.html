@@ -252,6 +252,7 @@
             <option value="">Tất cả đồng bộ điểm</option>
             <option value="dong">Đã đồng bộ</option>
             <option value="chua">Chưa đồng bộ</option>
+            <option value="loi">Lỗi đồng bộ</option>
           </select>
           <button class="btn btn-default" onclick="resetFilter()">🔄 Reset</button>
           <div class="colvis-wrap">
@@ -1693,7 +1694,7 @@ function render(){
     const matchStatus = !fstatus || s.status === fstatus;
     const matchHoSo = !fhoso || HOSO_CHECK[fhoso](s);
     const matchKetLuanHd = !fketluanhd || (fketluanhd === '_empty' ? !s.conclusion : s.conclusion === fketluanhd);
-    const matchDongBo = !fdongbo || (fdongbo === 'dong' ? s.dongBoDiem === 'Đã đồng bộ' : s.dongBoDiem !== 'Đã đồng bộ');
+    const matchDongBo = !fdongbo || (fdongbo === 'dong' ? s.dongBoDiem === 'Đã đồng bộ' : fdongbo === 'loi' ? (s.dongBoDiem === 'Lỗi đồng bộ' || s.dongBoDiem === 'Đã khóa') : (s.dongBoDiem !== 'Đã đồng bộ' && !(s.dongBoDiem === 'Lỗi đồng bộ' || s.dongBoDiem === 'Đã khóa')));
     return matchQ && matchDot && matchLoai && matchDonVi && matchGv && matchStatus && matchHoSo && matchKetLuanHd && matchDongBo;
   });
 
@@ -1747,6 +1748,10 @@ function render(){
       : `<span style="color:var(--text-3);font-size:12px">— Chưa kết luận —</span>`;
     const dongBoCell = s.diemTongKet != null && s.dongBoDiem === 'Đã đồng bộ'
       ? `<span style="font-size:12px" title="Đã đồng bộ ${s.dongBoNgay||''}">Đã đồng bộ</span>`
+      : s.dongBoDiem === 'Đã khóa'
+      ? `<span style="color:var(--error);font-size:12px;cursor:help" title="${s.dongBoLoi||'Lớp học phần đã khóa điểm'}">🔒 Đã khóa</span>`
+      : s.dongBoDiem === 'Lỗi đồng bộ'
+      ? `<span style="color:var(--error);font-size:12px;cursor:help" title="${s.dongBoLoi||'Lỗi đồng bộ'}">⚠ Lỗi đồng bộ</span>`
       : `<span style="color:var(--text-3);font-size:12px">Chưa đồng bộ</span>`;
     const ghiChuHoiDongCell = (s.hoiDong && s.hoiDong.completeNote)
       ? `<span style="font-size:12px;color:var(--text-2)">${s.hoiDong.completeNote}</span>`

@@ -551,6 +551,22 @@
 <!-- ════════════════════════════════════════
      MODAL: CHẤM ĐIỂM HÀNG LOẠT
 ════════════════════════════════════════ -->
+<!-- ════════════════════════════════════════
+     MODAL: CHẶN HOÀN THÀNH HỘI ĐỒNG (CR-20261111-001)
+════════════════════════════════════════ -->
+<div class="overlay hidden" id="modal-chanht">
+  <div class="modal-box w650">
+    <div class="modal-hd">
+      <span class="modal-title">⚠️ Chưa thể hoàn thành hội đồng</span>
+      <button class="modal-close" data-close="modal-chanht">✕</button>
+    </div>
+    <div class="modal-bd" style="overflow-y:auto;max-height:70vh" id="chanht-bd"></div>
+    <div class="modal-ft">
+      <button class="btn btn-primary" data-close="modal-chanht">Đóng</button>
+    </div>
+  </div>
+</div>
+
 <div class="overlay hidden" id="modal-bulkscore">
   <div class="modal-box w520">
     <div class="modal-hd">
@@ -839,7 +855,7 @@ const STATUS_CFG = {
   cancelled: { label:'Đã hủy',     cls:'tag-default' }
 };
 /* Vai trò "tk" (Thư ký) chỉ ghi biên bản, không chấm điểm */
-function isScoringRole(role) { return role !== 'tk'; }
+function isScoringRole(role, c) { return role !== 'tk' || (!!c && c.type === 'danhgia'); } // Thư ký Hội đồng Đánh giá chấm như thành viên (CR-20261110-001)
 const CONCLUSION_CFG = {
   dat       : { label:'Đạt',                       cls:'cl-dat'      },
   khongdat  : { label:'Không đạt',                  cls:'cl-khongdat' },
@@ -1033,6 +1049,18 @@ const COUNCILS = [
 
 /* ── State ────────────────────────────────────────────────── */
 let currentCouncilId = COUNCILS[0].id;
+(function () {
+  const hd = COUNCILS.find(c => c.code === 'HD-2026-016');
+  if (!hd) return;
+  hd.students.forEach(sv => { if (!sv.scores) sv.scores = {}; });
+  // CR-20261111-001 demo: GV chấm 1 = 8,5, GV chấm 2 = 6,5 → lệch đúng 2,0 (bị chặn)
+  hd.students[0].scores['TS. Phạm Quốc Hùng'] = { score: 8.5, comment: 'Quyển trình bày tốt.' };
+  hd.students[0].scores['TS. Lê Đức Thọ']     = { score: 6.5, comment: 'Còn thiếu phần đánh giá kết quả.' };
+  // Sinh viên 2 mới có GV chấm 1 → thiếu điểm GV chấm 2
+  if (hd.students[1]) hd.students[1].scores['TS. Phạm Quốc Hùng'] = { score: 7.5, comment: 'Đạt yêu cầu.' };
+  // CR-20261111-002 demo: SV 2 chưa có điểm GVHD (thiếu đầu điểm); lớp học phần của SV 2 đã khóa điểm (→ Đã khóa)
+  if (hd.students[1]) { hd.students[1].diemGVHD = null; hd.students[1].lhpKhoaDiem = true; }
+})();
 let currentPersona   = '';
 /* GV_LOCK: khi truy cập từ màn "Hội đồng của tôi" (?gv=Tên GV), khóa cứng persona
    theo đúng GV đăng nhập, ẩn dropdown mô phỏng và toàn bộ thao tác quản lý hội đồng */
@@ -1105,14 +1133,14 @@ const closeButtonHtml = `<button class="btn btn-default btn-sm" onclick="cancelC
 
 /* ── Helpers ──────────────────────────────────────────────── */
 function council() { return COUNCILS.find(c => c.id === currentCouncilId); }
-function scoringMembers(c) { return c.members.filter(m => isScoringRole(m.role)); }
+function scoringMembers(c) { return c.members.filter(m => isScoringRole(m.role, c)); }
 /* Hội đồng "Chấm điểm" (type=chamdiem, chấm quyển): chỉ 2 vai trò Giảng viên chấm 1/2 (gvc1/gvc2) được chấm.
    GVHD không chấm ở đây (đã có điểm từ trước, xem gvhdFinalScore).
    Hội đồng "Đánh giá"/"Phản biện" (bảo vệ): mọi thành viên trừ Thư ký (xem isScoringRole) cùng chấm — mỗi
    người 1 điểm, lấy trung bình cộng ra Điểm hội đồng. GVHD/GVPB cũng không chấm ở đây. */
 function isOfficialScorer(m, c) { return c.type === 'chamdiem' ? (m.role === 'gvc1' || m.role === 'gvc2') : true; }
 /* Vai trò được phép mở modal Chấm điểm: loại chấm quyển chỉ gvc1/gvc2; loại khác thì mọi vai trò chấm được (trừ tk, xem isScoringRole) */
-function canScoreThisType(m, c) { return c.type === 'chamdiem' ? (m.role === 'gvc1' || m.role === 'gvc2') : isScoringRole(m.role); }
+function canScoreThisType(m, c) { return c.type === 'chamdiem' ? (m.role === 'gvc1' || m.role === 'gvc2') : isScoringRole(m.role, c); }
 function officialScoringMembers(c) { return scoringMembers(c).filter(m => isOfficialScorer(m, c)); }
 function avgScore(sv) {
   const vals = Object.values(sv.scores).map(s => s.score).filter(v => typeof v === 'number');
@@ -1784,7 +1812,95 @@ function setCpRowsVisible(editing) {
     renderCouncilInfo(council());
   }
 }
+/* ── CR-20261111-001: kiểm tra trước khi hoàn thành hội đồng ──
+   Chặn khi: sinh viên chưa đủ điểm của thành viên chấm, hoặc điểm (đã làm tròn) lệch từ 2 điểm trở lên.
+   Hội đồng Chấm điểm: so GV chấm 1, 2; Hội đồng Đánh giá: mọi thành viên chấm (gồm Thư ký). Phản biện: ngoài phạm vi. */
+const NGUONG_LECH = 2;
+const lamTron1 = v => Math.round(v * 10 + 1e-9) / 10;
+const fmtDiem = v => (+v).toFixed(1).replace('.', ',');
+/* Đầu điểm thành phần ngoài hội đồng (GVHD, GVPB) có trong cấu trúc lớp học phần nhưng chưa có điểm */
+function dauDiemThieu(sv) {
+  const ds = [];
+  if (sv.trongSoGVHD != null && sv.diemGVHD == null) ds.push('Điểm GVHD');
+  if (sv.trongSoGVPB != null && sv.diemGVPB == null) ds.push('Điểm phản biện');
+  return ds;
+}
+function tinhDiemCuoi(sv, c) {
+  const ds = officialScoringMembers(c).map(m => sv.scores && sv.scores[m.name] && sv.scores[m.name].score).filter(v => typeof v === 'number').map(lamTron1);
+  const hoiDong = ds.length ? lamTron1(ds.reduce((a, b) => a + b, 0) / ds.length) : null;
+  const parts = [[sv.trongSoGVHD, sv.diemGVHD], [sv.trongSoGVPB, sv.diemGVPB], [sv.trongSoHoiDong, hoiDong]].filter(x => x[0] != null);
+  const tong = parts.reduce((s, x) => s + x[0], 0);
+  const cuoi = tong && parts.every(x => x[1] != null) ? lamTron1(parts.reduce((s, x) => s + lamTron1(x[1]) * x[0], 0) / tong) : null;
+  return { hoiDong, cuoi };
+}
+/* ── CR-20261111-002 (US-DAKL-51): hoàn thành hội đồng thì tự tính điểm và đẩy về lớp học phần ── */
+function dayDiemVeLHP(c) {
+  const luc = new Date().toLocaleString('vi-VN');
+  let ok = 0, loi = 0;
+  c.students.forEach(sv => {
+    const kq = tinhDiemCuoi(sv, c);
+    sv.diemHoiDongLHP = kq.hoiDong; sv.diemCuoiLHP = kq.cuoi; sv.dongBoNgay = luc;
+    if (sv.lhpKhoaDiem) { sv.dongBo = 'Đã khóa'; sv.dongBoLyDo = 'Lớp học phần đã khóa điểm — cần phía Lớp học phần mở khóa mới đồng bộ lại được'; loi++; }
+    else { sv.dongBo = 'Đã đồng bộ'; sv.dongBoLyDo = ''; ok++; }
+  });
+  c.lichSuDayDiem = (c.lichSuDayDiem || []).concat([{ luc, nguoi: currentPersonaOrDefault ? currentPersonaOrDefault() : '', ok, loi }]);
+  return { ok, loi };
+}
+function thongBaoDayDiem(kq) {
+  // TB-02 (đề xuất, chờ duyệt)
+  showToast(`🏁 Đã hoàn thành hội đồng và đẩy điểm về lớp học phần cho ${kq.ok} sinh viên.` + (kq.loi ? ` ${kq.loi} sinh viên chưa đồng bộ được, xem cột Đồng bộ.` : ''), kq.loi ? 'warn' : 'ok');
+}
+function kiemTraHoanThanh(c) {
+  const thieu = [], lech = [], thieuDau = [];
+  if (c.type === 'phanbien') return { thieu, lech, thieuDau };
+  // CR-20261111-002 (US-DAKL-50): đầu điểm thành phần ngoài hội đồng (GVHD, GVPB…) phải có đủ
+  c.students.forEach(sv => { const ds = dauDiemThieu(sv); if (ds.length) thieuDau.push({ sv, ds }); });
+  const tv = officialScoringMembers(c);
+  c.students.forEach(sv => {
+    const sc = sv.scores || {};
+    const chua = tv.filter(m => !sc[m.name] || typeof sc[m.name].score !== 'number');
+    if (chua.length) { thieu.push({ sv, chua }); return; }
+    if (tv.length < 2) return;
+    const ds = tv.map(m => ({ m, d: lamTron1(sc[m.name].score) }));
+    const cao = ds.reduce((a, b) => b.d > a.d ? b : a), thap = ds.reduce((a, b) => b.d < a.d ? b : a);
+    const doLech = lamTron1(cao.d - thap.d);
+    if (doLech >= NGUONG_LECH - 1e-9) lech.push({ sv, cao, thap, doLech });
+  });
+  return { thieu, lech, thieuDau };
+}
+function tenTV(m) { return `${m.name} (${ROLE_LABEL[m.role] || m.role})`; }
+function hienThongBaoChan(kq) {
+  const svCell = sv => `<td style="white-space:nowrap">${sv.maSV}</td><td>${sv.tenSV}</td>`;
+  let h = '';
+  if (kq.lech.length) {
+    h += `<p style="margin:0 0 8px">Có <strong>${kq.lech.length}</strong> sinh viên có điểm giữa các thành viên lệch từ 2 điểm trở lên. Vui lòng kiểm tra và điều chỉnh điểm trước khi hoàn thành.</p>
+      <table class="sv-tbl" style="margin-bottom:16px"><thead><tr><th>Mã SV</th><th>Họ tên</th><th>Cao nhất</th><th>Thấp nhất</th><th style="text-align:center">Lệch</th></tr></thead><tbody>
+      ${kq.lech.map(x => `<tr>${svCell(x.sv)}<td><strong>${fmtDiem(x.cao.d)}</strong> — ${tenTV(x.cao.m)}</td><td><strong>${fmtDiem(x.thap.d)}</strong> — ${tenTV(x.thap.m)}</td><td style="text-align:center;color:var(--danger,#cf1322);font-weight:700">${fmtDiem(x.doLech)}</td></tr>`).join('')}
+      </tbody></table>`;
+  }
+  if (kq.thieu.length) {
+    h += `<p style="margin:0 0 8px">Có <strong>${kq.thieu.length}</strong> sinh viên chưa đủ điểm của các thành viên chấm.</p>
+      <table class="sv-tbl"><thead><tr><th>Mã SV</th><th>Họ tên</th><th>Chưa chấm</th></tr></thead><tbody>
+      ${kq.thieu.map(x => `<tr>${svCell(x.sv)}<td>${x.chua.map(tenTV).join('<br>')}</td></tr>`).join('')}
+      </tbody></table>`;
+  }
+  if (kq.thieuDau.length) {
+    h += `<p style="margin:${h ? '16px' : '0'} 0 8px">Có <strong>${kq.thieuDau.length}</strong> sinh viên chưa đủ đầu điểm thành phần.</p>
+      <table class="sv-tbl"><thead><tr><th>Mã SV</th><th>Họ tên</th><th>Lớp học phần</th><th>Thiếu</th></tr></thead><tbody>
+      ${kq.thieuDau.map(x => `<tr>${svCell(x.sv)}<td>${x.sv.lop || '—'}</td><td>${x.ds.join('<br>')}</td></tr>`).join('')}
+      </tbody></table>`;
+  }
+  document.getElementById('chanht-bd').innerHTML = h;
+  openModal('modal-chanht');
+}
+function duocHoanThanh(c) {
+  const kq = kiemTraHoanThanh(c);
+  if (!kq.thieu.length && !kq.lech.length && !kq.thieuDau.length) return true;
+  hienThongBaoChan(kq);
+  return false;
+}
 function openCompleteModal() {
+  if (!duocHoanThanh(council())) return;
   document.getElementById('cp-date').value = new Date().toISOString().slice(0,10);
   document.getElementById('cp-note').value = '';
   clearCpFile();
@@ -1808,15 +1924,17 @@ function clearCpFile() {
 }
 function submitComplete() {
   const c = council();
+  if (!duocHoanThanh(c)) return; // kiểm tra lại khi lưu (AC-09)
   c.status = 'completed';
   c.completedAt  = fmtDMY(document.getElementById('cp-date').value);
   c.completeNote = document.getElementById('cp-note').value.trim();
   const fileInput = document.getElementById('cp-file-input');
   if (fileInput.files && fileInput.files[0]) c.bienBanFile = fileInput.files[0].name;
+  const kqDay = dayDiemVeLHP(c);
   persistCouncilChange(c);
   setCpRowsVisible(false);
   renderAll();
-  showToast('🏁 Đã đánh dấu hội đồng hoàn thành.', 'ok');
+  thongBaoDayDiem(kqDay);
 }
 
 /* ── Xóa / Thu hồi / Hủy hội đồng (từ Section A) ──────────── */

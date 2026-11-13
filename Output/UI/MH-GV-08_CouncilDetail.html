@@ -293,6 +293,22 @@
 <!-- ════════════════════════════════════════
      MODAL: CHẤM ĐIỂM HÀNG LOẠT
 ════════════════════════════════════════ -->
+<!-- ════════════════════════════════════════
+     MODAL: CHẶN HOÀN THÀNH HỘI ĐỒNG (CR-20261111-001)
+════════════════════════════════════════ -->
+<div class="overlay hidden" id="modal-chanht">
+  <div class="modal-box w650">
+    <div class="modal-hd">
+      <span class="modal-title">⚠️ Chưa thể hoàn thành hội đồng</span>
+      <button class="modal-close" data-close="modal-chanht">✕</button>
+    </div>
+    <div class="modal-bd" style="overflow-y:auto;max-height:70vh" id="chanht-bd"></div>
+    <div class="modal-ft">
+      <button class="btn btn-primary" data-close="modal-chanht">Đóng</button>
+    </div>
+  </div>
+</div>
+
 <div class="overlay hidden" id="modal-bulkscore">
   <div class="modal-box w520">
     <div class="modal-hd">
@@ -777,6 +793,19 @@ const COUNCILS = [
     hd23.students[0].scores['TS. Phạm Quốc Hùng'] = { score: 8.0, comment: 'Quyển trình bày đúng quy định, cần bổ sung đánh giá thực nghiệm.',
       phieu: { mauId: m17.id, diem: [1.3, 3.7, 1.5, 1.5], tuDien: { vong_cham: '1' }, nhanXet: 'Quyển trình bày đúng quy định, cần bổ sung đánh giá thực nghiệm.', tong: 8.0 },
       nguoiNhap: 'TS. Phạm Quốc Hùng', ngayNhap: '19/06/2026 16:40' };
+    // CR-20261111-001 demo: GV chấm 2 cho 6,0 → lệch đúng 2,0 (bị chặn); SV thứ 2 mới có 1 GV chấm (thiếu điểm)
+    hd23.students[0].scores['TS. Lê Đức Thọ'] = { score: 6.0, comment: 'Quyển còn thiếu phần đánh giá kết quả.',
+      phieu: { mauId: m17.id, diem: [1.0, 2.8, 1.1, 1.1], tuDien: { vong_cham: '1' }, nhanXet: 'Quyển còn thiếu phần đánh giá kết quả.', tong: 6.0 },
+      nguoiNhap: 'TS. Lê Đức Thọ', ngayNhap: '19/06/2026 17:05' };
+    if (hd23.students[1]) hd23.students[1].scores['TS. Phạm Quốc Hùng'] = { score: 7.5, comment: 'Đạt yêu cầu.',
+      phieu: { mauId: m17.id, diem: [1.2, 3.5, 1.4, 1.4], tuDien: { vong_cham: '1' }, nhanXet: 'Đạt yêu cầu.', tong: 7.5 },
+      nguoiNhap: 'TS. Phạm Quốc Hùng', ngayNhap: '19/06/2026 16:50' };
+    // CR-20261111-002 demo: SV 2 thiếu đầu điểm "Báo cáo khóa luận"; lớp học phần của SV 2 đã khóa điểm (→ Đã khóa)
+    if (hd23.students[1]) {
+      const bc = (hd23.students[1].diemThanhPhan || []).find(d => !d.type && /Báo cáo/.test(d.ten));
+      if (bc) bc.diem = null;
+      hd23.students[1].lhpKhoaDiem = true;
+    }
   }
   // TS. Phạm Thu Hà đã tự chấm 1 sinh viên theo mẫu M16 — để Chủ tịch xem phiếu / chấm hộ thành viên khác
   const hd22 = COUNCILS.find(c => c.id === 22), m16 = pchDsMau().find(m => m.loaiHD === 'danhgia');
@@ -1537,7 +1566,91 @@ function setCpRowsVisible(editing) {
     renderCouncilInfo(council());
   }
 }
+/* ── CR-20261111-001: kiểm tra trước khi hoàn thành hội đồng ──
+   Chặn khi: sinh viên chưa đủ điểm của thành viên chấm, hoặc điểm (đã làm tròn) lệch từ 2 điểm trở lên.
+   Hội đồng Chấm điểm: so các GV chấm; Hội đồng Đánh giá: mọi thành viên chấm (gồm Thư ký). Phản biện: ngoài phạm vi. */
+const NGUONG_LECH = 2;
+/* Đầu điểm thành phần không thuộc hội đồng (không có type) mà chưa có điểm */
+function dauDiemThieu(sv) { return (sv.diemThanhPhan || []).filter(d => !d.type && (d.diem == null || d.diem === '')).map(d => d.ten); }
+/* Điểm hội đồng (TB điểm thành viên đã làm tròn) và điểm cuối Σ(đầu điểm × trọng số), làm tròn theo "Điểm thành phần" */
+function tinhDiemCuoi(sv, c) {
+  const tv = c.type === 'chamdiem' ? officialScoringMembers(c) : scoringMembers(c);
+  const ds = tv.map(m => sv.scores[m.name] && sv.scores[m.name].score).filter(v => typeof v === 'number').map(pchLamTron);
+  const hoiDong = ds.length ? pchLamTron(ds.reduce((a, b) => a + b, 0) / ds.length) : null;
+  const dp = sv.diemThanhPhan || [];
+  const tong = dp.reduce((s, d) => s + d.trongSo, 0);
+  const gt = d => d.type === 'hoidong' ? hoiDong : d.type === 'hoidong_gc' ? pchLamTron(resolveDiemThanhPhan(d, sv)) : pchLamTron(d.diem);
+  const cuoi = tong && dp.every(d => typeof gt(d) === 'number') ? pchLamTron(dp.reduce((s, d) => s + gt(d) * d.trongSo, 0) / tong) : null;
+  return { hoiDong, cuoi };
+}
+/* ── CR-20261111-002 (US-DAKL-51): hoàn thành hội đồng thì tự tính điểm và đẩy về lớp học phần ── */
+function dayDiemVeLHP(c) {
+  const luc = new Date().toLocaleString('vi-VN');
+  let ok = 0, loi = 0;
+  c.students.forEach(sv => {
+    const kq = tinhDiemCuoi(sv, c);
+    sv.diemHoiDongLHP = kq.hoiDong; sv.diemCuoiLHP = kq.cuoi; sv.dongBoNgay = luc;
+    if (sv.lhpKhoaDiem) { sv.dongBo = 'Đã khóa'; sv.dongBoLyDo = 'Lớp học phần đã khóa điểm — cần phía Lớp học phần mở khóa mới đồng bộ lại được'; loi++; }
+    else { sv.dongBo = 'Đã đồng bộ'; sv.dongBoLyDo = ''; ok++; }
+  });
+  c.lichSuDayDiem = (c.lichSuDayDiem || []).concat([{ luc, nguoi: currentPersonaOrDefault ? currentPersonaOrDefault() : '', ok, loi }]);
+  return { ok, loi };
+}
+function thongBaoDayDiem(kq) {
+  // TB-02 (đề xuất, chờ duyệt)
+  showToast(`🏁 Đã hoàn thành hội đồng và đẩy điểm về lớp học phần cho ${kq.ok} sinh viên.` + (kq.loi ? ` ${kq.loi} sinh viên chưa đồng bộ được, xem cột Đồng bộ.` : ''), kq.loi ? 'warn' : 'ok');
+}
+function kiemTraHoanThanh(c) {
+  const thieu = [], lech = [], thieuDau = [];
+  if (c.type === 'phanbien') return { thieu, lech, thieuDau };
+  // CR-20261111-002 (US-DAKL-50): đầu điểm thành phần ngoài hội đồng (GVHD, GVPB…) phải có đủ
+  c.students.forEach(sv => { const ds = dauDiemThieu(sv); if (ds.length) thieuDau.push({ sv, ds }); });
+  const tv = c.type === 'chamdiem' ? officialScoringMembers(c) : scoringMembers(c);
+  c.students.forEach(sv => {
+    const chua = tv.filter(m => !sv.scores[m.name] || typeof sv.scores[m.name].score !== 'number');
+    if (chua.length) { thieu.push({ sv, chua }); return; }
+    if (tv.length < 2) return;
+    const ds = tv.map(m => ({ m, d: pchLamTron(sv.scores[m.name].score) }));
+    const cao = ds.reduce((a, b) => b.d > a.d ? b : a), thap = ds.reduce((a, b) => b.d < a.d ? b : a);
+    const doLech = Math.round((cao.d - thap.d) * 1000) / 1000;
+    if (doLech >= NGUONG_LECH - 1e-9) lech.push({ sv, cao, thap, doLech });
+  });
+  return { thieu, lech, thieuDau };
+}
+function tenTV(m) { return `${m.name} (${ROLE_LABEL[m.role] || m.role})`; }
+function hienThongBaoChan(kq) {
+  const svCell = sv => `<td style="white-space:nowrap">${sv.maSV}</td><td>${sv.tenSV}</td>`;
+  let h = '';
+  if (kq.lech.length) {
+    h += `<p style="margin:0 0 8px">Có <strong>${kq.lech.length}</strong> sinh viên có điểm giữa các thành viên lệch từ 2 điểm trở lên. Vui lòng kiểm tra và điều chỉnh điểm trước khi hoàn thành.</p>
+      <table class="sv-tbl" style="margin-bottom:16px"><thead><tr><th>Mã SV</th><th>Họ tên</th><th>Cao nhất</th><th>Thấp nhất</th><th style="text-align:center">Lệch</th></tr></thead><tbody>
+      ${kq.lech.map(x => `<tr>${svCell(x.sv)}<td><strong>${pchDiem(x.cao.d)}</strong> — ${tenTV(x.cao.m)}</td><td><strong>${pchDiem(x.thap.d)}</strong> — ${tenTV(x.thap.m)}</td><td style="text-align:center;color:var(--danger,#cf1322);font-weight:700">${pchDiem(x.doLech)}</td></tr>`).join('')}
+      </tbody></table>`;
+  }
+  if (kq.thieu.length) {
+    h += `<p style="margin:0 0 8px">Có <strong>${kq.thieu.length}</strong> sinh viên chưa đủ điểm của các thành viên chấm.</p>
+      <table class="sv-tbl"><thead><tr><th>Mã SV</th><th>Họ tên</th><th>Chưa chấm</th></tr></thead><tbody>
+      ${kq.thieu.map(x => `<tr>${svCell(x.sv)}<td>${x.chua.map(tenTV).join('<br>')}</td></tr>`).join('')}
+      </tbody></table>`;
+  }
+  if (kq.thieuDau.length) {
+    h += `<p style="margin:${h ? '16px' : '0'} 0 8px">Có <strong>${kq.thieuDau.length}</strong> sinh viên chưa đủ đầu điểm thành phần.</p>
+      <table class="sv-tbl"><thead><tr><th>Mã SV</th><th>Họ tên</th><th>Lớp học phần</th><th>Thiếu</th></tr></thead><tbody>
+      ${kq.thieuDau.map(x => `<tr>${svCell(x.sv)}<td>${x.sv.lop || '—'}</td><td>${x.ds.join('<br>')}</td></tr>`).join('')}
+      </tbody></table>`;
+  }
+  document.getElementById('chanht-bd').innerHTML = h;
+  openModal('modal-chanht');
+}
+/* Trả về true nếu được hoàn thành; không thì hiện thông báo */
+function duocHoanThanh(c) {
+  const kq = kiemTraHoanThanh(c);
+  if (!kq.thieu.length && !kq.lech.length && !kq.thieuDau.length) return true;
+  hienThongBaoChan(kq);
+  return false;
+}
 function openCompleteModal() {
+  if (!duocHoanThanh(council())) return;
   document.getElementById('cp-date').value = new Date().toISOString().slice(0,10);
   document.getElementById('cp-note').value = '';
   clearCpFile();
@@ -1561,15 +1674,17 @@ function clearCpFile() {
 }
 function submitComplete() {
   const c = council();
+  if (!duocHoanThanh(c)) return; // kiểm tra lại khi lưu (AC-09)
   c.status = 'completed';
   c.completedAt  = fmtDMY(document.getElementById('cp-date').value);
   c.completeNote = document.getElementById('cp-note').value.trim();
   const fileInput = document.getElementById('cp-file-input');
   if (fileInput.files && fileInput.files[0]) c.bienBanFile = fileInput.files[0].name;
+  const kqDay = dayDiemVeLHP(c);
   persistCouncilChange(c);
   setCpRowsVisible(false);
   renderAll();
-  showToast('🏁 Đã đánh dấu hội đồng hoàn thành.', 'ok');
+  thongBaoDayDiem(kqDay);
 }
 
 /* ── Xuất danh sách sinh viên & điểm ─────────────────────── */

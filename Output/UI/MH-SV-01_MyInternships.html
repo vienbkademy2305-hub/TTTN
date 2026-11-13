@@ -4123,5 +4123,371 @@ function toast(msg, type = 'success') {
 })();
 </script>
 <!-- CRDAKL-END -->
+<!-- CRNBC-START -->
+<!-- ═══════════════════════════════════════════════════════════════════════
+     CR-20261113-002 — SV "Đạt nhưng cần chỉnh sửa" nộp lại báo cáo (Bản giải trình sửa chữa ĐA/KLTN)
+       - Cột Thao tác tab ĐA/KLTN: nút ⋮ → danh sách việc sinh viên được làm
+       - Form theo mẫu, 2 bảng thêm/xóa dòng, tải file báo cáo; Xem trước / Tải đơn / Nộp
+       - Mô phỏng node: Kiểm tra đơn đã nộp → Kiểm tra kết luận → Kiểm tra thời gian nộp
+       - Dữ liệu dùng chung với MH-SV-05, MH-GV-02 (localStorage crdakl_nbc, crdakl_nbc_hoso)
+     ═══════════════════════════════════════════════════════════════════════ -->
+<div class="overlay hidden" id="modal-nbc">
+  <div class="modal-box" style="width:860px;max-width:96vw;max-height:94vh">
+    <div class="modal-hd">
+      <span class="modal-title">📤 Nộp báo cáo sau chỉnh sửa — Bản giải trình sửa chữa ĐA/KLTN</span>
+      <button class="modal-close" onclick="closeModal('modal-nbc')">✕</button>
+    </div>
+    <div class="modal-bd" style="overflow-y:auto">
+      <div class="alert alert-info" style="margin-bottom:14px"><span class="alert-ico">ℹ️</span>
+        <div class="alert-body"><span class="alert-desc" id="nbc-alert"></span></div></div>
+      <div id="nbc-info"></div>
+      <div class="sec-title" style="font-size:13px;margin-bottom:8px"><span class="sec-badge">1</span> Tác giả chỉnh sửa và bổ sung đồ án/khóa luận theo góp ý của Hội đồng <span class="req">*</span></div>
+      <table class="nbc-edit"><thead><tr><th style="width:44px">STT</th><th>Nội dung <span class="req">*</span></th><th style="width:90px">Trang cũ</th><th>Sửa thành <span class="req">*</span></th><th style="width:90px">Trang mới</th><th style="width:40px"></th></tr></thead><tbody id="nbc-t1"></tbody></table>
+      <button class="btn btn-default btn-sm" style="margin:6px 0 16px" onclick="CRNBC.addRow(1)">＋ Thêm dòng</button>
+      <div class="sec-title" style="font-size:13px;margin-bottom:8px"><span class="sec-badge">2</span> Tác giả xin được giữ quan điểm của mình ở một số nội dung đồ án/khoá luận</div>
+      <table class="nbc-edit"><thead><tr><th style="width:44px">STT</th><th>Nội dung <span class="req">*</span></th><th>Lý do giữ quan điểm của mình <span class="req">*</span></th><th style="width:90px">Trang</th><th style="width:40px"></th></tr></thead><tbody id="nbc-t2"></tbody></table>
+      <button class="btn btn-default btn-sm" style="margin:6px 0 16px" onclick="CRNBC.addRow(2)">＋ Thêm dòng</button>
+      <div class="sec-title" style="font-size:13px;margin-bottom:8px"><span class="sec-badge">3</span> File báo cáo sau chỉnh sửa <span class="req">*</span></div>
+      <div class="fi"><input type="file" class="fc" id="nbc-file" accept=".pdf,.doc,.docx" style="padding:5px 10px">
+        <div style="font-size:11px;color:var(--text-3);margin-top:3px">PDF / Word · Duyệt xong, file này thay file báo cáo đã nộp trước đó</div></div>
+    </div>
+    <div class="modal-ft">
+      <button class="btn btn-default" onclick="closeModal('modal-nbc')">Hủy</button>
+      <button class="btn btn-default" onclick="CRNBC.preview()">👁️ Xem trước</button>
+      <button class="btn btn-primary" onclick="CRNBC.submit()">Nộp</button>
+    </div>
+  </div>
+</div>
+<div class="overlay hidden" id="modal-nbc-pv" style="z-index:1150">
+  <div class="modal-box" style="width:800px;max-width:95vw">
+    <div class="modal-hd"><span class="modal-title">Xem trước — Bản giải trình sửa chữa ĐA/KLTN</span><button class="modal-close" onclick="closeModal('modal-nbc-pv')">✕</button></div>
+    <div class="modal-bd" style="background:#f0f0f0;max-height:72vh;overflow:auto">
+      <div id="nbc-pv-doc" style="background:#fff;max-width:680px;margin:0 auto;padding:36px 44px;box-shadow:0 1px 4px rgba(0,0,0,.15)"></div>
+    </div>
+    <div class="modal-ft"><button class="btn btn-default" onclick="closeModal('modal-nbc-pv')">Đóng</button><button class="btn btn-primary" onclick="CRNBC.download()">⬇️ Tải đơn</button></div>
+  </div>
+</div>
+<style>
+  .nbc-kebab{font-size:18px;font-weight:700;line-height:1;padding:2px 10px !important;border-radius:6px}
+  .nbc-kebab:hover{background:#f0f0f0}
+  #nbc-menu{position:fixed;z-index:1200;background:#fff;border:1px solid var(--border);border-radius:8px;box-shadow:0 6px 16px rgba(0,0,0,.12);padding:4px 0;min-width:240px;display:none}
+  #nbc-menu button{display:flex;align-items:center;gap:8px;width:100%;border:none;background:none;padding:8px 14px;font-size:13px;text-align:left;cursor:pointer;color:var(--text-1)}
+  #nbc-menu button:hover:not(:disabled){background:#e6f4ff}
+  #nbc-menu button:disabled{color:var(--text-3);cursor:not-allowed}
+  #nbc-menu button span.i{width:20px;text-align:center}
+  .nbc-edit{width:100%;border-collapse:collapse;font-size:13px}
+  .nbc-edit th{background:#fafafa;font-weight:600;padding:6px 8px;border:1px solid #e8e8e8;text-align:left}
+  .nbc-edit td{padding:4px;border:1px solid #e8e8e8;vertical-align:top}
+  .nbc-edit td .fc{width:100%;padding:4px 6px;font-size:13px}
+  .nbc-edit textarea.fc{resize:vertical;min-height:34px}
+  .nbc-edit .err{border-color:var(--error) !important}
+</style>
+<script>
+(function(){
+  // ===== Dùng chung (CR-20261113-002): dữ liệu, đơn "Bản giải trình sửa chữa ĐA/KLTN" =====
+  const NBC_LS = 'crdakl_nbc', NBC_HS = 'crdakl_nbc_hoso';
+  const nbcLoad = (k, d) => { try { return JSON.parse(localStorage.getItem(k)) || d; } catch(e) { return d; } };
+  const nbcSave = (k, v) => localStorage.setItem(k, JSON.stringify(v));
+  const nbcFmt = iso => iso ? String(iso).split('-').reverse().join('/') : '';
+  const nbcEsc = x => String(x == null ? '' : x).replace(/&/g, '&amp;').replace(/"/g, '&quot;').replace(/</g, '&lt;');
+  const NBC_ST = { cho_gvhd:'Chờ GVHD xác nhận', cho_hd:'Chờ hội đồng xác nhận', approved:'Đã duyệt', rejected:'Từ chối', khong_thanh_cong:'Không thành công' };
+  function nbcDoc(c){
+    const v = c.data, F = x => `<span class="fill">${nbcEsc(x) || '…………'}</span>`;
+    const tbl = (cols, rows) => `<table class="nbc-dtbl"><thead><tr>${cols.map(h => `<th>${h}</th>`).join('')}</tr></thead><tbody>${
+      rows.length ? rows.map(r => `<tr>${r.map(x => `<td>${nbcEsc(x)}</td>`).join('')}</tr>`).join('') : `<tr>${cols.map(() => '<td>&nbsp;</td>').join('')}</tr>`}</tbody></table>`;
+    const [d, m, y] = nbcFmt(c.ngayNop).split('/');
+    return `<div class="nbc-doc">
+      <table class="nbc-head"><tr><td><b>BỘ GIÁO DỤC VÀ ĐÀO TẠO</b><br><b>TRƯỜNG ĐẠI HỌC PHENIKAA</b></td><td><b>CỘNG HOÀ XÃ HỘI CHỦ NGHĨA VIỆT NAM</b><br><b><u>Độc lập - Tự do - Hạnh phúc</u></b></td></tr></table>
+      <p class="c b" style="margin:20px 0 14px">BẢN GIẢI TRÌNH SỬA CHỮA ĐỒ ÁN/KHÓA LUẬN TỐT NGHIỆP</p>
+      <p style="margin-left:40px">Kính gửi: &nbsp;&nbsp;- Hội đồng đánh giá đồ án/khóa luận tốt nghiệp;<br><span style="margin-left:78px">- Khoa</span></p>
+      <p>Họ và tên tác giả đồ án/khoá luận: ${F(v.ho_ten)}</p>
+      <p>Mã sinh viên: ${F(v.ma_sv)} &nbsp;&nbsp;&nbsp; Lớp: ${F(v.lop)}</p>
+      <p>Ngành: ${F(v.nganh)}</p>
+      <p>Đã bảo vệ đồ án/khoá luận tốt nghiệp ngày ${F(nbcFmt(v.ngay_bao_ve))}</p>
+      <p>Tên đề tài: ${F(v.ten_de_tai_hien_tai)}</p>
+      <p>Giảng viên hướng dẫn: ${F(v.gvhd)}</p>
+      <p style="text-indent:30px;text-align:justify">Theo góp ý của Hội đồng, dưới sự định hướng của giảng viên hướng dẫn, tác giả đồ án/khoá luận đã nghiêm túc tiếp thu những ý kiến đóng góp của Hội đồng và tiến hành sửa chữa, bổ sung đồ án/khoá luận theo đúng tinh thần kết luận của Hội đồng. Chi tiết về các nội dung chỉnh sửa như sau:</p>
+      <p class="b">1. Tác giả chỉnh sửa và bổ sung đồ án/khóa luận theo góp ý của Hội đồng</p>
+      ${tbl(['Nội dung', 'Trang cũ', 'Sửa thành', 'Trang mới'], (v.chinh_sua_bo_sung || []).map(r => [r.noi_dung, r.trang_cu, r.sua_thanh, r.trang_moi]))}
+      <p class="b">2. Tác giả xin được giữ quan điểm của mình ở một số nội dung đồ án/khoá luận</p>
+      ${tbl(['Nội dung', 'Lý do giữ quan điểm của mình', 'Trang'], (v.giu_quan_diem || []).map(r => [r.noi_dung, r.ly_do, r.trang]))}
+      <p style="text-align:justify">Trên đây là Bản giải trình về những điểm sửa chữa, bổ sung đồ án/khoá luận của tác giả theo đúng yêu cầu của Hội đồng đánh giá ĐAKLTN ngành ${F(v.nganh)} tại Trường Đại học Phenikaa ngày ${F(nbcFmt(v.ngay_bao_ve))}.</p>
+      <p style="text-align:right;font-style:italic">Hà Nội, ngày ${F(d)} tháng ${F(m)} năm ${F(y)}</p>
+      <table class="nbc-sign"><tr><td><b>CHỦ TỊCH HỘI ĐỒNG</b><br><i>(Ký, ghi rõ họ tên)</i><br><br><br>${nbcEsc(v.chu_tich_hoi_dong)}</td>
+        <td><b>GV HƯỚNG DẪN</b><br><i>(Ký, ghi rõ họ tên)</i><br><br><br>${nbcEsc(v.gvhd)}</td>
+        <td><b>TÁC GIẢ</b><br><i>(Ký, ghi rõ họ tên)</i><br><br><br>${nbcEsc(v.ho_ten)}</td></tr></table></div>`;
+  }
+  const NBC_CSS = `.nbc-doc{font-family:'Times New Roman',serif;font-size:14px;line-height:1.55;color:#000}.nbc-doc p{margin:0 0 6px}.nbc-doc .c{text-align:center}.nbc-doc .b{font-weight:700}
+    .nbc-doc .fill{border-bottom:1px dotted #555;padding:0 4px;font-style:italic;color:#0958d9}.nbc-head,.nbc-sign{width:100%;border-collapse:collapse}.nbc-head td,.nbc-sign td{text-align:center;vertical-align:top;width:50%;font-size:13px}
+    .nbc-sign td{width:33%}.nbc-dtbl{width:100%;border-collapse:collapse;margin:4px 0 10px}.nbc-dtbl th,.nbc-dtbl td{border:1px solid #000;padding:4px 6px;font-size:13px;vertical-align:top}.nbc-dtbl th{text-align:center}`;
+  function nbcDownload(c){
+    const html = `<html><head><meta charset="utf-8"><style>${NBC_CSS} .fill{border:none;color:#000;font-style:normal}</style></head><body>${nbcDoc(c)}</body></html>`;
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(new Blob(['﻿' + html], { type:'application/msword' }));
+    a.download = 'Ban_giai_trinh_sua_chua_' + (c.data.ma_sv || '') + '_' + (c.id || 'nhap') + '.doc';
+    a.click();
+  }
+  // Bảng chỉ đọc (popup chi tiết / duyệt)
+  function nbcRoTable(title, cols, keys, rows){
+    return `<div class="fi" style="grid-column:1/-1"><label>${title}</label><table class="nbc-ro"><thead><tr><th style="width:40px">STT</th>${cols.map(h => `<th>${h}</th>`).join('')}</tr></thead><tbody>${
+      (rows || []).length ? rows.map((r, i) => `<tr><td style="text-align:center">${i + 1}</td>${keys.map(k => `<td>${nbcEsc(r[k])}</td>`).join('')}</tr>`).join('')
+      : `<tr><td colspan="${cols.length + 1}" style="text-align:center;color:var(--text-3)">Không có</td></tr>`}</tbody></table></div>`;
+  }
+  function nbcDetail(c, fileBtns){
+    const d = c.data, RO = 'background:#fafafa;cursor:default';
+    const fi = (l, v, w) => `<div class="fi"${w ? ' style="grid-column:1/-1"' : ''}><label>${l}</label><input class="fc" readonly style="${RO}" value="${nbcEsc(v || '—')}"></div>`;
+    const ta = (l, v) => `<div class="fi" style="grid-column:1/-1"><label>${l}</label><textarea class="fc" readonly rows="3" style="${RO};resize:none">${nbcEsc(v || '—')}</textarea></div>`;
+    const sec = t => `<div class="sec-title" style="grid-column:1/-1;font-size:13px;margin:6px 0 0">${t}</div>`;
+    const f = d.file_bao_cao || '', ext = f.split('.').pop().toLowerCase();
+    return `<div class="f-row col-2" style="margin-bottom:16px">
+      ${sec('Thông tin sinh viên')}${fi('Họ và tên tác giả', d.ho_ten)}${fi('Mã sinh viên', d.ma_sv)}${fi('Lớp', d.lop)}${fi('Ngành', d.nganh)}
+      ${sec('Đề tài và hội đồng')}${fi('Mã yêu cầu', c.id)}${fi('Đợt ĐA/KLTN', c.maDot)}${fi('Tên đề tài', d.ten_de_tai_hien_tai, true)}${fi('Giảng viên hướng dẫn', d.gvhd, true)}
+      ${fi('Đã bảo vệ ngày', nbcFmt(d.ngay_bao_ve))}${fi('Ngày hội đồng hoàn thành', nbcFmt(d.ngay_hoan_thanh_hd))}${fi('Mã hội đồng', d.ma_hoi_dong)}${fi('Tên hội đồng', d.ten_hoi_dong)}
+      ${fi('Chủ tịch hội đồng', d.chu_tich_hoi_dong)}${fi('Kết luận hội đồng', d.ket_luan)}${ta('Yêu cầu chỉnh sửa của hội đồng', d.yeu_cau_chinh_sua)}
+      ${sec('Nội dung giải trình')}
+      ${nbcRoTable('1. Tác giả chỉnh sửa và bổ sung theo góp ý của Hội đồng', ['Nội dung', 'Trang cũ', 'Sửa thành', 'Trang mới'], ['noi_dung', 'trang_cu', 'sua_thanh', 'trang_moi'], d.chinh_sua_bo_sung)}
+      ${nbcRoTable('2. Tác giả xin được giữ quan điểm', ['Nội dung', 'Lý do giữ quan điểm', 'Trang'], ['noi_dung', 'ly_do', 'trang'], d.giu_quan_diem)}
+      <div class="fi" style="grid-column:1/-1"><label>File báo cáo sau chỉnh sửa</label>${f ? `<div class="file-item-row" style="display:flex;align-items:center;gap:8px;padding:6px 10px;border:1px solid var(--border);border-radius:6px">
+        <span style="font-size:16px">${ext === 'pdf' ? '📕' : '📘'}</span><span class="file-item-name" style="flex:1">${nbcEsc(f)}</span>${fileBtns ? fileBtns(f, ext) : ''}</div>` : '<input class="fc" readonly value="—">'}</div>
+      ${c.ketQua ? ta('Kết quả', c.ketQua) : ''}${c.lyDoKhongDat ? ta('Lý do không thành công', c.lyDoKhongDat) : ''}
+    </div>`;
+  }
+  // Bảng "Quy trình phê duyệt"
+  const NBC_QT = [
+    { buoc:'Kiểm tra kết luận', ten:'Kiểm tra kết luận', vai:'Hệ thống', pc:'Kết luận được phép: Đạt nhưng cần chỉnh sửa' },
+    { buoc:'Kiểm tra thời gian nộp', ten:'Kiểm tra thời gian nộp', vai:'Hệ thống', pc:'Trong N ngày kể từ mốc PĐT chọn' },
+    { buoc:'GVHD xác nhận', ten:'Chờ người duyệt', vai:'Giảng viên hướng dẫn', pc:'GVHD của sinh viên' },
+    { buoc:'Hội đồng xác nhận', ten:'Chờ người duyệt', vai:'Chủ tịch, Thư ký', pc:'Thành viên hội đồng của sinh viên' },
+    { buoc:'Cập nhật báo cáo ĐAKLTN', ten:'Cập nhật báo cáo ĐAKLTN', vai:'Hệ thống', pc:'Ghi đè file báo cáo' },
+    { buoc:'Cập nhật kết luận hội đồng', ten:'Cập nhật kết luận hội đồng', vai:'Hệ thống', pc:'Đạt nhưng cần chỉnh sửa → Đạt' },
+  ];
+  function nbcQt(c){
+    const TAG = { 'Đã nộp':'tag-blue', 'Đạt':'tag-success', 'Thành công':'tag-success', 'Đồng ý':'tag-success', 'Từ chối':'tag-error', 'Không đạt':'tag-error', 'Đang chờ':'tag-warning' };
+    const end = ['approved', 'rejected', 'khong_thanh_cong'].includes(c.status);
+    const rows = [{ ten:'Nộp biểu mẫu', vai:'Sinh viên', pc:'', nguoi:c.data.ho_ten, nhan:c.ngayNop, xuly:c.ngayNop, kq:'Đã nộp', lydo:'' }];
+    NBC_QT.forEach(t => {
+      const s = (c.steps || []).find(x => x.buoc === t.buoc);
+      rows.push(s ? { ...t, nguoi:s.nguoi, nhan:s.nhan, xuly:s.xuly, kq:s.kq, lydo:s.lydo } : { ...t, nguoi:'', nhan:'', xuly:'', kq:end ? 'Bỏ qua' : 'Chưa đến lượt', lydo:'' });
+    });
+    const td = x => `<td>${nbcEsc(x)}</td>`;
+    return `<table class="cr5-steps nbc-ro" style="min-width:980px"><thead><tr><th>STT</th><th>Bước</th><th>Vai trò duyệt</th><th>Phân công</th><th>Người xử lý</th><th>Thời gian nhận</th><th>Thời gian xử lý</th><th>Trạng thái</th><th>Lý do</th></tr></thead><tbody>
+      ${rows.map((r, i) => `<tr><td style="text-align:center">${i + 1}</td>${td(r.ten)}${td(r.vai)}${td(r.pc)}${td(r.nguoi)}${td(nbcFmt(r.nhan))}${td(nbcFmt(r.xuly))}<td><span class="tag ${TAG[r.kq] || 'tag-default'}">${r.kq}</span></td>${td(r.lydo)}</tr>`).join('')}
+      </tbody></table>`;
+  }
+  if(!document.getElementById('nbc-style')){
+    const st = document.createElement('style'); st.id = 'nbc-style';
+    st.textContent = NBC_CSS + `.nbc-ro{width:100%;border-collapse:collapse;font-size:12.5px}.nbc-ro th{background:#fafafa;font-weight:600;padding:6px 8px;border:1px solid #e8e8e8;text-align:left}.nbc-ro td{padding:6px 8px;border:1px solid #e8e8e8;vertical-align:top}`;
+    document.head.appendChild(st);
+  }
+  // Mẫu đơn của sinh viên khác (để GV/PĐT có dữ liệu xem; không lưu)
+  const NBC_TBL1 = [{ noi_dung:'Chương 4 — Đánh giá thực nghiệm', trang_cu:'52', sua_thanh:'Bổ sung bảng so sánh độ chính xác với 2 mô hình đối chứng', trang_moi:'53–55' },
+    { noi_dung:'Hình 3.2, 3.5', trang_cu:'31, 36', sua_thanh:'Vẽ lại hình, bổ sung chú thích', trang_moi:'31, 37' }];
+  const NBC_SAMPLES = [
+    { id:'YC-NBC-091', loai:'nopbc', maDot:'DA-HK2-2025-2026', ngayNop:'2026-06-18', status:'cho_gvhd', lyDoKhongDat:'',
+      data:{ ho_ten:'Trần Hải Nam', ma_sv:'B22DCCN110', lop:'D22CQCN02-B', nganh:'Kỹ thuật phần mềm', ten_de_tai_hien_tai:'DT-2026-0020 — Hệ thống quản lý phòng lab',
+        gvhd:'TS. Nguyễn Minh Tuấn', gvhd_list:['TS. Nguyễn Minh Tuấn'], ngay_bao_ve:'2026-06-15', ngay_hoan_thanh_hd:'2026-06-16', ma_hoi_dong:'HD-2025-198', ten_hoi_dong:'Hội đồng chấm ĐATN & KLTN HK1 2025-2026',
+        chu_tich_hoi_dong:'TS. Trần Văn Bình', thu_ky:'ThS. Nguyễn Thu Hoa', ket_luan:'Đạt nhưng cần chỉnh sửa', yeu_cau_chinh_sua:'Bổ sung đánh giá thực nghiệm ở Chương 4; vẽ lại các hình chương 3.',
+        chinh_sua_bo_sung:NBC_TBL1, giu_quan_diem:[], file_bao_cao:'BC_DATN_B22DCCN110_chinhsua.pdf', ngay_lam_don:'2026-06-18' },
+      steps:[{ buoc:'Kiểm tra kết luận', nguoi:'Hệ thống', nhan:'2026-06-18', xuly:'2026-06-18', kq:'Đạt', lydo:'' }, { buoc:'Kiểm tra thời gian nộp', nguoi:'Hệ thống', nhan:'2026-06-18', xuly:'2026-06-18', kq:'Đạt', lydo:'' },
+        { buoc:'GVHD xác nhận', nguoi:'TS. Nguyễn Minh Tuấn', nhan:'2026-06-18', xuly:'', kq:'Đang chờ', lydo:'' }] },
+    { id:'YC-NBC-092', loai:'nopbc', maDot:'DA-HK2-2025-2026', ngayNop:'2026-06-17', status:'cho_hd', lyDoKhongDat:'',
+      data:{ ho_ten:'Lê Thu Trang', ma_sv:'B22DCCN121', lop:'D22CQCN03-B', nganh:'Kỹ thuật phần mềm', ten_de_tai_hien_tai:'DT-2026-0021 — Ứng dụng quản lý học liệu số',
+        gvhd:'ThS. Lê Thu Hoa', gvhd_list:['ThS. Lê Thu Hoa'], ngay_bao_ve:'2026-06-15', ngay_hoan_thanh_hd:'2026-06-16', ma_hoi_dong:'HD-2025-198', ten_hoi_dong:'Hội đồng chấm ĐATN & KLTN HK1 2025-2026',
+        chu_tich_hoi_dong:'TS. Trần Văn Bình', thu_ky:'ThS. Nguyễn Thu Hoa', ket_luan:'Đạt nhưng cần chỉnh sửa', yeu_cau_chinh_sua:'Chỉnh lại phần tổng quan tài liệu, bổ sung kiểm thử hiệu năng.',
+        chinh_sua_bo_sung:[{ noi_dung:'Chương 2 — Tổng quan', trang_cu:'12–18', sua_thanh:'Rút gọn, bổ sung 5 tài liệu mới', trang_moi:'12–16' }],
+        giu_quan_diem:[{ noi_dung:'Chọn kiến trúc monolith', ly_do:'Quy mô ứng dụng nhỏ, 1 trường dùng; tách dịch vụ làm tăng chi phí vận hành', trang:'24' }],
+        file_bao_cao:'BC_DATN_B22DCCN121_chinhsua.pdf', ngay_lam_don:'2026-06-17' },
+      steps:[{ buoc:'Kiểm tra kết luận', nguoi:'Hệ thống', nhan:'2026-06-17', xuly:'2026-06-17', kq:'Đạt', lydo:'' }, { buoc:'Kiểm tra thời gian nộp', nguoi:'Hệ thống', nhan:'2026-06-17', xuly:'2026-06-17', kq:'Đạt', lydo:'' },
+        { buoc:'GVHD xác nhận', nguoi:'ThS. Lê Thu Hoa', nhan:'2026-06-17', xuly:'2026-06-18', kq:'Đồng ý', lydo:'' },
+        { buoc:'Hội đồng xác nhận', nguoi:'TS. Trần Văn Bình; ThS. Nguyễn Thu Hoa', nhan:'2026-06-18', xuly:'', kq:'Đang chờ', lydo:'' }] },
+  ];
+
+  const $ = id => document.getElementById(id);
+  const addDays = (iso, n) => { const [y,m,dd] = iso.split('-').map(Number); return new Date(Date.UTC(y, m-1, dd + n)).toISOString().slice(0,10); };
+  const SV = { ho_ten:'Nguyễn Văn An', ma_sv:'B22DCCN001', lop:'D22CQCN01-B', nganh:'Kỹ thuật phần mềm' };
+
+  // ---------- Dữ liệu mô phỏng: đợt DA-HK2-2025-2026 bị hội đồng kết luận "Đạt nhưng cần chỉnh sửa" ----------
+  const d0 = getDaklByMaDot('DA-HK2-2025-2026');
+  if(d0 && d0.hoiDong){
+    d0.conclusion = 'canchinh';
+    d0.hoiDong.hinhThuc = 'Trực tiếp — 15/06/2026 08:00';
+    Object.assign(d0.hoiDong, { ngayBaoVe:'2026-06-15', ngayHoanThanh:'2026-06-16',
+      ghiChuKetLuan:'Bổ sung đánh giá độ chính xác của mô hình ở Chương 4; sửa lỗi trình bày hình 3.2, 3.5; cập nhật tài liệu tham khảo.' });
+    d0.ghiChu = 'Hội đồng kết luận "Đạt nhưng cần chỉnh sửa". Nộp bản chỉnh sửa tại ⋮ → Nộp báo cáo sau chỉnh sửa.';
+  }
+  const hdOf = d => d && d.hoiDong ? d.hoiDong : null;
+  const memOf = (hd, role) => ((hd && hd.members) || []).filter(m => m.role === role).map(m => m.name);
+  const KL_LABEL = k => (CONCLUSION_CFG[k] || {}).label || '';
+
+  // Áp kết quả node Cập nhật báo cáo / Cập nhật kết luận (MH-GV-02 ghi crdakl_nbc_hoso)
+  function applyHoSo(){
+    const hs = nbcLoad(NBC_HS, {});
+    DAKL_DATA.forEach(d => {
+      const h = hs[d.maDot]; if(!h) return;
+      d.baoCao = { ...(d.baoCao || {}), file:h.file, ngayNop:h.ngay };
+      d.conclusion = 'dat';
+      d.ghiChu = '✅ Bản chỉnh sửa đã được xác nhận: đã cập nhật file báo cáo, kết luận chuyển "Đạt".';
+    });
+  }
+
+  // ---------- Thanh mô phỏng ----------
+  const card = document.querySelector('#tab-do-an-kl .card');
+  const demo = document.createElement('div');
+  demo.className = 'crd-demo';
+  demo.style.background = '#f6ffed'; demo.style.borderColor = '#b7eb8f';
+  demo.innerHTML = `<b>CR-20261113-002 · Mô phỏng nộp lại báo cáo</b>
+    <span>Node Kiểm tra thời gian nộp — mốc:</span>
+    <select class="fc" id="nbc-moc" style="width:auto"><option value="bv">Ngày bảo vệ</option><option value="ht">Ngày hội đồng hoàn thành</option></select>
+    <span>trong</span><input class="fc" type="number" min="1" id="nbc-n" value="14" style="width:64px"><span>ngày</span>
+    <button class="btn btn-default btn-sm" onclick="document.getElementById('crd-ngaynop').value='2026-06-20'">Đặt ngày nộp 20/06/2026</button>
+    <span style="color:var(--text-3)">Đợt DA-HK2-2025-2026: bảo vệ 15/06/2026, hội đồng hoàn thành 16/06/2026</span>`;
+  card.insertBefore(demo, card.children[1] || null);
+
+  // ---------- Nút ⋮ ----------
+  const menu = document.createElement('div');
+  menu.id = 'nbc-menu';
+  document.body.appendChild(menu);
+  const ITEMS = {};
+  function itemsOf(d){
+    const has = !!d.topic && !d.huy, tipNo = d.huy ? 'Bạn đã rút học phần' : 'Chưa có đề tài';
+    const duyet = typeof daklDeCuongStage === 'function' && daklDeCuongStage(d) === 'Đã duyệt';
+    const m = d.maDot;
+    return [
+      { i:'👁️', t:'Xem chi tiết đề tài', fn:() => openDaklTopicInfo(m), ok:!!d.topic, tip:'Chưa có đề tài' },
+      { i:'🔄', t:'Yêu cầu đổi đề tài', fn:() => openDaklDoiDeTai(m), ok:has, tip:tipNo },
+      { i:'⏰', t:'Yêu cầu gia hạn đề tài', fn:() => openDaklGiaHan(m), ok:has, tip:tipNo },
+      { i:'⏩', t:'Xin bảo vệ sớm', fn:() => CRDSV.openBaoVe(m), ok:has && duyet, tip:has ? 'Chỉ gửi được khi Tiến độ đã được GVHD duyệt' : tipNo },
+      { i:'📤', t:'Nộp báo cáo sau chỉnh sửa', fn:() => CRNBC.open(m), ok:has, tip:tipNo },
+    ];
+  }
+  const _render = renderDaklTable;
+  renderDaklTable = function(){
+    _render();
+    [...$('dakl-tbody').rows].forEach((tr, i) => {
+      const d = DAKL_DATA[i], cell = tr.cells[tr.cells.length - 1];
+      if(!d || !cell) return;
+      ITEMS[d.maDot] = itemsOf(d);
+      cell.innerHTML = `<button class="btn btn-link btn-sm nbc-kebab" title="Thao tác" onclick="CRNBC.menu(event,'${d.maDot}')">⋮</button>`;
+    });
+  };
+  document.addEventListener('click', e => { if(!e.target.closest('#nbc-menu') && !e.target.closest('.nbc-kebab')) menu.style.display = 'none'; });
+  document.addEventListener('scroll', () => { menu.style.display = 'none'; }, true);
+
+  // ---------- Bảng thêm / xóa dòng ----------
+  const COLS = { 1:[['noi_dung', 'ta'], ['trang_cu', 'in'], ['sua_thanh', 'ta'], ['trang_moi', 'in']], 2:[['noi_dung', 'ta'], ['ly_do', 'ta'], ['trang', 'in']] };
+  const REQ = { 1:['noi_dung', 'sua_thanh'], 2:['noi_dung', 'ly_do'] };
+  function rowsOf(n){
+    return [...$('nbc-t' + n).rows].map(tr => Object.fromEntries(COLS[n].map(([k]) => [k, tr.querySelector(`[data-k="${k}"]`).value.trim()])));
+  }
+  function drawRows(n, data){
+    $('nbc-t' + n).innerHTML = data.length ? data.map((r, i) => `<tr><td style="text-align:center;padding-top:9px">${i + 1}</td>${COLS[n].map(([k, t]) => `<td>${t === 'ta'
+      ? `<textarea class="fc" data-k="${k}" rows="1">${nbcEsc(r[k] || '')}</textarea>` : `<input class="fc" data-k="${k}" value="${nbcEsc(r[k] || '')}">`}</td>`).join('')}
+      <td style="text-align:center"><button class="icon-btn" title="Xóa dòng" onclick="CRNBC.delRow(${n},${i})">🗑</button></td></tr>`).join('')
+      : `<tr><td colspan="${COLS[n].length + 2}" style="text-align:center;color:var(--text-3);padding:10px">Chưa có dòng nào — bấm "＋ Thêm dòng"</td></tr>`;
+  }
+  const dataRows = n => $('nbc-t' + n).querySelector('[data-k]') ? rowsOf(n) : [];
+
+  let curMa = null, pending = null;
+  function info(d){
+    const hd = hdOf(d) || {};
+    const fi = (l, v, w) => `<div class="fi"${w ? ' style="grid-column:1/-1"' : ''}><label>${l}</label><input class="fc crd-ro" readonly value="${nbcEsc(v || '—')}"></div>`;
+    return `<div class="sec-title" style="font-size:13px;margin-bottom:10px">Thông tin sinh viên</div>
+      <div class="f-row col-2" style="margin-bottom:14px">${fi('Họ và tên tác giả', SV.ho_ten)}${fi('Mã sinh viên', SV.ma_sv)}${fi('Lớp', SV.lop)}${fi('Ngành', SV.nganh)}</div>
+      <div class="sec-title" style="font-size:13px;margin-bottom:10px">Đề tài và hội đồng</div>
+      <div class="f-row col-2" style="margin-bottom:16px">${fi('Đợt ĐA/KLTN', d.maDot)}${fi('Đã bảo vệ ngày', nbcFmt(hd.ngayBaoVe))}
+        ${fi('Tên đề tài', d.topic ? d.topic.ma + ' — ' + d.topic.ten : '', true)}${fi('Giảng viên hướng dẫn', d.gvhd, true)}
+        ${fi('Mã hội đồng', hd.ma)}${fi('Tên hội đồng', hd.ten)}${fi('Chủ tịch hội đồng', memOf(hd, 'Chủ tịch')[0])}${fi('Ngày hội đồng hoàn thành', nbcFmt(hd.ngayHoanThanh))}
+        ${fi('Kết luận hội đồng', KL_LABEL(d.conclusion))}
+        <div class="fi" style="grid-column:1/-1"><label>Yêu cầu chỉnh sửa của hội đồng</label><textarea class="fc crd-ro" readonly style="height:52px;resize:none">${nbcEsc(hd.ghiChuKetLuan || '—')}</textarea></div></div>`;
+  }
+  function collect(){
+    const d = getDaklByMaDot(curMa), hd = hdOf(d) || {}, f = $('nbc-file').files[0];
+    return { maDot:curMa, ...SV, ten_de_tai_hien_tai:d.topic ? `${d.topic.ma} — ${d.topic.ten}` : '', gvhd:d.gvhd, gvhd_list:[d.gvhd].filter(Boolean),
+      ngay_bao_ve:hd.ngayBaoVe || '', ngay_hoan_thanh_hd:hd.ngayHoanThanh || '', ma_hoi_dong:hd.ma || '', ten_hoi_dong:hd.ten || '',
+      chu_tich_hoi_dong:memOf(hd, 'Chủ tịch')[0] || '', thu_ky:memOf(hd, 'Thư ký')[0] || '', ket_luan:KL_LABEL(d.conclusion), yeu_cau_chinh_sua:hd.ghiChuKetLuan || '',
+      chinh_sua_bo_sung:dataRows(1), giu_quan_diem:dataRows(2), file_bao_cao:f ? f.name : '', ngay_lam_don:$('crd-ngaynop').value };
+  }
+  function missing(v){
+    let bad = false;
+    [1, 2].forEach(n => [...$('nbc-t' + n).rows].forEach(tr => REQ[n].forEach(k => {
+      const el = tr.querySelector(`[data-k="${k}"]`); if(!el) return;
+      el.classList.toggle('err', !el.value.trim()); if(!el.value.trim()) bad = true;
+    })));
+    if(!v.chinh_sua_bo_sung.length) return 'Bảng 1 "Chỉnh sửa và bổ sung" cần ít nhất 1 dòng';
+    if(bad) return 'Vui lòng nhập đủ các cột bắt buộc (*) trong bảng';
+    if(!v.file_bao_cao) return 'Vui lòng tải lên file báo cáo sau chỉnh sửa';
+    return '';
+  }
+
+  window.CRNBC = {
+    menu(e, maDot){
+      e.stopPropagation();
+      const items = ITEMS[maDot] || [];
+      menu.innerHTML = items.map((it, i) => `<button ${it.ok ? '' : 'disabled'} title="${it.ok ? '' : it.tip}" data-i="${i}"><span class="i">${it.i}</span>${it.t}</button>`).join('');
+      menu.querySelectorAll('button').forEach(b => b.onclick = () => { menu.style.display = 'none'; items[+b.dataset.i].fn(); });
+      menu.style.display = 'block';
+      const r = e.currentTarget.getBoundingClientRect(), w = menu.offsetWidth, h = menu.offsetHeight;
+      menu.style.left = Math.max(8, r.right - w) + 'px';
+      menu.style.top = (r.bottom + 4 + h < innerHeight ? r.bottom + 4 : r.top - h - 4) + 'px';
+    },
+    open(maDot){
+      const d = getDaklByMaDot(maDot); if(!d || !d.topic) return;
+      curMa = maDot;
+      const N = +$('nbc-n').value || 14, moc = $('nbc-moc').value === 'bv' ? 'ngày bảo vệ' : 'ngày hội đồng hoàn thành';
+      $('nbc-alert').textContent = `Đơn theo mẫu "Bản giải trình sửa chữa ĐA/KLTN". Chỉ sinh viên có kết luận "Đạt nhưng cần chỉnh sửa" được nộp; nộp trong ${N} ngày kể từ ${moc}. Đơn qua GVHD xác nhận, rồi Chủ tịch hoặc Thư ký hội đồng xác nhận; xác nhận xong file mới thay file báo cáo đã nộp và kết luận chuyển "Đạt".`;
+      $('nbc-info').innerHTML = info(d);
+      drawRows(1, [{}]); drawRows(2, []);
+      $('nbc-file').value = '';
+      $('modal-nbc').classList.remove('hidden');
+    },
+    addRow(n){ const r = dataRows(n); r.push({}); drawRows(n, r); },
+    delRow(n, i){ const r = dataRows(n); r.splice(i, 1); drawRows(n, r); },
+    preview(){
+      const v = collect(), e = missing(v);
+      if(e){ toast(e, 'error'); return; }
+      pending = { id:'', ngayNop:v.ngay_lam_don, data:v };
+      $('nbc-pv-doc').innerHTML = nbcDoc(pending);
+      $('modal-nbc-pv').classList.remove('hidden');
+    },
+    download(){ if(pending){ nbcDownload(pending); toast('Đang tải đơn'); } },
+    submit(){
+      const v = collect(), e = missing(v);
+      if(e){ toast(e, 'error'); return; }
+      const d = getDaklByMaDot(curMa), nop = v.ngay_lam_don, list = nbcLoad(NBC_LS, []);
+      const steps = [], st = (buoc, kq, lydo) => steps.push({ buoc, nguoi:'Hệ thống', nhan:nop, xuly:nop, kq, lydo:lydo || '' });
+      let ly = '';
+      // Node Kiểm tra đơn đã nộp (CR-20261105-002): đang có đơn cùng đợt chưa xử lý xong
+      const daCo = list.find(r => r.maDot === curMa && (r.status === 'cho_gvhd' || r.status === 'cho_hd'));
+      if(daCo) ly = `Bạn đã có đơn ${daCo.id} đang xử lý`;
+      // Node Kiểm tra kết luận
+      if(!ly){
+        if(d.conclusion === 'canchinh') st('Kiểm tra kết luận', 'Đạt');
+        else { ly = 'Đơn không thành công: chỉ sinh viên có kết luận hội đồng "Đạt nhưng cần chỉnh sửa" mới nộp được báo cáo sau chỉnh sửa.'; st('Kiểm tra kết luận', 'Không đạt', ly); }
+      }
+      // Node Kiểm tra thời gian nộp: trong N ngày kể từ mốc PĐT chọn
+      if(!ly){
+        const N = +$('nbc-n').value || 14, bv = $('nbc-moc').value === 'bv';
+        const moc = bv ? v.ngay_bao_ve : v.ngay_hoan_thanh_hd, han = moc ? addDays(moc, N) : '';
+        if(!moc || nop < moc || nop > han){
+          ly = `Đơn không thành công: đã hết thời gian nộp báo cáo sau chỉnh sửa (trong ${N} ngày kể từ ${bv ? 'ngày bảo vệ' : 'ngày hội đồng hoàn thành'} ${nbcFmt(moc)}).`;
+          st('Kiểm tra thời gian nộp', 'Không đạt', ly);
+        } else st('Kiểm tra thời gian nộp', 'Đạt');
+      }
+      const id = 'YC-NBC-' + (list.length + 101);
+      if(!ly) steps.push({ buoc:'GVHD xác nhận', nguoi:v.gvhd_list.join('; '), nhan:nop, xuly:'', kq:'Đang chờ', lydo:'' });
+      list.unshift({ id, loai:'nopbc', maDot:curMa, ngayNop:nop, status:ly ? 'khong_thanh_cong' : 'cho_gvhd', lyDoKhongDat:ly, data:v, steps });
+      nbcSave(NBC_LS, list);
+      closeModal('modal-nbc'); closeModal('modal-nbc-pv'); pending = null;
+      if(ly) toast(ly, 'error');
+      else toast(`Đã gửi đơn nộp báo cáo sau chỉnh sửa (${id}). Đơn đang chờ GVHD xác nhận.`);
+    },
+  };
+
+  applyHoSo();
+  renderDaklTable();
+  window.addEventListener('storage', () => { applyHoSo(); renderDaklTable(); });
+})();
+</script>
+<!-- CRNBC-END -->
 </body>
 </html>

@@ -292,6 +292,7 @@
             <option value="">Tất cả đồng bộ điểm</option>
             <option value="dong">Đã đồng bộ</option>
             <option value="chua">Chưa đồng bộ</option>
+            <option value="loi">Lỗi đồng bộ</option>
           </select>
           <button class="btn btn-default" onclick="resetFilter()">🔄 Reset</button>
           <div class="colvis-wrap">
@@ -2399,7 +2400,7 @@ function render(){
     const matchStatus = !fstatus || s.status === fstatus;
     const matchHoSo = !fhoso || HOSO_CHECK[fhoso](s);
     const matchKetLuanHd = !fketluanhd || (fketluanhd === '_empty' ? !s.conclusion : s.conclusion === fketluanhd);
-    const matchDongBo = !fdongbo || (fdongbo === 'dong' ? s.dongBoDiem === 'Đã đồng bộ' : s.dongBoDiem !== 'Đã đồng bộ');
+    const matchDongBo = !fdongbo || (fdongbo === 'dong' ? s.dongBoDiem === 'Đã đồng bộ' : fdongbo === 'loi' ? (s.dongBoDiem === 'Lỗi đồng bộ' || s.dongBoDiem === 'Đã khóa') : (s.dongBoDiem !== 'Đã đồng bộ' && !(s.dongBoDiem === 'Lỗi đồng bộ' || s.dongBoDiem === 'Đã khóa')));
     return matchQ && matchDot && matchLoai && matchDonVi && matchGv && matchStatus && matchHoSo && matchKetLuanHd && matchDongBo;
   });
 

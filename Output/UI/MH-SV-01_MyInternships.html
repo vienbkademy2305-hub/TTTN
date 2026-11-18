@@ -3559,7 +3559,8 @@ function toast(msg, type = 'success') {
      CR-20261104-001 — SV gửi đơn Đổi đề tài (M05) / Gia hạn (M06) / Bảo vệ sớm ĐA-KLTN
      Khối mở rộng gắn thêm, KHÔNG sửa code gốc phía trên (US-DAKL-12, 16, 18):
        - Nút 🔄 ⏰ ⏩: không khóa theo đơn đang xử lý (CR-20261105-002, đơn đi qua node Kiểm tra đơn đã nộp)
-       - Form theo biểu mẫu, [Hủy] [Lưu nháp] [Xem trước] [Nộp], báo kết quả kiểm tra ngay
+       - Form theo biểu mẫu, [Hủy] [Lưu nháp] [Xem trước] [Tải đơn] [Nộp], báo kết quả kiểm tra ngay
+         (v1.40: Xem trước chỉ có [Đóng]; Tải đơn là nút riêng ở footer)
        - Dữ liệu dùng chung với MH-SV-05, MH-GV-02 (localStorage crdakl_*)
      ═══════════════════════════════════════════════════════════════════════ -->
 <div class="overlay hidden" id="modal-crd-preview" style="z-index:1150">
@@ -3573,7 +3574,6 @@ function toast(msg, type = 'success') {
     </div>
     <div class="modal-ft">
       <button class="btn btn-default" onclick="closeModal('modal-crd-preview')">Đóng</button>
-      <button class="btn btn-primary" onclick="CRDSV.download()">⬇️ Tải đơn</button>
     </div>
   </div>
 </div>
@@ -3608,6 +3608,7 @@ function toast(msg, type = 'success') {
       <button class="btn btn-default" onclick="closeModal('modal-crd-baove')">Hủy</button>
       <button class="btn btn-default" onclick="CRDSV.draft('baove')">💾 Lưu nháp</button>
       <button class="btn btn-default" onclick="CRDSV.preview('baove')">👁️ Xem trước</button>
+      <button class="btn btn-default" onclick="CRDSV.download('baove')">⬇️ Tải đơn</button>
       <button class="btn btn-primary" onclick="CRDSV.submit('baove')">Nộp</button>
     </div>
   </div>
@@ -3866,6 +3867,7 @@ function toast(msg, type = 'success') {
   const footer = (m, loai) => `<button class="btn btn-default" onclick="closeModal('${m}')">Hủy</button>
     <button class="btn btn-default" onclick="CRDSV.draft('${loai}')">💾 Lưu nháp</button>
     <button class="btn btn-default" onclick="CRDSV.preview('${loai}')">👁️ Xem trước</button>
+    <button class="btn btn-default" onclick="CRDSV.download('${loai}')">⬇️ Tải đơn</button>
     <button class="btn btn-primary" onclick="CRDSV.submit('${loai}')">Nộp</button>`;
   function initQd(p, maDot){
     const list = (QD_DB[maDot] || []).slice().sort((a,b) => b.ngay.localeCompare(a.ngay));
@@ -4089,7 +4091,12 @@ function toast(msg, type = 'success') {
       $('crd-pv-doc').innerHTML = docHtml(pending);
       $('modal-crd-preview').classList.remove('hidden');
     },
-    download(){ if(pending){ downloadDoc(pending); toast('Đang tải đơn'); } },
+    download(loai){
+      const v = collect(loai), e = missing(loai, v);
+      if(e){ toast(e, 'error'); return; }
+      downloadDoc({ loai, ngayNop:ngayNop(), data:v });
+      toast('Đang tải đơn');
+    },
     submit(loai){
       const v = collect(loai), e = missing(loai, v);
       if(e){ toast(e, 'error'); return; }

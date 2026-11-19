@@ -1,0 +1,708 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Cấu hình deadline | Phòng Đào tạo</title>
+  <link rel="stylesheet" href="_styles.css">
+  <style>
+  .moc-note{font-size:12.5px;color:var(--text-2);background:#f6f8ff;border:1px solid #d6e4ff;border-radius:6px;padding:8px 12px;margin-bottom:14px}
+  .moc-dot-info{font-size:12.5px;color:var(--text-2)}
+  .moc-tbl{width:100%;border-collapse:collapse;font-size:13px}
+  .moc-tbl th,.moc-tbl td{padding:8px 10px;border:1px solid var(--border);vertical-align:middle}
+  .moc-tbl th{background:#fafafa;font-weight:500;white-space:nowrap;text-align:left}
+  .moc-tbl td.c{text-align:center;white-space:nowrap}
+  .moc-sub{font-size:12px;color:var(--text-3);margin-top:2px}
+  .moc-sec{font-size:13.5px;font-weight:600;margin:18px 0 10px;padding-bottom:6px;border-bottom:1px solid var(--border)}
+  .moc-sec:first-child{margin-top:0}
+  .moc-opt{display:flex;gap:10px}
+  .moc-opt label{flex:1;display:flex;gap:8px;align-items:flex-start;border:1px solid var(--border);border-radius:8px;padding:10px 12px;cursor:pointer;font-weight:400;margin:0}
+  .moc-opt label.on{border-color:var(--primary);background:var(--primary-light,#e6f4ff)}
+  .moc-opt label.dis{opacity:.45;cursor:not-allowed}
+  .moc-opt b{display:block;font-size:13px;margin-bottom:2px}
+  .moc-opt span{font-size:12px;color:var(--text-3)}
+  .moc-nt{border:1px solid var(--border);border-radius:8px;padding:10px 12px;margin-bottom:10px}
+  .moc-nt-hd{display:flex;align-items:center;gap:8px;font-size:13px;font-weight:500}
+  .moc-nt-hd input{margin:0}
+  .moc-nt-bd{margin:10px 0 0 24px;display:flex;flex-direction:column;gap:8px}
+  .moc-nt.off .moc-nt-bd{display:none}
+  .moc-line{display:flex;align-items:center;gap:8px;flex-wrap:wrap;font-size:13px}
+  .moc-line .fc{width:auto}
+  .moc-chip{display:inline-flex;align-items:center;gap:4px;border:1px solid var(--border);border-radius:12px;padding:1px 4px 1px 10px;font-size:12.5px;background:#fafafa}
+  .moc-chip button{border:none;background:none;cursor:pointer;color:var(--text-3);padding:0 4px}
+  .moc-tag{display:inline-flex;align-items:center;padding:1px 8px;border-radius:4px;font-size:12px;border:1px solid;white-space:nowrap}
+  .moc-tag.blue{color:#0958d9;background:#e6f4ff;border-color:#91caff}
+  .moc-tag.red{color:#cf1322;background:#fff1f0;border-color:#ffa39e}
+  .moc-tag.gray{color:var(--text-2);background:#fafafa;border-color:var(--border)}
+  .moc-tag.orange{color:#d46b08;background:#fff7e6;border-color:#ffd591}
+  .moc-tag.green{color:#389e0d;background:#f6ffed;border-color:#b7eb8f}
+  .moc-stats{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:14px}
+  .moc-stat{border:1px solid var(--border);border-radius:8px;padding:10px 12px}
+  .moc-stat .n{font-size:20px;font-weight:700}
+  .moc-stat .l{font-size:12px;color:var(--text-3)}
+  .moc-prev{border:1px solid var(--border);border-radius:8px;padding:12px 14px;background:#fcfcfc;font-size:13px;line-height:1.6}
+  .moc-prev mark{background:#fff1b8;padding:0 2px}
+  .moc-err{color:var(--danger,#ff4d4f);font-size:12px;margin-top:4px;display:none}
+  .moc-err.show{display:block}
+  .moc-ro .moc-opt label, .moc-ro .moc-ms-box{pointer-events:none}
+  .moc-ro .moc-ms-box{background:#f5f5f5}
+  .moc-ms{position:relative}
+  .moc-ms-box{display:flex;align-items:center;gap:4px;flex-wrap:nowrap;overflow:hidden;min-height:32px;height:auto;cursor:pointer;padding-right:26px;position:relative}
+  .moc-ms-box .ph{color:var(--text-3)}
+  .moc-ms-box .tg{display:inline-flex;align-items:center;background:#f5f5f5;border:1px solid var(--border);border-radius:4px;padding:0 6px;font-size:12px;line-height:20px}
+  .moc-ms-arrow{position:absolute;right:9px;top:50%;transform:translateY(-50%);color:var(--text-3);font-size:12px}
+  .moc-ms-pop{display:none;position:absolute;left:0;right:0;top:calc(100% + 4px);background:#fff;border:1px solid var(--border);border-radius:6px;box-shadow:0 6px 16px rgba(0,0,0,.12);z-index:20;max-height:260px;overflow-y:auto;padding:4px 0}
+  .moc-ms.open .moc-ms-pop{display:block}
+  .moc-ms-box.dis{background:#f5f5f5;cursor:not-allowed;color:var(--text-3)}
+  .moc-ms-pop .sep{border-top:1px solid var(--border);margin:4px 0}
+  .moc-mau-opt{padding:7px 12px;font-size:13px;cursor:pointer}
+  .moc-mau-opt:hover{background:#f5f5f5}
+  .moc-mau-opt.on{background:var(--primary-light,#fff7e6);color:var(--primary)}
+  .moc-mau-opt b{font-weight:600}
+  .moc-ms-pop label{display:flex;align-items:center;gap:8px;padding:6px 12px;font-size:13px;font-weight:400;margin:0;cursor:pointer}
+  .moc-ms-pop label:hover{background:#f5f5f5}
+</style>
+</head>
+<body>
+<div class="app">
+
+  <!-- ═══ SIDEBAR ═══ -->
+  <nav class="sidebar">
+    <div class="sb-logo">
+      <div class="sb-logo-icon">🎓</div>
+      <div><div class="sb-logo-text">HTQT Đại học</div><div class="text-muted text-sm">Phòng Đào tạo</div></div>
+    </div>
+    <div class="sb-user">
+      <div class="av" style="background:#1677ff">PĐT</div>
+      <div><div style="font-size:13px;font-weight:600">Nguyễn Thị Lan</div><span class="tag tag-blue" style="font-size:11px">Phòng Đào tạo</span></div>
+    </div>
+    <ul class="sb-menu">
+      <li><a href="MH-PDT-00_Dashboard.html">🏠&nbsp; Trang chủ</a></li>
+      <li>
+        <span class="mn-group">📅&nbsp; Quản lý đợt &nbsp;▾</span>
+        <ul class="sb-sub open">
+          <li><a href="MH-PDT-01_InternshipRound.html">Danh sách đợt</a></li>
+          <li><a href="MH-PDT-05_StudentEligibility.html">DS Xét điều kiện</a></li>
+        </ul>
+      </li>
+      <li>
+        <span class="mn-group">📋&nbsp; Đề tài &nbsp;▾</span>
+        <ul class="sb-sub open">
+          <li><a href="MH-PDT-08_StudentTopicApproval.html">DS nguyện vọng đề tài</a></li>
+          <li><a href="MH-KCM-03_TopicApproval.html">Xét duyệt đề tài GV</a></li>
+        </ul>
+      </li>
+      <li class="active">
+        <span class="mn-group">👨‍🏫&nbsp; Hướng dẫn &nbsp;▾</span>
+        <ul class="sb-sub open">
+          <li><a href="MH-PDT-10_GraduationProjectManagement.html">Quản lý ĐATN &amp; KLTN</a></li>
+          <li><a href="MH-TTTN-01_InternshipManagement.html">QL DS thực tập</a></li>
+          <li><a href="MH-GV-02_ChangeRequestApproval.html">Quản lý yêu cầu thay đổi</a></li>
+          <li><a href="MH-PDT-12_ScoreSheetConfig.html">Cấu hình phiếu chấm</a></li>
+          <li class="active"><a href="MH-PDT-13_MilestoneConfig.html">Cấu hình deadline</a></li>
+        </ul>
+      </li>
+      <li>
+        <span class="mn-group">⚖️&nbsp; Hội đồng &nbsp;▾</span>
+        <ul class="sb-sub open">
+          <li><a href="MH-PDT-07_CouncilManagement.html">Quản lý hội đồng</a></li>
+          <li><a href="MH-PDT-09_DecisionTemplateManagement.html">Mẫu quyết định</a></li>
+        </ul>
+      </li>
+    </ul>
+  </nav>
+
+  <!-- ═══ MAIN ═══ -->
+  <div class="main">
+    <header class="app-header">
+      <span class="h-breadcrumb">Hướng dẫn &gt; Cấu hình deadline</span>
+      <div class="h-right">
+        <div class="bw"><button class="btn btn-link" style="font-size:18px">🔔</button><span class="bc">3</span></div>
+        <div class="av" style="background:#1677ff">PĐT</div>
+      </div>
+    </header>
+
+    <main class="content">
+      <div class="card">
+        <div class="moc-note">Mỗi mốc là một việc phải làm trong đợt. Đến hạn hệ thống tự nhắc; quá hạn thì cảnh báo hoặc khoá thao tác theo cấu hình của mốc. Trước <b>Từ ngày</b> vẫn thực hiện được.</div>
+        <div class="filter-bar">
+          <label style="font-size:13px;font-weight:500;margin:0">Đợt <span class="req">*</span></label>
+          <select class="fc" style="width:360px" id="f-dot" onchange="MOC.onDot()"></select>
+          <span class="moc-dot-info" id="dot-info"></span>
+          <div style="margin-left:auto;display:flex;gap:8px">
+            <button class="btn btn-default" onclick="MOC.openCopy()">📋 Sao chép từ đợt khác</button>
+            <button class="btn btn-primary" onclick="MOC.openEdit(null)">➕ Thêm mốc</button>
+          </div>
+        </div>
+        <div class="tbl-wrap">
+          <table class="moc-tbl">
+            <thead><tr>
+              <th style="width:36px">#</th><th>Tên mốc</th><th>Mô tả</th><th style="width:90px">Đối tượng</th>
+              <th>Từ ngày</th><th>Đến ngày</th><th>Khi quá hạn</th><th>Trạng thái</th><th style="width:120px">Thao tác</th>
+            </tr></thead>
+            <tbody id="moc-body"></tbody>
+          </table>
+        </div>
+        <div id="moc-empty" class="cond-empty" style="display:none;padding:24px;text-align:center;color:var(--text-3)">Đợt này chưa có mốc nào. Nhấn <strong>➕ Thêm mốc</strong> hoặc <strong>📋 Sao chép từ đợt khác</strong>.</div>
+      </div>
+    </main>
+  </div>
+</div>
+<!-- Popup Thêm/Sửa mốc -->
+<div class="overlay hidden" id="modal-moc">
+  <div class="modal-box" style="width:920px;max-height:92vh;display:flex;flex-direction:column">
+    <div class="modal-hd">
+      <span class="modal-title" id="moc-title">➕ Thêm mốc thời gian</span>
+      <button class="modal-close" onclick="closeModal('modal-moc')">✕</button>
+    </div>
+    <div class="modal-bd" style="overflow-y:auto">
+      <div class="moc-sec">1. Thông tin mốc</div>
+      <div class="f-row col-2">
+        <div class="fi" style="grid-column:1/-1">
+          <label>Tên mốc <span class="req">*</span></label>
+          <input class="fc" id="moc-ten" placeholder="VD: Nộp tiến độ ĐA/KLTN">
+          <div class="moc-err" id="moc-ten-err">Vui lòng nhập Tên mốc</div>
+        </div>
+        <div class="fi" style="grid-column:1/-1">
+          <label>Mô tả</label>
+          <textarea class="fc" id="moc-mota" rows="2" placeholder="Hiện cho người phải làm, VD: Sinh viên nộp tiến độ qua Cổng sinh viên"></textarea>
+        </div>
+        <div class="fi">
+          <label>Từ ngày <span class="req">*</span></label>
+          <input class="fc" type="datetime-local" id="moc-tu">
+          <div class="moc-err" id="moc-tu-err">Vui lòng chọn Từ ngày</div>
+        </div>
+        <div class="fi">
+          <label>Đến ngày <span class="req">*</span></label>
+          <input class="fc" type="datetime-local" id="moc-den">
+          <div class="f-hint">Hạn chót tính đến đúng giờ, phút đã chọn</div>
+          <div class="moc-err" id="moc-den-err">Vui lòng chọn Đến ngày</div>
+        </div>
+        <div class="fi">
+          <label>Đối tượng <span class="req">*</span></label>
+          <select class="fc" id="moc-dt" onchange="MOC.onDoiTuong()">
+            <option value="">-- Chọn đối tượng --</option>
+            <option>Sinh viên</option>
+            <option>Cán bộ</option>
+          </select>
+          <div class="moc-err" id="moc-dt-err">Vui lòng chọn Đối tượng</div>
+        </div>
+        <div class="fi" id="moc-vt-wrap" style="display:none">
+          <label>Vai trò <span class="req">*</span></label>
+          <div class="moc-ms" id="moc-vt-ms">
+            <div class="fc moc-ms-box" onclick="MOC.togMS(event)"><span id="moc-vt-txt"></span><span class="moc-ms-arrow">▾</span></div>
+            <div class="moc-ms-pop" id="moc-vt"></div>
+          </div>
+          <div class="f-hint" id="moc-vt-hint" style="display:none">Vai trò khoa: hệ thống tự xác định các khoa có sinh viên trong đợt và gửi cho mọi người giữ vai trò đã chọn ở các khoa đó.</div>
+          <div class="moc-err" id="moc-vt-err">Vui lòng chọn ít nhất 1 vai trò</div>
+        </div>
+      </div>
+
+      <div class="moc-sec">2. Việc cần hoàn thành và xử lý khi quá hạn</div>
+      <div class="fi">
+        <label>Thao tác cần hoàn thành <span class="req">*</span></label>
+        <div class="moc-ms" id="moc-tt-ms">
+          <div class="fc moc-ms-box" id="moc-tt-box" onclick="MOC.togTTMS(event)"><span id="moc-tt-txt"></span><span class="moc-ms-arrow">▾</span></div>
+          <div class="moc-ms-pop" id="moc-tt"></div>
+        </div>
+        <div class="f-hint" id="moc-tt-hint"></div>
+        <div class="moc-err" id="moc-tt-err">Vui lòng chọn Thao tác cần hoàn thành</div>
+      </div>
+      <label style="display:block;font-size:13px;font-weight:500;margin-bottom:6px">Khi quá hạn <span style="color:var(--error,#ff4d4f);margin-left:2px">*</span></label>
+      <div class="moc-opt" id="moc-qh">
+        <label data-v="warn" onclick="MOC.pickQH('warn')"><input type="radio" name="moc-qh"><div><b>Chỉ cảnh báo</b><span>Vẫn thực hiện được; bản ghi làm sau hạn gắn nhãn "Trễ hạn"</span></div></label>
+        <label data-v="lock" onclick="MOC.pickQH('lock')"><input type="radio" name="moc-qh"><div><b>Khoá</b><span id="moc-lock-desc">Không cho thực hiện thao tác sau Đến ngày</span></div></label>
+      </div>
+
+      <div class="moc-sec">3. Thông báo <span style="font-weight:400;font-size:12px;color:var(--text-3)">— chọn loại thông báo, kênh, thời điểm gửi và người nhận; hệ thống tự chọn mẫu theo đơn vị của người nhận. Muốn gửi nhiều kênh thì thêm nhiều dòng</span></div>
+      <div id="moc-nt"></div>
+    </div>
+    <div class="modal-ft">
+      <button class="btn btn-default" id="moc-cancel" onclick="closeModal('modal-moc')">Hủy</button>
+      <button class="btn btn-primary" id="moc-save" onclick="MOC.save()">💾 Lưu mốc</button>
+    </div>
+  </div>
+</div>
+
+<!-- Popup xem trước mẫu thông báo -->
+<div class="overlay hidden" id="modal-moc-prev" style="z-index:1100">
+  <div class="modal-box" style="width:560px">
+    <div class="modal-hd">
+      <span class="modal-title">👁 Xem trước mẫu thông báo</span>
+      <button class="modal-close" onclick="closeModal('modal-moc-prev')">✕</button>
+    </div>
+    <div class="modal-bd" id="moc-prev-bd"></div>
+    <div class="modal-ft"><button class="btn btn-default" onclick="closeModal('modal-moc-prev')">Đóng</button></div>
+  </div>
+</div>
+
+<!-- Popup theo dõi mốc -->
+<div class="overlay hidden" id="modal-moc-td">
+  <div class="modal-box" style="width:900px;max-height:92vh;display:flex;flex-direction:column">
+    <div class="modal-hd">
+      <span class="modal-title" id="moc-td-title">📊 Theo dõi mốc</span>
+      <button class="modal-close" onclick="closeModal('modal-moc-td')">✕</button>
+    </div>
+    <div class="modal-bd" style="overflow-y:auto" id="moc-td-bd"></div>
+    <div class="modal-ft"><button class="btn btn-default" onclick="closeModal('modal-moc-td')">Đóng</button></div>
+  </div>
+</div>
+
+<!-- Popup mở khoá riêng -->
+<div class="overlay hidden" id="modal-moc-mk" style="z-index:1100">
+  <div class="modal-box" style="width:480px">
+    <div class="modal-hd">
+      <span class="modal-title">🔓 Mở khoá riêng</span>
+      <button class="modal-close" onclick="closeModal('modal-moc-mk')">✕</button>
+    </div>
+    <div class="modal-bd">
+      <div id="moc-mk-who" style="font-size:13px;margin-bottom:12px"></div>
+      <div class="fi">
+        <label>Hạn riêng đến <span class="req">*</span></label>
+        <input class="fc" type="datetime-local" id="moc-mk-den">
+        <div class="moc-err" id="moc-mk-err">Hạn riêng phải sau Đến ngày của mốc</div>
+      </div>
+      <div class="fi">
+        <label>Lý do <span class="req">*</span></label>
+        <textarea class="fc" id="moc-mk-ly" rows="2" placeholder="VD: Giảng viên ốm, đã có xác nhận của Khoa"></textarea>
+        <div class="moc-err" id="moc-mk-ly-err">Vui lòng nhập Lý do</div>
+      </div>
+      <div class="f-hint">Thực hiện trong hạn riêng vẫn gắn nhãn "Trễ hạn" vì đã qua Đến ngày của mốc.</div>
+    </div>
+    <div class="modal-ft">
+      <button class="btn btn-default" onclick="closeModal('modal-moc-mk')">Hủy</button>
+      <button class="btn btn-primary" onclick="MOC.saveMK()">🔓 Mở khoá</button>
+    </div>
+  </div>
+</div>
+
+
+<!-- Popup sao chép từ đợt khác -->
+<div class="overlay hidden" id="modal-moc-copy">
+  <div class="modal-box" style="width:520px">
+    <div class="modal-hd">
+      <span class="modal-title">📋 Sao chép mốc từ đợt khác</span>
+      <button class="modal-close" onclick="closeModal('modal-moc-copy')">✕</button>
+    </div>
+    <div class="modal-bd">
+      <div class="fi">
+        <label>Đợt nguồn <span class="req">*</span></label>
+        <select class="fc" id="copy-src" onchange="MOC.copyPreview()"></select>
+        <div class="f-hint">Chỉ hiện đợt cùng loại với đợt đang chọn.</div>
+      </div>
+      <div id="copy-list" style="font-size:13px"></div>
+    </div>
+    <div class="modal-ft">
+      <button class="btn btn-default" onclick="closeModal('modal-moc-copy')">Hủy</button>
+      <button class="btn btn-primary" onclick="MOC.doCopy()">📋 Sao chép</button>
+    </div>
+  </div>
+</div>
+
+<script src="_utils.js"></script>
+<script>
+  const toast = (m, t) => showToast(m, t === 'error' ? 'err' : 'ok');
+  window.toast = toast;
+(function(){
+  const TODAY = '2026-11-18T09:00';
+  const VAI_TRO = ['GVHD', 'GVPB', 'Thành viên hội đồng', 'Trưởng khoa cấp 1', 'Phó Trưởng khoa cấp 1', 'Trưởng khoa cấp 2',
+    'Phó Trưởng khoa cấp 2', 'Quyền Trưởng Khoa', 'Giáo vụ khoa'];
+  const KHOA = ['Trưởng khoa cấp 1', 'Phó Trưởng khoa cấp 1', 'Trưởng khoa cấp 2', 'Phó Trưởng khoa cấp 2', 'Quyền Trưởng Khoa', 'Giáo vụ khoa'];
+  const dtLabel = m => m.dt === 'Cán bộ' ? 'Cán bộ: ' + (m.vt || []).join(', ') : (m.dt || '');
+  // Thao tác hệ thống cung cấp sẵn — lọc theo đối tượng + loại đợt (tttn / dakl). btn = nút bị khoá khi quá hạn
+  const TT = [
+    { id:'sv_nguyenvong', vt:['Sinh viên'], loai:['tttn', 'dakl'], ten:'Đăng ký nguyện vọng', btn:'Đăng ký nguyện vọng (MH-SV-02)' },
+    { id:'sv_tiendo', vt:['Sinh viên'], loai:['tttn'], ten:'Nộp tiến độ TTTN', btn:'Nộp / Nộp lại tiến độ (Cổng SV, MH-SV-01)' },
+    { id:'sv_tiendo_dakl', vt:['Sinh viên'], loai:['dakl'], ten:'Nộp tiến độ ĐA/KLTN', btn:'Nộp / Nộp lại tiến độ (Cổng SV, MH-SV-01)' },
+    { id:'sv_baocao', vt:['Sinh viên'], loai:['tttn', 'dakl'], ten:'Nộp báo cáo', btn:'Nộp báo cáo (Cổng SV, MH-SV-01)' },
+    { id:'sv_baocao_cs', vt:['Sinh viên'], loai:['dakl'], ten:'Nộp báo cáo sau chỉnh sửa', btn:'Nộp báo cáo sau chỉnh sửa (MH-SV-01)' },
+    { id:'sv_giahan', vt:['Sinh viên'], loai:['tttn', 'dakl'], ten:'Nộp đơn gia hạn', btn:'Tạo đơn gia hạn (MH-SV-05)' },
+    { id:'sv_doidetai', vt:['Sinh viên'], loai:['dakl'], ten:'Nộp đơn đổi đề tài', btn:'Tạo đơn đổi đề tài (MH-SV-05)' },
+    { id:'sv_doicstt', vt:['Sinh viên'], loai:['tttn'], ten:'Nộp đơn đổi cơ sở thực tập', btn:'Tạo đơn đổi cơ sở thực tập (MH-SV-05)' },
+    // GVHD
+    { id:'gvhd_detai', vt:['GVHD'], loai:['dakl'], ten:'Gửi đề tài xét duyệt', btn:'Gửi xét duyệt đề tài (MH-GV-04)' },
+    { id:'gvhd_nvhd', vt:['GVHD'], loai:['tttn', 'dakl'], ten:'Duyệt nguyện vọng hướng dẫn', btn:'Chấp nhận / Từ chối hướng dẫn (MH-GV-03)' },
+    { id:'gvhd_nvdt', vt:['GVHD'], loai:['dakl'], ten:'Duyệt nguyện vọng đề tài', btn:'Xác nhận nguyện vọng đề tài (MH-GV-05)' },
+    { id:'gvhd_tiendo', vt:['GVHD'], loai:['tttn', 'dakl'], ten:'Duyệt tiến độ', btn:'Duyệt / Yêu cầu chỉnh sửa tiến độ (MH-GV-06)' },
+    { id:'gvhd_diem', vt:['GVHD'], loai:['tttn'], ten:'Nhập điểm GVHD', btn:'Lưu điểm (MH-GV-01)' },
+    { id:'gvhd_nhanxet', vt:['GVHD'], loai:['tttn', 'dakl'], ten:'Gửi phiếu nhận xét', btn:'Gửi phiếu nhận xét GVHD (MH-GV-06)' },
+    // GVPB
+    { id:'gvpb_cham', vt:['GVPB'], loai:['dakl'], ten:'Gửi phiếu chấm phản biện', btn:'Gửi phiếu chấm GVPB (MH-GV-06)' },
+    // Thành viên hội đồng
+    { id:'hd_cham', vt:['Thành viên hội đồng'], loai:['dakl'], ten:'Chấm điểm hội đồng', btn:'Chấm điểm / Lưu (MH-GV-08)' },
+    { id:'hd_ketluan', vt:['Thành viên hội đồng'], loai:['dakl'], ten:'Nhập kết luận hội đồng', btn:'Kết luận (MH-GV-08)' },
+    { id:'hd_hoanthanh', vt:['Thành viên hội đồng'], loai:['dakl'], ten:'Hoàn thành hội đồng', btn:'🏁 Hoàn thành hội đồng (MH-GV-08, MH-KCM-09)', theoHD:true },
+    // Khoa
+    { id:'khoa_duyetdtgv', vt:KHOA, loai:['dakl'], ten:'Duyệt đề tài giảng viên', btn:'Phê duyệt / Từ chối đề tài (MH-KCM-03)' },
+    { id:'khoa_duyetnv', vt:KHOA, loai:['tttn', 'dakl'], ten:'Khoa duyệt nguyện vọng hướng dẫn', btn:'Phê duyệt nguyện vọng (MH-KCM-05)' },
+    { id:'khoa_duyetdtsv', vt:KHOA, loai:['dakl'], ten:'Duyệt đề tài sinh viên', btn:'Phê duyệt / Từ chối (MH-KCM-06)' },
+    { id:'khoa_pcgvhd', vt:KHOA, loai:['tttn', 'dakl'], ten:'Phân công GVHD', btn:'Phân công GVHD (MH-KCM-07)' },
+    { id:'khoa_pcdetai', vt:KHOA, loai:['dakl'], ten:'Phân công đề tài', btn:'Phân công đề tài (MH-KCM-07)' },
+    { id:'khoa_pcgvpb', vt:KHOA, loai:['dakl'], ten:'Phân công GVPB', btn:'Phân công GVPB (MH-KCM-07)' },
+    { id:'khoa_laphd', vt:KHOA, loai:['dakl'], ten:'Lập hội đồng', btn:'Tạo hội đồng / Gửi yêu cầu thành lập (MH-KCM-08)' },
+    { id:'khoa_xephd', vt:KHOA, loai:['dakl'], ten:'Xếp sinh viên vào hội đồng', btn:'Xếp sinh viên (MH-KCM-09)' },
+    { id:'khoa_ketluan', vt:KHOA, loai:['dakl'], ten:'Cập nhật kết luận', btn:'Cập nhật kết luận (MH-KCM-07)' },
+    { id:'khoa_diemcuoi', vt:KHOA, loai:['dakl'], ten:'Nhập điểm cuối', btn:'Nhập điểm cuối (MH-KCM-07)' },
+  ];
+  const NONE = 'none';
+  // Mẫu giả lập — lấy từ module Thông báo, nhóm "Mốc thời gian"
+  // Mẫu giả lập — lấy từ module Thông báo, nhóm "Mốc thời gian"; kênh gửi theo cấu hình của mẫu
+  // 4 loại thông báo deadline (module Thông báo). Hệ thống tự chọn mẫu cụ thể nhất theo đơn vị của người nhận;
+  // nội dung dưới đây là mẫu HỆ THỐNG, chỉ để xem trước.
+  const MAU = [
+    { id:'SYS_DEADLINE_OPEN', ma:'SYS_DEADLINE_OPEN', ten:'Mở mốc thời gian', td:'[Thông báo] Bắt đầu {{milestone_name}}', nd:'Chào {{recipient_name}}, mốc <b>{{milestone_name}}</b> của {{round_name}} bắt đầu từ {{start_time}} đến {{end_time}}. Việc cần làm: {{required_actions}}. Xem tại {{detail_url}}.' },
+    { id:'SYS_DEADLINE_REMIND', ma:'SYS_DEADLINE_REMIND', ten:'Nhắc hạn mốc', td:'[Nhắc hạn] {{milestone_name}} – còn {{hours_remaining}} giờ', nd:'Chào {{recipient_name}}, mốc <b>{{milestone_name}}</b> của {{round_name}} hết hạn lúc <b>{{end_time}}</b>. Bạn chưa hoàn thành: {{required_actions}}. Thực hiện tại {{detail_url}}.' },
+    { id:'SYS_DEADLINE_END', ma:'SYS_DEADLINE_END', ten:'Kết thúc mốc', td:'[Hết hạn] {{milestone_name}}', nd:'Chào {{recipient_name}}, mốc <b>{{milestone_name}}</b> của {{round_name}} đã kết thúc lúc {{end_time}}. {{lock_status}}.' },
+    { id:'SYS_DEADLINE_OVERDUE', ma:'SYS_DEADLINE_OVERDUE', ten:'Quá hạn mốc', td:'[Quá hạn] {{milestone_name}}', nd:'Chào {{recipient_name}}, mốc <b>{{milestone_name}}</b> đã quá hạn {{hours_overdue}} giờ (hạn {{end_time}}). Bạn chưa hoàn thành: {{required_actions}}. {{lock_status}}.' },
+  ];
+
+  const KENH = [{ v:'email', l:'Email' }, { v:'sms', l:'SMS' }, { v:'in_app', l:'Trong ứng dụng' }];
+  const mauOf = id => MAU.find(m => m.id === id) || MAU[0];
+  const KHI = [
+    { v:'start', l:'Khi bắt đầu mốc', gio:false },
+    { v:'end', l:'Khi kết thúc mốc', gio:false },
+    { v:'before', l:'Nhắc trước hạn', gio:true, sau:'giờ trước Đến ngày' },
+    { v:'after', l:'Sau hạn (trễ hạn)', gio:true, sau:'giờ sau Đến ngày' },
+    { v:'repeat', l:'Nhắc lại mỗi', gio:true, sau:'giờ đến khi hoàn thành' },
+  ];
+
+  const DOTS = [
+    { id:'tttn-hk1-2627', ten:'Thực tập tốt nghiệp HK1 2026-2027', loai:'tttn', loaiTen:'Thực tập tốt nghiệp', tu:'2026-11-01', den:'2027-01-31' },
+    { id:'datn-hk1-2627', ten:'Đồ án tốt nghiệp HK1 2026-2027', loai:'dakl', loaiTen:'Đồ án tốt nghiệp', tu:'2026-10-15', den:'2027-01-15' },
+    { id:'kltn-hk1-2627', ten:'Khóa luận tốt nghiệp HK1 2026-2027', loai:'dakl', loaiTen:'Khóa luận tốt nghiệp', tu:'2026-10-15', den:'2027-01-15' },
+    { id:'datn-hk2-2526', ten:'Đồ án tốt nghiệp HK2 2025-2026', loai:'dakl', loaiTen:'Đồ án tốt nghiệp', tu:'2026-02-01', den:'2026-06-30' },
+  ];
+  let curDot = (new URLSearchParams(location.search).get('dot')) || 'datn-hk1-2627';
+  if(!DOTS.some(d => d.id === curDot)) curDot = 'datn-hk1-2627';
+  const dotOf = id => DOTS.find(d => d.id === id);
+  const loaiDot = () => dotOf(curDot).loai;
+  const ttOf = id => TT.find(t => t.id === id);
+  const isNone = m => (m.tt || []).includes(NONE);
+  const ttsOf = m => (m.tt || []).map(ttOf).filter(Boolean);
+  const ttNames = m => ttsOf(m).map(t => t.ten);
+  const fmt = d => { if(!d) return ''; const [dd, tt] = d.split('T'); return dd.split('-').reverse().join('/') + (tt ? ' ' + tt : ''); };
+  const esc = s => String(s == null ? '' : s).replace(/[&<>"]/g, c => ({ '&':'&amp;', '<':'&lt;', '>':'&gt;', '"':'&quot;' })[c]);
+  const ntDefault = () => [{ mau:'SYS_DEADLINE_OPEN', kenh:'in_app', khi:'start', gio:0, gui:'all' }, { mau:'SYS_DEADLINE_REMIND', kenh:'in_app', khi:'before', gio:24, gui:'chua' }, { mau:'SYS_DEADLINE_REMIND', kenh:'in_app', khi:'before', gio:8, gui:'chua' }, { mau:'SYS_DEADLINE_OVERDUE', kenh:'in_app', khi:'after', gio:8, gui:'chua' }];
+
+  let MOCS = {
+    'tttn-hk1-2627':[
+      { ten:'Nộp tiến độ TTTN', mota:'Sinh viên kê khai cơ sở thực tập và nộp tiến độ', tu:'2026-11-02T08:00', den:'2026-11-15T17:00', dt:'Sinh viên', tt:['sv_tiendo'], qh:'warn', nt:ntDefault() },
+      { ten:'Nộp báo cáo thực tập', mota:'', tu:'2026-12-15T08:00', den:'2026-12-31T17:00', dt:'Sinh viên', tt:['sv_baocao'], qh:'lock', nt:ntDefault() },
+      { ten:'GVHD gửi nhận xét', mota:'', tu:'2027-01-02T08:00', den:'2027-01-10T17:00', dt:'Cán bộ', vt:['GVHD'], tt:['gvhd_nhanxet'], qh:'warn', nt:ntDefault() },
+    ],
+    'datn-hk1-2627':[
+      { ten:'Nộp tiến độ ĐA/KLTN', mota:'Sinh viên nộp tiến độ ĐA/KLTN qua Cổng sinh viên', tu:'2026-11-01T08:00', den:'2026-11-15T17:00', dt:'Sinh viên', tt:['sv_tiendo_dakl'], qh:'lock', nt:ntDefault() },
+      { ten:'Khoa phân công GVPB', mota:'', tu:'2026-11-16T08:00', den:'2026-11-25T17:00', dt:'Cán bộ', vt:['Trưởng khoa cấp 1', 'Giáo vụ khoa'], tt:['khoa_pcgvpb'], qh:'warn', nt:ntDefault() },
+      { ten:'GVPB gửi phiếu chấm', mota:'', tu:'2026-12-01T08:00', den:'2026-12-10T17:00', dt:'Cán bộ', vt:['GVPB'], tt:['gvpb_cham'], qh:'lock', nt:ntDefault() },
+      { ten:'Hoàn thành hội đồng', mota:'Hội đồng chấm xong và bấm Hoàn thành hội đồng', tu:'2026-12-15T08:00', den:'2026-12-20T17:00', dt:'Cán bộ', vt:['Thành viên hội đồng'], tt:['hd_hoanthanh'], qh:'warn', nt:ntDefault() },
+      { ten:'Bảo vệ trước hội đồng', mota:'Lịch bảo vệ chung toàn đợt', tu:'2026-12-15T08:00', den:'2026-12-19T17:00', dt:'Sinh viên', tt:[NONE], qh:'warn', nt:[{ mau:'SYS_DEADLINE_OPEN', kenh:'in_app', khi:'start', gio:0, gui:'all' }, { mau:'SYS_DEADLINE_REMIND', kenh:'in_app', khi:'before', gio:24, gui:'all' }] },
+    ],
+  };
+  MOCS['kltn-hk1-2627'] = [];
+  MOCS['datn-hk2-2526'] = MOCS['datn-hk1-2627'].map(m => Object.assign(JSON.parse(JSON.stringify(m)), { tu:m.tu.replace('2026-1', '2026-0').replace('2026-12', '2026-05'), den:m.den.replace('2026-1', '2026-0').replace('2026-12', '2026-05') }));
+  const list = () => (MOCS[curDot] = MOCS[curDot] || []);
+
+  // Trạng thái mốc: sap (Sắp mở) / dang (Đang diễn ra) / xong (Đã kết thúc)
+  const ttMoc = m => !m.tu || !m.den || TODAY < m.tu ? 'sap' : TODAY <= m.den ? 'dang' : 'xong';
+  const tinhTrang = m => ({ sap:'<span class="moc-tag gray">Sắp mở</span>', dang:'<span class="moc-tag blue">Đang diễn ra</span>', xong:'<span class="moc-tag green">Đã kết thúc</span>' })[ttMoc(m)];
+  const ntSum = n => n.length ? [...new Set(n.map(x => mauOf(x.mau).ten))].map(esc).join('<br>') : '<span style="color:var(--text-3)">Không gửi</span>';
+
+  const IB = 'class="btn btn-link btn-sm" style="font-size:15px;padding:0 5px"';
+  const IBD = 'class="btn btn-link btn-sm" style="font-size:15px;padding:0 5px;opacity:.35;cursor:not-allowed"';
+  function actions(m, i){
+    const st = ttMoc(m), xem = '';
+    const tk = isNone(m) || st === 'sap' ? '' : `<button ${IB} title="Xem thống kê" onclick="MOC.openTD(${i})">📊</button>`;
+    if(st === 'sap') return xem + `<button ${IB} title="Sửa" onclick="MOC.openEdit(${i})">✏️</button><button ${IB} title="Xoá" onclick="MOC.del(${i})">🗑</button>`;
+    if(st === 'dang') return xem + tk
+      + `<button ${IBD} title="Mốc đang diễn ra nên không sửa được, tránh hệ thống gửi thông báo sai hoặc không gửi được">✏️</button>`
+      + `<button ${IBD} title="Mốc đang diễn ra nên không xoá được, tránh hệ thống không gửi được thông báo">🗑</button>`;
+    return xem + tk;
+  }
+  function render(){
+    const rows = list().slice().sort((a, b) => (a.tu || '9') < (b.tu || '9') ? -1 : 1);
+    MOCS[curDot] = rows;
+    document.getElementById('moc-body').innerHTML = rows.map((m, i) => {
+      return `<tr>
+        <td class="c">${i + 1}</td>
+        <td><a href="javascript:void(0)" style="font-weight:500;color:var(--primary)" title="Xem chi tiết" onclick="MOC.openEdit(${i},true)">${esc(m.ten)}</a></td>
+        <td style="font-size:12.5px;color:var(--text-2)">${esc(m.mota) || '—'}</td>
+        <td>${esc(m.dt || '')}</td>
+        <td class="c">${fmt(m.tu) || '—'}</td><td class="c">${fmt(m.den) || '—'}</td>
+        <td class="c">${isNone(m) ? '—' : m.qh === 'lock' ? '<span class="moc-tag red">🔒 Khoá</span>' : '<span class="moc-tag orange">⚠ Chỉ cảnh báo</span>'}</td>
+        <td class="c">${tinhTrang(m)}</td>
+        <td class="c" style="white-space:nowrap">${actions(m, i)}</td></tr>`;
+    }).join('');
+    document.getElementById('moc-empty').style.display = rows.length ? 'none' : '';
+  }
+
+  // ---------- Popup Thêm/Sửa ----------
+  let editIdx = null, W = null;
+  function renderVTText(){
+    const vt = W.vt || [];
+    document.getElementById('moc-vt-hint').style.display = vt.some(v => KHOA.includes(v)) ? '' : 'none';
+    document.getElementById('moc-vt-txt').innerHTML = vt.length ? vt.slice(0, 2).map(v => `<span class="tg">${esc(v)}</span>`).join('') + (vt.length > 2 ? `<span class="tg" title="${esc(vt.slice(2).join(', '))}">+${vt.length - 2}</span>` : '') : '<span class="ph">-- Chọn vai trò --</span>';
+  }
+  document.addEventListener('click', e => { document.querySelectorAll('.moc-ms.open').forEach(ms => { if(!ms.contains(e.target)) ms.classList.remove('open'); }); });
+  function renderVT(){
+    const show = W.dt === 'Cán bộ';
+    document.getElementById('moc-vt-wrap').style.display = show ? '' : 'none';
+    renderVTText();
+    document.getElementById('moc-vt').innerHTML = VAI_TRO.map(v => `<label><input type="checkbox" ${(W.vt || []).includes(v) ? 'checked' : ''} onchange="MOC.togVT('${v}',this.checked)"> ${esc(v)}</label>`).join('');
+  }
+  function fillTT(){
+    const dt = W.dt, loai = loaiDot();
+    const ai = dt === 'Sinh viên' ? ['Sinh viên'] : dt === 'Cán bộ' ? (W.vt || []) : [];
+    const opts = TT.filter(t => t.loai.includes(loai) && t.vt.some(v => ai.includes(v)));
+    W.tt = (W.tt || []).filter(id => id === NONE || opts.some(t => t.id === id));
+    const box = document.getElementById('moc-tt-box'), dis = !ai.length;
+    box.classList.toggle('dis', dis);
+    if(dis) document.getElementById('moc-tt-ms').classList.remove('open');
+    const names = isNone(W) ? ['Không gắn thao tác'] : W.tt.map(id => ttOf(id).ten);
+    document.getElementById('moc-tt-txt').innerHTML = names.length ? names.slice(0, 2).map(v => `<span class="tg">${esc(v)}</span>`).join('')
+      + (names.length > 2 ? `<span class="tg" title="${esc(names.slice(2).join(', '))}">+${names.length - 2}</span>` : '') : '<span class="ph">-- Chọn thao tác --</span>';
+    document.getElementById('moc-tt').innerHTML = opts.map(t => `<label><input type="checkbox" ${W.tt.includes(t.id) ? 'checked' : ''} onchange="MOC.togTT('${t.id}',this.checked)"> ${esc(t.ten)}</label>`).join('')
+      + `<div class="sep"></div><label><input type="checkbox" ${isNone(W) ? 'checked' : ''} onchange="MOC.togTT('${NONE}',this.checked)"> Không gắn thao tác (chỉ thông báo lịch)</label>`;
+  }
+  function renderTTHint(){
+    const ts = ttsOf(W), h = document.getElementById('moc-tt-hint');
+    if(isNone(W)) h.innerHTML = 'Mốc chỉ để thông báo lịch: không theo dõi hoàn thành, không cảnh báo hay khoá.';
+    else if(ts.length) h.innerHTML = [ts.length > 1 ? 'Hoàn thành khi đã làm <b>tất cả</b> thao tác đã chọn; Khoá thì khoá tất cả các thao tác này.' : '',
+      ts.some(t => t.theoHD) ? 'Hoàn thành hội đồng làm theo <b>từng hội đồng</b>: theo dõi, cảnh báo, khoá tính theo hội đồng; thông báo chỉ gửi cho <b>Chủ tịch và Thư ký</b> của hội đồng.' : ''].filter(Boolean).join('<br>');
+    else h.innerHTML = !W.dt ? 'Chọn Đối tượng ở mục 1 trước' : (W.dt === 'Cán bộ' && !(W.vt || []).length ? 'Chọn Vai trò ở mục 1 trước' : '');
+  }
+  function renderQH(){
+    const none = isNone(W);
+    document.querySelectorAll('#moc-qh label').forEach(l => {
+      const v = l.dataset.v, dis = none;
+      l.classList.toggle('on', !none && W.qh === v); l.classList.toggle('dis', dis);
+      l.querySelector('input').checked = !none && W.qh === v; l.querySelector('input').disabled = dis;
+    });
+    const tn = ttNames(W);
+    document.getElementById('moc-lock-desc').textContent = tn.length ? `Sau Đến ngày, bấm "${tn.join('", "')}" sẽ báo "Đã quá hạn ${W.ten || '[Tên mốc]'} (${fmt(W.den) || 'dd/mm/yyyy'}), không thể thực hiện"` : 'Không cho thực hiện thao tác sau Đến ngày';
+  }
+  const GUI = [{ v:'all', l:'Gửi toàn bộ' }, { v:'chua', l:'Gửi cho người chưa hoàn thành' }, { v:'xong', l:'Gửi cho người đã hoàn thành' }];
+  function mauOpts(i, cur, q){
+    q = q.trim().toLowerCase();
+    const ms = MAU.filter(m => !q || m.ma.toLowerCase().includes(q) || m.ten.toLowerCase().includes(q));
+    return ms.length ? ms.map(m => `<div class="moc-mau-opt ${m.id === cur ? 'on' : ''}" onclick="MOC.pickMau(${i},'${m.id}')" title="${esc(m.ma)}">${esc(m.ten)}</div>`).join('')
+      : '<div style="padding:8px 12px;color:var(--text-3);font-size:13px">Không tìm thấy loại thông báo</div>';
+  }
+  function renderNT(){
+    const none = isNone(W), BAN = ['after', 'repeat'];
+    if(none) W.nt = W.nt.filter(x => !BAN.includes(x.khi));
+    W.nt.forEach(x => { if(!x.gui || none) x.gui = none ? 'all' : (x.khi === 'start' ? 'all' : 'chua'); });
+    const rows = W.nt.map((x, i) => {
+      const k = KHI.find(o => o.v === x.khi);
+      return `<tr>
+        <td class="c">${i + 1}</td>
+        <td><div class="moc-ms" id="mau-ms-${i}">
+          <div class="fc moc-ms-box" onclick="MOC.openMau(event,${i})"><span style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${esc(mauOf(x.mau).ten)}</span><span class="moc-ms-arrow">▾</span></div>
+          <div class="moc-ms-pop" style="min-width:320px">
+            <div style="padding:6px 8px"><input class="fc" placeholder="🔍 Tìm theo mã hoặc tên loại..." oninput="MOC.filterMau(${i},this.value)"></div>
+            <div id="mau-list-${i}">${mauOpts(i, x.mau, '')}</div>
+          </div></div></td>
+        <td><select class="fc" onchange="MOC.ntSet(${i},'kenh',this.value)">${KENH.map(o => `<option value="${o.v}" ${o.v === (x.kenh || 'in_app') ? 'selected' : ''}>${o.l}</option>`).join('')}</select></td>
+        <td><select class="fc" onchange="MOC.ntSet(${i},'khi',this.value)">${KHI.map(o => `<option value="${o.v}" ${o.v === x.khi ? 'selected' : ''} ${none && BAN.includes(o.v) ? 'disabled' : ''}>${o.l}</option>`).join('')}</select></td>
+        <td>${k.gio ? `<input class="fc" type="number" min="1" value="${x.gio || ''}" style="width:90px" onchange="MOC.ntSet(${i},'gio',+this.value)">` : '<span style="color:var(--text-3)">—</span>'}</td>
+        <td><select class="fc" ${none ? 'disabled' : ''} onchange="MOC.ntSet(${i},'gui',this.value)">${GUI.map(o => `<option value="${o.v}" ${o.v === x.gui ? 'selected' : ''}>${o.l}</option>`).join('')}</select></td>
+        <td class="c"><button class="btn btn-link btn-sm" title="Xem trước" onclick="MOC.prev(${i})">👁</button>
+          <button class="btn btn-link btn-sm" style="color:var(--danger)" title="Xoá" onclick="MOC.ntDel(${i})">🗑</button></td></tr>`;
+    }).join('');
+    document.getElementById('moc-nt').innerHTML = `
+      <div style="display:flex;justify-content:flex-end;margin-bottom:8px"><button class="btn btn-default btn-sm" onclick="MOC.ntAdd()">➕ Thêm thông báo</button></div>
+      <table class="moc-tbl"><thead><tr><th style="width:48px">STT</th><th>Loại thông báo</th><th style="width:130px">Kênh</th><th style="width:170px">Thời điểm gửi</th><th style="width:100px">Số giờ</th><th style="width:240px">Gửi cho</th><th style="width:80px">Thao tác</th></tr></thead>
+        <tbody>${rows || '<tr><td colspan="7" style="text-align:center;color:var(--text-3)">Chưa có thông báo nào — mốc không gửi thông báo</td></tr>'}</tbody></table>
+      <div style="margin-top:8px">
+        <div class="f-hint" style="margin:0">Số giờ tính theo <b>giờ hành chính 8:00–12:00, 13:00–17:00 (giờ Việt Nam, 8 giờ/ngày)</b>, không tính nghỉ trưa, thứ 7, chủ nhật, ngày nghỉ lễ, Tết. Nhắc lại mỗi N giờ: từ Từ ngày đến khi hoàn thành; mốc Khoá thì dừng ở Đến ngày.${none ? ' Mốc không gắn thao tác chỉ gửi toàn bộ, không có Sau hạn, Nhắc lại.' : ''}</div>
+      </div>`;
+  }
+  let RO = false;
+  function applyRO(){
+    const md = document.getElementById('modal-moc');
+    md.classList.toggle('moc-ro', RO);
+    if(RO) md.querySelectorAll('.modal-bd input, .modal-bd select, .modal-bd textarea').forEach(e => { e.disabled = true; });
+    else ['moc-ten', 'moc-mota', 'moc-tu', 'moc-den', 'moc-dt'].forEach(id => { document.getElementById(id).disabled = false; });
+    md.querySelectorAll('.modal-bd button').forEach(b => { if(b.title !== 'Xem trước') b.style.display = RO ? 'none' : ''; });
+    document.getElementById('moc-save').style.display = RO ? 'none' : '';
+    document.getElementById('moc-cancel').textContent = RO ? 'Đóng' : 'Hủy';
+  }
+  function renderAll(){ renderTTHint(); renderQH(); renderNT(); applyRO(); }
+
+  let TD = null;
+  function renderTD(){
+    const { people, size } = TD, total = people.length, pages = Math.max(1, Math.ceil(total / size));
+    if(TD.page > pages) TD.page = pages;
+    const p0 = (TD.page - 1) * size, rows = people.slice(p0, p0 + size);
+    const nums = Array.from({ length:pages }, (_, k) => k + 1);
+    document.getElementById('moc-td-tbl').innerHTML = `
+      <div class="tbl-wrap"><table class="moc-tbl"><thead><tr><th style="width:48px">STT</th>${TD.head}<th>Tình trạng</th><th style="width:100px">Thao tác</th></tr></thead>
+        <tbody>${rows.map((p, j) => `<tr><td class="c">${p0 + j + 1}</td>${TD.cells(p)}<td>${TD.stTag(p)}</td><td class="c">${TD.act(p)}</td></tr>`).join('')}</tbody></table></div>
+      <div class="pagination">
+        <span class="pg-info">Hiển thị ${total ? p0 + 1 : 0}–${p0 + rows.length} / ${total}</span>
+        <button class="pg-btn" ${TD.page === 1 ? 'disabled style="opacity:.4;cursor:not-allowed"' : ''} onclick="MOC.tdPage(${TD.page - 1})">‹</button>
+        ${nums.map(n => `<button class="pg-btn ${n === TD.page ? 'active' : ''}" onclick="MOC.tdPage(${n})">${n}</button>`).join('')}
+        <button class="pg-btn" ${TD.page === pages ? 'disabled style="opacity:.4;cursor:not-allowed"' : ''} onclick="MOC.tdPage(${TD.page + 1})">›</button>
+        <select class="fc" style="width:auto;margin-left:8px" onchange="MOC.tdSize(+this.value)">${[10, 20, 50].map(n => `<option value="${n}" ${n === size ? 'selected' : ''}>${n} / trang</option>`).join('')}</select>
+      </div>`;
+  }
+  window.MOC = {
+    openEdit(i, ro){
+      editIdx = i; RO = !!ro;
+      const src = i == null ? { ten:'', mota:'', tu:'', den:'', dt:'', vt:[], tt:[], qh:'warn', nt:ntDefault() } : list()[i];
+      W = JSON.parse(JSON.stringify(src));
+      document.getElementById('moc-title').textContent = i == null ? '➕ Thêm mốc thời gian' : ro ? '👁 Chi tiết mốc thời gian' : '✏️ Sửa mốc thời gian';
+      document.getElementById('moc-ten').value = W.ten; document.getElementById('moc-mota').value = W.mota;
+      document.getElementById('moc-tu').value = W.tu; document.getElementById('moc-den').value = W.den;
+      W.vt = W.vt || []; document.getElementById('moc-dt').value = W.dt || ''; renderVT();
+      document.querySelectorAll('#modal-moc .moc-err').forEach(e => e.classList.remove('show'));
+      fillTT(); renderAll();
+      openModal('modal-moc');
+    },
+    onDoiTuong(){ W.dt = document.getElementById('moc-dt').value; if(W.dt !== 'Cán bộ') W.vt = []; renderVT(); fillTT(); renderAll(); },
+    togMS(e){ e.stopPropagation(); document.getElementById('moc-vt-ms').classList.toggle('open'); },
+    togVT(v, on){ W.vt = on ? [...new Set([...W.vt, v])] : W.vt.filter(x => x !== v); W.vt.sort((a, b) => VAI_TRO.indexOf(a) - VAI_TRO.indexOf(b)); renderVTText(); fillTT(); renderAll(); },
+    togTTMS(e){ e.stopPropagation(); if(document.getElementById('moc-tt-box').classList.contains('dis')) return; document.getElementById('moc-tt-ms').classList.toggle('open'); },
+    togTT(id, on){
+      if(id === NONE) W.tt = on ? [NONE] : [];
+      else { W.tt = W.tt.filter(x => x !== NONE && x !== id); if(on) W.tt.push(id); W.tt.sort((a, b) => TT.findIndex(t => t.id === a) - TT.findIndex(t => t.id === b)); }
+      if(isNone(W)) W.qh = 'warn';
+      fillTT(); renderAll();
+    },
+    pickQH(v){ if(isNone(W)) return; W.qh = v; renderAll(); },
+    ntAdd(){ W.nt.push({ mau:'SYS_DEADLINE_REMIND', kenh:'in_app', khi:'before', gio:8, gui:'chua' }); renderNT(); },
+    openMau(e, i){
+      e.stopPropagation();
+      const ms = document.getElementById('mau-ms-' + i), was = ms.classList.contains('open');
+      document.querySelectorAll('.moc-ms.open').forEach(x => x.classList.remove('open'));
+      if(!was){ ms.classList.add('open'); const inp = ms.querySelector('input'); inp.value = ''; MOC.filterMau(i, ''); inp.focus(); }
+    },
+    filterMau(i, q){ document.getElementById('mau-list-' + i).innerHTML = mauOpts(i, W.nt[i].mau, q); },
+    pickMau(i, id){ W.nt[i].mau = id; renderNT(); applyRO(); },
+    ntDel(i){ W.nt.splice(i, 1); renderNT(); },
+    ntSet(i, f, v){ const x = W.nt[i]; x[f] = v; if(f === 'khi'){ x.gio = (KHI.find(o => o.v === v) || {}).gio ? (x.gio || 8) : 0; } renderNT(); },
+    prev(i){
+      const x = W && W.nt[i] ? W.nt[i] : { mau:'SYS_DEADLINE_REMIND' }, m = mauOf(x.mau);
+      const ten = document.getElementById('moc-ten').value || 'Nộp tiến độ ĐA/KLTN', den = fmt(document.getElementById('moc-den').value) || '15/02/2026 17:00', tu = fmt(document.getElementById('moc-tu').value) || '01/02/2026 08:00';
+      const vars = { '{{milestone_name}}':ten, '{{round_name}}':dotOf(curDot).ten, '{{start_time}}':tu, '{{end_time}}':den, '{{hours_remaining}}':'8', '{{hours_overdue}}':'8',
+        '{{required_actions}}':ttNames(W).join(', ') || 'Nộp tiến độ ĐA/KLTN', '{{lock_status}}':W.qh === 'lock' ? 'Hệ thống đã khoá thao tác' : 'Bạn vẫn thực hiện được, bản ghi sẽ gắn nhãn Trễ hạn',
+        '{{recipient_name}}':'Nguyễn Văn An', '{{detail_url}}':'<u>Cổng sinh viên › Đồ án tốt nghiệp</u>' };
+      const fill = t => Object.keys(vars).reduce((r, v) => r.split(v).join(`<mark>${vars[v]}</mark>`), t);
+      document.getElementById('moc-prev-bd').innerHTML = `<div style="font-size:12.5px;color:var(--text-3);margin-bottom:8px">Loại: <b>${esc(m.ten)}</b> · Kênh: ${esc((KENH.find(k => k.v === (x.kenh || 'in_app')) || {}).l)} · Mẫu hệ thống, dữ liệu minh hoạ</div>
+        <div class="moc-prev"><div style="font-weight:600;margin-bottom:6px">${fill(esc(m.td))}</div>${fill(m.nd)}</div>
+        <div class="f-hint" style="margin-top:8px">Hệ thống tự chọn mẫu cụ thể nhất theo đơn vị của người nhận (mẫu đơn vị → tổ chức → hệ thống). Sửa nội dung tại Quản lý thông báo › Mẫu thông báo.</div>`;
+      openModal('modal-moc-prev');
+    },
+    save(){
+      W.ten = document.getElementById('moc-ten').value.trim(); W.mota = document.getElementById('moc-mota').value.trim();
+      W.tu = document.getElementById('moc-tu').value; W.den = document.getElementById('moc-den').value; W.dt = document.getElementById('moc-dt').value; if(W.dt !== 'Cán bộ') W.vt = [];
+      const err = (id, show, msg) => { const e = document.getElementById(id); if(msg) e.textContent = msg; e.classList.toggle('show', show); return show; };
+      let bad = false;
+      bad = err('moc-ten-err', !W.ten) || bad;
+      bad = err('moc-tu-err', !W.tu) || bad;
+      bad = err('moc-den-err', !W.den || (W.tu && W.den <= W.tu), !W.den ? 'Vui lòng chọn Đến ngày' : 'Đến ngày phải sau Từ ngày') || bad;
+      bad = err('moc-dt-err', !W.dt) || bad;
+      bad = err('moc-vt-err', W.dt === 'Cán bộ' && !W.vt.length) || bad;
+      bad = err('moc-tt-err', !W.tt.length) || bad;
+      if(!bad && list().some((m, i) => i !== editIdx && m.ten.toLowerCase() === W.ten.toLowerCase())) bad = err('moc-ten-err', true, 'Tên mốc đã có trong đợt');
+      if(!bad && W.nt.some(x => (KHI.find(o => o.v === x.khi) || {}).gio && !(x.gio >= 1))){ toast('Thông báo: nhập số giờ từ 1 trở lên cho các dòng Nhắc trước hạn, Sau hạn, Nhắc lại.', 'error'); bad = true; }
+      if(!bad){ const k = W.nt.map(x => x.mau + ':' + (x.kenh || 'in_app') + ':' + x.khi + ':' + x.gio + ':' + x.gui); if(k.some((v, j) => k.indexOf(v) !== j)){ toast('Thông báo: có 2 dòng trùng cả loại, kênh, thời điểm gửi và người nhận.', 'error'); bad = true; } }
+      if(bad) return;
+      if(editIdx == null) list().push(W); else list()[editIdx] = W;
+      closeModal('modal-moc'); render(); toast(editIdx == null ? 'Đã thêm mốc "' + W.ten + '"' : 'Đã lưu mốc "' + W.ten + '"');
+    },
+    del(i){ const m = list()[i]; if(ttMoc(m) !== 'sap') return; if(!confirm('Xoá mốc "' + m.ten + '"? Thông báo chưa gửi của mốc sẽ bị huỷ.')) return; list().splice(i, 1); render(); toast('Đã xoá mốc "' + m.ten + '"'); },
+
+    // ---------- Theo dõi ----------
+    openTD(i){
+      const m = list()[i], ts = ttsOf(m), byHD = ts.some(t => t.theoHD), qua = TODAY > m.den, sv = m.dt === 'Sinh viên';
+      // Dữ liệu minh hoạ
+      const HO = ['Nguyễn', 'Trần', 'Lê', 'Phạm', 'Vũ', 'Ngô', 'Đỗ', 'Hoàng', 'Bùi', 'Đặng', 'Lý', 'Phan'];
+      const DEM = ['Văn', 'Thị', 'Minh', 'Thu', 'Quang', 'Hải', 'Ngọc', 'Đức'];
+      const TEN = ['An', 'Bình', 'Cường', 'Dung', 'Nam', 'Hoa', 'Huy', 'Lan', 'Long', 'Mai', 'Phúc', 'Trang', 'Tuấn', 'Yến'];
+      const DV = ['Khoa Công nghệ thông tin', 'Khoa Kinh tế', 'Khoa Ngoại ngữ', 'Khoa Điện – Điện tử'];
+      const STS = ['ok', 'ok', 'tre', 'chua', 'ok', 'mo', 'chua', 'ok'];
+      const people = byHD
+        ? Array.from({ length:12 }, (_, k) => ({ a:`HĐ${String(k + 1).padStart(2, '0')} – ${['CNPM', 'HTTT', 'KHMT', 'ATTT', 'KTPM', 'MMT'][k % 6]}`,
+            b:`TS ${HO[k % 12]} ${DEM[(k + 2) % 8]} ${TEN[k % 14]}`, c:`ThS ${HO[(k + 5) % 12]} ${DEM[(k + 1) % 8]} ${TEN[(k + 7) % 14]}`, st:STS[k % 8] }))
+        : Array.from({ length:sv ? 27 : 14 }, (_, k) => ({ a:`${HO[k % 12]} ${DEM[(k * 3) % 8]} ${TEN[(k * 5) % 14]}`,
+            b:sv ? String(20210001 + k * 7) : DV[k % 4], dv:DV[(k * 3) % 4], st:STS[k % 8] }));
+      const done = p => p.st === 'ok' || p.st === 'tre';
+      const cnt = st => people.filter(p => p.st === st).length, nChua = people.filter(p => !done(p)).length;
+      const stTag = p => done(p) ? '<span class="moc-tag green">Hoàn thành</span>' : `<span class="moc-tag ${qua ? 'red' : 'gray'}">Chưa hoàn thành</span>`;
+      const ico = (icon, tip, fn) => `<button class="btn btn-link btn-sm" style="font-size:15px;padding:0 6px" title="${tip}" onclick="${fn}">${icon}</button>`;
+      const act = p => done(p) ? '' :
+        ico('📨', 'Gửi nhắc', `toast('Đã gửi nhắc cho ${esc(p.a)} theo loại ${qua ? 'Quá hạn mốc' : 'Nhắc hạn mốc'}')`)
+        + (m.qh === 'lock' && qua ? ico('🔓', p.st === 'mo' ? 'Sửa hạn riêng' : 'Mở khoá riêng', `MOC.openMK('${esc(p.a)}','${m.den}')`) : '');
+      const head = byHD ? '<th>Hội đồng</th><th>Chủ tịch</th><th>Thư ký</th>'
+        : sv ? '<th>Họ tên</th><th>MSSV</th><th>Đơn vị quản lý</th>' : '<th>Họ tên</th><th>Đơn vị</th>';
+      const cells = p => byHD ? `<td>${esc(p.a)}</td><td>${esc(p.b)}</td><td>${esc(p.c)}</td>`
+        : sv ? `<td>${esc(p.a)}</td><td>${esc(p.b)}</td><td>${esc(p.dv)}</td>` : `<td>${esc(p.a)}</td><td>${esc(p.b)}</td>`;
+      TD = { people, page:1, size:10, head, cells, stTag, act };
+      document.getElementById('moc-td-title').textContent = '📊 Theo dõi mốc: ' + m.ten;
+      document.getElementById('moc-td-bd').innerHTML = `
+        <div style="font-size:13px;margin-bottom:12px;color:var(--text-2)">${esc(dtLabel(m))} · ${esc(ttNames(m).join(', '))} · ${fmt(m.tu)} – ${fmt(m.den)} · ${m.qh === 'lock' ? '🔒 Khoá' : '⚠ Chỉ cảnh báo'} · ${tinhTrang(m)}</div>
+        <div class="moc-stats">
+          <div class="moc-stat"><div class="n">${people.length}</div><div class="l">Tổng ${byHD ? 'hội đồng' : 'người'}</div></div>
+          <div class="moc-stat"><div class="n" style="color:#389e0d">${cnt('ok')}</div><div class="l">Hoàn thành đúng hạn</div></div>
+          <div class="moc-stat"><div class="n" style="color:#d46b08">${cnt('tre')}</div><div class="l">Trễ hạn</div></div>
+          <div class="moc-stat"><div class="n" style="color:#cf1322">${nChua}</div><div class="l">Chưa hoàn thành</div></div>
+        </div>
+        <div style="display:flex;justify-content:flex-end;margin-bottom:8px">
+          <button class="btn btn-default btn-sm" onclick="toast('Đã gửi nhắc cho ${nChua} ${byHD ? 'hội đồng' : 'người'} chưa hoàn thành')">📨 Nhắc tất cả chưa hoàn thành</button>
+        </div>
+        <div id="moc-td-tbl"></div>
+        <div class="f-hint" style="margin-top:8px">${m.qh === 'lock' ? 'Mở khoá riêng chỉ có sau Đến ngày, cho từng ' + (byHD ? 'hội đồng' : 'người') + ' chưa hoàn thành. ' : ''}Nhắc thủ công: trước hạn gửi loại Nhắc hạn mốc, sau hạn gửi loại Quá hạn mốc, theo kênh của dòng thông báo tương ứng.</div>`;
+      renderTD();
+      openModal('modal-moc-td');
+    },
+    tdPage(p){ TD.page = p; renderTD(); },
+    tdSize(n){ TD.size = n; TD.page = 1; renderTD(); },
+    openMK(who, den){
+      document.getElementById('moc-mk-who').innerHTML = `Mở khoá cho <b>${esc(who)}</b>. Đến ngày của mốc: <b>${fmt(den)}</b>.`;
+      document.getElementById('moc-mk-den').value = ''; document.getElementById('moc-mk-den').dataset.den = den;
+      document.getElementById('moc-mk-ly').value = '';
+      document.querySelectorAll('#modal-moc-mk .moc-err').forEach(e => e.classList.remove('show'));
+      openModal('modal-moc-mk');
+    },
+    saveMK(){
+      const d = document.getElementById('moc-mk-den'), ly = document.getElementById('moc-mk-ly').value.trim();
+      const b1 = !d.value || d.value <= d.dataset.den, b2 = !ly;
+      document.getElementById('moc-mk-err').classList.toggle('show', b1);
+      document.getElementById('moc-mk-ly-err').classList.toggle('show', b2);
+      if(b1 || b2) return;
+      closeModal('modal-moc-mk'); toast('Đã mở khoá riêng đến ' + fmt(d.value));
+    },
+  };
+
+  // ---------- Chọn đợt ----------
+  function renderDot(){
+    const sel = document.getElementById('f-dot');
+    sel.innerHTML = DOTS.map(d => `<option value="${d.id}" ${d.id === curDot ? 'selected' : ''}>${esc(d.ten)}</option>`).join('');
+    const d = dotOf(curDot);
+    document.getElementById('dot-info').innerHTML = `Loại: <b>${esc(d.loaiTen)}</b> · Thời gian đợt: ${fmt(d.tu)} – ${fmt(d.den)}`;
+    render();
+  }
+  Object.assign(window.MOC, {
+    onDot(){ curDot = document.getElementById('f-dot').value; renderDot(); },
+    openCopy(){
+      const src = DOTS.filter(d => d.id !== curDot && d.loai === loaiDot());
+      document.getElementById('copy-src').innerHTML = src.length ? src.map(d => `<option value="${d.id}">${esc(d.ten)} (${(MOCS[d.id] || []).length} mốc)</option>`).join('') : '<option value="">Không có đợt cùng loại</option>';
+      MOC.copyPreview(); openModal('modal-moc-copy');
+    },
+    copyPreview(){
+      const id = document.getElementById('copy-src').value, ms = MOCS[id] || [];
+      document.getElementById('copy-list').innerHTML = !id ? '' : ms.length ? '<div style="margin:6px 0 4px;font-weight:500">Các mốc sẽ sao chép:</div><ul style="margin:0 0 0 18px;padding:0">'
+        + ms.map(m => `<li>${esc(m.ten)}</li>`).join('') + '</ul>' : '<div style="color:var(--text-3);margin-top:6px">Đợt nguồn chưa có mốc nào.</div>';
+    },
+    doCopy(){
+      const id = document.getElementById('copy-src').value, ms = (MOCS[id] || []).filter(m => !list().some(x => x.ten.toLowerCase() === m.ten.toLowerCase()));
+      if(!id || !ms.length){ toast('Không có mốc nào để sao chép.', 'error'); return; }
+      ms.forEach(m => list().push(Object.assign(JSON.parse(JSON.stringify(m)), { tu:'', den:'' })));
+      closeModal('modal-moc-copy'); render(); toast('Đã sao chép ' + ms.length + ' mốc. Nhập Từ ngày, Đến ngày cho từng mốc.');
+    },
+  });
+  renderDot();
+})();
+</script>
+</body>
+</html>

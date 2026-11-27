@@ -1,0 +1,834 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Phân nhóm &amp; phân công | Khoa CNTT</title>
+  <link rel="stylesheet" href="_styles.css">
+  <style>
+    .mini-stats{display:grid;grid-template-columns:repeat(5,1fr);gap:12px;margin:16px 0 4px}
+    .mini{background:#fafafa;border:1px solid #f0f0f0;border-radius:8px;padding:10px 14px}
+    .mini b{display:block;font-size:22px;line-height:30px}
+    .mini span{color:var(--text-3);font-size:12px}
+    .step-hd{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px}
+    .step-title{font-size:15px;font-weight:600;display:flex;align-items:center;gap:8px;margin:0}
+    .step-no{width:22px;height:22px;border-radius:50%;background:var(--primary);color:#fff;font-size:12px;display:inline-flex;align-items:center;justify-content:center}
+    .split-row{display:flex;flex-wrap:wrap;gap:12px;align-items:flex-end}
+    .sp-sep{border-left:1px solid #f0f0f0;padding-left:12px}
+    .split-row .fi{margin-bottom:0}
+    .sp-radio{display:flex;gap:16px;align-items:center;height:34px}
+    .sp-radio label{display:flex;align-items:center;gap:6px;cursor:pointer;margin:0}
+    input[type=radio]{accent-color:var(--primary);width:16px;height:16px;cursor:pointer}
+    .sp-prev{margin-top:12px;padding:10px 14px;border:1px dashed #ffd591;background:#fffaf0;border-radius:6px;font-size:13px}
+    .sp-prev.bad{border-color:#ffa39e;background:#fff2f0;color:#cf1322}
+    .g-miss{color:#d46b08;font-size:12px}
+    .g-sub{font-size:12px;color:var(--text-3);line-height:1.4}
+    .sel-row td{background:#fff7e6!important}
+    .row-dis td{color:var(--text-3);background:#fafafa}
+    .row-dis input[type=radio]{cursor:not-allowed}
+    table.tbl td.top{vertical-align:top}
+    #conf-desc{white-space:pre-line}
+    .top-filters{display:flex;flex-wrap:wrap;gap:16px}
+    .top-filters .fi{margin:0}
+    .icon-btn:disabled{opacity:.25;filter:grayscale(1)}
+    .pk-two{display:grid;grid-template-columns:1fr 1.15fr;gap:16px}
+    .pk-bar{display:flex;gap:8px;align-items:center;height:34px;margin-bottom:10px}
+    .pk-bar b{white-space:nowrap}
+    .pk-bar input.fc{flex:1;min-width:0}
+    .pk-bar input[type=number].fc{flex:none;width:70px}
+    .pk-bar select.fc{flex:none;width:115px}
+    .pk-bar label{display:flex;gap:6px;align-items:center;margin:0;font-weight:400;cursor:pointer}
+    .pk-two input[type=checkbox]{width:16px;height:16px;accent-color:var(--primary);cursor:pointer}
+    .pk-scroll{height:min(52vh,420px);overflow:auto;border:1px solid #f0f0f0;border-radius:6px}
+    .pk-row{display:flex;align-items:center;gap:10px;margin:0;padding:7px 10px;border-bottom:1px solid #f5f5f5;cursor:pointer;font-weight:400}
+    .pk-row.on{background:#fff7e6}
+    .pk-card{border:1px solid #e8e8e8;border-radius:6px;margin:6px 8px}
+    .pk-card-hd{display:flex;justify-content:space-between;align-items:center;padding:6px 10px;background:#fafafa;font-weight:600;cursor:pointer}
+    .pk-over{color:#cf1322}
+    .pk-mems{max-height:170px;overflow-y:auto;border-top:1px solid #f0f0f0}
+    .pk-mem{display:flex;justify-content:space-between;align-items:center;padding:3px 10px;font-size:13px}
+    .pk-x{border:0;background:none;cursor:pointer;color:#999}
+    .pk-x:hover{color:var(--error)}
+    .pk-empty{padding:16px;color:var(--text-3);font-size:13px}
+  </style>
+</head>
+<body>
+<div class="app">
+
+  <!-- ═══ SIDEBAR ═══ -->
+  <nav class="sidebar">
+    <div class="sb-logo">
+      <div class="sb-logo-icon">🎓</div>
+      <div><div class="sb-logo-text">HTQT Đại học</div><div class="text-muted text-sm">Khoa CNTT</div></div>
+    </div>
+    <div class="sb-user">
+      <div class="av">KC</div>
+      <div>
+        <div style="font-size:13px;font-weight:600">TS. Trần Văn Bình</div>
+        <div style="font-size:11px;color:var(--text-3)">Giáo vụ Khoa</div>
+      </div>
+    </div>
+    <ul class="sb-menu">
+      <li><a href="#">🏠&nbsp; Trang chủ</a></li>
+      <li>
+        <span class="mn-group">📅&nbsp; Quản lý đợt &nbsp;▾</span>
+        <ul class="sb-sub open">
+          <li><a href="#">Danh sách đợt</a></li>
+          <li><a href="MH-KCM-04_StudentEligibility.html">DS Xét điều kiện</a></li>
+        </ul>
+      </li>
+      <li>
+        <span class="mn-group">📋&nbsp; Đề tài &nbsp;▾</span>
+        <ul class="sb-sub open">
+          <li><a href="MH-KCM-06_StudentTopicApproval.html">DS nguyện vọng đề tài</a></li>
+          <li><a href="MH-KCM-03_TopicApproval.html">Xét duyệt đề tài GV</a></li>
+        </ul>
+      </li>
+      <li>
+        <span class="mn-group">⚖️&nbsp; Hội đồng &nbsp;▾</span>
+        <ul class="sb-sub open">
+          <li><a href="MH-KCM-08_CouncilManagement.html">Quản lý hội đồng</a></li>
+          <li><a href="MH-KCM-09_CouncilStudentAssignment.html">Chi tiết &amp; Chấm điểm</a></li>
+        </ul>
+      </li>
+      <li class="active">
+        <span class="mn-group">👨‍🏫&nbsp; Hướng dẫn &nbsp;▾</span>
+        <ul class="sb-sub open">
+          <li><a href="MH-DATN-01_GraduationProjectManagement.html">Quản lý ĐATN &amp; KLTN</a></li>
+          <li><a href="MH-GV-01_InternshipTracking.html">Quản lý thực tập tốt nghiệp</a></li>
+          <li class="active"><a href="MH-KCM-10_GroupAssignment.html">Phân nhóm &amp; phân công</a></li>
+          <li><a href="MH-GV-02_ChangeRequestApproval.html">Quản lý yêu cầu thay đổi</a></li>
+        </ul>
+      </li>
+    </ul>
+  </nav>
+
+  <!-- ═══ MAIN ═══ -->
+  <div class="main">
+    <header class="app-header">
+      <span class="h-breadcrumb">Hướng dẫn &gt; <strong>Phân nhóm &amp; phân công</strong></span>
+      <div class="h-right">
+        <div class="bw"><button class="btn btn-link" style="font-size:18px">🔔</button><span class="bc">2</span></div>
+        <div class="av">KC</div>
+      </div>
+    </header>
+
+    <main class="content">
+
+      <!-- Chọn đợt + lớp học phần -->
+      <div class="card" style="margin-bottom:16px">
+        <div class="top-filters">
+          <div class="fi"><label>Đợt</label><select class="fc" style="width:250px" id="f-dot" onchange="onDot()"></select></div>
+          <div class="fi"><label>Lớp học phần</label><select class="fc" style="width:230px" id="f-lop" onchange="onLop()"></select></div>
+          <div class="fi"><label>Loại hình</label><input class="fc readonly" style="width:230px" id="f-loai" readonly tabindex="-1"></div>
+        </div>
+        <div class="alert alert-info" style="margin:12px 0 0" id="dot-note"></div>
+        <div class="mini-stats" id="stats"></div>
+      </div>
+
+      <!-- Chia nhóm + xếp sinh viên: gộp một khối để vẫn thấy bảng phân công -->
+      <div class="card" style="margin-bottom:16px">
+        <div class="step-hd"><h3 class="step-title"><span class="step-no">1</span> Chia nhóm</h3></div>
+        <div class="split-row">
+          <div class="fi" style="width:190px">
+            <label>Chia theo</label>
+            <select class="fc" id="sp-mode" onchange="onSplitMode()"><option value="groups">Số nhóm</option><option value="size">Số SV tối đa mỗi nhóm</option></select>
+          </div>
+          <div class="fi" style="width:100px">
+            <label id="sp-val-label">Số nhóm<span class="req">*</span></label>
+            <input type="number" class="fc" id="sp-val" min="1" value="3" oninput="renderPreview()">
+          </div>
+          <div class="fi"><button class="btn btn-primary" id="btn-split" onclick="doSplit()">🧩 Chia nhóm</button></div>
+          <div class="fi sp-sep" style="width:210px">
+            <label>Cách xếp SV vào nhóm</label>
+            <select class="fc" id="sp-method" onchange="renderPlace()"><option value="order">Theo thứ tự mã SV</option><option value="name">Theo tên sinh viên</option><option value="random">Ngẫu nhiên</option><option value="pick">Tự chọn sinh viên</option></select>
+          </div>
+          <div class="fi"><button class="btn btn-primary" id="btn-place" onclick="onPlace()">👥 Xếp sinh viên</button></div>
+          <div class="fi" id="fi-replace"><button class="btn btn-default" onclick="resetPlace()">🔄 Xếp lại từ đầu</button></div>
+        </div>
+        <div class="sp-prev" id="sp-prev"></div>
+        <div class="sp-prev" id="pl-prev"></div>
+        <div class="sp-prev bad" id="work-note"></div>
+      </div>
+
+      <!-- Danh sách nhóm -->
+      <div class="card">
+        <div class="step-hd">
+          <h3 class="step-title"><span class="step-no">2</span> <span id="grp-title">Phân công cho nhóm</span></h3>
+          <div style="display:flex;gap:8px"><button class="btn btn-default" onclick="addEmpty()">＋ Thêm nhóm trống</button><button class="btn btn-primary" id="btn-push" onclick="pushList()">Lưu và công bố</button></div>
+        </div>
+        <div id="grp-warn"></div>
+        <div class="tbl-wrap">
+          <table class="tbl">
+            <thead id="grp-head"></thead>
+            <tbody id="grp-body"></tbody>
+          </table>
+        </div>
+        <div class="pagination"><span class="pg-info" id="grp-info"></span></div>
+      </div>
+
+    </main>
+  </div>
+</div>
+
+<!-- ═══ MODAL: TỰ CHỌN SINH VIÊN VÀO NHÓM ═══ -->
+<div class="overlay hidden" id="m-pick">
+  <div class="modal-box w960">
+    <div class="modal-hd"><h4 class="modal-title" id="pk-title">Chọn sinh viên vào nhóm</h4><button class="modal-close" data-close="m-pick">✕</button></div>
+    <div class="modal-bd">
+      <div class="sp-prev bad" id="pk-work" style="margin:0 0 12px"></div>
+      <div class="pk-two">
+        <div>
+          <div class="pk-bar"><b id="pk-free"></b><input class="fc" id="pk-q" placeholder="Mã SV, họ tên..." oninput="renderPick()"><select class="fc" id="pk-sort" aria-label="Sắp xếp" onchange="renderPick()"><option value="order">Theo mã SV</option><option value="name">Theo tên</option></select></div>
+          <div class="pk-bar">Tick nhanh <input type="number" class="fc" id="pk-n" min="1"> SV đầu danh sách <button class="btn btn-default btn-sm" onclick="pickFirst()">Tick</button></div>
+          <div class="pk-scroll" id="pk-left"></div>
+        </div>
+        <div>
+          <div class="pk-bar"><b id="pk-groups"></b><input class="fc" id="pk-qg" placeholder="Tìm SV trong các nhóm..." oninput="renderPick()"></div>
+          <div class="pk-bar"><label id="pk-only-wrap"><input type="checkbox" id="pk-only" onchange="renderPick()"> Chỉ hiện nhóm còn chỗ</label></div>
+          <div class="pk-scroll" id="pk-right"></div>
+        </div>
+      </div>
+    </div>
+    <div class="modal-ft" style="align-items:center">
+      <span class="g-sub" id="pk-count" style="margin-right:auto"></span>
+      <button class="btn btn-default" data-close="m-pick">Hủy</button>
+      <button class="btn btn-primary" onclick="savePick()">Lưu</button>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ MODAL: THÀNH VIÊN ═══ -->
+<div class="overlay hidden" id="m-members">
+  <div class="modal-box w700">
+    <div class="modal-hd"><h4 class="modal-title" id="mm-title">Thành viên nhóm</h4><button class="modal-close" data-close="m-members" onclick="render()">✕</button></div>
+    <div class="modal-bd" id="mm-body"></div>
+    <div class="modal-ft"><button class="btn btn-default" data-close="m-members" onclick="render()">Đóng</button></div>
+  </div>
+</div>
+
+<!-- ═══ MODAL: ĐỀ TÀI (đồ án / khoá luận) ═══ -->
+<div class="overlay hidden" id="m-topic">
+  <div class="modal-box w960">
+    <div class="modal-hd"><h4 class="modal-title" id="mt-title">Phân công đề tài cho nhóm</h4><button class="modal-close" data-close="m-topic">✕</button></div>
+    <div class="modal-bd">
+      <div class="alert alert-info"><span class="alert-ico">ℹ️</span><div class="alert-body"><div class="alert-desc" id="mt-info"></div></div></div>
+      <div class="tbl-wrap">
+        <table class="tbl" style="font-size:13px">
+          <thead><tr>
+            <th style="width:36px"></th><th style="width:100px">Mã đề tài</th><th style="min-width:230px">Tên đề tài</th><th style="min-width:150px">GVHD</th>
+            <th style="width:90px;text-align:center" title="Số SV đã được gán / Số SV tối đa của đề tài">SLSV</th>
+            <th style="width:100px;text-align:center" title="Chỉ tiêu hướng dẫn của GVHD: đã dùng / tổng">Chỉ tiêu GV</th>
+            <th style="min-width:210px">Khả dụng cho nhóm</th>
+          </tr></thead>
+          <tbody id="mt-body"></tbody>
+        </table>
+      </div>
+      <div class="sp-prev" id="mt-prev" style="display:none"></div>
+    </div>
+    <div class="modal-ft"><button class="btn btn-default" data-close="m-topic">Hủy</button><button class="btn btn-primary" id="mt-save" onclick="saveTopic()" disabled>Lưu</button></div>
+  </div>
+</div>
+
+<!-- ═══ MODAL: GVHD (thực tập) ═══ -->
+<div class="overlay hidden" id="m-gv">
+  <div class="modal-box w700">
+    <div class="modal-hd"><h4 class="modal-title" id="mg-title">Phân công GVHD cho nhóm</h4><button class="modal-close" data-close="m-gv">✕</button></div>
+    <div class="modal-bd">
+      <div class="alert alert-info"><span class="alert-ico">ℹ️</span><div class="alert-body"><div class="alert-desc" id="mg-info"></div></div></div>
+      <div class="tbl-wrap">
+        <table class="tbl" style="font-size:13px">
+          <thead><tr><th style="width:36px"></th><th>Giảng viên</th><th style="width:180px">Đơn vị</th><th style="width:100px;text-align:center">Chỉ tiêu</th><th style="min-width:180px">Khả dụng cho nhóm</th></tr></thead>
+          <tbody id="mg-body"></tbody>
+        </table>
+      </div>
+      <div class="f-hint" style="margin-top:8px">Đồng hướng dẫn, GV ngoài trường và trọng số: dùng "Phân công GVHD" ở màn Quản lý thực tập tốt nghiệp.</div>
+    </div>
+    <div class="modal-ft"><button class="btn btn-default" data-close="m-gv">Hủy</button><button class="btn btn-primary" id="mg-save" onclick="saveGv()" disabled>Lưu</button></div>
+  </div>
+</div>
+
+<!-- ═══ MODAL: CƠ SỞ THỰC TẬP (thực tập) ═══ -->
+<div class="overlay hidden" id="m-cs">
+  <div class="modal-box w700">
+    <div class="modal-hd"><h4 class="modal-title" id="mc-title">Phân cơ sở thực tập cho nhóm</h4><button class="modal-close" data-close="m-cs">✕</button></div>
+    <div class="modal-bd">
+      <div class="alert alert-info"><span class="alert-ico">ℹ️</span><div class="alert-body"><div class="alert-desc" id="mc-info"></div></div></div>
+      <div class="fi"><label>Loại cơ sở thực tập</label>
+        <div class="sp-radio">
+          <label><input type="radio" name="cs-loai" value="dt" checked onchange="onCsLoai()"> Doanh nghiệp đối tác</label>
+          <label><input type="radio" name="cs-loai" value="khac" onchange="onCsLoai()"> Khác</label>
+        </div>
+      </div>
+      <div id="cs-dt">
+        <div class="fi"><label>Doanh nghiệp đối tác<span class="req">*</span></label>
+          <select class="fc" id="cs-dn" onchange="onDn()"></select>
+          <div class="fe" id="cs-dn-err">Vui lòng chọn doanh nghiệp.</div></div>
+        <div class="f-row col-2">
+          <div class="fi"><label>Tỉnh/Thành phố</label><input class="fc readonly" id="cs-tinh" readonly tabindex="-1" placeholder="Tự điền theo doanh nghiệp"></div>
+          <div class="fi"><label>Phường/Xã</label><input class="fc readonly" id="cs-phuong" readonly tabindex="-1" placeholder="Tự điền theo doanh nghiệp"></div>
+        </div>
+        <div class="fi"><label>Địa chỉ</label><input class="fc readonly" id="cs-addr" readonly tabindex="-1" placeholder="Tự điền theo doanh nghiệp"></div>
+        <div class="fi"><label>Người liên hệ</label><input class="fc readonly" id="cs-contact" readonly tabindex="-1" placeholder="Tự điền theo doanh nghiệp"></div>
+      </div>
+      <div id="cs-khac" style="display:none">
+        <div class="fi" id="fi-kten"><label>Tên cơ sở thực tập<span class="req">*</span></label><input class="fc" id="cs-k-ten"><div class="fe">Vui lòng nhập tên cơ sở.</div></div>
+        <div class="f-row col-2">
+          <div class="fi" id="fi-ktinh"><label>Tỉnh/Thành phố<span class="req">*</span></label><input class="fc" id="cs-k-tinh"><div class="fe">Vui lòng nhập Tỉnh/Thành phố.</div></div>
+          <div class="fi" id="fi-kphuong"><label>Phường/Xã<span class="req">*</span></label><input class="fc" id="cs-k-phuong"><div class="fe">Vui lòng nhập Phường/Xã.</div></div>
+        </div>
+        <div class="fi"><label>Địa chỉ</label><input class="fc" id="cs-k-addr"></div>
+        <div class="fi"><label>Người liên hệ</label><input class="fc" id="cs-k-contact"></div>
+      </div>
+    </div>
+    <div class="modal-ft"><button class="btn btn-default" data-close="m-cs">Hủy</button><button class="btn btn-primary" onclick="saveCs()">Lưu</button></div>
+  </div>
+</div>
+
+<!-- ═══ MODAL: SV KHÔNG CÓ TRONG DANH SÁCH CHIA ═══ -->
+<div class="overlay hidden" id="m-work">
+  <div class="modal-box w700">
+    <div class="modal-hd"><h4 class="modal-title">Sinh viên không có trong danh sách chia</h4><button class="modal-close" data-close="m-work">✕</button></div>
+    <div class="modal-bd"><table class="tbl"><thead><tr><th style="width:140px">Mã SV</th><th>Họ và tên</th><th style="width:180px">Lý do</th></tr></thead><tbody id="mw-body"></tbody></table></div>
+    <div class="modal-ft"><button class="btn btn-default" data-close="m-work">Đóng</button></div>
+  </div>
+</div>
+
+<script src="_utils.js"></script>
+<script>
+/* ═════════ DỮ LIỆU MẪU ═════════ */
+const DOTS = [
+  {id:'tt', name:'TTTN HK1 2025-2026', type:'tt', label:'Thực tập tốt nghiệp'},
+  {id:'da', name:'ĐATN HK2 2025-2026', type:'da', label:'Đồ án tốt nghiệp'},
+  {id:'kl', name:'KLTN HK2 2025-2026', type:'kl', label:'Khóa luận tốt nghiệp'}
+];
+const GV = {
+  'TS. Nguyễn Minh Tuấn': {donVi:'BM. Công nghệ phần mềm', total:15, base:5},
+  'TS. Lê Thị Mai':       {donVi:'BM. Hệ thống thông tin', total:15, base:15},
+  'ThS. Trần Văn Hùng':   {donVi:'BM. Công nghệ phần mềm', total:10, base:2},
+  'PGS.TS. Phạm Thị Lan': {donVi:'BM. Trí tuệ nhân tạo',   total:20, base:4}
+};
+const TOPICS = [
+  {id:'DT-2026-0001', name:'Hệ thống gợi ý học phần bằng học máy',          gv:'TS. Nguyễn Minh Tuấn', max:2, base:0},
+  {id:'DT-2026-0002', name:'Phân tích cảm xúc đánh giá sản phẩm trực tuyến', gv:'TS. Lê Thị Mai',       max:2, base:0},
+  {id:'DT-2026-0040', name:'Hệ thống quản lý bãi đỗ xe bằng nhận diện biển số', gv:'TS. Nguyễn Minh Tuấn', max:8, base:0},
+  {id:'DT-2026-0041', name:'Nền tảng thi trực tuyến chống gian lận',        gv:'ThS. Trần Văn Hùng',   max:6, base:0},
+  {id:'DT-2026-0042', name:'Ứng dụng quản lý thực tập trên thiết bị di động', gv:'PGS.TS. Phạm Thị Lan', max:5, base:0},
+  {id:'DT-2026-0043', name:'Nhận diện biển báo giao thông bằng thị giác máy', gv:'PGS.TS. Phạm Thị Lan', max:10, base:0}
+];
+const DN = [
+  {id:'dn1', name:'FPT Software',     tinh:'TP. Hồ Chí Minh', phuong:'Phường Tân Thuận Đông', addr:'Lô T2, Khu công nghệ cao', contact:'Ông Lê Văn Khải — 0901 234 567'},
+  {id:'dn2', name:'Tập đoàn Viettel', tinh:'Hà Nội',          phuong:'Phường Mỹ Đình 2',       addr:'Số 1 Trần Hữu Dực',       contact:'Bà Nguyễn Thu Hà — 0912 345 678'},
+  {id:'dn3', name:'VNPT Technology',  tinh:'Hà Nội',          phuong:'Phường Dịch Vọng Hậu',   addr:'57 Huỳnh Thúc Kháng',     contact:'Ông Trần Quốc Minh — 0935 456 789'}
+];
+const HO=['Nguyễn','Trần','Lê','Phạm','Hoàng','Huỳnh','Phan','Vũ','Võ','Đặng','Bùi','Đỗ'];
+const DEM=['Văn','Thị','Minh','Quốc','Hoàng','Thanh','Gia','Ngọc','Anh','Đức'];
+const TEN=['Bảo','Chi','Dũng','Giang','Hà','Hiếu','Huy','Khánh','Lan','Linh','Long','Mai','Nam','Nhi','Phát','Phúc','Quân','Sơn','Thảo','Trang','Tú','Vy','Yến','Khoa','Quyên','Trung','Việt','Thịnh','An','Phương'];
+function genSV(n, off, spec){
+  const a = [];
+  for (let i = 0; i < n; i++) { const k = i + off; a.push({code:'B22DCCN'+(1000+k), name:HO[(k*5)%12]+' '+DEM[(k*3+1)%10]+' '+TEN[k%30], st:(spec && spec[i]) || 'ok'}); }
+  return a;
+}
+/* st: ok = đủ điều kiện · noelig = không đủ điều kiện · huy = đã hủy · wish = đã đăng ký nguyện vọng */
+const DATA = {
+  tt: {'INT3110_4': {sv:genSV(14, 0, {3:'noelig'}), groups:[]},
+       'INT3110_5': {sv:genSV(12, 100), groups:[]}},
+  da: {'INT3110_4': {sv:genSV(19, 200, {5:'noelig', 11:'huy', 14:'wish', 15:'wish'}), groups:[]},
+       'INT3110_5': {sv:genSV(12, 300), groups:[]}},
+  kl: {'INT3110_6': {sv:genSV(10, 400), groups:[]}}
+};
+(function seed(){
+  const mk = (dot, lop, parts, extra) => { const l = DATA[dot][lop]; let p = 0;
+    parts.forEach((n, i) => { l.groups.push(Object.assign({no:i+1, m:l.sv.slice(p, p+n).map(s => s.code)}, extra[i] || {})); p += n; }); };
+  mk('tt', 'INT3110_5', [6, 6], [{gv:'ThS. Trần Văn Hùng', cs:{loai:'dt', name:'FPT Software', addr:'Lô T2, Khu công nghệ cao, Phường Tân Thuận Đông, TP. Hồ Chí Minh'}}, {}]);
+  mk('da', 'INT3110_5', [6, 6], [{topic:'DT-2026-0040'}, {}]);
+})();
+
+/* work: đã gửi đề cương / GV đã duyệt cơ sở (khoá) · solo: mới được phân đề tài, cơ sở riêng (đổi được) */
+(function mark(){
+  const set = (dot, lop, i, key, val) => { DATA[dot][lop].sv[i][key] = val; };
+  set('da', 'INT3110_4', 2, 'work', 'Đã gửi đề cương'); set('da', 'INT3110_4', 7, 'work', 'Đã gửi đề cương'); set('da', 'INT3110_4', 12, 'work', 'Đã gửi đề cương');
+  set('da', 'INT3110_4', 3, 'solo', true); set('da', 'INT3110_4', 9, 'solo', true);
+  set('da', 'INT3110_5', 1, 'work', 'Đã gửi đề cương');
+  set('tt', 'INT3110_4', 1, 'work', 'GV đã duyệt cơ sở'); set('tt', 'INT3110_4', 4, 'solo', true);
+  set('tt', 'INT3110_5', 2, 'work', 'GV đã duyệt cơ sở');
+})();
+
+/* ═════════ TRẠNG THÁI & TIỆN ÍCH ═════════ */
+const $ = id => document.getElementById(id);
+const pad2 = n => String(n).padStart(2, '0');
+let curDot = 'da', curLop = 'INT3110_4', curGroup = null, selTopic = null, selGv = null;
+const D = () => DOTS.find(d => d.id === curDot);
+const isTT = () => D().type === 'tt';
+const L = () => DATA[curDot][curLop];
+const svOf = c => L().sv.find(s => s.code === c);
+const isWork = c => !!svOf(c).work;
+const eligible = () => L().sv.filter(s => s.st === 'ok' && !s.work);   /* SV được đưa vào chia */
+const groupOf = no => L().groups.find(g => g.no === no);
+const locked = g => isTT() ? !!g.gv : !!g.topic;
+function inGroups(){ const set = new Set(); L().groups.forEach(g => g.m.forEach(c => set.add(c))); return set; }
+const unassigned = () => { const s = inGroups(); return eligible().filter(x => !s.has(x.code)); };
+function gvOfGroup(dot, g){ return DOTS.find(d => d.id === dot).type === 'tt' ? g.gv : (g.topic ? TOPICS.find(t => t.id === g.topic).gv : null); }
+function gvUsed(name){
+  let n = GV[name].base;
+  Object.values(DATA[curDot]).forEach(l => l.groups.forEach(g => { if (gvOfGroup(curDot, g) === name) n += g.m.length; }));
+  return n;
+}
+function topicAssigned(id){
+  let n = TOPICS.find(t => t.id === id).base;
+  Object.values(DATA[curDot]).forEach(l => l.groups.forEach(g => { if (g.topic === id) n += g.m.length; }));
+  return n;
+}
+/* Rải n SV vào các nhóm đang có counts: ưu tiên nhóm ít SV nhất, không vượt cap (nếu có) */
+function fill(counts, n, cap){
+  const total = counts.slice(), add = counts.map(() => 0);
+  let left = n;
+  while (left > 0) {
+    let best = -1;
+    total.forEach((x, i) => { if ((!cap || x < cap) && (best < 0 || x < total[best])) best = i; });
+    if (best < 0) break;
+    total[best]++; add[best]++; left--;
+  }
+  return {add, total, left};
+}
+
+/* Cảnh báo 1: SV đã khoá, không chọn vào nhóm được */
+const lockWhy = () => isTT() ? 'đã gửi đề cương hoặc đã được giảng viên duyệt cơ sở thực tập' : 'đã gửi đề cương';
+const withheld = () => L().sv.filter(s => s.st === 'ok' && s.work && !inGroups().has(s.code));
+function renderWork(){
+  const n = withheld().length;
+  const html = n ? `${n} sinh viên không có trong danh sách chia vì ${lockWhy()}. <a class="text-link" onclick="openWork()">Xem danh sách</a>` : '';
+  ['work-note', 'pk-work'].forEach(id => { $(id).style.display = n ? '' : 'none'; $(id).innerHTML = html; });
+}
+function openWork(){
+  $('mw-body').innerHTML = withheld().map(s => `<tr><td style="font-family:monospace">${s.code}</td><td>${s.name}</td><td>${s.work}</td></tr>`).join('');
+  openModal('m-work');
+}
+/* Cảnh báo 2: SV đã phân công riêng, vẫn cho chia nhưng hỏi trước */
+function askSolo(codes, run){
+  const solo = codes.filter(c => svOf(c).solo);
+  if (!solo.length) { run(); return; }
+  showConfirm('Sinh viên đã có phân công riêng', run, 'Tiếp tục');
+  $('conf-desc').textContent = `${solo.length} sinh viên bạn chọn đã có phân công riêng. Khi công bố, phân công cũ sẽ được thay bằng phân công của nhóm. Bạn có muốn tiếp tục?\n${solo.map(c => `${svOf(c).name} (${c})`).join(', ')}`;
+}
+/* Nhóm đã phân công chỉ nhận thêm SV khi đề tài và GVHD còn chỗ. from = nhóm đang chứa SV (khi chuyển) */
+function noSlot(g, from){
+  if (g.topic && !(from && from.topic === g.topic)) { const t = TOPICS.find(x => x.id === g.topic); if (topicAssigned(t.id) >= t.max) return `Đề tài ${t.id} đã đủ SV`; }
+  const gv = gvOfGroup(curDot, g);
+  if (gv && !(from && gvOfGroup(curDot, from) === gv) && gvUsed(gv) >= GV[gv].total) return `${gv} đã đạt giới hạn ${GV[gv].total} SV`;
+  return '';
+}
+
+/* ═════════ ĐỢT / LỚP HỌC PHẦN ═════════ */
+function init(){
+  $('f-dot').innerHTML = DOTS.map(d => `<option value="${d.id}">${d.name}</option>`).join('');
+  $('f-dot').value = curDot; fillLop(); render();
+}
+function fillLop(){
+  const lops = Object.keys(DATA[curDot]);
+  if (!lops.includes(curLop)) curLop = lops[0];
+  $('f-lop').innerHTML = lops.map(l => `<option ${l === curLop ? 'selected' : ''}>${l}</option>`).join('');
+}
+function onDot(){ curDot = $('f-dot').value; fillLop(); syncSplitValue(true); render(); }
+function onLop(){ curLop = $('f-lop').value; syncSplitValue(true); render(); }
+
+/* ═════════ CHIA NHÓM ═════════ */
+const openGroups = () => L().groups.filter(g => !locked(g)).sort((a, b) => a.no - b.no);
+/* SV còn chia được = SV đủ điều kiện không nằm trong nhóm đã phân công */
+function splitPool(){
+  const set = new Set();
+  L().groups.filter(locked).forEach(g => g.m.forEach(c => set.add(c)));
+  return eligible().filter(s => !set.has(s.code));
+}
+const splitMode = () => $('sp-mode').value;
+/* Ô nhập đi theo nhóm hiện có: thêm / xoá nhóm thì "Số nhóm" đổi theo */
+function syncSplitValue(reset){
+  const byGroups = splitMode() === 'groups';
+  const cur = byGroups ? L().groups.length : L().cap;
+  if (cur) $('sp-val').value = cur;
+  else if (reset) $('sp-val').value = byGroups ? 3 : 5;
+}
+function onSplitMode(){
+  $('sp-val-label').innerHTML = (splitMode() === 'size' ? 'Số SV tối đa' : 'Số nhóm') + '<span class="req">*</span>';
+  syncSplitValue(true); renderPreview();
+}
+/* Tên tiếng Việt: xếp theo TÊN (chữ cuối) rồi mới đến họ và đệm */
+const tenOf = n => n.trim().split(' ').pop();
+const byName = (a, b) => tenOf(a.name).localeCompare(tenOf(b.name), 'vi') || a.name.localeCompare(b.name, 'vi') || a.code.localeCompare(b.code);
+const byCode = (a, b) => a.code.localeCompare(b.code);
+function renderPreview(){
+  const box = $('sp-prev'), count = L().groups.length, done = L().groups.filter(locked).length;
+  const pool = eligible().length, v = parseInt($('sp-val').value, 10), size = splitMode() === 'size';
+  const note = done ? ` <span class="g-sub">${done} nhóm đã phân công cũng được chia lại và phải phân công lại.</span>` : '';
+  $('btn-split').textContent = count ? '🧩 Chia lại nhóm' : '🧩 Chia nhóm';
+  box.classList.remove('bad');
+  const same = count > 0 && (size ? v === L().cap : v === count);
+  box.style.display = same ? 'none' : '';
+  $('pl-prev').style.display = same ? '' : 'none';
+  if (same) return;
+  const bad = t => { box.classList.add('bad'); box.textContent = t; };
+  if (!pool) return bad('Không còn sinh viên nào để chia nhóm trong lớp này.');
+  if (!v || v < 1) return bad('Nhập số lớn hơn 0.');
+  if (!size && v > pool) return bad(`Số nhóm (${v}) lớn hơn số SV cần chia (${pool}).`);
+  const n = size ? Math.ceil(pool / v) : v;
+  const sizes = fill(Array(n).fill(0), pool, size ? v : 0).total.join(', ');
+  box.innerHTML = (count ? `Bấm "Chia lại nhóm" sẽ thay ${count} nhóm hiện tại bằng ` : 'Sẽ tạo ') + `<b>${n} nhóm</b> trống cho ${pool} SV, dự kiến sĩ số: ${sizes}.${note}`;
+}
+function doSplit(){
+  const l = L(), v = parseInt($('sp-val').value, 10), size = splitMode() === 'size', pool = eligible().length;
+  if (!pool) { showToast('Không còn sinh viên nào để chia nhóm', 'warn'); return; }
+  if (!v || v < 1) { showToast('Vui lòng nhập số lớn hơn 0', 'warn'); return; }
+  if (!size && v > pool) { showToast('Số nhóm không được lớn hơn số SV cần chia', 'warn'); return; }
+  const old = l.groups, kept = old.reduce((sum, g) => sum + g.m.filter(isWork).length, 0);
+  const placed = old.reduce((sum, g) => sum + g.m.length, 0) - kept;
+  const run = () => {
+    const n = size ? Math.ceil(pool / v) : v;
+    l.cap = size ? v : null;
+    l.groups = Array.from({length: n}, (_, i) => ({no: i + 1, m:[]}));
+    render(); showToast(`Đã chia lớp ${curLop} thành ${n} nhóm. Tiếp theo chọn cách xếp sinh viên vào nhóm.`);
+  };
+  if (!old.some(g => g.m.length || g.cs || locked(g))) { run(); return; }
+  const count = key => old.filter(g => g[key]).length;
+  const lost = (isTT() ? [['gv', 'GVHD'], ['cs', 'cơ sở thực tập']] : [['topic', 'đề tài và GVHD']])
+    .filter(([key]) => count(key)).map(([key, name]) => `${name} của ${count(key)} nhóm`);
+  showConfirm(`Chia lại nhóm của lớp ${curLop}?`, run, 'Chia lại', 'btn-danger');
+  $('conf-desc').textContent = `${old.length} nhóm hiện tại bị xoá, ${placed} SV quay về chưa vào nhóm.`
+    + (lost.length ? `\nMất ${lost.join(', ')}. Phải phân công lại.` : '')
+    + (kept ? `\n${kept} SV ${lockWhy()} rời nhóm nhưng giữ dữ liệu đã công bố.` : '')
+    + (old.some(g => g.synced) ? `\nDanh sách ở ${listName()} chỉ đổi khi bấm Lưu và công bố.` : '');
+}
+
+/* ═════════ XẾP SINH VIÊN VÀO NHÓM ═════════ */
+/* Tự chọn thì mở popup; xếp tự động: còn SV thì xếp phần còn lại, hết SV thì xếp lại */
+function onPlace(){
+  if ($('sp-method').value === 'pick') openPick(); else doPlace(!unassigned().length);
+}
+/* Xếp lại từ đầu: đưa hết SV ra khỏi các nhóm chưa phân công, nhóm vẫn giữ */
+function resetPlace(){
+  const open = openGroups(), n = open.reduce((sum, g) => sum + g.m.filter(c => !isWork(c)).length, 0);
+  showConfirm(`Xếp lại sinh viên của lớp ${curLop}?`, () => { open.forEach(g => g.m = g.m.filter(isWork)); render(); showToast(`Đã đưa ${n} SV ra khỏi nhóm. Chọn cách xếp rồi bấm nút xếp hoặc chọn sinh viên.`); }, 'Xếp lại', 'btn-danger');
+  $('conf-desc').textContent = `${n} sinh viên được đưa ra khỏi nhóm, các nhóm vẫn giữ.\nCác nhóm đã phân công giữ nguyên.`;
+}
+function renderPlace(){
+  const box = $('pl-prev'), open = openGroups(), un = unassigned().length, manual = $('sp-method').value === 'pick', cap = L().cap;
+  $('btn-place').textContent = manual ? '👆 Chọn sinh viên' : '👥 Xếp sinh viên';
+  $('btn-place').disabled = !open.length || !splitPool().length;
+  $('fi-replace').style.display = open.some(g => g.m.some(c => !isWork(c))) ? '' : 'none';
+  $('sp-method').disabled = !open.length;
+  box.classList.remove('bad');
+  if (!open.length) { box.textContent = L().groups.length ? 'Tất cả nhóm đã phân công. Muốn đổi thành viên thì bấm vào cột Thành viên của nhóm.' : ''; return; }
+  const empty = open.filter(g => !g.m.length).map(g => 'Nhóm ' + pad2(g.no)).join(', ');
+  if (manual) {
+    box.innerHTML = un ? `Bấm "Chọn sinh viên" để đưa SV vào từng nhóm. Còn <b>${un} SV</b> chưa vào nhóm.`
+      : 'Tất cả sinh viên đã vào nhóm.' + (empty ? ` <b>${empty}</b> đang trống: bấm "Chọn sinh viên" để chuyển SV sang.` : ' Muốn đổi thì bấm "Chọn sinh viên".');
+    return;
+  }
+  if (un) {
+    const plan = fill(open.map(g => g.m.length), un, cap);
+    box.innerHTML = `Còn <b>${un} SV</b> chưa vào nhóm. Sau khi xếp, ${open.length} nhóm có sĩ số: ${plan.total.join(', ')}.` + (plan.left ? ` <b>${plan.left} SV không xếp được</b> vì mỗi nhóm tối đa ${cap} SV, hãy thêm nhóm trống hoặc chia lại.` : '');
+    box.classList.toggle('bad', plan.left > 0);
+    return;
+  }
+  const now = open.map(g => g.m.length);
+  const all = fill(open.map(g => g.m.filter(isWork).length), splitPool().length, cap);
+  const redo = empty || Math.max(...now) - Math.min(...now) > 1;
+  box.innerHTML = `Tất cả sinh viên đã vào nhóm, sĩ số: ${now.join(', ')}.` + (empty ? ` <b>${empty}</b> đang trống.` : '')
+    + (redo ? ` Bấm "Xếp sinh viên" để chia đều lại thành: <b>${all.total.join(', ')}</b>.` : ' Muốn đổi cách xếp thì chọn lại rồi bấm "Xếp sinh viên".');
+}
+function doPlace(redo){
+  const l = L(), open = openGroups();
+  if (!open.length) { showToast('Chưa có nhóm nào nhận được sinh viên. Hãy chia nhóm trước.', 'warn'); return; }
+  const pool = redo ? splitPool() : unassigned();
+  if (!pool.length) { showToast('Không còn sinh viên nào chưa vào nhóm', 'warn'); return; }
+  const before = inGroups(), fresh = pool.filter(x => !before.has(x.code)).map(x => x.code);
+  const run = () => {
+    if (redo) open.forEach(g => g.m = g.m.filter(isWork));
+    const method = $('sp-method').value;
+    const list = pool.slice().sort(method === 'name' ? byName : byCode);
+    if (method === 'random') for (let i = list.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [list[i], list[j]] = [list[j], list[i]]; }
+    const plan = fill(open.map(g => g.m.length), list.length, l.cap);
+    let p = 0;
+    open.forEach((g, i) => { g.m = g.m.concat(list.slice(p, p + plan.add[i]).map(s => s.code)); p += plan.add[i]; if (method !== 'name') g.m.sort(); });
+    render();
+    if (plan.left) showToast(`Đã xếp ${p} SV. Còn ${plan.left} SV chưa xếp được vì mỗi nhóm tối đa ${l.cap} SV.`, 'warn');
+    else showToast(`Đã xếp ${p} SV vào ${open.length} nhóm`);
+  };
+  if (redo) {
+    showConfirm(`Xếp lại sinh viên của lớp ${curLop}?`, () => askSolo(fresh, run), 'Xếp lại');
+    $('conf-desc').textContent = 'Sinh viên trong các nhóm chưa phân công được xếp lại từ đầu, phần đã tự chọn hoặc chuyển tay sẽ mất.\nCác nhóm đã phân công giữ nguyên.';
+  } else askSolo(fresh, run);
+}
+/* ── Tự chọn: trái là SV chưa vào nhóm, phải là các nhóm; chỉ ghi khi bấm Lưu ── */
+let pickMap = new Map(), pickTicks = new Set(), pickOpen = null, pickLast = null;   /* pickMap: mã SV → số nhóm (bản nháp) */
+function openPick(no){
+  const targets = openGroups();
+  if (!targets.length) { showToast('Chưa có nhóm nào nhận được sinh viên. Hãy chia nhóm trước.', 'warn'); return; }
+  pickMap = new Map();
+  targets.forEach(g => g.m.forEach(c => pickMap.set(c, g.no)));
+  pickTicks = new Set(); pickLast = null;
+  pickOpen = targets.some(g => g.no === no) ? no : null;
+  const cap = L().cap;
+  $('pk-title').textContent = `Chọn sinh viên vào nhóm — ${curLop}`;
+  $('pk-q').value = ''; $('pk-qg').value = ''; $('pk-sort').value = 'order'; $('pk-only').checked = false;
+  $('pk-only-wrap').style.display = cap ? '' : 'none';
+  $('pk-n').value = cap || Math.max(1, Math.ceil(splitPool().length / targets.length));
+  $('pk-left').scrollTop = 0; $('pk-right').scrollTop = 0;
+  renderPick(); openModal('m-pick');
+}
+const pickSize = no => [...pickMap.values()].filter(v => v === no).length;
+const pickHit = (s, q) => !q || (s.code + ' ' + s.name).toLowerCase().includes(q);
+function pickFree(){
+  const q = $('pk-q').value.trim().toLowerCase();
+  return splitPool().filter(s => !pickMap.has(s.code) && pickHit(s, q)).sort($('pk-sort').value === 'name' ? byName : byCode);
+}
+function renderPick(){
+  const cap = L().cap, targets = openGroups(), pool = splitPool();
+  const left = $('pk-left'), right = $('pk-right'), leftTop = left.scrollTop, rightTop = right.scrollTop;
+  const inner = right.querySelector('.pk-mems'), innerTop = inner ? inner.scrollTop : 0;
+  const free = pool.filter(s => !pickMap.has(s.code)).length;
+  $('pk-free').textContent = `Chưa vào nhóm (${free})`;
+  left.innerHTML = pickFree().map(s => `<label class="pk-row${pickTicks.has(s.code) ? ' on' : ''}"><input type="checkbox" ${pickTicks.has(s.code) ? 'checked' : ''} onclick="pickTick(event,'${s.code}')"><span class="g-sub">${s.code}</span>${s.name}</label>`).join('')
+    || '<div class="pk-empty">Không còn sinh viên.</div>';
+  const qg = $('pk-qg').value.trim().toLowerCase(), only = cap && $('pk-only').checked;
+  $('pk-groups').textContent = `Các nhóm (${targets.length})`;
+  const cards = targets.map(g => ({no: g.no, n: pickSize(g.no), mems: L().sv.filter(s => pickMap.get(s.code) === g.no && pickHit(s, qg))}))
+    .filter(c => (!only || c.n < cap) && (!qg || c.mems.length));
+  right.innerHTML = cards.map(c => {
+    const show = qg ? true : pickOpen === c.no;
+    return `<div class="pk-card"><div class="pk-card-hd" onclick="pickToggle(${c.no})"><span class="${cap && c.n > cap ? 'pk-over' : ''}">${show ? '▾' : '▸'} Nhóm ${pad2(c.no)} · ${c.n}${cap ? '/' + cap : ''} SV</span><button class="btn btn-primary btn-sm" ${pickTicks.size ? '' : 'disabled'} onclick="event.stopPropagation();pickGive(${c.no})">Đưa ${pickTicks.size || ''} SV vào</button></div>`
+      + (show ? '<div class="pk-mems">' + (c.mems.map(s => `<div class="pk-mem"><span><span class="g-sub">${s.code}</span>&nbsp; ${s.name}</span>${s.work ? `<span class="g-sub">${s.work}</span>` : `<button class="pk-x" title="Gỡ khỏi nhóm" onclick="pickRemove('${s.code}')">✕</button>`}</div>`).join('') || '<div class="pk-empty">Chưa có sinh viên.</div>') + '</div>' : '')
+      + '</div>';
+  }).join('') || `<div class="pk-empty">${qg ? 'Không nhóm nào có sinh viên này.' : 'Các nhóm đã đủ.'}</div>`;
+  left.scrollTop = leftTop; right.scrollTop = rightTop;
+  const now = right.querySelector('.pk-mems'); if (now) now.scrollTop = innerTop;
+  $('pk-count').textContent = `Còn ${free} / ${pool.length} SV chưa vào nhóm`;
+}
+function pickToggle(no){
+  pickOpen = pickOpen === no ? null : no;
+  const mems = $('pk-right').querySelector('.pk-mems'); if (mems) mems.scrollTop = 0;
+  renderPick();
+}
+function pickFirst(){ pickTicks = new Set(pickFree().slice(0, parseInt($('pk-n').value, 10) || 0).map(s => s.code)); renderPick(); }
+/* Giữ Shift để tick cả một đoạn */
+function pickTick(e, code){
+  const on = e.target.checked, list = pickFree().map(s => s.code), a = list.indexOf(pickLast), b = list.indexOf(code);
+  (e.shiftKey && a >= 0 ? list.slice(Math.min(a, b), Math.max(a, b) + 1) : [code]).forEach(c => on ? pickTicks.add(c) : pickTicks.delete(c));
+  pickLast = code; renderPick();
+}
+function pickGive(no){ pickTicks.forEach(c => pickMap.set(c, no)); pickTicks = new Set(); pickLast = null; renderPick(); }
+function pickRemove(code){ pickMap.delete(code); renderPick(); }
+function savePick(){
+  const before = inGroups(), fresh = [...pickMap.keys()].filter(c => !before.has(c));
+  askSolo(fresh, () => {
+    openGroups().forEach(g => g.m = [...pickMap].filter(([, no]) => no === g.no).map(([c]) => c).sort());
+    closeModal('m-pick'); render(); showToast('Đã lưu danh sách sinh viên của các nhóm');
+  });
+}
+
+function addEmpty(){
+  const l = L(); const no = l.groups.reduce((m, g) => Math.max(m, g.no), 0) + 1;
+  l.groups.push({no, m:[]}); render(); showToast(`Đã thêm Nhóm ${pad2(no)} (trống)`);
+}
+function dissolve(no){
+  const g = groupOf(no);
+  showConfirm(`Xoá Nhóm ${pad2(no)}?`, () => { L().groups = L().groups.filter(x => x.no !== no); render(); showToast('Đã xoá nhóm. SV quay về danh sách chưa vào nhóm.'); }, 'Xoá nhóm', 'btn-danger');
+  $('conf-desc').textContent = g.m.length ? g.m.length + ' SV trong nhóm quay về danh sách chưa vào nhóm.' + (g.cs ? ' Cơ sở thực tập của nhóm sẽ mất.' : '') : '';
+}
+
+/* ═════════ THÀNH VIÊN ═════════ */
+function openMembers(no){ curGroup = no; renderMembers(); openModal('m-members'); }
+function renderMembers(){
+  const g = groupOf(curGroup), lock = locked(g), pool = unassigned();
+  const others = L().groups.filter(x => x.no !== g.no).sort((a, b) => a.no - b.no);
+  $('mm-title').textContent = `Nhóm ${pad2(g.no)} — ${curLop} — ${g.m.length} SV`;
+  let h = `<table class="tbl"><thead><tr><th style="width:40px">STT</th><th style="width:130px">Mã SV</th><th>Họ và tên</th><th style="width:190px">Chuyển sang nhóm</th><th style="width:80px"></th></tr></thead><tbody>`;
+  h += g.m.length ? g.m.map((c, i) => `<tr><td>${i+1}</td><td style="font-family:monospace">${c}</td><td>${svOf(c).name}</td>` + (isWork(c)
+    ? `<td colspan="2"><span class="g-sub">${svOf(c).work}, không đổi được</span></td>`
+    : `<td><select class="fc" style="font-size:12px" onchange="mvMove('${c}',this.value)"><option value="">— Giữ nguyên —</option>${others.map(o => `<option value="${o.no}">Nhóm ${pad2(o.no)} (${o.m.length} SV)</option>`).join('')}</select></td><td><button class="btn btn-danger btn-sm" onclick="mvRemove('${c}')">Gỡ</button></td>`) + '</tr>').join('')
+    : '<tr><td colspan="5" class="tbl-empty" style="padding:20px">Nhóm chưa có sinh viên.</td></tr>';
+  h += '</tbody></table><div class="divider"></div>';
+  if (lock) {
+    const full = noSlot(g);
+    h += `<div class="fi" style="margin:0"><label>Thêm sinh viên</label><select class="fc" style="width:340px" ${full || !pool.length ? 'disabled' : ''} onchange="mvAdd(this.value)"><option value="">— Chọn trong ${pool.length} SV chưa vào nhóm —</option>${pool.map(x => `<option value="${x.code}">${x.code} — ${x.name}</option>`).join('')}</select>${full ? `<div class="g-sub">${full}, không thêm được.</div>` : ''}</div>`;
+  } else h += `<button class="btn btn-default" ${pool.length ? '' : 'disabled'} onclick="closeModal('m-members');render();openPick(${g.no})">＋ Chọn thêm sinh viên (${pool.length} SV chưa vào nhóm)</button>`;
+  $('mm-body').innerHTML = h;
+}
+function mvMove(c, no){
+  if (!no || isWork(c)) return;
+  const g = groupOf(curGroup), t = groupOf(parseInt(no, 10)), full = locked(t) ? noSlot(t, g) : '';
+  if (full) { showToast(full, 'warn'); renderMembers(); return; }
+  g.m = g.m.filter(x => x !== c); t.m.push(c); t.m.sort(); renderMembers(); showToast('Đã chuyển sinh viên sang nhóm khác');
+}
+function mvRemove(c){ if (isWork(c)) return; const g = groupOf(curGroup); g.m = g.m.filter(x => x !== c); renderMembers(); showToast('Đã gỡ sinh viên khỏi nhóm', 'warn'); }
+function mvAdd(c){
+  if (!c) return;
+  const g = groupOf(curGroup), full = noSlot(g);
+  if (full) { showToast(full, 'warn'); return; }
+  askSolo([c], () => { g.m.push(c); g.m.sort(); renderMembers(); showToast('Đã thêm sinh viên vào nhóm'); });
+  renderMembers();
+}
+
+/* ═════════ ĐỀ TÀI (đồ án / khoá luận) ═════════ */
+function openTopic(no){
+  const g = groupOf(no); if (!g.m.length) { showToast('Nhóm chưa có sinh viên', 'warn'); return; }
+  curGroup = no; selTopic = g.topic || null;
+  $('mt-title').textContent = `Phân công đề tài cho Nhóm ${pad2(no)} (${g.m.length} SV)`;
+  $('mt-info').innerHTML = `Cả nhóm <b>${g.m.length} SV</b> làm chung một đề tài. Đề tài chỉ chọn được khi <b>số chỗ còn lại ≥ ${g.m.length}</b> và GVHD của đề tài còn đủ chỉ tiêu. GVHD tự theo đề tài.`;
+  renderTopics(); openModal('m-topic');
+}
+function topicInfo(t, g){
+  const sz = g.m.length, cur = g.topic === t.id;
+  const assigned = topicAssigned(t.id) - (cur ? sz : 0), left = t.max - assigned;
+  const gvCur = g.topic && TOPICS.find(x => x.id === g.topic).gv === t.gv;
+  const gvu = gvUsed(t.gv) - (gvCur ? sz : 0), gvLeft = GV[t.gv].total - gvu;
+  let st = 'ok', tag;
+  if (left <= 0) { st = 'block'; tag = '<span class="tag tag-error">Đề tài đã đủ SV</span>'; }
+  else if (left < sz) { st = 'block'; tag = `<span class="tag tag-error">Không đủ chỗ cho ${sz} SV (còn ${left})</span>`; }
+  else if (gvLeft <= 0) { st = 'block'; tag = `<span class="tag tag-error">${t.gv} đã đạt giới hạn ${GV[t.gv].total} SV</span>`; }
+  else if (gvLeft < sz) { st = 'block'; tag = `<span class="tag tag-error">GVHD chỉ còn ${gvLeft} chỗ, không đủ cho ${sz} SV</span>`; }
+  else tag = `<span class="tag tag-success">Chọn được (còn ${left} chỗ)</span>`;
+  return {assigned, left, gvu, gvLeft, st, tag};
+}
+function renderTopics(){
+  const g = groupOf(curGroup);
+  $('mt-body').innerHTML = TOPICS.map(t => {
+    const i = topicInfo(t, g), dis = i.st === 'block';
+    return `<tr class="${dis ? 'row-dis' : ''}${selTopic === t.id ? ' sel-row' : ''}"><td style="text-align:center"><input type="radio" name="tp" ${dis ? 'disabled' : ''} ${selTopic === t.id ? 'checked' : ''} onchange="pickTopic('${t.id}')"></td>
+      <td><b>${t.id}</b></td><td>${t.name}</td><td>${t.gv}</td><td style="text-align:center">${i.assigned} / ${t.max}</td><td style="text-align:center">${i.gvu} / ${GV[t.gv].total}</td><td>${i.tag}</td></tr>`;
+  }).join('');
+  const box = $('mt-prev'), btn = $('mt-save');
+  if (!selTopic) { box.style.display = 'none'; btn.disabled = true; return; }
+  const t = TOPICS.find(x => x.id === selTopic), i = topicInfo(t, g);
+  btn.disabled = i.st === 'block'; box.style.display = 'block';
+  box.innerHTML = `<b>Sau khi lưu:</b> Nhóm ${pad2(g.no)} (${g.m.length} SV) làm đề tài <b>${t.id}</b>. GVHD <b>${t.gv}</b> tự áp dụng cho cả nhóm. Số SV của đề tài: ${i.assigned} → ${i.assigned + g.m.length} / ${t.max}. Chỉ tiêu GVHD: ${i.gvu} → ${i.gvu + g.m.length} / ${GV[t.gv].total}.`;
+}
+function pickTopic(id){ selTopic = id; renderTopics(); }
+function saveTopic(){
+  const g = groupOf(curGroup), t = TOPICS.find(x => x.id === selTopic);
+  if (topicInfo(t, g).st === 'block') { showToast('Đề tài không còn đủ chỗ hoặc GVHD không đủ chỉ tiêu cho cả nhóm', 'warn'); return; }
+  askSolo(g.m, () => {
+    g.topic = selTopic; closeModal('m-topic'); render();
+    showToast(`Đã gán đề tài ${t.id}. GVHD ${t.gv} áp dụng cho ${g.m.length} SV.`);
+  });
+}
+
+/* ═════════ GVHD (thực tập) ═════════ */
+function openGv(no){
+  const g = groupOf(no); if (!g.m.length) { showToast('Nhóm chưa có sinh viên', 'warn'); return; }
+  curGroup = no; selGv = g.gv || null;
+  $('mg-title').textContent = `Phân công GVHD cho Nhóm ${pad2(no)} (${g.m.length} SV)`;
+  $('mg-info').innerHTML = `Cả nhóm <b>${g.m.length} SV</b> do cùng một GVHD hướng dẫn. Chỉ chọn được GVHD còn đủ <b>${g.m.length}</b> chỗ trong chỉ tiêu.`;
+  renderGvs(); openModal('m-gv');
+}
+function gvInfo(name, g){
+  const sz = g.m.length, used = gvUsed(name) - (g.gv === name ? sz : 0), left = GV[name].total - used;
+  const st = left <= 0 ? 'block' : left < sz ? 'block' : 'ok';
+  const tag = left <= 0 ? `<span class="tag tag-error">${name} đã đạt giới hạn ${GV[name].total} SV</span>` : left < sz ? `<span class="tag tag-error">Chỉ còn ${left} chỗ, không đủ cho ${sz} SV</span>` : `<span class="tag tag-success">Chọn được (còn ${left} chỗ)</span>`;
+  return {used, left, st, tag};
+}
+function renderGvs(){
+  const g = groupOf(curGroup);
+  $('mg-body').innerHTML = Object.keys(GV).map(n => {
+    const i = gvInfo(n, g), dis = i.st === 'block';
+    return `<tr class="${dis ? 'row-dis' : ''}${selGv === n ? ' sel-row' : ''}"><td style="text-align:center"><input type="radio" name="gv" ${dis ? 'disabled' : ''} ${selGv === n ? 'checked' : ''} onchange="pickGv('${n}')"></td><td><b>${n}</b></td><td style="font-size:12px">${GV[n].donVi}</td><td style="text-align:center">${i.used} / ${GV[n].total}</td><td>${i.tag}</td></tr>`;
+  }).join('');
+  $('mg-save').disabled = !selGv || gvInfo(selGv, g).st === 'block';
+}
+function pickGv(n){ selGv = n; renderGvs(); }
+function saveGv(){ const g = groupOf(curGroup); if (gvInfo(selGv, g).st === 'block') { showToast('GVHD không đủ chỉ tiêu cho cả nhóm', 'warn'); return; } askSolo(g.m, () => { g.gv = selGv; closeModal('m-gv'); render(); showToast(`Đã phân công ${selGv} cho ${g.m.length} SV của Nhóm ${pad2(g.no)}`); }); }
+
+/* ═════════ CƠ SỞ THỰC TẬP (thực tập) ═════════ */
+function openCs(no){
+  const g = groupOf(no); if (!g.m.length) { showToast('Nhóm chưa có sinh viên', 'warn'); return; }
+  curGroup = no;
+  $('mc-title').textContent = `Phân cơ sở thực tập cho Nhóm ${pad2(no)} (${g.m.length} SV)`;
+  $('mc-info').innerHTML = `Cả nhóm <b>${g.m.length} SV</b> đi cùng một cơ sở, không giới hạn số SV nhận. Danh mục doanh nghiệp đối tác dùng chung với TTTN.`;
+  $('cs-dn').innerHTML = '<option value="">-- Chọn doanh nghiệp từ danh mục --</option>' + DN.map(d => `<option value="${d.id}">${d.name}</option>`).join('');
+  ['cs-k-ten','cs-k-tinh','cs-k-phuong','cs-k-addr','cs-k-contact'].forEach(i => $(i).value = '');
+  document.querySelectorAll('#m-cs .fi.err').forEach(e => e.classList.remove('err')); $('cs-dn-err').style.display = 'none';
+  document.querySelector('input[name="cs-loai"][value="dt"]').checked = true;
+  const c = g.cs; if (c && c.loai === 'dt') { const d = DN.find(x => x.name === c.name); if (d) $('cs-dn').value = d.id; }
+  onCsLoai(); onDn(); openModal('m-cs');
+}
+function onCsLoai(){ const k = document.querySelector('input[name="cs-loai"]:checked').value === 'khac'; $('cs-dt').style.display = k ? 'none' : 'block'; $('cs-khac').style.display = k ? 'block' : 'none'; }
+function onDn(){
+  const d = DN.find(x => x.id === $('cs-dn').value);
+  $('cs-tinh').value = d ? d.tinh : ''; $('cs-phuong').value = d ? d.phuong : ''; $('cs-addr').value = d ? d.addr : ''; $('cs-contact').value = d ? d.contact : '';
+  $('cs-dn-err').style.display = 'none';
+}
+function saveCs(){
+  const g = groupOf(curGroup), khac = document.querySelector('input[name="cs-loai"]:checked').value === 'khac';
+  let cs;
+  if (!khac) {
+    const d = DN.find(x => x.id === $('cs-dn').value); if (!d) { $('cs-dn-err').style.display = 'block'; return; }
+    cs = {loai:'dt', name:d.name, addr:`${d.addr}, ${d.phuong}, ${d.tinh}`};
+  } else {
+    let ok = true;
+    [['cs-k-ten','fi-kten'],['cs-k-tinh','fi-ktinh'],['cs-k-phuong','fi-kphuong']].forEach(([i, f]) => { const bad = !$(i).value.trim(); $(f).classList.toggle('err', bad); if (bad) ok = false; });
+    if (!ok) return;
+    cs = {loai:'khac', name:$('cs-k-ten').value.trim(), addr:[$('cs-k-addr').value.trim(), $('cs-k-phuong').value.trim(), $('cs-k-tinh').value.trim()].filter(Boolean).join(', ')};
+  }
+  askSolo(g.m, () => { g.cs = cs; closeModal('m-cs'); render(); showToast(`Đã phân cơ sở thực tập cho ${g.m.length} SV của Nhóm ${pad2(g.no)}`); });
+}
+
+/* ═════════ LƯU VÀ CÔNG BỐ SANG DANH SÁCH ═════════ */
+const snap = g => JSON.stringify([g.m.slice().sort(), g.topic || null, g.gv || null, g.cs || null]);
+const listName = () => isTT() ? 'Quản lý thực tập tốt nghiệp' : 'Quản lý ĐATN & KLTN';
+const ready = g => g.m.length > 0 && !!(g.topic || g.gv || g.cs);   /* có dữ liệu gì thì công bố dữ liệu đó */
+function pushList(){
+  const l = L(), todo = l.groups.filter(g => ready(g) && g.synced !== snap(g));
+  if (!todo.length) { showToast(l.groups.some(ready) ? 'Không có thay đổi mới để công bố' : `Chưa có nhóm nào được phân công ${isTT() ? 'GVHD hoặc cơ sở thực tập' : 'đề tài'}`, 'warn'); return; }
+  const kept = todo.reduce((n, g) => n + g.m.filter(isWork).length, 0);
+  const sv = todo.reduce((n, g) => n + g.m.length, 0) - kept, skip = l.groups.filter(g => !ready(g)).length, un = unassigned().length;
+  const rest = [skip ? `${skip} nhóm chưa phân công` : '', un ? `${un} SV chưa vào nhóm` : ''].filter(Boolean).join(', ');
+  showConfirm(`Lưu và công bố lớp ${curLop}?`, () => { todo.forEach(g => { g.m.forEach(c => { if (!isWork(c)) delete svOf(c).solo; }); g.synced = snap(g); }); render(); showToast(`Đã lưu và công bố ${sv} SV sang ${listName()}`); }, 'Lưu và công bố');
+  $('conf-desc').textContent = `${todo.length} nhóm, ${sv} SV được công bố sang ${listName()}.` + (kept ? `\n${kept} SV ${lockWhy()} giữ nguyên phân công cũ.` : '') + (rest ? `\nChưa công bố: ${rest}.` : '');
+}
+
+/* ═════════ HIỂN THỊ ═════════ */
+function render(){
+  const d = D(), l = L(), tt = isTT();
+  $('f-loai').value = d.label;
+  $('dot-note').innerHTML = `<span class="alert-ico">ℹ️</span><div class="alert-body"><div class="alert-desc">${tt
+    ? 'Đợt <b>thực tập</b>: chia nhóm, phân <b>GVHD</b> và <b>cơ sở thực tập</b> cho cả nhóm. Điểm chấm vẫn riêng từng sinh viên.'
+    : 'Đợt <b>' + d.label.toLowerCase() + '</b>: chia nhóm, chọn <b>đề tài</b> cho cả nhóm. GVHD tự theo đề tài, không có cơ sở thực tập. Điểm chấm vẫn riêng từng sinh viên.'}</div></div>`;
+  const el = l.sv.filter(x => x.st === 'ok'), set = inGroups(), g = l.groups;
+  const done = g.filter(locked).length, un = unassigned().length;
+  $('stats').innerHTML = `<div class="mini"><b>${l.sv.length}</b><span>SV trong lớp học phần</span></div>
+    <div class="mini"><b>${el.length}</b><span>SV đủ điều kiện</span></div>
+    <div class="mini"><b>${set.size}</b><span>Đã vào nhóm</span></div>
+    <div class="mini"><b style="${un ? 'color:#d46b08' : ''}">${un}</b><span>Chưa vào nhóm</span></div>
+    <div class="mini"><b>${g.length}</b><span>Số nhóm (${done} đã ${tt ? 'có GVHD' : 'có đề tài'})</span></div>`;
+  syncSplitValue(false); renderPlace(); renderPreview(); renderWork();
+  $('grp-title').textContent = tt ? 'Phân công GVHD và cơ sở thực tập cho nhóm' : 'Phân công đề tài cho nhóm';
+  $('grp-warn').innerHTML = g.length && un ? `<div class="alert alert-warning"><span class="alert-ico">⚠️</span><div class="alert-body"><div class="alert-desc">Còn <b>${un} SV đủ điều kiện chưa vào nhóm</b>. Xếp ở Bước 1, hoặc bấm vào cột Thành viên của một nhóm để thêm.</div></div></div>` : '';
+  $('grp-head').innerHTML = `<tr><th style="width:90px">Nhóm</th><th style="width:60px;text-align:center">Số SV</th><th style="min-width:200px">Thành viên</th>`
+    + (tt ? '<th style="min-width:170px">GVHD</th><th style="min-width:230px">Cơ sở thực tập</th>' : '<th style="min-width:260px">Đề tài</th><th style="min-width:160px">GVHD</th>')
+    + `<th style="width:${tt ? 130 : 90}px;text-align:center">Hành động</th></tr>`;
+  $('grp-info').textContent = `${g.length} nhóm`;
+  $('btn-push').title = 'Công bố sang ' + listName();
+  $('grp-body').innerHTML = g.length ? g.slice().sort((a, b) => a.no - b.no).map(x => {
+    const names = x.m.map(c => svOf(c).name);
+    const mem = x.m.length ? `<a class="text-link" onclick="openMembers(${x.no})">${names.slice(0,2).join(', ')}${names.length > 2 ? ` <span class="tag tag-default">+${names.length-2}</span>` : ''}</a>` : `<a class="text-link" onclick="${locked(x) ? 'openMembers' : 'openPick'}(${x.no})">＋ Chọn sinh viên</a>`;
+    let mid, acts;
+    if (tt) {
+      const gv = x.gv ? x.gv : '<span class="g-miss">Chưa phân công</span>';
+      const cs = x.cs ? `${x.cs.name}${x.cs.loai === 'khac' ? ' <span class="tag tag-default">Khác</span>' : ''}` : '<span class="g-miss">Chưa phân</span>';
+      mid = `<td class="top">${gv}</td><td class="top">${cs}</td>`;
+      acts = `<button class="icon-btn" title="${x.gv ? 'Đổi GVHD cho cả nhóm' : 'Phân công GVHD cho cả nhóm'}" ${x.m.length ? '' : 'disabled'} onclick="openGv(${x.no})">👨‍🏫</button><button class="icon-btn" title="${x.cs ? 'Đổi cơ sở thực tập cho cả nhóm' : 'Phân cơ sở thực tập cho cả nhóm'}" ${x.m.length ? '' : 'disabled'} onclick="openCs(${x.no})">🏢</button>`;
+    } else {
+      const t = x.topic ? TOPICS.find(z => z.id === x.topic) : null;
+      mid = `<td class="top">${t ? `<b>${t.id}</b> — ${t.name}` : '<span class="g-miss">Chưa gán</span>'}</td>`
+        + `<td class="top">${t ? t.gv : '<span class="g-sub">—</span>'}</td>`;
+      acts = `<button class="icon-btn" title="${t ? 'Đổi đề tài cho cả nhóm' : 'Phân công đề tài cho cả nhóm'}" ${x.m.length ? '' : 'disabled'} onclick="openTopic(${x.no})">📋</button>`;
+    }
+    return `<tr><td class="top" style="font-weight:600">Nhóm ${pad2(x.no)}</td><td class="top" style="text-align:center">${x.m.length}</td><td class="top">${mem}</td>${mid}
+      <td class="top"><div class="tbl-actions" style="justify-content:center">${acts}<button class="icon-btn danger" title="${locked(x) ? 'Nhóm đã phân công. Muốn bỏ thì bấm Chia lại nhóm' : x.synced ? 'Nhóm đã công bố, không xoá được' : 'Xoá nhóm'}" ${locked(x) || x.synced ? 'disabled' : ''} onclick="dissolve(${x.no})">🗑️</button></div></td></tr>`;
+  }).join('') : '<tr><td colspan="6" class="tbl-empty">Chưa có nhóm nào. Chia nhóm ở Bước 1.</td></tr>';
+}
+/* Popup chọn sinh viên: bấm ra ngoài không đóng, tránh mất phần đã tick */
+$('m-pick').addEventListener('click', e => { if (e.target === e.currentTarget) e.stopPropagation(); });
+init();
+</script>
+</body>
+</html>
